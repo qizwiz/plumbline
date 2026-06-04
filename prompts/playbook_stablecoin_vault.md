@@ -63,6 +63,26 @@ c.mint(a);
 assert(dreUSD.totalSupply() <= usdc.balanceOf(address(c)) /*+ other tracked backing*/);
 ```
 
+## Pre-contest study (the 4 days) — pattern-load on the real class
+
+dreUSD's own docs aren't public (drefinance → "Rezerve", a different protocol); architecture arrives
+with the code Jun 8. So study the CLASS until you recognize it on sight.
+
+**Best primers (read these first):**
+- Zellic — "Exploring ERC-4626: A Security Primer" (zellic.io/blog) — the single best overview.
+- Arbitrary Execution — "Vulnerabilities of ERC-4626 Vaults, Part 2" (arbitraryexecution.com/blog).
+- RivaNorth — "ERC-4626 Vulnerabilities and How to Avoid Them" (checklist style).
+
+**Real findings to internalize (pattern → lesson):**
+- **DECIMALS** — code-423n4/2024-04-noya #1438: TVL recorded at 18 decimals not scaled to USDC's 6 →
+  off by 1e12 → accounting broken. *Lesson:* trace EVERY scale between USDC(6) and dreUSD/shares(18).
+- **ROUNDING DIRECTION** — code-423n4/2022-11-redactedcartel #197: `previewWithdraw` must round UP, but
+  it called `convertToShares` (rounds down) → returns too-low → value leaks to the user. *Lesson:*
+  verify every preview*/convert* rounds in the PROTOCOL's favor, both directions.
+- **INFLATION / donation** — sherlock 2024-01-napier #125, pareto #72, smilee #22: first-depositor
+  donates to inflate share price; later deposits round to 0 shares. *Lesson:* prove the mitigation
+  (virtual/dead shares) exists AND is sized to defeat a realistic donation.
+
 ## Day-1 procedure (Jun 8)
 1. Clone the published scope; identify the vault, the stablecoin, the mint/redeem, the rewards module.
 2. Feed this playbook to the adaptive planner as `context`; run `pact_check` on each in-scope contract
