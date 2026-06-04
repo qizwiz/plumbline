@@ -24,6 +24,19 @@ Agents take the rule-bound load; a verified layer governs them; humans handle on
 person. That is an AI-native operating model with governance baked into the architecture, not painted
 on top.
 
+## Governance as the harness, not a feature
+
+Governance, compliance, and safety belong in the framework everything is built on — *auditable,
+defensible, safe by design* — not bolted on as a later layer. Plumbline takes that literally:
+
+- **Safe by design** = the trust kernel's soundness is a **machine-checked Lean 4 proof**, not an
+  assertion. The agent cannot weaken it.
+- **Auditable & defensible** = a proof is the strongest audit artifact there is. The basis for a
+  finding is a derivation you can hand a regulator or an investigator — not "the model said so."
+
+AI can write the code and propose the answers. It cannot build *this* — the verified foundation that
+decides whether the whole system is worth trusting. That foundation is still human work.
+
 ## Proven on financial correctness
 
 The working demonstration is smart-contract money-safety. Plumbline autonomously finds where value
