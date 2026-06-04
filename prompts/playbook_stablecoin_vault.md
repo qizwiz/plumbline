@@ -6,6 +6,25 @@ mint/redemption, rewards distribution, and a LayerZero OFT cross-chain adapter. 
 fed to the adaptive planner as `context`. Each item = the invariant that must hold + the attack that
 breaks it. ★ = plumbline's sweet spot (conservation/solvency, auto-checkable); ☉ = manual-heavy.
 
+## CONFIRMED protocol model (dre.mortgage, from their site + scope)
+
+dreUSD = USD stablecoin (1:1 USDC, backed by REAL-ESTATE CREDIT / RWA). dreUSDs = ERC-4626 vault you
+stake dreUSD into to earn the yield — "REAL YIELD. PAID DAILY." Structurally an sDAI / Ethena-sUSDe
+yield-vault. Backing is OFF-CHAIN RWA → its onchain value is likely admin-attested (a trust
+assumption to note, AND a manipulation surface to probe).
+
+**SHARPENED PRIORITY for THIS protocol (hunt in this order):**
+0. **★★ JIT YIELD SNIPING (the headline risk for a "paid daily" vault):** if the daily reward hits the
+   vault as an INSTANT LUMP (raises share price in one tx), an attacker deposits right before it,
+   captures yield long-term stakers earned, and withdraws. Find HOW rewards are injected: instant lump
+   = finding (Medium/High); streamed/vested over time = mitigated. Plumbline test: deposit → inject
+   reward → redeem → profit? = value-creation invariant broken.
+1. DECIMALS (USDC 6 vs dreUSD/shares 18) — §2, highest-frequency.
+2. ERC-4626 inflation/donation — §1.
+3. Rewards-distribution accounting (the daily accrual math) — §3.
+4. Mint/redeem 1:1 + backing solvency, and the RWA attestation/oracle trust surface — §2.
+5. LayerZero OFT cross-chain supply conservation — §4 (manual).
+
 ## 1. ERC-4626 vault (the share token)  ★
 - **No value creation (round-trip):** `redeem(deposit(a)) <= a`. Break: rounding in the user's favor.
 - **Solvency:** shares issued never exceed backing — `convertToAssets(totalSupply) <= totalAssets()`.
