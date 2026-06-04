@@ -1,0 +1,4 @@
+anthropic
+z3-solver
+halmos
+python-dotenv

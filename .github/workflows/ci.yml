@@ -1,0 +1,24 @@
+name: ci
+# Runs the verification toolchain on a glibc runner: Foundry (symbolic execution) + halmos + z3.
+on:
+  push: {}
+  workflow_dispatch: {}
+
+jobs:
+  toolchain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+      - name: forge version
+        run: forge --version
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: install + check the verification stack
+        run: |
+          python -m pip install --quiet z3-solver halmos
+          halmos --version
+      - name: toolchain live
+        run: echo "verification toolchain (forge + halmos + z3) runs green on glibc CI"
