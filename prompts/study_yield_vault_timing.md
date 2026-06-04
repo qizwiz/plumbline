@@ -51,6 +51,38 @@ Medium/High right there.
 - **MakerDAO sDAI / DSR `Pot`** — `chi`/`dsr`/`drip` continuous per-second accrual (the no-lump approach).
 - **OpenZeppelin `ERC4626`** — base + virtual-shares inflation mitigation.
 
+## Plumbline JIT test (parameterized — fill the real names Jun 8, then run)
+
+The JIT bug IS a value-creation invariant break, so plumbline can test it autonomously. Replace the
+`/*FILL*/` names with dreUSDs' real functions once the code drops; the concrete-replay validator then
+confirms any "profit" is real (not a halmos nonlinear artifact).
+
+```solidity
+// JIT yield-sniping test: can an attacker deposit, capture an instant yield drop, and exit at a profit?
+// c = dreUSDs vault; dre = dreUSD stablecoin; both funded to address(this) by the scaffold.
+function check_inv(uint256 a, uint256 y) public {
+    require(a > 0 && a <= 1e24);
+    require(y > 0 && y <= 1e24);
+
+    // (optional) a pre-existing long-term staker so JIT steals from someone:
+    // c./*deposit*/(seed, address(0xBEEF));
+
+    uint256 sh   = c./*deposit*/(a, address(this));   // attacker stakes RIGHT BEFORE the yield drop
+    dre./*transfer or yield-inject*/(address(c), y);   // the daily yield hits the vault as a lump
+    uint256 out  = c./*redeem*/(sh, address(this), address(this)); // attacker exits RIGHT AFTER
+
+    // FAITHFUL invariant: a just-in-time depositor must NOT extract more than they put in.
+    // If `out > a`, the lump-sum yield was snipable -> JIT works -> FINDING.
+    assert(out <= a);
+}
+```
+
+If dreUSDs **streams/vests** yield (totalAssets subtracts unvested) or has a **withdrawal cooldown**,
+this PROVES (out <= a) — good, the vault is safe. If it injects a lump with no cooldown, halmos returns
+a counterexample (`y > 0` profit), the replay validator confirms it concretely → your Medium/High.
+(Caveat: if the real yield-injection is a permissioned function, model the attacker as also being able
+to front-run/sandwich the keeper's injection tx, or test with the injection as a separate actor.)
+
 ## First 30 minutes on Jun 8 (yield vault)
 1. Open dreUSDs' `totalAssets()` → unvested-subtracting, or raw balance? (raw = lumpy = dig in)
 2. Find where daily yield is injected → vesting function or plain `transfer`?
