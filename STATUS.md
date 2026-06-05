@@ -28,6 +28,7 @@ verified per corpus.
 | puppy-raffle      | `check_refundDoesNotPayTwice`     | COUNTEREXAMPLE    |
 | puppy-raffle      | `check_uint64CastDoesNotLoseFee`  | COUNTEREXAMPLE    |
 | t-swap            | `check_swapPreservesXYK`          | COUNTEREXAMPLE    |
+| boss-bridge       | `check_withdrawCannotBeReplayed`  | COUNTEREXAMPLE    |
 
 None VERIFIED yet — autonomous cron has no Foundry toolchain. The Codespace
 runs all of them at `setup.sh` boot. If any returns PROVED, the scaffold's

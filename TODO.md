@@ -123,11 +123,14 @@ unbounded work.
 
 ### Refilled 2026-06-05 (second pass, P4/P5)
 
-- [ ] **(P4) Halmos scaffold for boss-bridge H-3 signature replay.**
+- [x] **(P4) Halmos scaffold for boss-bridge H-3 signature replay.**
       Write `examples/boss-bridge/foundry.toml` + `test/Properties.t.sol`
       with `check_withdrawCannotBeReplayed` — a property asserting that the
       same withdrawal signature cannot drain funds twice. Expected halmos
       verdict: COUNTEREXAMPLE (no nonce/expiry in `withdrawTokensToL1`).
+      Uses `vm.sign(SIGNER_KEY, hash)` for a known signature; submits
+      withdrawTokensToL1 twice with the same (v,r,s); INVARIANT: total
+      withdrawn ≤ amount. commit: (pulse)
 
 - [ ] **(P4) `tools/dedup_reps.py` per refill template.** Detects and reports
       duplicate `rep_id`s in `reps.jsonl`. Should never trigger; if it does,
@@ -136,6 +139,20 @@ unbounded work.
 - [ ] **(P5) Per-corpus `README-bugs.md` for t-swap.** Cross-reference each
       finding from `.ANSWERS.md` to specific line ranges in `TSwapPool.sol`
       / `PoolFactory.sol`. Parallel to the puppy-raffle item.
+
+### Refilled 2026-06-05 (third pass)
+
+- [ ] **(P5) Per-corpus `README-bugs.md` for thunder-loan.** Cross-reference
+      each finding from `.ANSWERS.md` to specific line ranges across
+      `ThunderLoan.sol` / `AssetToken.sol` / `OracleUpgradeable.sol`.
+
+- [ ] **(P4) `tools/replay.py`:** given a `rep_id`, re-print the score row
+      from `reps.jsonl` (verifier output, leads, score, contract path).
+      Useful for sanity-checking historical reps without scrolling JSONL.
+
+- [ ] **(P4) `scoreboard.py --corpus <name>` filter flag.** Restrict the
+      μ±σ aggregate to one corpus. Useful for comparing one corpus across
+      proposer kinds.
 
 ## Hard stops
 
