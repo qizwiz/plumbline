@@ -55,11 +55,15 @@ unbounded work.
       Result: OK 20/20 rows pass; sanity.yml runs on every push/PR.
       commit: (pulse)
 
-- [ ] **(P3) MCP tool definitions for plumbline.** Wrap `sol_match.match`,
+- [x] **(P3) MCP tool definitions for plumbline.** Wrap `sol_match.match`,
       `halmos_rep.run_one`, `scoreboard.main` as MCP tools (one Python file
       with `@mcp.tool` decorators). Outcome: `mcp_server.py`, importable
       from any Claude session. (Per JH user rule: "If you CAN mcp it,
       mcp it.")
+      Result: mcp_server.py + .mcp.json — 5 tools exposed
+      (plumbline_match, plumbline_scoreboard, plumbline_validate,
+      plumbline_halmos_rep, plumbline_status). sol_intent deliberately
+      NOT exposed (LLM-spend gate). commit: (pulse)
 
 - [ ] **(P3) Add `.github/workflows/loop.yml`** that runs the rep loop on
       every push to main: install deps → run all `examples/*` with

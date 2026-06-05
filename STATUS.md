@@ -82,6 +82,15 @@ invariants. (Honest prior: COUNTEREXAMPLE on both, with concrete EVM traces.)
   preferred to land the puppy-raffle corpus and the halmos scaffold so YOUR
   next session is more informative than another stochastic sweep would be.
 
+## MCP server
+
+`mcp_server.py` exposes 5 plumbline tools to any MCP host (Claude Desktop /
+Code / Codespace): `plumbline_match`, `plumbline_scoreboard`,
+`plumbline_validate`, `plumbline_halmos_rep`, `plumbline_status`. `.mcp.json`
+ships the host config. `sol_intent` (LLM-spend) is deliberately NOT exposed.
+
+Wire it up: `pip install fastmcp` then point your host at `.mcp.json`.
+
 ## Codespace info
 
 - Repo: `qizwiz/plumbline` @ `e8190c0` (main)
