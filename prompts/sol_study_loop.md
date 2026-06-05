@@ -22,6 +22,7 @@ Return ONE small JSON object (no fences) — a DELTA, not the whole journal:
 }
 
 HARD RULES:
+- Add AT MOST 4 new hypotheses this round — the highest-value ones. Keep "reasoning" to ONE sentence.
 - Only include hypotheses NOT already in the list below. If you have nothing genuinely new, return
   "new_hypotheses": [] — that's how the loop knows it's dry. Do NOT pad.
 - status is "open" only (never "confirmed") — there is no source to verify against yet; a hypothesis is

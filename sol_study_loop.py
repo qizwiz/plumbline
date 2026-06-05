@@ -54,12 +54,24 @@ def _ids(j):
 def _parse_delta(out):
     out = re.sub(r"^```[a-zA-Z]*\n?|```$", "", out.strip())
     m = re.search(r"\{.*\}", out, re.S)
-    if not m:
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            pass
+    # SALVAGE: pull whatever complete hypothesis objects exist (robust to truncated/malformed JSON).
+    hyps = []
+    for hm in re.finditer(r'\{[^{}]*"claim"[^{}]*\}', out, re.S):
+        try:
+            hyps.append(json.loads(hm.group(0)))
+        except Exception:
+            pass
+    if not hyps:
         return None
-    try:
-        return json.loads(m.group(0))
-    except Exception:
-        return None
+    nxt = re.search(r'"next"\s*:\s*"([^"]*)"', out)
+    mu = re.search(r'"model_update"\s*:\s*"([^"]*)"', out)
+    return {"model_update": mu.group(1) if mu else "", "new_hypotheses": hyps,
+            "resolve": [], "open_questions": [], "next": nxt.group(1) if nxt else ""}
 
 
 def loop(paths, rounds=5, dry_limit=2, fresh=False):
@@ -77,7 +89,7 @@ def loop(paths, rounds=5, dry_limit=2, fresh=False):
         prompt = pi.render(open(os.path.join(HERE, "prompts/sol_study_loop.md")).read(),
                            model=str(journal.get("model", ""))[:8000], hyp_list=hyp_list[:20000],
                            material=material)
-        delta = _parse_delta(agent._ask(prompt, 2500))
+        delta = _parse_delta(agent._ask(prompt, 4000))
         if delta is None:
             print(f"  round {r}: unparseable delta; stopping"); break
         # merge delta into journal (deterministic — the macro half)
