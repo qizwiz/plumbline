@@ -51,30 +51,52 @@ def _ids(j):
     return {(h.get("id") or h.get("claim", "")[:60]) for h in j.get("hypotheses", [])}
 
 
-def loop(paths, rounds=4, dry_limit=2, fresh=False):
+def _parse_delta(out):
+    out = re.sub(r"^```[a-zA-Z]*\n?|```$", "", out.strip())
+    m = re.search(r"\{.*\}", out, re.S)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(0))
+    except Exception:
+        return None
+
+
+def loop(paths, rounds=5, dry_limit=2, fresh=False):
+    """Each round the LLM emits a small DELTA (new hypotheses + resolutions); we merge into the journal
+    in code. Robust to the truncation/malformation that re-emitting the whole journal caused."""
     material = _material(paths)
     journal = ({} if fresh or not os.path.exists(JOURNAL)
                else json.load(open(JOURNAL))) or {"model": "", "hypotheses": [], "resolved": [],
                                                    "open_questions": [], "next": ""}
     dry = 0
     for r in range(1, rounds + 1):
-        before = _ids(journal)
+        have = _ids(journal)
+        hyp_list = "\n".join(f"- {h.get('id', '?')}: {str(h.get('claim', ''))[:120]}"
+                             for h in journal.get("hypotheses", [])) or "(none yet)"
         prompt = pi.render(open(os.path.join(HERE, "prompts/sol_study_loop.md")).read(),
-                           journal=json.dumps(journal, indent=1)[:60000], material=material)
-        out = agent._ask(prompt, 4000)
-        m = re.search(r"\{.*\}", out, re.S)
-        if not m:
-            print(f"  round {r}: no JSON returned; stopping"); break
-        try:
-            journal = json.loads(m.group(0))
-        except Exception as e:
-            print(f"  round {r}: parse error ({e}); stopping"); break
-        new = _ids(journal) - before
+                           model=str(journal.get("model", ""))[:8000], hyp_list=hyp_list[:20000],
+                           material=material)
+        delta = _parse_delta(agent._ask(prompt, 2500))
+        if delta is None:
+            print(f"  round {r}: unparseable delta; stopping"); break
+        # merge delta into journal (deterministic — the macro half)
+        if delta.get("model_update"):
+            journal["model"] = (str(journal.get("model", "")) + "\n" + delta["model_update"]).strip()[:12000]
+        added = [h for h in delta.get("new_hypotheses", [])
+                 if (h.get("id") or h.get("claim", "")[:60]) not in have]
+        journal.setdefault("hypotheses", []).extend(added)
+        for rs in delta.get("resolve", []):
+            for h in journal["hypotheses"]:
+                if h.get("id") == rs.get("id"):
+                    h["status"] = rs.get("status", "refuted"); h["resolution"] = rs.get("why", "")
+        journal["open_questions"] = delta.get("open_questions", journal.get("open_questions", []))
+        journal["next"] = delta.get("next", journal.get("next", ""))
         os.makedirs(os.path.dirname(JOURNAL), exist_ok=True)
         json.dump(journal, open(JOURNAL, "w"), indent=1)
-        print(f"  round {r}: {len(journal.get('hypotheses', []))} hypotheses (+{len(new)} new) | "
+        print(f"  round {r}: {len(journal.get('hypotheses', []))} hypotheses (+{len(added)} new) | "
               f"next: {str(journal.get('next', ''))[:90]}", flush=True)
-        dry = dry + 1 if not new else 0
+        dry = dry + 1 if not added else 0
         if dry >= dry_limit:
             print(f"  DRY ({dry_limit} rounds, no new hypotheses) — converged."); break
     return journal
