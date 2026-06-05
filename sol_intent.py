@@ -89,12 +89,12 @@ def _chunks(sols, budget):
     return out
 
 
-def analyze(root, model=None, budget=120000):
+def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md"):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
     struggle = git_struggle(root, sols)
-    tmpl = open(os.path.join(HERE, "prompts/sol_intent.md")).read()
+    tmpl = open(os.path.join(HERE, prompt)).read()
     chunks = _chunks(sols, budget)
     # The prompt is file-backed and SELF-IMPROVING: sol_flywheel scores this output on grounded
     # recall/precision and calls prompt_improve.improve_if_weak, which rewrites sol_intent.md when weak.
@@ -109,5 +109,6 @@ def analyze(root, model=None, budget=120000):
 
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else "."
-    print(f"sol_intent: recovering builder intent + violations for {root}\n")
-    print(analyze(root))
+    prompt = "prompts/sol_find.md" if "--recall" in sys.argv else "prompts/sol_intent.md"
+    print(f"sol_intent: {'RECALL-first' if '--recall' in sys.argv else 'intent'} pass for {root}\n")
+    print(analyze(root, prompt=prompt))
