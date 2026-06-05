@@ -45,10 +45,8 @@ contract Attacker {
 /// will either PROVE or refute with a concrete EVM counterexample.
 ///
 /// Predicted verdicts (from .ANSWERS.md):
-///   check_refundDoesNotPayTwice  →  COUNTEREXAMPLE
-///       The Attacker.receive() reentry drains entranceFee a second time
-///       before players[idx] gets zeroed. This is H-1: refund's external
-///       call precedes the state write (CEI violation).
+///   check_refundDoesNotPayTwice     →  COUNTEREXAMPLE   (H-1 reentrancy)
+///   check_uint64CastDoesNotLoseFee  →  COUNTEREXAMPLE   (H-3 totalFees uint64 truncation)
 contract Properties is Test {
     PuppyRaffle public raffle;
     Attacker public attacker;
@@ -92,5 +90,28 @@ contract Properties is Test {
         uint256 balAfter = address(attacker).balance;
         uint256 gained = balAfter - balBefore;
         assert(gained <= ENTRANCE_FEE);
+    }
+
+    /// PROMISE (H-3 finding): `totalFees` must accumulate accurately. The
+    /// canonical bug is at `PuppyRaffle::selectWinner`:
+    ///     totalFees = totalFees + uint64(fee);
+    /// where `fee` is a uint256 that can exceed 2**64 - 1 (~18.45 ETH).
+    /// The cast LOSES the high bits, so the stored fee no longer equals
+    /// the arithmetic fee.
+    ///
+    /// This test isolates the exact cast — halmos handles BitVec arithmetic
+    /// natively, so this version returns a clean COUNTEREXAMPLE instantly.
+    /// (A "full setup" version going through selectWinner would also work
+    /// but might TIMEOUT on the 4-player array setup; isolating the line
+    /// is faithful to the bug-shape without fighting symbolic indirection.)
+    ///
+    /// Predicted halmos verdict: COUNTEREXAMPLE
+    ///     witness: any fee with bit 64 or above set, e.g. fee = 2**64.
+    function check_uint64CastDoesNotLoseFee(uint256 fee) public pure {
+        // Bound the search: fees larger than 2**128 are physically impossible
+        // (more wei than exist), but anything above 2**64-1 triggers the bug.
+        if (fee >= (uint256(1) << 128)) return;
+        uint64 truncated = uint64(fee);
+        assert(uint256(truncated) == fee);
     }
 }

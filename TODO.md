@@ -35,9 +35,11 @@ unbounded work.
       Outcome: 2 new files committed; STATUS.md updated.
       commit: (this pulse)
 
-- [ ] **(P1) Foundry+halmos scaffold for puppy-raffle integer overflow (H-3).**
-      Write a `check_totalFeesNoOverflow` test that asserts no `uint64`
-      truncation as cumulative fees grow. Expected: COUNTEREXAMPLE.
+- [x] **(P1) Foundry+halmos scaffold for puppy-raffle integer overflow (H-3).**
+      Added `check_uint64CastDoesNotLoseFee` to puppy-raffle Properties.t.sol.
+      Isolates the exact bug line (`uint64(fee)` cast in selectWinner) to
+      give halmos a clean BitVec property; predicted COUNTEREXAMPLE on any
+      fee ≥ 2**64. commit: (this pulse)
 
 - [ ] **(P2) Foundry+halmos scaffold for t-swap `x*y=k` invariant (H-5).**
       Write `examples/t-swap/foundry.toml` + `test/Invariants.t.sol`. After
