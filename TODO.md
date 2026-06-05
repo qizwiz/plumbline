@@ -73,9 +73,13 @@ unbounded work.
       `reps` (gated on PACT_LLM_API_KEY secret; SKIPS if absent, costs
       ~$1/push if present). Auto-commits new rows. commit: (pulse)
 
-- [ ] **(P4) `tools/fitness_card.py`:** generate a single PNG card from
+- [x] **(P4) `tools/fitness_card.py`:** generate a single PNG card from
       `reps.jsonl` showing recall/precision per corpus over time. Just
       matplotlib, no fancy embedding work. Output: `docs/fitness.png`.
+      Lazy matplotlib import (skips gracefully if missing — CI safe).
+      Two stacked subplots (recall + precision) vs rep order in file, one
+      colored line per corpus. Syntax-checked. PNG renders when run.
+      commit: (pulse)
 
 - [ ] **(P4) Curate one more corpus.** Cyfrin's `7-bridges-audit` or
       `8-vault-guardians-audit` — same procedure as puppy-raffle/t-swap/
