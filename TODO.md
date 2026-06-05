@@ -81,9 +81,12 @@ unbounded work.
       colored line per corpus. Syntax-checked. PNG renders when run.
       commit: (pulse)
 
-- [ ] **(P4) Curate one more corpus.** Cyfrin's `7-bridges-audit` or
+- [x] **(P4) Curate one more corpus.** Cyfrin's `7-bridges-audit` or
       `8-vault-guardians-audit` — same procedure as puppy-raffle/t-swap/
       thunder-loan. Each adds ~15 real findings to the corpus.
+      Picked 7-boss-bridge-audit (13 findings: 8H + 1M + 3L + 1I).
+      vault-guardians audit-data branch returned 404 — skipped.
+      commit: (pulse)
 
 - [ ] **(P5) Cleanup pass:** verify CLAUDE.md / STATUS.md / README.md are
       mutually consistent. Trim stale notes.
