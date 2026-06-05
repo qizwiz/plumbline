@@ -7,7 +7,8 @@ corpus, with the standard error. That's what we'd train a Layer-2 policy
 against once it exists.
 
   python scoreboard.py
-  python scoreboard.py --by sha256_dir   # group by content hash instead of path
+  python scoreboard.py --by sha256_dir       # group by content hash instead of path
+  python scoreboard.py --corpus puppy-raffle # restrict the aggregate to one corpus
 """
 from __future__ import annotations
 
@@ -24,9 +25,12 @@ REP_LOG = os.path.join(HERE, "reps.jsonl")
 
 def main():
     by = "path"
-    for a in sys.argv[1:]:
-        if a == "--by" and len(sys.argv) > sys.argv.index(a) + 1:
-            by = sys.argv[sys.argv.index(a) + 1]
+    corpus_filter = None
+    args = sys.argv[1:]
+    if "--by" in args:
+        by = args[args.index("--by") + 1]
+    if "--corpus" in args:
+        corpus_filter = args[args.index("--corpus") + 1]
 
     if not os.path.exists(REP_LOG):
         print(f"no reps yet at {REP_LOG}")
@@ -38,9 +42,17 @@ def main():
         key = r.get("contract", {}).get(by) or r.get("contract", {}).get("path", "?")
         if by == "path":
             key = os.path.basename(key.rstrip("/"))
+        if corpus_filter is not None and corpus_filter not in key:
+            continue
         groups[key].append(r)
 
-    print(f"\n  total reps: {len(rows)}   groups: {len(groups)}   log: {REP_LOG}")
+    if corpus_filter is not None and not groups:
+        print(f"no reps match corpus filter {corpus_filter!r}")
+        return
+
+    shown = sum(len(g) for g in groups.values())
+    fhint = f"   filter: {corpus_filter!r}" if corpus_filter else ""
+    print(f"\n  total reps: {len(rows)}   shown: {shown}   groups: {len(groups)}{fhint}   log: {REP_LOG}")
     print()
     cols = ["corpus", "n", "proposer", "recall (μ±σ)", "precision (μ±σ)", "leads (μ)", "findings"]
     print(f"  {cols[0]:32s} {cols[1]:>3s}  {cols[2]:12s} {cols[3]:>15s} {cols[4]:>18s} {cols[5]:>10s} {cols[6]:>9s}")

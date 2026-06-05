@@ -160,9 +160,12 @@ unbounded work.
       sol_match and halmos verifier shapes, includes truth path + first
       5 leads. Verified against last row in dataset. commit: (pulse)
 
-- [ ] **(P4) `scoreboard.py --corpus <name>` filter flag.** Restrict the
+- [x] **(P4) `scoreboard.py --corpus <name>` filter flag.** Restrict the
       μ±σ aggregate to one corpus. Useful for comparing one corpus across
       proposer kinds.
+      Substring-match (e.g. `--corpus dreusd` matches all 3 synthetic
+      twins). Header shows total/shown/groups + filter for honesty. Verified
+      against puppy-raffle (1 rep) and dreusd (10 across 3 groups). commit: (pulse)
 
 ### Refilled 2026-06-05 (fourth pass)
 
@@ -184,6 +187,25 @@ unbounded work.
       msg.sender's choice." Symbolically halmos will refute by finding the
       sender for which `keccak256(sender, t, d) % n == desiredIndex`.
       Expected verdict: COUNTEREXAMPLE.
+
+### Refilled 2026-06-05 (fifth pass)
+
+- [ ] **(P4) Halmos scaffold for boss-bridge H-2 — self-call infinite mint.**
+      Write `check_depositCannotMintWithoutBacking` — assert that the
+      amount minted on L2 is bounded by the actual ERC20 balance increase
+      on the vault. Predicted halmos verdict: COUNTEREXAMPLE
+      (`depositTokensToL2(from=vault, ...)` lets attacker call into the
+      vault as a borrower without transferring tokens in).
+
+- [ ] **(P5) Per-corpus `README-bugs.md` for synthetic-dreusd (foundational
+      twin).** Cross-reference the 2 planted bugs in `.ANSWERS.md` to
+      specific lines in `dreUSD.sol` / `dreUSDs.sol`. Parallel to the
+      puppy-raffle / t-swap / thunder-loan indices.
+
+- [ ] **(P5) Cron audit-trail freshness pass on STATUS.md.** Confirm the
+      "Cron audit trail" section's commit-count pointer and the corpora/
+      scaffolds tables still match `git log --oneline e8190c0..HEAD` and
+      `ls examples/*/test/`. If drift detected, refresh.
 
 ## Hard stops
 
