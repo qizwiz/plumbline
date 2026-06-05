@@ -42,6 +42,11 @@ contract Properties is Test {
     function setUp() public {
         usdc = new MockUSDC();
         dre  = new dreUSD(address(usdc));
+        // Pre-fund the protocol with a deep USDC reserve so a buggy `redeem`
+        // (which tries to send dreAmount = deposit*1e12 USDC) does NOT revert
+        // on underflow — letting halmos actually reach the assertion. Without
+        // this, every path reverts and halmos reports vacuous PASS.
+        usdc.mintTo(address(dre), 1e30);
     }
 
     /// PROMISE (README §1, §2): a mint→redeem round-trip returns exactly what
