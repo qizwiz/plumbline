@@ -169,9 +169,13 @@ unbounded work.
 
 ### Refilled 2026-06-05 (fourth pass)
 
-- [ ] **(P5) Per-corpus `README-bugs.md` for boss-bridge.** Cross-reference
+- [x] **(P5) Per-corpus `README-bugs.md` for boss-bridge.** Cross-reference
       each finding from `.ANSWERS.md` to specific line ranges across
       `L1BossBridge.sol` / `L1Vault.sol` / `TokenFactory.sol`.
+      13-row table covering H-1..H-8 / M-1 / L-1..L-3 / I-1 across all
+      4 source files. Cross-references H-3 to the existing halmos
+      scaffold (`check_withdrawCannotBeReplayed`); notes H-2 and H-7 are
+      queued for follow-up. commit: (pulse)
 
 - [ ] **(P4) Halmos scaffold for boss-bridge H-7 — unbounded withdraw.**
       Write a `check_withdrawCannotExceedDeposit` property: the amount
