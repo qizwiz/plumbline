@@ -1,0 +1,58 @@
+# dreUSD — REAL audit findings (Spearbit + Quantstamp). Ground truth for scoring our research.
+
+## Spearbit findings
+- 5.1.1 Fiat mint struct hash clobbers memory
+- 5.1.10 Missing L2 sequencer uptime check may cause loss of funds due to stale prices
+- 5.1.2 Stale cTs causes instant reward vesting
+- 5.1.3 VestPeriod under 1 day can brick addRewards
+- 5.1.4 Express limit decrease can break payback
+- 5.1.5 Composer refund can fail without msg.value
+- 5.1.6 Sanctions checks are inconsistent across flows
+- 5.1.7 Cross-Chain token freeze can strand funds
+- 5.1.8 Missing oracle price deviation check exposes protocol to depeg losses
+- 5.1.9 Users may receive lower than expected express withdrawal amounts due to unbounded fees
+- 5.1.9 Users may receive lower than expected express withdrawal amounts due to unbounded fees applied
+- 5.2.1 Express minUsdcAmount uses uncapped quote
+- 5.2.10 Spoke Chain Share Token Missing Sanctions Enforcement
+- 5.2.11 Dust Reward Addition Unfairly Resets Vesting Schedule, Delaying Existing Unvested Rewards
+- 5.2.12 Insufficient guardrails for stalenessThresholds may cause loss of funds due to stale prices
+- 5.2.13 DreUSDs vault does not prevent share transfers when paused
+- 5.2.14 Insufficient guardrails in setVestPeriod() may be risky
+- 5.2.15 Centralization risks can cause significant loss/lock of funds
+- 5.2.16 New withdrawalWaitingTime is applied retrospectively to pending withdrawal requests
+- 5.2.17 Permit Front-Run DOS on Permit-Based Mint Flows
+- 5.2.18 Incorrect event emission in _queueExpressWithdrawal() and _queueWithdrawal
+- 5.2.19 Insufficient guardrails in updateWithdrawal() may be risky
+- 5.2.2 Fiat mint sig not purpose bound
+- 5.2.20 Withdrawal fills are not prevented when paused
+- 5.2.3 Compose flow can get stuck on freeze/sanctions/pause
+- 5.2.4 Express debt can accrue without payback addr
+- 5.2.5 Composer clears OFT minAmountLD to zero
+- 5.2.6 AaveAdapter init does not validate aToken
+- 5.2.7 WithdrawalNFT burn has unbounded loop
+- 5.2.8 USDT enabling fee-on-transfer will lead to protocol loss
+- 5.2.9 CEI violation in _queueExpressWithdrawal fee bypass via _safeMint reentrancy
+
+## Quantstamp findings (descriptions)
+- dreUSDManager.mintRewards() mints dreUSD to the distributor and then calls addRewards(). Inside addRewards(), the
+- The comment concerning dreUSD.transferOwnership() states that the intention of the overridden function is for calling to
+- dreUSDs bridged from an unfrozen account on a spoke chain to a frozen account on the hub chain will fail during the
+- Many of the privileged roles in the protocol contracts can be granted to numerous contracts and accounts. For some functionality,
+- The dreUSDs contract uses _virtualBalance to track explicit deposits and vested dreUSD rewards. Donating dreUSD to the
+- On spoke chains, dreShareOFT keeps its own sanctionsList and frozen state, while local dreUSD enforces a separate
+- Bridge routing uses two recipient fields depending on path. In standard sends, the outer SendParam.to is the destination
+- dreUSDs.setRewardsDistributor() changes the rewardsDistributor address used by the vault. Since
+- dreUSDManager.mintAndStake() enforces minAmountOut only for the intermediate dreUSD mint, then deposits into
+- dreUSDManager.fillWithdrawal() passes a queued usdcAmount into withdraw(), but
+- dreUSDs always calls _claimVestedRewards() in _deposit and _withdraw, and that path calls
+- fillExpressWithdrawals() records express reimbursement in a global expressFillerDebt bucket, but it does not record
+- dreOVaultComposer.setStuckFundsRecipient() allows address(0) and its NatSpec explicitly says zero may be used to
+- OpenZeppelin's Ownable and OwnableUpgradeable implement the renounceOwnership() function, which sets the owner
+- Every Solidity file specifies in the header a version number of the format pragma solidity (^)0.8.*. The caret (^) before the
+- Upgradeable contracts in the codebase are appending uint256[50] private __gap; to their storage layouts in order to make
+- It is important to validate inputs, even if they only come from trusted addresses, to avoid human error. Consider the following
+- The following functions update important state variables but do not emit events. Changes are not visible in logs and are harder to
+- The code comment in fillExpressWithdrawals() (L605) and fillWithdrawals() (L548) states that positions that do not
+- updateVaultAdapter() validates only non-zero address. Vault-backed fills then assume the configured adapter uses the same
+- Reward mint routing and vault reward accounting are controlled by separate configurable addresses, and there is no on-chain
+- The contracts use raw scaling numbers like 10_000 and 10 ** decimals in many places. This makes the math harder to read

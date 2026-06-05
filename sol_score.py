@@ -47,14 +47,28 @@ Return ONE JSON object, no fences:
 
 
 def score(leads: str, truth: str):
-    out = agent._ask(_PROMPT.format(leads=leads[:30000], truth=truth[:20000]), 2500)
-    m = re.search(r"\{.*\}", out.strip().strip("`"), re.S)
-    if not m:
+    prompt = _PROMPT.replace("{leads}", leads[:30000]).replace("{truth}", truth[:20000])
+    out = agent._ask(prompt, 4000)
+    body = out.strip().strip("`")
+    m = re.search(r"\{.*\}", body, re.S)
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            pass
+    # SALVAGE (truncated/malformed JSON): recover the scalars + whatever list items are intact.
+    def _num(key):
+        g = re.search(rf'"{key}"\s*:\s*([0-9.]+)', body)
+        return float(g.group(1)) if g else None
+    def _list(key):
+        g = re.search(rf'"{key}"\s*:\s*\[(.*?)\]', body, re.S)
+        return [s.strip().strip('"') for s in re.findall(r'"([^"]+)"', g.group(1))] if g else []
+    rec, prec = _num("recall"), _num("precision")
+    if rec is None and prec is None:
         return None
-    try:
-        return json.loads(m.group(0))
-    except Exception:
-        return None
+    return {"recall": rec or 0.0, "precision": prec or 0.0,
+            "missed": _list("missed"), "noise": _list("noise"), "matches": _list("matches"),
+            "signal": (re.search(r'"signal"\s*:\s*"([^"]*)"', body) or [None, "(salvaged; signal truncated)"])[1]}
 
 
 if __name__ == "__main__":

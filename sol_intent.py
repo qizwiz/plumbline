@@ -74,19 +74,37 @@ def git_struggle(root, sols):
     return "\n".join(f"  {rel}: {churn} commits, {struggle} fix/revert" for _, churn, struggle, rel in rows)
 
 
-def analyze(root, model=None):
+def _chunks(sols, budget):
+    """Pack source files into chunks under `budget` chars so the finder SEES every file (a finder that
+    truncates cannot audit a real codebase — real repos exceed any context window). Keeps files in their
+    walk order so same-directory contracts tend to land together."""
+    out, cur, sz = [], [], 0
+    for rel, src in sols:
+        piece = f"// ===== {rel} =====\n{src}"
+        if cur and sz + len(piece) > budget:
+            out.append(cur); cur, sz = [], 0
+        cur.append(piece); sz += len(piece)
+    if cur:
+        out.append(cur)
+    return out
+
+
+def analyze(root, model=None, budget=120000):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
     struggle = git_struggle(root, sols)
-    src_blob = "\n\n".join(f"// ===== {rel} =====\n{src}" for rel, src in sols)[:60000]
+    tmpl = open(os.path.join(HERE, "prompts/sol_intent.md")).read()
+    chunks = _chunks(sols, budget)
     # The prompt is file-backed and SELF-IMPROVING: sol_flywheel scores this output on grounded
     # recall/precision and calls prompt_improve.improve_if_weak, which rewrites sol_intent.md when weak.
-    prompt = pi.render(
-        open(os.path.join(HERE, "prompts/sol_intent.md")).read(),
-        struggle=struggle, readme=readme or "(no README)",
-        adrs=adrs or "(no ADRs found)", sources=src_blob)
-    return agent._ask(prompt, 3000)
+    outs = []
+    for i, ch in enumerate(chunks):
+        prompt = pi.render(tmpl, struggle=struggle, readme=readme or "(no README)",
+                           adrs=adrs or "(no ADRs found)", sources="\n\n".join(ch))
+        tag = f"\n===== CHUNK {i + 1}/{len(chunks)} =====\n" if len(chunks) > 1 else ""
+        outs.append(tag + agent._ask(prompt, 8000))
+    return "\n".join(outs)
 
 
 if __name__ == "__main__":
