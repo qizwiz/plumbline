@@ -9,14 +9,12 @@ interface IUSDC {
     function balanceOf(address) external view returns (uint256);
 }
 
-/// @title  dreUSD — USD-pegged stablecoin, 1:1 USDC-backed.
-/// @notice Every dreUSD is backed 1:1 by USDC held by the protocol. Mint $X of USDC -> X dreUSD;
-///         redeeming X dreUSD returns exactly $X of USDC. No value is created or destroyed.
-/// @dev    PLANTED BUG (decimals 6<->18). USDC is 6 decimals, dreUSD is 18. `mint` scales correctly
-///         (×1e12); `redeem` does NOT scale back (÷1e12), so it pays out 1e12× too much USDC per
-///         dreUSD — letting an attacker drain other users' backing and breaking 1:1 redeem.
+/// @title  dreUSD — USD-pegged stablecoin, fully backed by USDC.
+/// @notice Every dreUSD is backed one-to-one by USDC held in the protocol. Mint $X of USDC to receive
+///         X dreUSD; redeem X dreUSD to receive back $X of USDC. The peg holds in both directions and
+///         no value is created or destroyed by a mint/redeem round-trip.
 contract dreUSD is ERC20 {
-    IUSDC public immutable usdc; // 6 decimals
+    IUSDC public immutable usdc;
     address public minter;
 
     constructor(address _usdc) ERC20("dre USD", "dreUSD", 18) {
@@ -24,15 +22,15 @@ contract dreUSD is ERC20 {
         minter = msg.sender;
     }
 
-    /// @notice Mint dreUSD by depositing USDC at $1 = 1 dreUSD.
-    function mint(uint256 usdcAmount) external {            // usdcAmount: 6-decimal USDC units
+    /// @notice Mint dreUSD by depositing USDC at one dollar to one dreUSD.
+    function mint(uint256 usdcAmount) external {
         usdc.transferFrom(msg.sender, address(this), usdcAmount);
-        _mint(msg.sender, usdcAmount * 1e12);              // correct: scale 6 -> 18 decimals
+        _mint(msg.sender, usdcAmount * 1e12);
     }
 
-    /// @notice Redeem dreUSD back to USDC at $1 = 1 dreUSD.
-    function redeem(uint256 dreAmount) external {           // dreAmount: 18-decimal dreUSD units
+    /// @notice Redeem dreUSD back into the underlying USDC at one dreUSD to one dollar.
+    function redeem(uint256 dreAmount) external {
         _burn(msg.sender, dreAmount);
-        usdc.transfer(msg.sender, dreAmount);              // BUG: missing /1e12 -> pays 1e12x too much
+        usdc.transfer(msg.sender, dreAmount);
     }
 }
