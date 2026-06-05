@@ -18,5 +18,7 @@ jobs:
           python-version: "3.12"
       - name: schema validator
         run: python tools/validate_reps.py
+      - name: duplicate rep_id check
+        run: python tools/dedup_reps.py
       - name: scoreboard renders
         run: python scoreboard.py || true

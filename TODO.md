@@ -132,9 +132,11 @@ unbounded work.
       withdrawTokensToL1 twice with the same (v,r,s); INVARIANT: total
       withdrawn ≤ amount. commit: (pulse)
 
-- [ ] **(P4) `tools/dedup_reps.py` per refill template.** Detects and reports
+- [x] **(P4) `tools/dedup_reps.py` per refill template.** Detects and reports
       duplicate `rep_id`s in `reps.jsonl`. Should never trigger; if it does,
       log to STATUS.md. Add to sanity.yml CI.
+      Result: OK 20/20 reps, 0 duplicates. Wired into sanity.yml between
+      schema-validator and scoreboard. commit: (pulse)
 
 - [ ] **(P5) Per-corpus `README-bugs.md` for t-swap.** Cross-reference each
       finding from `.ANSWERS.md` to specific line ranges in `TSwapPool.sol`
