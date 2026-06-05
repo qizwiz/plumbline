@@ -161,6 +161,17 @@ if __name__ == "__main__":
         pr = nx.pagerank(G)
         top = sorted(pr, key=pr.get, reverse=True)[:8]
         print("top call-graph hubs (audit-first):", [t for t in top])
-    print(f"\n=== {len(dets)} DETERMINISTIC detector hits ===")
-    for f, sev, kind, msg in sorted(dets, key=lambda x: x[1]):
-        print(f"  [{sev}] {kind}: {msg}")
+    print(f"\n=== {len(dets)} hits, aggregated to CLASS-LEVEL leads (precision: 1 finding = 1 class, "
+          f"not N instances) ===")
+    import collections
+    groups = collections.defaultdict(list)
+    for f, sev, kind, msg in dets:
+        groups[kind].append(f["id"])
+    for kind, ids in groups.items():
+        funcs = sorted(set(ids))
+        print(f"  {kind} affecting {len(funcs)} functions: {', '.join(funcs[:12])}"
+              + (" ..." if len(funcs) > 12 else ""))
+    if "--instances" in sys.argv:
+        print("\n--- per-instance ---")
+        for f, sev, kind, msg in sorted(dets, key=lambda x: x[1]):
+            print(f"  [{sev}] {kind}: {msg}")
