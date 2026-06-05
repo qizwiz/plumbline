@@ -48,10 +48,12 @@ unbounded work.
       Used `vm.store` to seed `swap_count = 9` so the next swap immediately
       hits the bonus path; avoids 10-swap symbolic exploration. commit: (pulse)
 
-- [ ] **(P2) Audit `reps.jsonl` for schema drift.** Read all 20 rows,
+- [x] **(P2) Audit `reps.jsonl` for schema drift.** Read all 20 rows,
       confirm each has `contract`, `proposer`, `score`, `verifier`,
       `prior`, `embed_coords`. Write `tools/validate_reps.py` (tiny).
       Outcome: validator script + a CI hook in `.github/workflows/`.
+      Result: OK 20/20 rows pass; sanity.yml runs on every push/PR.
+      commit: (pulse)
 
 - [ ] **(P3) MCP tool definitions for plumbline.** Wrap `sol_match.match`,
       `halmos_rep.run_one`, `scoreboard.main` as MCP tools (one Python file
