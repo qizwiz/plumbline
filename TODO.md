@@ -138,9 +138,11 @@ unbounded work.
       Result: OK 20/20 reps, 0 duplicates. Wired into sanity.yml between
       schema-validator and scoreboard. commit: (pulse)
 
-- [ ] **(P5) Per-corpus `README-bugs.md` for t-swap.** Cross-reference each
+- [x] **(P5) Per-corpus `README-bugs.md` for t-swap.** Cross-reference each
       finding from `.ANSWERS.md` to specific line ranges in `TSwapPool.sol`
       / `PoolFactory.sol`. Parallel to the puppy-raffle item.
+      11-row table mapping H/L/I findings to TSwapPool.sol /
+      PoolFactory.sol line ranges + one-line mechanism. commit: (pulse)
 
 ### Refilled 2026-06-05 (third pass)
 
@@ -155,6 +157,27 @@ unbounded work.
 - [ ] **(P4) `scoreboard.py --corpus <name>` filter flag.** Restrict the
       μ±σ aggregate to one corpus. Useful for comparing one corpus across
       proposer kinds.
+
+### Refilled 2026-06-05 (fourth pass)
+
+- [ ] **(P5) Per-corpus `README-bugs.md` for boss-bridge.** Cross-reference
+      each finding from `.ANSWERS.md` to specific line ranges across
+      `L1BossBridge.sol` / `L1Vault.sol` / `TokenFactory.sol`.
+
+- [ ] **(P4) Halmos scaffold for boss-bridge H-7 — unbounded withdraw.**
+      Write a `check_withdrawCannotExceedDeposit` property: the amount
+      withdrawn for a (user, signature) pair must not exceed what was
+      previously deposited under the same identity. Expected verdict:
+      COUNTEREXAMPLE (the bridge accepts arbitrary `amount` in withdraw
+      signatures without correlating to deposits).
+
+- [ ] **(P4) Halmos scaffold for puppy-raffle H-2 — weak randomness.**
+      Write `check_winnerNotAttackerControlled` — a property where an
+      attacker (msg.sender) can predict and select the index, asserted as
+      "the contract's selected winner is statistically independent of
+      msg.sender's choice." Symbolically halmos will refute by finding the
+      sender for which `keccak256(sender, t, d) % n == desiredIndex`.
+      Expected verdict: COUNTEREXAMPLE.
 
 ## Hard stops
 
