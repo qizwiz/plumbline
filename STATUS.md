@@ -19,20 +19,23 @@ Each `examples/<name>/.ANSWERS.md` is one finding per `## SEV-N title`
 section, aligned to `sol_match._lines()`. Section count = finding count is
 verified per corpus.
 
-## Halmos scaffolds (predicted verdicts)
+## Halmos scaffolds — predicted vs LIVE verdicts (updated 2026-06-05 from real codespace run)
 
-| corpus            | property                          | predicted verdict |
-| ----------------- | --------------------------------- | ----------------- |
-| synthetic-dreusd  | `check_redeemReturnsDeposit`      | COUNTEREXAMPLE    |
-| synthetic-dreusd  | `check_supplyAtMostBacking`       | COUNTEREXAMPLE    |
-| puppy-raffle      | `check_refundDoesNotPayTwice`     | COUNTEREXAMPLE    |
-| puppy-raffle      | `check_uint64CastDoesNotLoseFee`  | COUNTEREXAMPLE    |
-| t-swap            | `check_swapPreservesXYK`          | COUNTEREXAMPLE    |
-| boss-bridge       | `check_withdrawCannotBeReplayed`  | COUNTEREXAMPLE    |
+| corpus            | property                          | predicted        | LIVE verdict        |
+| ----------------- | --------------------------------- | ---------------- | ------------------- |
+| synthetic-dreusd  | `check_redeemReturnsDeposit`      | COUNTEREXAMPLE   | **PASS (VACUOUS)**  |
+| synthetic-dreusd  | `check_supplyAtMostBacking`       | COUNTEREXAMPLE   | **TIMEOUT**         |
+| puppy-raffle      | `check_refundDoesNotPayTwice`     | COUNTEREXAMPLE   | not yet — config quirk |
+| puppy-raffle      | `check_uint64CastDoesNotLoseFee`  | COUNTEREXAMPLE   | not yet             |
+| t-swap            | `check_swapPreservesXYK`          | COUNTEREXAMPLE   | not yet             |
+| boss-bridge       | `check_withdrawCannotBeReplayed`  | COUNTEREXAMPLE   | not yet             |
 
-None VERIFIED yet — autonomous cron has no Foundry toolchain. The Codespace
-runs all of them at `setup.sh` boot. If any returns PROVED, the scaffold's
-modeling of the bug is wrong — that is itself useful signal.
+**PASS (VACUOUS) means halmos didn't find a violating path — but only
+because the buggy path reverts before reaching the assertion.** See
+CLAUDE.md "Scaffold honesty" for the diagnostic + repair plan.
+
+Halmos itself works; the scaffolds need rework. Every scaffold gets a
+`check_setupCompiles` reach test before any bug check is trusted.
 
 ## Tools (deterministic, no LLM spend)
 

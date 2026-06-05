@@ -54,6 +54,77 @@ If you find yourself describing the loop instead of running it, the loop is
 not running. The honest test: `wc -l reps.jsonl`. If that number didn't go
 up this session, you didn't do a rep.
 
+## Scaffold honesty (the lesson from the 2026-06-05 codespace run)
+
+**Halmos `[PASS]` does NOT mean "the bug doesn't exist."** It means *no
+symbolic path I explored violated this assertion*. If the buggy path
+reverts before the assertion runs, `[PASS]` is *vacuous* — halmos correctly
+reports it, but the verdict carries no information about the bug.
+
+This bit us hard on first live halmos run. Five halmos scaffolds were
+written by reading the .ANSWERS.md finding and writing what *looked* like
+the right `check_*` function. **None were verified end-to-end.** The first
+one we ran (`check_redeemReturnsDeposit` on synthetic-dreusd) returned
+PASS — not because the bug is absent, but because the buggy `redeem` path
+reverts on underflow before the assertion can fail. Pre-funding the
+protocol let the path run but the verdict still came back PASS, suggesting
+halmos's modeling of solmate ERC20 internals doesn't propagate state the
+way I expected.
+
+**Rule going forward — every scaffold must include a reach test.** Add a
+trivial `check_setupCompiles` that asserts something that only holds if the
+full setup ran:
+```solidity
+function check_setupCompiles() public view {
+    assert(address(dre) != address(0));     // setUp ran
+    assert(usdc.balanceOf(USER) > 0);       // mintTo worked
+    assert(dre.totalSupply() == 0);         // pre-mint sanity
+}
+```
+This MUST return PASS. If it doesn't, the scaffold is broken before the
+bug check even matters. Run it first, EVERY time, before trusting any
+bug-check verdict on the same file.
+
+**Status of the 5 scaffolds (all UNVERIFIED until rerun with reach tests):**
+
+| corpus           | scaffold                          | live verdict so far  |
+| ---------------- | --------------------------------- | -------------------- |
+| synthetic-dreusd | `check_redeemReturnsDeposit`      | PASS — VACUOUS (revert in path) |
+| synthetic-dreusd | `check_supplyAtMostBacking`       | TIMEOUT              |
+| puppy-raffle     | `check_refundDoesNotPayTwice`     | NOT YET RUN (forge `src="."` config quirk — "Nothing to compile") |
+| puppy-raffle     | `check_uint64CastDoesNotLoseFee`  | NOT YET RUN          |
+| t-swap           | `check_swapPreservesXYK`          | NOT YET RUN          |
+| boss-bridge      | `check_withdrawCannotBeReplayed`  | NOT YET RUN          |
+
+**Repair plan** — for each scaffold:
+1. Add a `check_setupCompiles` reach test
+2. Run halmos; reach test must PASS
+3. Run the bug check; expected COUNTEREXAMPLE
+4. If still PASS: investigate which path reverts, fix the setup
+5. Mark verified in the table above
+
+This is the difference between "I wrote a halmos test" and "halmos confirms
+the bug." Only the second one survives a contest.
+
+## Forge install quirks (operational, not architectural)
+
+Discovered 2026-06-05 during live verification:
+
+- **`forge install --no-commit` was REMOVED in forge 1.7+.** It silently
+  no-ops and prints usage. Use bare `forge install <dep>`. The default in
+  modern forge IS no-commit.
+- **`forge install` in a git subdir installs to the GIT ROOT's `lib/`,
+  not the subdir's `lib/`.** Each example/<name>/foundry.toml expects
+  `libs = ["lib"]` relative to itself. Fix: symlink each
+  `examples/<name>/lib` → `/workspaces/plumbline/lib`. Done by setup.sh.
+- **Solmate's own internal tests pin `solc =0.8.15`.** If they stay in the
+  build graph, forge fails to compile against any other solc version. Fix:
+  `rm -rf lib/solmate/src/test` in setup.sh.
+- **`src = "."` in a foundry.toml makes forge sometimes report "Nothing to
+  compile"** even with .sol files present. Conventional layout (`src = "src"`
+  with sources moved into a `src/` subdir) works. Worth applying when we
+  iterate on the scaffolds.
+
 ## Layer 1 carrier — the five tokenizer/matcher lessons (all from real reps)
 
 The scorer–truth-format contract is *generative* — each new corpus shape
