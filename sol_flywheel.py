@@ -30,8 +30,12 @@ RUNGS = [
      "gen": [PY, "sol_intent.py", "examples/synthetic-dreusd"],
      "truth": "examples/synthetic-dreusd/.ANSWERS.md",
      "note": "planted decimals + JIT bugs — the sanity floor; if this misses, nothing downstream is trustworthy"},
-    # rung 2+: drop in past Sherlock/Code4rena contests — source dir + its judged-findings file.
-    # {"name":"<contest>-high","difficulty":2,"bar":0.6,"gen":[PY,"sol_intent.py","<src>"],"truth":"<judged_high.md>"},
+    {"name": "twin-reserve-inflation", "difficulty": 2, "bar": 0.5,
+     "gen": [PY, "sol_intent.py", "examples/synthetic-dreusd-2"],
+     "truth": "examples/synthetic-dreusd-2/.ANSWERS.md",
+     "note": "cross-function timing bug: totalAssets double-counts reserved withdrawals (burn-now/pay-later "
+             "pps inflation). No wrong constant — needs reasoning about state between calls."},
+    # rung 3+: subtler self-play twins (adversary aims at lessons.md blind spots) + real past-contest findings.
 ]
 
 
