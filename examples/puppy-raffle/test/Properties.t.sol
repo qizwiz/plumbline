@@ -3,7 +3,7 @@ pragma solidity ^0.7.6;
 pragma experimental ABIEncoderV2;
 
 import {Test} from "forge-std/Test.sol";
-import {PuppyRaffle} from "../PuppyRaffle.sol";
+import {PuppyRaffle} from "../src/PuppyRaffle.sol";
 
 /// Reentrancy attacker for H-1. The malicious `receive()` calls back into
 /// `PuppyRaffle::refund` while the protocol is still mid-payout — exploits
