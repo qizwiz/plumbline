@@ -22,6 +22,12 @@ two commands to validate the hypothesis when you open the Codespace.
   (`uint64(fee)` truncation in `selectWinner`). Both predicted halmos
   verdicts: COUNTEREXAMPLE. Setup.sh updated to forge install OpenZeppelin
   v3.4.2 + Brechtpd/base64.
+- `t-swap/foundry.toml` + `test/Invariants.t.sol` — `check_swapPreservesXYK`
+  targeting H-5 (the 1e18 bonus token transfer every SWAP_COUNT_MAX=10
+  swaps breaks the constant-product invariant). `vm.store` seeds
+  `swap_count = 9` so the next swap immediately hits the bonus path.
+  Predicted halmos verdict: COUNTEREXAMPLE. Setup.sh updated to forge
+  install OpenZeppelin v4.x for solc 0.8.20.
 
 ## What is hypothesized (unverified)
 

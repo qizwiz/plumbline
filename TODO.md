@@ -41,10 +41,12 @@ unbounded work.
       give halmos a clean BitVec property; predicted COUNTEREXAMPLE on any
       fee ≥ 2**64. commit: (this pulse)
 
-- [ ] **(P2) Foundry+halmos scaffold for t-swap `x*y=k` invariant (H-5).**
+- [x] **(P2) Foundry+halmos scaffold for t-swap `x*y=k` invariant (H-5).**
       Write `examples/t-swap/foundry.toml` + `test/Invariants.t.sol`. After
       any sequence of swaps, `reserveX * reserveY >= k_before`. Expected:
       COUNTEREXAMPLE (H-5 says the extra-token-on-swapCount path breaks this).
+      Used `vm.store` to seed `swap_count = 9` so the next swap immediately
+      hits the bonus path; avoids 10-swap symbolic exploration. commit: (pulse)
 
 - [ ] **(P2) Audit `reps.jsonl` for schema drift.** Read all 20 rows,
       confirm each has `contract`, `proposer`, `score`, `verifier`,
