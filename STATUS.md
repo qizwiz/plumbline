@@ -16,6 +16,10 @@ two commands to validate the hypothesis when you open the Codespace.
 - `synthetic-dreusd/foundry.toml` + `test/Properties.t.sol` — Foundry +
   halmos scaffold with two symbolic invariants targeting the planted
   decimals bug. Compiles in pattern; not yet run.
+- `puppy-raffle/foundry.toml` + `test/Properties.t.sol` — Attacker contract
+  + `check_refundDoesNotPayTwice` targeting H-1 reentrancy (CEI violation
+  in `refund`). Predicted halmos verdict: COUNTEREXAMPLE. Setup.sh updated
+  to forge install OpenZeppelin v3.4.2 + Brechtpd/base64.
 
 ## What is hypothesized (unverified)
 

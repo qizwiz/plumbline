@@ -28,11 +28,12 @@ unbounded work.
 
 ## Items
 
-- [ ] **(P1) Foundry+halmos scaffold for puppy-raffle reentrancy (H-1).**
+- [x] **(P1) Foundry+halmos scaffold for puppy-raffle reentrancy (H-1).**
       Write `examples/puppy-raffle/foundry.toml` + `test/Properties.t.sol`
       with `check_refundIsBounded` using an Attacker contract whose `receive`
       re-enters `refund`. Expected halmos verdict: COUNTEREXAMPLE.
       Outcome: 2 new files committed; STATUS.md updated.
+      commit: (this pulse)
 
 - [ ] **(P1) Foundry+halmos scaffold for puppy-raffle integer overflow (H-3).**
       Write a `check_totalFeesNoOverflow` test that asserts no `uint64`

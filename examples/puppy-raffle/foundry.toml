@@ -1,0 +1,18 @@
+[profile.default]
+src = "."
+test = "test"
+out = "out"
+libs = ["lib"]
+solc_version = "0.7.6"
+optimizer = true
+optimizer_runs = 200
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "lib/base64/=lib/base64/",
+    "forge-std/=lib/forge-std/src/",
+]
+
+[profile.default.halmos]
+function = "check"
+loop = 5
+solver-timeout-assertion = 120000

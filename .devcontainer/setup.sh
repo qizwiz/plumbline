@@ -25,6 +25,14 @@ if [ -f examples/synthetic-dreusd/foundry.toml ]; then
     forge install --no-commit foundry-rs/forge-std transmissions11/solmate 2>&1 | tail -5 || true)
 fi
 
+echo ">>> [3a'/4] Foundry libs for examples/puppy-raffle (solc 0.7.6)..."
+if [ -f examples/puppy-raffle/foundry.toml ]; then
+  (cd examples/puppy-raffle && \
+    forge install --no-commit foundry-rs/forge-std \
+      OpenZeppelin/openzeppelin-contracts@v3.4.2 \
+      Brechtpd/base64 2>&1 | tail -5 || true)
+fi
+
 echo ">>> [3b/4] Verifying the rep loop turns..."
 ./.venv/bin/python first_rep.py || true
 ./.venv/bin/python scoreboard.py || true
