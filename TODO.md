@@ -17,6 +17,15 @@ This file drives the autonomous cron. Each pulse: pick the topmost
 7. **STATUS.md is the source of truth for "what JH sees first."** Update it
    when an item lands.
 
+## Self-extending rule (read before picking an item)
+
+When you finish a pulse and notice fewer than 5 unchecked `[ ]` items
+remain in this file, BEFORE you stop, append the templated items from
+`## Refill templates` (at the bottom of this file) — pick the 3 most
+relevant to current state and append them as new bounded items. This is
+the queue's only autonomy: refill from the templated list, never invent
+unbounded work.
+
 ## Items
 
 - [ ] **(P1) Foundry+halmos scaffold for puppy-raffle reentrancy (H-1).**
@@ -63,7 +72,53 @@ This file drives the autonomous cron. Each pulse: pick the topmost
 
 ## Hard stops
 
-- If item count drops to 0: append a single line "queue empty 2026-MM-DD"
-  to STATUS.md, push, end the cron.
+- If item count drops to 0 AND refill templates exhausted: append a single
+  line "queue empty 2026-MM-DD" to STATUS.md, push, end the cron.
 - If a single pulse takes >3 commits: stop. Drift detected.
 - If JH messages: cron yields immediately on next idle window.
+
+## Refill templates (used by self-extending rule)
+
+Pick 3 most relevant when items run low. Each is bounded, deterministic,
+verifiable. Cyfrin audit-data layout is known (`audit-data/<date>-<name>.md`
+on the `audit-data` branch).
+
+### Curation templates
+- Curate `examples/<name>` from Cyfrin/N-<name>-audit. Copy `src/`, extract
+  finding sections from canonical audit-data report via `gh api`, write
+  `.ANSWERS.md` matching sol_match's section tokenizer. Verify section
+  count vs finding count.
+- Candidates not yet curated: bridges audit, vault-guardians audit,
+  boss-bridge audit, password-store audit. Use `gh api` to find each repo's
+  audit-data branch first.
+
+### Halmos scaffold templates
+- For each curated `examples/<name>` that has a Foundry-style src layout:
+  write `foundry.toml` (solc version from `pragma solidity` of source) +
+  `test/Properties.t.sol` with at least one `check_*` symbolic invariant
+  targeting a HIGH finding from `.ANSWERS.md`. Predict halmos verdict in a
+  comment. Update `.devcontainer/setup.sh` so a Codespace boot picks up
+  the new scaffold.
+
+### Documentation templates
+- For each `examples/<name>`, write a short `README-bugs.md` cross-referencing
+  the planted/curated bugs to specific lines in the source. Keeps the
+  corpus readable without re-running the audit.
+- Update `CLAUDE.md` with any new Layer 1 contract changes (only after a
+  REAL rep surfaces a bug — never speculative).
+- Trim or refactor `STATUS.md` to keep it under 100 lines and accurate.
+
+### Tooling templates
+- Add a tiny CLI flag to `scoreboard.py`: `--corpus <name>` filters to one
+  group. Useful when comparing pulses.
+- Add `tools/dedup_reps.py` that detects and reports duplicate rep_ids
+  (should never happen, but if it does we want to know).
+- Add `tools/replay.py` that re-prints the score for a given `rep_id` from
+  `reps.jsonl` — useful for sanity-checking historical reps.
+- Add a single GH Actions workflow `.github/workflows/sanity.yml` that
+  runs `python -c 'import json; [json.loads(l) for l in open("reps.jsonl")]'`
+  on every push (validates the dataset stays parseable).
+
+### MCP templates
+- Wrap one plumbline function as an MCP tool at a time (sol_match.match
+  first, then scoreboard.main, then halmos_rep.run_one).
