@@ -6,6 +6,43 @@ mint/redemption, rewards distribution, and a LayerZero OFT cross-chain adapter. 
 fed to the adaptive planner as `context`. Each item = the invariant that must hold + the attack that
 breaks it. ★ = plumbline's sweet spot (conservation/solvency, auto-checkable); ☉ = manual-heavy.
 
+## REAL dreUSD architecture (from the PUBLIC Spearbit + Quantstamp audits, github.com/dre-labs/transparency)
+
+The protocol is FAR bigger than the Sherlock blurb. The dreUSD has TWO prior audits (Spearbit 2026-02,
+Quantstamp 2026-03) — public PDFs. Real features + Spearbit's risk map (these bugs are FIXED; the
+contest is leftovers/variants/3-months-of-changes in these SAME areas):
+- **Vested yield** (dreUSDs) — NOT a naive lump. JIT class is real but subtler: hunt **vesting BYPASS**
+  ("Stale cTs causes instant reward vesting"; "VestPeriod under 1 day can brick addRewards").
+- **Fiat mint** via EIP-712 sigs ("struct hash clobbers memory"; "sig not purpose bound" = replay/cross-use).
+- **Express withdrawals** — debt/fee/NFT instant-exit ("limit decrease breaks payback"; "debt without
+  payback addr"; "unbounded fees"; CEI/reentrancy via `_safeMint`).
+- **Cross-chain hub/spoke OFT** ("token freeze strands funds"; "Composer clears OFT minAmountLD to 0";
+  "spoke share token missing sanctions").
+- **Oracles** ("missing price-deviation check → depeg"; "missing L2 sequencer uptime check").
+- **Sanctions/compliance** layer (inconsistent across flows), **Aave yield adapters** (aToken not
+  validated), **withdrawal NFTs** (unbounded burn loop), **fee-on-transfer** (USDT) handling.
+HUNT (contest = what 2 firms missed): vesting-bypass variants, express-withdrawal debt/fee math + the
+reentrancy class, oracle deviation/sequencer, cross-chain freeze/strand, sanctions gaps, and anything
+ADDED since Mar 2026. The glue, not the ERC20/4626 basics.
+
+### #0 HOTTEST AREA — confirmed by BOTH firms: dreRewardsDistributor ↔ dreUSDs.totalAssets() ↔ vesting
+Components: `dreUSDManager` (orchestrator: USDC->dreUSD mint, withdrawals via `dreWithdrawalNFT` filled
+in USDC from Aave by privileged fillers), `dreUSDs` (ERC4626 vault), `dreRewardsDistributor` (streams/
+vests yield into the vault). The reward→vest→totalAssets→redeem machinery is the most bug-dense surface:
+- Spearbit: "stale cTs -> instant reward vesting" (vesting bypass); "VestPeriod<1day bricks addRewards";
+  "dust reward addition resets vesting schedule".
+- Quantstamp: "Manager can deflate share price during reward top-up"; the desync — *vested-reward
+  transfer desyncs the vault asset counter -> shareholders can't redeem though totalAssets counts it*.
+Specifics are FIXED; hunt VARIANTS in this exact machinery (top-up timing, totalAssets vs actual
+balance vs unvested, cTs/cooldown staleness, dust/rounding in the vest schedule, mintAndStake slippage).
+
+### "ACKNOWLEDGED" (NOT fixed — still in the code; escalations/variants may pay):
+- **DRE-7**: bridge sends can credit BLOCKED recipients on the destination chain (sanctions bypass cross-chain).
+- **DRE-12**: express filler debt can be reimbursed to the WRONG filler.
+
+(Source: public audits at github.com/dre-labs/transparency — Spearbit 2026-02, Quantstamp 2026-03.
+Real site = dre.app / docs.dre.app; GitHub org = dre-labs. The dre.mortgage/aura leads were dead ends.)
+
 ## CONFIRMED protocol model (dre.mortgage, from their site + scope)
 
 dreUSD = USD stablecoin (1:1 USDC, backed by REAL-ESTATE CREDIT / RWA). dreUSDs = ERC-4626 vault you
