@@ -27,7 +27,8 @@ import rep_log
 PY = os.path.join(HERE, ".venv/bin/python")
 
 
-def run_one(ex_path: str, truth_override: str | None = None) -> dict:
+def run_one(ex_path: str, truth_override: str | None = None,
+            recall_mode: bool = False) -> dict:
     ex_abs = os.path.join(HERE, ex_path) if not os.path.isabs(ex_path) else ex_path
     if truth_override:
         truth = (os.path.join(HERE, truth_override)
@@ -45,8 +46,15 @@ def run_one(ex_path: str, truth_override: str | None = None) -> dict:
             truth = None  # rep still logs; score is null
 
     # Call sol_intent the same way sol_flywheel does — subprocess, capture stdout.
+    cmd = [PY, "sol_intent.py", ex_abs]
+    if recall_mode:
+        # Recall-first prompt (sol_find.md) — short bullets, no proof requirement,
+        # 8 explicit lenses. Use for large corpora where the proof-grade intent
+        # prompt exhausts output budget on the Promises phase before reaching
+        # Violations (seen on sequence corpus, 50 .sol files, 2026-06-05).
+        cmd.append("--recall")
     proc = subprocess.run(
-        [PY, "sol_intent.py", ex_abs],
+        cmd,
         cwd=HERE,
         capture_output=True,
         text=True,
@@ -89,6 +97,7 @@ def run_one(ex_path: str, truth_override: str | None = None) -> dict:
         "proposer": {
             "kind": "sol_intent",
             "version": "v1",
+            "mode": "recall" if recall_mode else "intent",
             "model": os.environ.get("ANTHROPIC_MODEL", "default"),
             "exit": proc.returncode,
         },
@@ -105,12 +114,15 @@ def run_one(ex_path: str, truth_override: str | None = None) -> dict:
 
 
 def main():
-    if len(sys.argv) < 2:
+    args = sys.argv[1:]
+    recall_mode = "--recall" in args
+    exes = [a for a in args if not a.startswith("--")]
+    if not exes:
         print(__doc__)
         sys.exit(1)
-    for ex in sys.argv[1:]:
+    for ex in exes:
         try:
-            r = run_one(ex)
+            r = run_one(ex, recall_mode=recall_mode)
             print(json.dumps({
                 "ex": ex,
                 "rep_id": r["rep_id"],
