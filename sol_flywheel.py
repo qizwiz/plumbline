@@ -42,8 +42,10 @@ def _leads(rung):
 
 def _learn(rung, sc):
     """Write the GROUNDED miss-signal back as a durable lesson (the only thing that trains the generator)."""
-    lesson = (f"\n## from {rung['name']} (recall {sc.get('recall')}, difficulty {rung['difficulty']})\n"
-              f"MISSED: {'; '.join(sc.get('missed', []))[:600]}\n"
+    lesson = (f"\n## from {rung['name']} (recall {sc.get('recall')}, precision {sc.get('precision')}, "
+              f"difficulty {rung['difficulty']})\n"
+              f"MISSED (train to catch): {'; '.join(sc.get('missed', []))[:600]}\n"
+              f"NOISE (train to stop over-flagging): {'; '.join(sc.get('noise', []))[:400]}\n"
               f"LESSON: {sc.get('signal', '')}\n")
     with open(LESSONS, "a", encoding="utf-8") as f:
         f.write(lesson)

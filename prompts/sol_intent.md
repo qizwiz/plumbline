@@ -23,6 +23,10 @@ Return markdown:
 ## Intent — the promises
 ## Violations — where the code betrays them   (struggle-prioritized; highest severity first)
 
+=== GROUNDED LESSONS (bug patterns you have demonstrably MISSED before — derived from measured recall, not
+opinion; weight these heavily, they are your known blind spots) ===
+{{lessons}}
+
 === STRUGGLE MAP (git history: where they fought bugs) ===
 {{struggle}}
 
