@@ -1,0 +1,97 @@
+name: rep-loop
+
+# Runs the bilayer Layer 1 loop on every push to main: scoreboard, validator,
+# and (if PACT_LLM_API_KEY is set as a repo secret) one sol_intent rep per
+# curated corpus. If the secret is absent, the model-rep stage is SKIPPED
+# (not failed) — the deterministic half still runs.
+#
+# Honest cost note: each sol_intent rep is one paid LLM call (~$0.05–$0.50
+# depending on contract size). With 3 corpora and 1 rep per corpus per push,
+# expect ~$1/push. Set the secret only when you want the auto-rep on; unset
+# it to keep CI cheap.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'sol_match.py'
+      - 'sol_intent.py'
+      - 'rep_log.py'
+      - 'model_rep.py'
+      - 'reps.jsonl'
+      - '.github/workflows/loop.yml'
+  workflow_dispatch:
+    inputs:
+      run_reps:
+        description: 'Run sol_intent reps on the curated corpora'
+        required: false
+        default: 'true'
+
+jobs:
+  scoreboard:
+    name: scoreboard + validator (deterministic, free)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt fastembed numpy
+      - run: python tools/validate_reps.py
+      - run: python scoreboard.py
+
+  reps:
+    name: sol_intent reps (paid, gated on PACT_LLM_API_KEY)
+    runs-on: ubuntu-latest
+    needs: scoreboard
+    # Only run when the secret exists AND either manual-dispatch with
+    # run_reps=true or push to main that touched a corpus.
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: deps
+        run: pip install -r requirements.txt fastembed numpy
+      - name: gate on secret
+        id: gate
+        env:
+          KEY: ${{ secrets.PACT_LLM_API_KEY }}
+        run: |
+          if [ -z "$KEY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "PACT_LLM_API_KEY not set — skipping reps stage (deterministic stage already ran)."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: run reps on curated corpora
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          PACT_LLM_API_KEY: ${{ secrets.PACT_LLM_API_KEY }}
+          PACT_LLM_BASE_URL: ${{ secrets.PACT_LLM_BASE_URL }}
+          PACT_LLM_MODEL: ${{ secrets.PACT_LLM_MODEL }}
+        run: |
+          set -e
+          for ex in examples/puppy-raffle examples/t-swap examples/thunder-loan; do
+            if [ -f "$ex/.ANSWERS.md" ]; then
+              python model_rep.py "$ex" || true
+            fi
+          done
+          python tools/validate_reps.py
+      - name: commit new rows
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          set -e
+          git config user.name "plumbline-bot"
+          git config user.email "bot@plumbline.local"
+          if ! git diff --quiet reps.jsonl; then
+            git add reps.jsonl
+            git commit -m "ci(reps): auto-append $(git diff --cached --stat reps.jsonl | tail -1 | awk '{print $4}') new rows"
+            git push
+          else
+            echo "no new rows"
+          fi

@@ -65,10 +65,13 @@ unbounded work.
       plumbline_halmos_rep, plumbline_status). sol_intent deliberately
       NOT exposed (LLM-spend gate). commit: (pulse)
 
-- [ ] **(P3) Add `.github/workflows/loop.yml`** that runs the rep loop on
+- [x] **(P3) Add `.github/workflows/loop.yml`** that runs the rep loop on
       every push to main: install deps → run all `examples/*` with
       `model_rep.py` skipping if no API key → commit any new reps.jsonl
       rows → push back. Self-extending dataset.
+      Two jobs: `scoreboard` (deterministic, always runs) +
+      `reps` (gated on PACT_LLM_API_KEY secret; SKIPS if absent, costs
+      ~$1/push if present). Auto-commits new rows. commit: (pulse)
 
 - [ ] **(P4) `tools/fitness_card.py`:** generate a single PNG card from
       `reps.jsonl` showing recall/precision per corpus over time. Just
@@ -80,6 +83,25 @@ unbounded work.
 
 - [ ] **(P5) Cleanup pass:** verify CLAUDE.md / STATUS.md / README.md are
       mutually consistent. Trim stale notes.
+
+### Refilled 2026-06-05 (template-derived, P4/P5)
+
+- [ ] **(P4) Halmos scaffold for thunder-loan H-1 storage collision.**
+      Write `examples/thunder-loan/foundry.toml` + `test/Properties.t.sol`
+      with `check_storageSlotsConsistent` comparing the slot layout of
+      `ThunderLoan` vs `ThunderLoanUpgraded`. Expected: COUNTEREXAMPLE
+      (s_flashLoanFee at different slot in upgrade). Update setup.sh
+      to forge install OZ-upgradeable.
+
+- [ ] **(P4) Curate examples/boss-bridge from Cyfrin/7-boss-bridge-audit.**
+      Same procedure as puppy-raffle/t-swap/thunder-loan: gh api the
+      audit-data report, write `.ANSWERS.md` aligned to sol_match's
+      section tokenizer, copy `src/`, verify section count.
+
+- [ ] **(P5) Per-corpus `README-bugs.md` for puppy-raffle.** Cross-reference
+      each finding from `.ANSWERS.md` to the specific line range in
+      `PuppyRaffle.sol`. Keeps the corpus auditable without re-reading the
+      original Cyfrin report.
 
 ## Hard stops
 
