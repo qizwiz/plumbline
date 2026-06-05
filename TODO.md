@@ -153,9 +153,12 @@ unbounded work.
       across all 4 source files. Cross-references H-1 to the existing
       [skip:] note on the storage-collision halmos scaffold. commit: (pulse)
 
-- [ ] **(P4) `tools/replay.py`:** given a `rep_id`, re-print the score row
+- [x] **(P4) `tools/replay.py`:** given a `rep_id`, re-print the score row
       from `reps.jsonl` (verifier output, leads, score, contract path).
       Useful for sanity-checking historical reps without scrolling JSONL.
+      Prefix-match (8 hex chars enough), pretty rendering for both
+      sol_match and halmos verifier shapes, includes truth path + first
+      5 leads. Verified against last row in dataset. commit: (pulse)
 
 - [ ] **(P4) `scoreboard.py --corpus <name>` filter flag.** Restrict the
       μ±σ aggregate to one corpus. Useful for comparing one corpus across
