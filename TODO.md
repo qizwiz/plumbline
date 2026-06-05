@@ -99,7 +99,9 @@ unbounded work.
 
 ### Refilled 2026-06-05 (template-derived, P4/P5)
 
-- [ ] **(P4) Halmos scaffold for thunder-loan H-1 storage collision.**
+- [skip: halmos models runtime symbolic state, not compiled storage layouts;
+   this bug needs `forge inspect storage` or slither-check-upgradeability]
+   **(P4) Halmos scaffold for thunder-loan H-1 storage collision.**
       Write `examples/thunder-loan/foundry.toml` + `test/Properties.t.sol`
       with `check_storageSlotsConsistent` comparing the slot layout of
       `ThunderLoan` vs `ThunderLoanUpgraded`. Expected: COUNTEREXAMPLE
@@ -112,10 +114,12 @@ unbounded work.
       section tokenizer, copy `src/`, verify section count.
       [done by P4.2 (commit bbf1513) under the parent item]
 
-- [ ] **(P5) Per-corpus `README-bugs.md` for puppy-raffle.** Cross-reference
+- [x] **(P5) Per-corpus `README-bugs.md` for puppy-raffle.** Cross-reference
       each finding from `.ANSWERS.md` to the specific line range in
       `PuppyRaffle.sol`. Keeps the corpus auditable without re-reading the
       original Cyfrin report.
+      16-row table mapping each H/M/I finding to specific line ranges +
+      one-line mechanism, plus a usage note. commit: (pulse)
 
 ### Refilled 2026-06-05 (second pass, P4/P5)
 
