@@ -146,9 +146,12 @@ unbounded work.
 
 ### Refilled 2026-06-05 (third pass)
 
-- [ ] **(P5) Per-corpus `README-bugs.md` for thunder-loan.** Cross-reference
+- [x] **(P5) Per-corpus `README-bugs.md` for thunder-loan.** Cross-reference
       each finding from `.ANSWERS.md` to specific line ranges across
       `ThunderLoan.sol` / `AssetToken.sol` / `OracleUpgradeable.sol`.
+      14-row table covering H-1..H-4 / M-1..M-4 / L-1..L-3 / I-1..I-4
+      across all 4 source files. Cross-references H-1 to the existing
+      [skip:] note on the storage-collision halmos scaffold. commit: (pulse)
 
 - [ ] **(P4) `tools/replay.py`:** given a `rep_id`, re-print the score row
       from `reps.jsonl` (verifier output, leads, score, contract path).
