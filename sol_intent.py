@@ -74,27 +74,17 @@ def git_struggle(root, sols):
     return "\n".join(f"  {rel}: {churn} commits, {struggle} fix/revert" for _, churn, struggle, rel in rows)
 
 
-def _lessons():
-    """The grounded feedback loop: bug patterns the flywheel measured us MISSING (lessons.md). Empty
-    until the flywheel has run a rung we failed — then it sharpens every future analysis."""
-    p = os.path.join(HERE, "prompts", "lessons.md")
-    if os.path.isfile(p):
-        t = open(p, encoding="utf-8", errors="replace").read()
-        # drop the header comments; keep the actual lessons
-        body = "\n".join(l for l in t.splitlines() if not l.startswith("#")).strip()
-        return body[-6000:] if body else "(none yet — no measured misses)"
-    return "(none yet — no measured misses)"
-
-
 def analyze(root, model=None):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
     struggle = git_struggle(root, sols)
     src_blob = "\n\n".join(f"// ===== {rel} =====\n{src}" for rel, src in sols)[:60000]
+    # The prompt is file-backed and SELF-IMPROVING: sol_flywheel scores this output on grounded
+    # recall/precision and calls prompt_improve.improve_if_weak, which rewrites sol_intent.md when weak.
     prompt = pi.render(
         open(os.path.join(HERE, "prompts/sol_intent.md")).read(),
-        lessons=_lessons(), struggle=struggle, readme=readme or "(no README)",
+        struggle=struggle, readme=readme or "(no README)",
         adrs=adrs or "(no ADRs found)", sources=src_blob)
     return agent._ask(prompt, 3000)
 
