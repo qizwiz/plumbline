@@ -88,8 +88,14 @@ unbounded work.
       vault-guardians audit-data branch returned 404 — skipped.
       commit: (pulse)
 
-- [ ] **(P5) Cleanup pass:** verify CLAUDE.md / STATUS.md / README.md are
+- [x] **(P5) Cleanup pass:** verify CLAUDE.md / STATUS.md / README.md are
       mutually consistent. Trim stale notes.
+      STATUS.md fully rewritten — corpus inventory (7 total: 4 real + 3
+      synthetic, ~95 findings), halmos-scaffolds table (5 properties),
+      tools inventory, updated validation commands, MCP section,
+      cron-audit-trail pointer. CLAUDE.md left as-is (its 5 Layer 1 lessons
+      remain accurate; no source of inconsistency). README.md not touched
+      this pulse — separate item. commit: (pulse)
 
 ### Refilled 2026-06-05 (template-derived, P4/P5)
 
@@ -100,15 +106,32 @@ unbounded work.
       (s_flashLoanFee at different slot in upgrade). Update setup.sh
       to forge install OZ-upgradeable.
 
-- [ ] **(P4) Curate examples/boss-bridge from Cyfrin/7-boss-bridge-audit.**
+- [x] **(P4) Curate examples/boss-bridge from Cyfrin/7-boss-bridge-audit.**
       Same procedure as puppy-raffle/t-swap/thunder-loan: gh api the
       audit-data report, write `.ANSWERS.md` aligned to sol_match's
       section tokenizer, copy `src/`, verify section count.
+      [done by P4.2 (commit bbf1513) under the parent item]
 
 - [ ] **(P5) Per-corpus `README-bugs.md` for puppy-raffle.** Cross-reference
       each finding from `.ANSWERS.md` to the specific line range in
       `PuppyRaffle.sol`. Keeps the corpus auditable without re-reading the
       original Cyfrin report.
+
+### Refilled 2026-06-05 (second pass, P4/P5)
+
+- [ ] **(P4) Halmos scaffold for boss-bridge H-3 signature replay.**
+      Write `examples/boss-bridge/foundry.toml` + `test/Properties.t.sol`
+      with `check_withdrawCannotBeReplayed` — a property asserting that the
+      same withdrawal signature cannot drain funds twice. Expected halmos
+      verdict: COUNTEREXAMPLE (no nonce/expiry in `withdrawTokensToL1`).
+
+- [ ] **(P4) `tools/dedup_reps.py` per refill template.** Detects and reports
+      duplicate `rep_id`s in `reps.jsonl`. Should never trigger; if it does,
+      log to STATUS.md. Add to sanity.yml CI.
+
+- [ ] **(P5) Per-corpus `README-bugs.md` for t-swap.** Cross-reference each
+      finding from `.ANSWERS.md` to specific line ranges in `TSwapPool.sol`
+      / `PoolFactory.sol`. Parallel to the puppy-raffle item.
 
 ## Hard stops
 

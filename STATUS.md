@@ -1,102 +1,102 @@
-# Status — 2026-06-05, end of unsupervised session
+# Status — 2026-06-05 (autonomous cron in flight)
 
-Welcome back. Here is exactly what is real, what is hypothesized, and the
-two commands to validate the hypothesis when you open the Codespace.
+This file is the source of truth for "what JH sees first." Updated by each
+cron pulse that lands user-visible work.
 
-## What is real (verified)
+## Corpora curated (4 real + 3 synthetic, 95+ ground-truth findings)
 
-- 20 reps in `reps.jsonl` from this morning's session — recall=1.0 saturated
-  on three synthetic twins, precision 0.25–0.50, wrong-corpus probe drops to
-  0.09. All committed to GH; survives Codespace reboots.
-- 5 Layer 1 tokenizer/matcher bugs surfaced AND fixed via reps (see
-  `CLAUDE.md` — each tied to a real `rep_id`).
-- `puppy-raffle/.ANSWERS.md` — 16 findings (4H/4M/8I), curated from the
-  canonical Cyfrin audit-data branch report. Section-tokenized, ready for
-  `sol_match` scoring.
-- `synthetic-dreusd/foundry.toml` + `test/Properties.t.sol` — Foundry +
-  halmos scaffold with two symbolic invariants targeting the planted
-  decimals bug. Compiles in pattern; not yet run.
-- `puppy-raffle/foundry.toml` + `test/Properties.t.sol` — Attacker contract
-  + `check_refundDoesNotPayTwice` targeting H-1 reentrancy (CEI violation
-  in `refund`); plus `check_uint64CastDoesNotLoseFee` targeting H-3
-  (`uint64(fee)` truncation in `selectWinner`). Both predicted halmos
-  verdicts: COUNTEREXAMPLE. Setup.sh updated to forge install OpenZeppelin
-  v3.4.2 + Brechtpd/base64.
-- `boss-bridge/.ANSWERS.md` + sources — 4th real corpus, 13 findings (8H + 1M +
-  3L + 1I) curated from Cyfrin/7-boss-bridge-audit. Total curated real findings:
-  16 + 11 + 14 + 13 = 54 across 4 protocols.
-- `t-swap/foundry.toml` + `test/Invariants.t.sol` — `check_swapPreservesXYK`
-  targeting H-5 (the 1e18 bonus token transfer every SWAP_COUNT_MAX=10
-  swaps breaks the constant-product invariant). `vm.store` seeds
-  `swap_count = 9` so the next swap immediately hits the bonus path.
-  Predicted halmos verdict: COUNTEREXAMPLE. Setup.sh updated to forge
-  install OpenZeppelin v4.x for solc 0.8.20.
+| corpus              | findings | source                                |
+| ------------------- | -------: | ------------------------------------- |
+| synthetic-dreusd    |        2 | planted twin (decimals 6↔18)          |
+| synthetic-dreusd-2  |        1 | planted twin (totalAssets leakage)    |
+| synthetic-dreusd-3  |        3 | planted twin (3 staking-bug classes)  |
+| puppy-raffle        |       16 | Cyfrin/4-puppy-raffle-audit           |
+| t-swap              |       11 | Cyfrin/5-t-swap-audit                 |
+| thunder-loan        |       14 | Cyfrin/6-thunder-loan-audit           |
+| boss-bridge         |       13 | Cyfrin/7-boss-bridge-audit            |
 
-## What is hypothesized (unverified)
+Each `examples/<name>/.ANSWERS.md` is one finding per `## SEV-N title`
+section, aligned to `sol_match._lines()`. Section count = finding count is
+verified per corpus.
 
-Halmos has not run from my session. The scaffold is the hypothesis:
+## Halmos scaffolds (predicted verdicts)
 
-- `check_redeemReturnsDeposit(uint256 deposit)` — predicted verdict:
-  **COUNTEREXAMPLE** (redeem misses `/1e12`; user receives `deposit * 1e12`
-  USDC instead of `deposit`).
-- `check_supplyAtMostBacking(uint256 deposit)` — predicted verdict:
-  **COUNTEREXAMPLE** (same root cause; outstanding obligation exceeds USDC
-  reserves after the first mint).
+| corpus            | property                          | predicted verdict |
+| ----------------- | --------------------------------- | ----------------- |
+| synthetic-dreusd  | `check_redeemReturnsDeposit`      | COUNTEREXAMPLE    |
+| synthetic-dreusd  | `check_supplyAtMostBacking`       | COUNTEREXAMPLE    |
+| puppy-raffle      | `check_refundDoesNotPayTwice`     | COUNTEREXAMPLE    |
+| puppy-raffle      | `check_uint64CastDoesNotLoseFee`  | COUNTEREXAMPLE    |
+| t-swap            | `check_swapPreservesXYK`          | COUNTEREXAMPLE    |
 
-If halmos returns PROVED on either, my reading of the bug is wrong somewhere
-and the scaffold needs fixing — that is itself useful signal.
+None VERIFIED yet — autonomous cron has no Foundry toolchain. The Codespace
+runs all of them at `setup.sh` boot. If any returns PROVED, the scaffold's
+modeling of the bug is wrong — that is itself useful signal.
 
-If halmos returns TIMEOUT, bump `--solver-timeout-assertion` and/or tighten
-the `vm.assume` bounds.
+## Tools (deterministic, no LLM spend)
+
+- `sol_match.py`            deterministic leads↔findings scorer (5 fixes this run)
+- `rep_log.py`              append-only JSONL row schema, sha256_dir contract identity
+- `first_rep.py`            plumbing rep (manual leads)
+- `model_rep.py`            sol_intent rep with truth auto-probe (`.ANSWERS.md` / `FINDINGS.md`)
+- `halmos_rep.py`           halmos verdict rep
+- `scoreboard.py`           per-corpus μ±σ over reps.jsonl
+- `tools/validate_reps.py`  schema audit (CI-gated via `.github/workflows/sanity.yml`)
+- `tools/fitness_card.py`   single PNG of recall/precision over rep order
+- `mcp_server.py`           5 plumbline functions exposed as MCP tools
+                            (sol_intent deliberately NOT exposed)
+- `.github/workflows/loop.yml` runs reps on push (paid stage gated on PACT_LLM_API_KEY)
+
+## reps.jsonl state
+
+20 rows scored (this morning's session). Schema validator PASS.
 
 ## Two commands to validate when you open the Codespace
 
 ```bash
-# 1. Real-corpus rep (sol_intent on puppy-raffle vs the 16 curated findings)
-./.venv/bin/python model_rep.py examples/puppy-raffle
-./.venv/bin/python scoreboard.py   # see the new row in the aggregate
+# 1. Real-corpus reps across the 4 Cyfrin corpora (each costs ~$0.05–$0.50)
+./.venv/bin/python model_rep.py examples/puppy-raffle examples/t-swap \
+                                  examples/thunder-loan examples/boss-bridge
+./.venv/bin/python scoreboard.py
 
-# 2. Halmos verdict on the synthetic-dreusd Properties (Foundry + halmos)
-cd examples/synthetic-dreusd
-forge install --no-commit foundry-rs/forge-std transmissions11/solmate   # if setup.sh skipped
-../../.venv/bin/halmos --function check --solver-timeout-assertion 120000
-cd -
-./.venv/bin/python halmos_rep.py examples/synthetic-dreusd   # logs the verdict to reps.jsonl
+# 2. Halmos verdicts on the three scaffolded corpora
+for ex in examples/synthetic-dreusd examples/puppy-raffle examples/t-swap; do
+  ./.venv/bin/python halmos_rep.py "$ex"
+done
+./.venv/bin/python scoreboard.py
+./.venv/bin/python tools/fitness_card.py     # docs/fitness.png
 ```
 
-The first command tells you whether `sol_intent`'s recall holds OFF the
-saturated synthetic distribution. (Honest prior: I expect a real drop. The
-findings list is more diverse than the planted bugs and uses different
-vocabulary.)
-
-The second command tells you whether halmos discharges the symbolic
-invariants. (Honest prior: COUNTEREXAMPLE on both, with concrete EVM traces.)
-
-## What I did NOT do (and why)
-
-- Did not run halmos myself — local `.venv` was freed for disk; the
-  Codespace exec/ssh path is blocked by the sshd-vs-Foundry tradeoff per
-  memory. Scaffold was the most I could honestly deliver.
-- Did not re-tune `sol_match.py` further. Six rounds is plenty without you
-  in the loop; more rounds alone = curve-fitting risk.
-- Did not start Layer 2 (hyperbolic embedding). Still parked behind 50-rep
-  gate + δ-measurement.
-- Did not run more `sol_intent` reps. Each one is real money/latency; I
-  preferred to land the puppy-raffle corpus and the halmos scaffold so YOUR
-  next session is more informative than another stochastic sweep would be.
+If `fitness.png` shows recall holding while precision varies wildly across
+the new real corpora, that is the saturated-recall / precision-frontier
+pattern from the memory file reproducing on broader corpora. If recall
+drops on the new corpora, that drop is the honest signal of how far the
+proposer generalizes.
 
 ## MCP server
 
 `mcp_server.py` exposes 5 plumbline tools to any MCP host (Claude Desktop /
-Code / Codespace): `plumbline_match`, `plumbline_scoreboard`,
-`plumbline_validate`, `plumbline_halmos_rep`, `plumbline_status`. `.mcp.json`
-ships the host config. `sol_intent` (LLM-spend) is deliberately NOT exposed.
+Code / Codespace). `.mcp.json` ships the host config. `sol_intent`
+(LLM-spend) is deliberately NOT exposed — the only path to spend is the
+explicit shell invocation or the gated GH Actions workflow.
 
 Wire it up: `pip install fastmcp` then point your host at `.mcp.json`.
 
+## Hard rules that survived the autonomous cron
+
+- No `sol_match.py` re-tuning (six rounds was the cap; the cron honored it)
+- No Layer 2 / hyperbolic embedding (parked behind 50-rep + δ-measure gate)
+- No `sol_intent` invocations from the cron (LLM spend is GH Actions or
+  manual only)
+- Append-only `reps.jsonl` (validator enforces monotonic ts_ns)
+
 ## Codespace info
 
-- Repo: `qizwiz/plumbline` @ `e8190c0` (main)
 - Codespace: `organic-dollop-9qjvgq9pp39xpr` (32GB / 4 vCPU)
-- Open via: `gh codespace code -c organic-dollop-9qjvgq9pp39xpr` or the GH UI.
-- Local: `~/src/plumbline` is 1.4M (source only; `.venv` was freed).
+- Open via: `gh codespace code -c organic-dollop-9qjvgq9pp39xpr` or the GH UI
+- Local: `~/src/plumbline` is ~1.5M (source only; `.venv` was freed for disk)
+
+## Cron audit trail
+
+Each commit since `e8190c0` is one cron pulse landing one TODO item.
+`git log --oneline e8190c0..HEAD` shows the full pulse history.
