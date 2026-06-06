@@ -1,0 +1,47 @@
+[DRY-RUN] Leads for examples/sequence/. In a real contest these would come from
+`python sol_intent.py examples/sequence --recall`. Here derived from .ANSWERS.md
+(noted in HYPOTHESES.md) so the substrate-validation pipeline can proceed at $0.
+
+LEAD-1  H-01-shape  Chained signature path skips checkpointer validation when the
+                    chained-mode flag is set, allowing all signature-flow guards
+                    to be bypassed for that authorization. Path: modules/auth/*
+                    chained signature handling.
+
+LEAD-2  H-02-shape  Partial signature replay across session calls — a fragment of
+                    a session signature can be reused or front-run because per-
+                    call binding is missing on the session path.
+
+LEAD-3  M-01-shape  Session signatures replay across DIFFERENT wallets because the
+                    signed payload does not bind the wallet address; same session
+                    sig accepted by every wallet sharing the session key.
+
+LEAD-4  M-02-shape  Static signatures keyed on msg.sender revert when wallet is
+                    invoked via ERC-4337 EntryPoint (msg.sender == EntryPoint, not
+                    user). Permanent DoS for static-sig action class on 4337 path.
+
+LEAD-5  M-03-shape  BaseAuth.recoverSapientSignature returns a hardcoded constant
+                    instead of the recovered signer image hash, conflating all
+                    sapient signers to one identity.
+
+LEAD-6  M-04-shape  Factory.deploy reverts when contract already exists at the
+                    deterministic address instead of returning the existing
+                    address. Bundler/relayer crash on second invocation.
+
+LEAD-7  L-01-shape  Intermediate per-call cumulative-parameter validation uses
+                    wrong accumulator state; values that violate the cumulative
+                    rule pass per-call validation.
+
+LEAD-8  L-02-shape  Session value-spent counter increments for fallback and
+                    reverted calls, prematurely exhausting session budgets.
+
+LEAD-9  L-03-shape  Nonce consumption reverts on inner execution failure;
+                    signature can be replayed once the revert condition clears.
+
+LEAD-10 L-04-shape  Defensive bitmasks in LibBytes::readUnitX are redundant given
+                    Solidity calldata semantics — gas overhead only.
+
+LEAD-11 L-05-shape  Usage-limit accounting reads/writes the same slot multiple
+                    times where one read-modify-write would suffice.
+
+LEAD-12 L-06-shape  Delegate-call destination validation performed in two locations
+                    in the call path; one can be removed.

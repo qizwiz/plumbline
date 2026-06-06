@@ -1,0 +1,1375 @@
+'solc --version' running
+'solc examples/sequence/Stage2Module.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/Factory.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/Wallet.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/Guest.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/Estimator.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/ERC4337FactoryWrapper.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/Stage1Module.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+'solc --version' running
+'solc examples/sequence/Simulator.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --via-ir --optimize --allow-paths .,/Users/jonathanhill/src/plumbline/examples/sequence' running
+INFO:Detectors:
+Detector: controlled-delegatecall
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses delegatecall to a input-controlled function id
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall
+INFO:Detectors:
+Detector: incorrect-shift
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) contains an incorrect shift operation: a = word_readUintX_asm_0 >> shift_readUintX_asm_0 & 1 << 8 * _length - 1 (examples/sequence/utils/LibBytes.sol#76)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly
+INFO:Detectors:
+Detector: uninitialized-local
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).linkedPayload (examples/sequence/modules/auth/BaseSig.sol#164) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#167) is a local variable never initialized
+BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address).snapshot (examples/sequence/modules/auth/BaseSig.sol#91) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Detector: unused-return
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) ignores return value by (threshold,weight,imageHash,None,opHash) = BaseSig.recover(_payload,_signature,BaseSig.RecoverMode.Initial,address(0)) (examples/sequence/modules/auth/BaseAuth.sol#111-112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: write-after-write
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_8,rindex) = _signature.readUintX(rindex,sizeSize_scope_7) (examples/sequence/modules/auth/BaseSig.sol#333)
+	rindex = nrindex_scope_9 (examples/sequence/modules/auth/BaseSig.sol#339)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_11,rindex) = _signature.readUint24(rindex) (examples/sequence/modules/auth/BaseSig.sol#365)
+	rindex = nrindex_scope_12 (examples/sequence/modules/auth/BaseSig.sol#369)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_25,rindex) = _signature.readUintX(rindex,sizeSize_scope_26) (examples/sequence/modules/auth/BaseSig.sol#460)
+	rindex = nrindex_scope_27 (examples/sequence/modules/auth/BaseSig.sol#468)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_32,rindex) = _signature.readUintX(rindex,sizeSize_scope_31) (examples/sequence/modules/auth/BaseSig.sol#495)
+	rindex = nrindex_scope_33 (examples/sequence/modules/auth/BaseSig.sol#503)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+INFO:Detectors:
+Detector: timestamp
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp <= block.timestamp (examples/sequence/modules/auth/BaseAuth.sol#94)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: assembly
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses assembly
+	- INLINE ASM (examples/sequence/modules/Hooks.sol#113-116)
+Implementation._setImplementation(address) (examples/sequence/modules/Implementation.sol#36-42) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#39-41)
+Implementation._getImplementation() (examples/sequence/modules/Implementation.sol#44-48) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#45-47)
+Storage.writeBytes32(bytes32,bytes32) (examples/sequence/modules/Storage.sol#9-13) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#10-12)
+Storage.readBytes32(bytes32) (examples/sequence/modules/Storage.sol#15-21) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#18-20)
+Storage.writeBytes32Map(bytes32,bytes32,bytes32) (examples/sequence/modules/Storage.sol#23-28) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#25-27)
+Storage.readBytes32Map(bytes32,bytes32) (examples/sequence/modules/Storage.sol#30-35) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#32-34)
+LibBytes.readFirstUint8(bytes) (examples/sequence/utils/LibBytes.sol#11-19) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#14-18)
+LibBytes.readUint8(bytes,uint256) (examples/sequence/utils/LibBytes.sol#21-27) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#22-26)
+LibBytes.readUint16(bytes,uint256) (examples/sequence/utils/LibBytes.sol#29-35) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#30-34)
+LibBytes.readUint24(bytes,uint256) (examples/sequence/utils/LibBytes.sol#37-43) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#38-42)
+LibBytes.readUint64(bytes,uint256) (examples/sequence/utils/LibBytes.sol#45-51) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#46-50)
+LibBytes.readUint160(bytes,uint256) (examples/sequence/utils/LibBytes.sol#53-59) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#54-58)
+LibBytes.readUint256(bytes,uint256) (examples/sequence/utils/LibBytes.sol#61-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#62-65)
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#73-78)
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#82-86)
+LibBytes.readBytes32(bytes,uint256) (examples/sequence/utils/LibBytes.sol#89-94) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#90-93)
+LibBytes.readAddress(bytes,uint256) (examples/sequence/utils/LibBytes.sol#96-102) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#97-101)
+LibBytes.readRSVCompact(bytes,uint256) (examples/sequence/utils/LibBytes.sol#105-118) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#110-114)
+LibOptim.fkeccak256(bytes32,bytes32) (examples/sequence/utils/LibOptim.sol#16-22) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#17-21)
+LibOptim.returnData() (examples/sequence/utils/LibOptim.sol#28-37) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#29-36)
+LibOptim.call(address,uint256,uint256,bytes) (examples/sequence/utils/LibOptim.sol#48-52) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#49-51)
+LibOptim.delegatecall(address,uint256,bytes) (examples/sequence/utils/LibOptim.sol#62-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#63-65)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+4 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/Stage2Module.sol#2)
+		-^0.8.27 (examples/sequence/modules/Calls.sol#2)
+		-^0.8.27 (examples/sequence/modules/Hooks.sol#2)
+		-^0.8.27 (examples/sequence/modules/Implementation.sol#2)
+		-^0.8.27 (examples/sequence/modules/Nonce.sol#2)
+		-^0.8.27 (examples/sequence/modules/Payload.sol#2)
+		-^0.8.27 (examples/sequence/modules/Storage.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseSig.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/SelfAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/Stage2Auth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ICheckpointer.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IDelegatedExtension.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IPartialAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ISapient.sol#2)
+	- Version constraint ^0.8.18 is used by:
+		-^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+	- Version constraint ^0.8.28 is used by:
+		-^0.8.28 (examples/sequence/modules/interfaces/IAccount.sol#2)
+		-^0.8.28 (examples/sequence/modules/interfaces/IEntryPoint.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: cyclomatic-complexity
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes) (examples/sequence/modules/auth/BaseSig.sol#212-514) has a high cyclomatic complexity (35).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.18 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119):
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Parameter Calls.execute(bytes,bytes)._payload (examples/sequence/modules/Calls.sol#37) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._signature (examples/sequence/modules/Calls.sol#38) is not in mixedCase
+Parameter Calls.selfExecute(bytes)._payload (examples/sequence/modules/Calls.sol#57) is not in mixedCase
+Parameter ERC4337v07.executeUserOp(bytes)._payload (examples/sequence/modules/ERC4337v07.sol#60) is not in mixedCase
+Parameter Implementation.updateImplementation(address)._implementation (examples/sequence/modules/Implementation.sol#18) is not in mixedCase
+Parameter Nonce.readNonce(uint256)._space (examples/sequence/modules/Nonce.sol#24) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._noChainId (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._wallet (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.toEIP712(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#249) is not in mixedCase
+Parameter Payload.hash(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#270) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._decoded (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._wallet (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.readBytes32(bytes32)._key (examples/sequence/modules/Storage.sol#16) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter BaseAuth.getStaticSignature(bytes32)._hash (examples/sequence/modules/auth/BaseAuth.sol#57) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._hash (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._address (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._timestamp (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.updateImageHash(bytes32)._imageHash (examples/sequence/modules/auth/BaseAuth.sol#76) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#82) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#83) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#124) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#125) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._hash (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#159) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#160) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._payload (examples/sequence/modules/auth/BaseSig.sol#76) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._signature (examples/sequence/modules/auth/BaseSig.sol#77) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._recoverMode (examples/sequence/modules/auth/BaseSig.sol#78) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#79) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#159) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#160) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._snapshot (examples/sequence/modules/auth/BaseSig.sol#161) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#162) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#213) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._opHash (examples/sequence/modules/auth/BaseSig.sol#214) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#215) is not in mixedCase
+Parameter LibBytes.readFirstUint8(bytes)._data (examples/sequence/utils/LibBytes.sol#12) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._data (examples/sequence/utils/LibBytes.sol#69) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._index (examples/sequence/utils/LibBytes.sol#70) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._length (examples/sequence/utils/LibBytes.sol#71) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#106) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#107) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._a (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._b (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._val (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: too-many-digits
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses literals with too many digits:
+	- a = word_readBytes4_asm_0 & 0xffffffff00000000000000000000000000000000000000000000000000000000 (examples/sequence/utils/LibBytes.sol#84)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+INFO:Detectors:
+Detector: unindexed-event-address
+Event Hooks.DefinedHook(bytes4,address) (examples/sequence/modules/Hooks.sol#20) has address parameters but no indexed parameters
+Event Implementation.ImplementationUpdated(address) (examples/sequence/modules/Implementation.sol#12) has address parameters but no indexed parameters
+Event BaseAuth.StaticSignatureSet(bytes32,address,uint96) (examples/sequence/modules/auth/BaseAuth.sol#37) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Detectors:
+Detector: locked-ether
+Contract locking ether found:
+	Contract Factory (examples/sequence/Factory.sol#9-28) has payable functions:
+	 - Factory.deploy(address,bytes32) (examples/sequence/Factory.sol#18-26)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+INFO:Detectors:
+Detector: assembly
+Factory.deploy(address,bytes32) (examples/sequence/Factory.sol#18-26) uses assembly
+	- INLINE ASM (examples/sequence/Factory.sol#20-22)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/Factory.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/Wallet.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/Wallet.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: naming-convention
+Parameter Factory.deploy(address,bytes32)._mainModule (examples/sequence/Factory.sol#18) is not in mixedCase
+Parameter Factory.deploy(address,bytes32)._salt (examples/sequence/Factory.sol#18) is not in mixedCase
+Constant Wallet.creationCode (examples/sequence/Wallet.sol#64-65) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/Wallet.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: naming-convention
+Constant Wallet.creationCode (examples/sequence/Wallet.sol#64-65) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: incorrect-shift
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) contains an incorrect shift operation: a = word_readUintX_asm_0 >> shift_readUintX_asm_0 & 1 << 8 * _length - 1 (examples/sequence/utils/LibBytes.sol#76)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly
+INFO:Detectors:
+Detector: uninitialized-local
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).linkedPayload (examples/sequence/modules/auth/BaseSig.sol#164) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#167) is a local variable never initialized
+BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address).snapshot (examples/sequence/modules/auth/BaseSig.sol#91) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Detector: unused-return
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) ignores return value by (threshold,weight,imageHash,None,opHash) = BaseSig.recover(_payload,_signature,BaseSig.RecoverMode.Initial,address(0)) (examples/sequence/modules/auth/BaseAuth.sol#111-112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: write-after-write
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_8,rindex) = _signature.readUintX(rindex,sizeSize_scope_7) (examples/sequence/modules/auth/BaseSig.sol#333)
+	rindex = nrindex_scope_9 (examples/sequence/modules/auth/BaseSig.sol#339)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_11,rindex) = _signature.readUint24(rindex) (examples/sequence/modules/auth/BaseSig.sol#365)
+	rindex = nrindex_scope_12 (examples/sequence/modules/auth/BaseSig.sol#369)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_25,rindex) = _signature.readUintX(rindex,sizeSize_scope_26) (examples/sequence/modules/auth/BaseSig.sol#460)
+	rindex = nrindex_scope_27 (examples/sequence/modules/auth/BaseSig.sol#468)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_32,rindex) = _signature.readUintX(rindex,sizeSize_scope_31) (examples/sequence/modules/auth/BaseSig.sol#495)
+	rindex = nrindex_scope_33 (examples/sequence/modules/auth/BaseSig.sol#503)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+INFO:Detectors:
+Detector: timestamp
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp <= block.timestamp (examples/sequence/modules/auth/BaseAuth.sol#94)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: assembly
+Storage.writeBytes32(bytes32,bytes32) (examples/sequence/modules/Storage.sol#9-13) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#10-12)
+Storage.readBytes32(bytes32) (examples/sequence/modules/Storage.sol#15-21) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#18-20)
+Storage.writeBytes32Map(bytes32,bytes32,bytes32) (examples/sequence/modules/Storage.sol#23-28) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#25-27)
+Storage.readBytes32Map(bytes32,bytes32) (examples/sequence/modules/Storage.sol#30-35) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#32-34)
+LibBytes.readFirstUint8(bytes) (examples/sequence/utils/LibBytes.sol#11-19) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#14-18)
+LibBytes.readUint8(bytes,uint256) (examples/sequence/utils/LibBytes.sol#21-27) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#22-26)
+LibBytes.readUint16(bytes,uint256) (examples/sequence/utils/LibBytes.sol#29-35) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#30-34)
+LibBytes.readUint24(bytes,uint256) (examples/sequence/utils/LibBytes.sol#37-43) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#38-42)
+LibBytes.readUint64(bytes,uint256) (examples/sequence/utils/LibBytes.sol#45-51) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#46-50)
+LibBytes.readUint160(bytes,uint256) (examples/sequence/utils/LibBytes.sol#53-59) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#54-58)
+LibBytes.readUint256(bytes,uint256) (examples/sequence/utils/LibBytes.sol#61-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#62-65)
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#73-78)
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#82-86)
+LibBytes.readBytes32(bytes,uint256) (examples/sequence/utils/LibBytes.sol#89-94) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#90-93)
+LibBytes.readAddress(bytes,uint256) (examples/sequence/utils/LibBytes.sol#96-102) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#97-101)
+LibBytes.readRSVCompact(bytes,uint256) (examples/sequence/utils/LibBytes.sol#105-118) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#110-114)
+LibOptim.fkeccak256(bytes32,bytes32) (examples/sequence/utils/LibOptim.sol#16-22) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#17-21)
+LibOptim.returnData() (examples/sequence/utils/LibOptim.sol#28-37) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#29-36)
+LibOptim.call(address,uint256,uint256,bytes) (examples/sequence/utils/LibOptim.sol#48-52) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#49-51)
+LibOptim.delegatecall(address,uint256,bytes) (examples/sequence/utils/LibOptim.sol#62-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#63-65)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+3 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/Guest.sol#2)
+		-^0.8.27 (examples/sequence/modules/Calls.sol#2)
+		-^0.8.27 (examples/sequence/modules/Nonce.sol#2)
+		-^0.8.27 (examples/sequence/modules/Payload.sol#2)
+		-^0.8.27 (examples/sequence/modules/Storage.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseSig.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/SelfAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ICheckpointer.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IDelegatedExtension.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IPartialAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ISapient.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+	- Version constraint ^0.8.18 is used by:
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: cyclomatic-complexity
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes) (examples/sequence/modules/auth/BaseSig.sol#212-514) has a high cyclomatic complexity (35).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+Version constraint ^0.8.18 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: missing-inheritance
+Guest (examples/sequence/Guest.sol#12-73) should inherit from IAuth (examples/sequence/modules/interfaces/IAuth.sol#7-17)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-inheritance
+INFO:Detectors:
+Detector: naming-convention
+Parameter Calls.execute(bytes,bytes)._payload (examples/sequence/modules/Calls.sol#37) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._signature (examples/sequence/modules/Calls.sol#38) is not in mixedCase
+Parameter Calls.selfExecute(bytes)._payload (examples/sequence/modules/Calls.sol#57) is not in mixedCase
+Parameter Nonce.readNonce(uint256)._space (examples/sequence/modules/Nonce.sol#24) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._noChainId (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._wallet (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.toEIP712(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#249) is not in mixedCase
+Parameter Payload.hash(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#270) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._decoded (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._wallet (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.readBytes32(bytes32)._key (examples/sequence/modules/Storage.sol#16) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter BaseAuth.getStaticSignature(bytes32)._hash (examples/sequence/modules/auth/BaseAuth.sol#57) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._hash (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._address (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._timestamp (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.updateImageHash(bytes32)._imageHash (examples/sequence/modules/auth/BaseAuth.sol#76) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#82) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#83) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#124) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#125) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._hash (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#159) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#160) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._payload (examples/sequence/modules/auth/BaseSig.sol#76) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._signature (examples/sequence/modules/auth/BaseSig.sol#77) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._recoverMode (examples/sequence/modules/auth/BaseSig.sol#78) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#79) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#159) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#160) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._snapshot (examples/sequence/modules/auth/BaseSig.sol#161) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#162) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#213) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._opHash (examples/sequence/modules/auth/BaseSig.sol#214) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#215) is not in mixedCase
+Parameter LibBytes.readFirstUint8(bytes)._data (examples/sequence/utils/LibBytes.sol#12) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._data (examples/sequence/utils/LibBytes.sol#69) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._index (examples/sequence/utils/LibBytes.sol#70) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._length (examples/sequence/utils/LibBytes.sol#71) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#106) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#107) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._a (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._b (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._val (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: too-many-digits
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses literals with too many digits:
+	- a = word_readBytes4_asm_0 & 0xffffffff00000000000000000000000000000000000000000000000000000000 (examples/sequence/utils/LibBytes.sol#84)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+INFO:Detectors:
+Detector: unimplemented-functions
+Calls (examples/sequence/modules/Calls.sol#15-131) does not implement functions:
+	- IAuth._isValidImage(bytes32) (examples/sequence/modules/interfaces/IAuth.sol#9-11)
+	- IAuth._updateImageHash(bytes32) (examples/sequence/modules/interfaces/IAuth.sol#13-15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unimplemented-functions
+INFO:Detectors:
+Detector: unindexed-event-address
+Event BaseAuth.StaticSignatureSet(bytes32,address,uint96) (examples/sequence/modules/auth/BaseAuth.sol#37) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Detectors:
+Detector: controlled-delegatecall
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses delegatecall to a input-controlled function id
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall
+INFO:Detectors:
+Detector: incorrect-shift
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) contains an incorrect shift operation: a = word_readUintX_asm_0 >> shift_readUintX_asm_0 & 1 << 8 * _length - 1 (examples/sequence/utils/LibBytes.sol#76)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly
+INFO:Detectors:
+Detector: uninitialized-local
+BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address).snapshot (examples/sequence/modules/auth/BaseSig.sol#91) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).linkedPayload (examples/sequence/modules/auth/BaseSig.sol#164) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#167) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Detector: unused-return
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) ignores return value by (threshold,weight,imageHash,None,opHash) = BaseSig.recover(_payload,_signature,BaseSig.RecoverMode.Initial,address(0)) (examples/sequence/modules/auth/BaseAuth.sol#111-112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: write-after-write
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_8,rindex) = _signature.readUintX(rindex,sizeSize_scope_7) (examples/sequence/modules/auth/BaseSig.sol#333)
+	rindex = nrindex_scope_9 (examples/sequence/modules/auth/BaseSig.sol#339)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_11,rindex) = _signature.readUint24(rindex) (examples/sequence/modules/auth/BaseSig.sol#365)
+	rindex = nrindex_scope_12 (examples/sequence/modules/auth/BaseSig.sol#369)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_25,rindex) = _signature.readUintX(rindex,sizeSize_scope_26) (examples/sequence/modules/auth/BaseSig.sol#460)
+	rindex = nrindex_scope_27 (examples/sequence/modules/auth/BaseSig.sol#468)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_32,rindex) = _signature.readUintX(rindex,sizeSize_scope_31) (examples/sequence/modules/auth/BaseSig.sol#495)
+	rindex = nrindex_scope_33 (examples/sequence/modules/auth/BaseSig.sol#503)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+INFO:Detectors:
+Detector: timestamp
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp <= block.timestamp (examples/sequence/modules/auth/BaseAuth.sol#94)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: assembly
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses assembly
+	- INLINE ASM (examples/sequence/modules/Hooks.sol#113-116)
+Implementation._setImplementation(address) (examples/sequence/modules/Implementation.sol#36-42) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#39-41)
+Implementation._getImplementation() (examples/sequence/modules/Implementation.sol#44-48) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#45-47)
+Storage.writeBytes32(bytes32,bytes32) (examples/sequence/modules/Storage.sol#9-13) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#10-12)
+Storage.readBytes32(bytes32) (examples/sequence/modules/Storage.sol#15-21) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#18-20)
+Storage.writeBytes32Map(bytes32,bytes32,bytes32) (examples/sequence/modules/Storage.sol#23-28) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#25-27)
+Storage.readBytes32Map(bytes32,bytes32) (examples/sequence/modules/Storage.sol#30-35) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#32-34)
+LibBytes.readFirstUint8(bytes) (examples/sequence/utils/LibBytes.sol#11-19) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#14-18)
+LibBytes.readUint8(bytes,uint256) (examples/sequence/utils/LibBytes.sol#21-27) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#22-26)
+LibBytes.readUint16(bytes,uint256) (examples/sequence/utils/LibBytes.sol#29-35) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#30-34)
+LibBytes.readUint24(bytes,uint256) (examples/sequence/utils/LibBytes.sol#37-43) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#38-42)
+LibBytes.readUint64(bytes,uint256) (examples/sequence/utils/LibBytes.sol#45-51) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#46-50)
+LibBytes.readUint160(bytes,uint256) (examples/sequence/utils/LibBytes.sol#53-59) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#54-58)
+LibBytes.readUint256(bytes,uint256) (examples/sequence/utils/LibBytes.sol#61-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#62-65)
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#73-78)
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#82-86)
+LibBytes.readBytes32(bytes,uint256) (examples/sequence/utils/LibBytes.sol#89-94) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#90-93)
+LibBytes.readAddress(bytes,uint256) (examples/sequence/utils/LibBytes.sol#96-102) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#97-101)
+LibBytes.readRSVCompact(bytes,uint256) (examples/sequence/utils/LibBytes.sol#105-118) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#110-114)
+LibOptim.fkeccak256(bytes32,bytes32) (examples/sequence/utils/LibOptim.sol#16-22) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#17-21)
+LibOptim.returnData() (examples/sequence/utils/LibOptim.sol#28-37) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#29-36)
+LibOptim.call(address,uint256,uint256,bytes) (examples/sequence/utils/LibOptim.sol#48-52) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#49-51)
+LibOptim.delegatecall(address,uint256,bytes) (examples/sequence/utils/LibOptim.sol#62-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#63-65)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+4 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/Estimator.sol#2)
+		-^0.8.27 (examples/sequence/Stage2Module.sol#2)
+		-^0.8.27 (examples/sequence/modules/Calls.sol#2)
+		-^0.8.27 (examples/sequence/modules/Hooks.sol#2)
+		-^0.8.27 (examples/sequence/modules/Implementation.sol#2)
+		-^0.8.27 (examples/sequence/modules/Nonce.sol#2)
+		-^0.8.27 (examples/sequence/modules/Payload.sol#2)
+		-^0.8.27 (examples/sequence/modules/Storage.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseSig.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/SelfAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/Stage2Auth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ICheckpointer.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IDelegatedExtension.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IPartialAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ISapient.sol#2)
+	- Version constraint ^0.8.18 is used by:
+		-^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+	- Version constraint ^0.8.28 is used by:
+		-^0.8.28 (examples/sequence/modules/interfaces/IAccount.sol#2)
+		-^0.8.28 (examples/sequence/modules/interfaces/IEntryPoint.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: cyclomatic-complexity
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes) (examples/sequence/modules/auth/BaseSig.sol#212-514) has a high cyclomatic complexity (35).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.18 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119):
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Parameter Estimator.estimate(bytes,bytes)._payload (examples/sequence/Estimator.sol#31) is not in mixedCase
+Parameter Estimator.estimate(bytes,bytes)._signature (examples/sequence/Estimator.sol#32) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._payload (examples/sequence/modules/Calls.sol#37) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._signature (examples/sequence/modules/Calls.sol#38) is not in mixedCase
+Parameter Calls.selfExecute(bytes)._payload (examples/sequence/modules/Calls.sol#57) is not in mixedCase
+Parameter ERC4337v07.executeUserOp(bytes)._payload (examples/sequence/modules/ERC4337v07.sol#60) is not in mixedCase
+Parameter Implementation.updateImplementation(address)._implementation (examples/sequence/modules/Implementation.sol#18) is not in mixedCase
+Parameter Nonce.readNonce(uint256)._space (examples/sequence/modules/Nonce.sol#24) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._noChainId (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._wallet (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.toEIP712(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#249) is not in mixedCase
+Parameter Payload.hash(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#270) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._decoded (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._wallet (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.readBytes32(bytes32)._key (examples/sequence/modules/Storage.sol#16) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter BaseAuth.getStaticSignature(bytes32)._hash (examples/sequence/modules/auth/BaseAuth.sol#57) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._hash (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._address (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._timestamp (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.updateImageHash(bytes32)._imageHash (examples/sequence/modules/auth/BaseAuth.sol#76) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#82) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#83) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#124) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#125) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._hash (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#159) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#160) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._payload (examples/sequence/modules/auth/BaseSig.sol#76) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._signature (examples/sequence/modules/auth/BaseSig.sol#77) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._recoverMode (examples/sequence/modules/auth/BaseSig.sol#78) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#79) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#159) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#160) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._snapshot (examples/sequence/modules/auth/BaseSig.sol#161) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#162) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#213) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._opHash (examples/sequence/modules/auth/BaseSig.sol#214) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#215) is not in mixedCase
+Parameter LibBytes.readFirstUint8(bytes)._data (examples/sequence/utils/LibBytes.sol#12) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._data (examples/sequence/utils/LibBytes.sol#69) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._index (examples/sequence/utils/LibBytes.sol#70) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._length (examples/sequence/utils/LibBytes.sol#71) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#106) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#107) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._a (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._b (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._val (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: too-many-digits
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses literals with too many digits:
+	- a = word_readBytes4_asm_0 & 0xffffffff00000000000000000000000000000000000000000000000000000000 (examples/sequence/utils/LibBytes.sol#84)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+INFO:Detectors:
+Detector: unindexed-event-address
+Event Hooks.DefinedHook(bytes4,address) (examples/sequence/modules/Hooks.sol#20) has address parameters but no indexed parameters
+Event Implementation.ImplementationUpdated(address) (examples/sequence/modules/Implementation.sol#12) has address parameters but no indexed parameters
+Event BaseAuth.StaticSignatureSet(bytes32,address,uint96) (examples/sequence/modules/auth/BaseAuth.sol#37) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Detectors:
+Detector: locked-ether
+Contract locking ether found:
+	Contract Factory (examples/sequence/Factory.sol#9-28) has payable functions:
+	 - Factory.deploy(address,bytes32) (examples/sequence/Factory.sol#18-26)
+	But does not have a function to withdraw the ether
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#contracts-that-lock-ether
+INFO:Detectors:
+Detector: missing-zero-check
+ERC4337FactoryWrapper.constructor(address,address)._senderCreator (examples/sequence/ERC4337FactoryWrapper.sol#20) lacks a zero-check on :
+		- senderCreator = _senderCreator (examples/sequence/ERC4337FactoryWrapper.sol#22)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+INFO:Detectors:
+Detector: assembly
+ERC4337FactoryWrapper.deploy(address,bytes32) (examples/sequence/ERC4337FactoryWrapper.sol#31-52) uses assembly
+	- INLINE ASM (examples/sequence/ERC4337FactoryWrapper.sol#39-47)
+Factory.deploy(address,bytes32) (examples/sequence/Factory.sol#18-26) uses assembly
+	- INLINE ASM (examples/sequence/Factory.sol#20-22)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/ERC4337FactoryWrapper.sol#2)
+		-^0.8.27 (examples/sequence/Factory.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/Wallet.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/Wallet.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: naming-convention
+Parameter ERC4337FactoryWrapper.deploy(address,bytes32)._mainModule (examples/sequence/ERC4337FactoryWrapper.sol#31) is not in mixedCase
+Parameter ERC4337FactoryWrapper.deploy(address,bytes32)._salt (examples/sequence/ERC4337FactoryWrapper.sol#31) is not in mixedCase
+Parameter Factory.deploy(address,bytes32)._mainModule (examples/sequence/Factory.sol#18) is not in mixedCase
+Parameter Factory.deploy(address,bytes32)._salt (examples/sequence/Factory.sol#18) is not in mixedCase
+Constant Wallet.creationCode (examples/sequence/Wallet.sol#64-65) is not in UPPER_CASE_WITH_UNDERSCORES
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: controlled-delegatecall
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses delegatecall to a input-controlled function id
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall
+INFO:Detectors:
+Detector: incorrect-shift
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) contains an incorrect shift operation: a = word_readUintX_asm_0 >> shift_readUintX_asm_0 & 1 << 8 * _length - 1 (examples/sequence/utils/LibBytes.sol#76)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly
+INFO:Detectors:
+Detector: uninitialized-local
+BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address).snapshot (examples/sequence/modules/auth/BaseSig.sol#91) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#167) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).linkedPayload (examples/sequence/modules/auth/BaseSig.sol#164) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Detector: unused-return
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) ignores return value by (threshold,weight,imageHash,None,opHash) = BaseSig.recover(_payload,_signature,BaseSig.RecoverMode.Initial,address(0)) (examples/sequence/modules/auth/BaseAuth.sol#111-112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: write-after-write
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_8,rindex) = _signature.readUintX(rindex,sizeSize_scope_7) (examples/sequence/modules/auth/BaseSig.sol#333)
+	rindex = nrindex_scope_9 (examples/sequence/modules/auth/BaseSig.sol#339)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_11,rindex) = _signature.readUint24(rindex) (examples/sequence/modules/auth/BaseSig.sol#365)
+	rindex = nrindex_scope_12 (examples/sequence/modules/auth/BaseSig.sol#369)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_25,rindex) = _signature.readUintX(rindex,sizeSize_scope_26) (examples/sequence/modules/auth/BaseSig.sol#460)
+	rindex = nrindex_scope_27 (examples/sequence/modules/auth/BaseSig.sol#468)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_32,rindex) = _signature.readUintX(rindex,sizeSize_scope_31) (examples/sequence/modules/auth/BaseSig.sol#495)
+	rindex = nrindex_scope_33 (examples/sequence/modules/auth/BaseSig.sol#503)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+INFO:Detectors:
+Detector: timestamp
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp <= block.timestamp (examples/sequence/modules/auth/BaseAuth.sol#94)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: assembly
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses assembly
+	- INLINE ASM (examples/sequence/modules/Hooks.sol#113-116)
+Implementation._setImplementation(address) (examples/sequence/modules/Implementation.sol#36-42) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#39-41)
+Implementation._getImplementation() (examples/sequence/modules/Implementation.sol#44-48) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#45-47)
+Storage.writeBytes32(bytes32,bytes32) (examples/sequence/modules/Storage.sol#9-13) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#10-12)
+Storage.readBytes32(bytes32) (examples/sequence/modules/Storage.sol#15-21) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#18-20)
+Storage.writeBytes32Map(bytes32,bytes32,bytes32) (examples/sequence/modules/Storage.sol#23-28) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#25-27)
+Storage.readBytes32Map(bytes32,bytes32) (examples/sequence/modules/Storage.sol#30-35) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#32-34)
+LibBytes.readFirstUint8(bytes) (examples/sequence/utils/LibBytes.sol#11-19) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#14-18)
+LibBytes.readUint8(bytes,uint256) (examples/sequence/utils/LibBytes.sol#21-27) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#22-26)
+LibBytes.readUint16(bytes,uint256) (examples/sequence/utils/LibBytes.sol#29-35) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#30-34)
+LibBytes.readUint24(bytes,uint256) (examples/sequence/utils/LibBytes.sol#37-43) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#38-42)
+LibBytes.readUint64(bytes,uint256) (examples/sequence/utils/LibBytes.sol#45-51) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#46-50)
+LibBytes.readUint160(bytes,uint256) (examples/sequence/utils/LibBytes.sol#53-59) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#54-58)
+LibBytes.readUint256(bytes,uint256) (examples/sequence/utils/LibBytes.sol#61-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#62-65)
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#73-78)
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#82-86)
+LibBytes.readBytes32(bytes,uint256) (examples/sequence/utils/LibBytes.sol#89-94) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#90-93)
+LibBytes.readAddress(bytes,uint256) (examples/sequence/utils/LibBytes.sol#96-102) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#97-101)
+LibBytes.readRSVCompact(bytes,uint256) (examples/sequence/utils/LibBytes.sol#105-118) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#110-114)
+LibOptim.fkeccak256(bytes32,bytes32) (examples/sequence/utils/LibOptim.sol#16-22) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#17-21)
+LibOptim.returnData() (examples/sequence/utils/LibOptim.sol#28-37) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#29-36)
+LibOptim.call(address,uint256,uint256,bytes) (examples/sequence/utils/LibOptim.sol#48-52) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#49-51)
+LibOptim.delegatecall(address,uint256,bytes) (examples/sequence/utils/LibOptim.sol#62-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#63-65)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+4 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/Stage1Module.sol#2)
+		-^0.8.27 (examples/sequence/Stage2Module.sol#2)
+		-^0.8.27 (examples/sequence/modules/Calls.sol#2)
+		-^0.8.27 (examples/sequence/modules/Hooks.sol#2)
+		-^0.8.27 (examples/sequence/modules/Implementation.sol#2)
+		-^0.8.27 (examples/sequence/modules/Nonce.sol#2)
+		-^0.8.27 (examples/sequence/modules/Payload.sol#2)
+		-^0.8.27 (examples/sequence/modules/Storage.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseSig.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/SelfAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/Stage1Auth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/Stage2Auth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ICheckpointer.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IDelegatedExtension.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IPartialAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ISapient.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/Wallet.sol#2)
+		-^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+	- Version constraint ^0.8.18 is used by:
+		-^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+	- Version constraint ^0.8.28 is used by:
+		-^0.8.28 (examples/sequence/modules/interfaces/IAccount.sol#2)
+		-^0.8.28 (examples/sequence/modules/interfaces/IEntryPoint.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: cyclomatic-complexity
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes) (examples/sequence/modules/auth/BaseSig.sol#212-514) has a high cyclomatic complexity (35).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/Wallet.sol#2)
+	- ^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+Version constraint ^0.8.18 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119):
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Constant Wallet.creationCode (examples/sequence/Wallet.sol#64-65) is not in UPPER_CASE_WITH_UNDERSCORES
+Parameter Calls.execute(bytes,bytes)._payload (examples/sequence/modules/Calls.sol#37) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._signature (examples/sequence/modules/Calls.sol#38) is not in mixedCase
+Parameter Calls.selfExecute(bytes)._payload (examples/sequence/modules/Calls.sol#57) is not in mixedCase
+Parameter ERC4337v07.executeUserOp(bytes)._payload (examples/sequence/modules/ERC4337v07.sol#60) is not in mixedCase
+Parameter Implementation.updateImplementation(address)._implementation (examples/sequence/modules/Implementation.sol#18) is not in mixedCase
+Parameter Nonce.readNonce(uint256)._space (examples/sequence/modules/Nonce.sol#24) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._noChainId (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._wallet (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.toEIP712(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#249) is not in mixedCase
+Parameter Payload.hash(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#270) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._decoded (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._wallet (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.readBytes32(bytes32)._key (examples/sequence/modules/Storage.sol#16) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter BaseAuth.getStaticSignature(bytes32)._hash (examples/sequence/modules/auth/BaseAuth.sol#57) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._hash (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._address (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._timestamp (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.updateImageHash(bytes32)._imageHash (examples/sequence/modules/auth/BaseAuth.sol#76) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#82) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#83) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#124) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#125) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._hash (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#159) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#160) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._payload (examples/sequence/modules/auth/BaseSig.sol#76) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._signature (examples/sequence/modules/auth/BaseSig.sol#77) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._recoverMode (examples/sequence/modules/auth/BaseSig.sol#78) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#79) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#159) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#160) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._snapshot (examples/sequence/modules/auth/BaseSig.sol#161) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#162) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#213) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._opHash (examples/sequence/modules/auth/BaseSig.sol#214) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#215) is not in mixedCase
+Variable Stage1Auth.INIT_CODE_HASH (examples/sequence/modules/auth/Stage1Auth.sol#18) is not in mixedCase
+Variable Stage1Auth.FACTORY (examples/sequence/modules/auth/Stage1Auth.sol#20) is not in mixedCase
+Variable Stage1Auth.STAGE_2_IMPLEMENTATION (examples/sequence/modules/auth/Stage1Auth.sol#22) is not in mixedCase
+Parameter LibBytes.readFirstUint8(bytes)._data (examples/sequence/utils/LibBytes.sol#12) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._data (examples/sequence/utils/LibBytes.sol#69) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._index (examples/sequence/utils/LibBytes.sol#70) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._length (examples/sequence/utils/LibBytes.sol#71) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#106) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#107) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._a (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._b (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._val (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: too-many-digits
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses literals with too many digits:
+	- a = word_readBytes4_asm_0 & 0xffffffff00000000000000000000000000000000000000000000000000000000 (examples/sequence/utils/LibBytes.sol#84)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+INFO:Detectors:
+Detector: unindexed-event-address
+Event Hooks.DefinedHook(bytes4,address) (examples/sequence/modules/Hooks.sol#20) has address parameters but no indexed parameters
+Event Implementation.ImplementationUpdated(address) (examples/sequence/modules/Implementation.sol#12) has address parameters but no indexed parameters
+Event BaseAuth.StaticSignatureSet(bytes32,address,uint96) (examples/sequence/modules/auth/BaseAuth.sol#37) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Detectors:
+Detector: controlled-delegatecall
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses delegatecall to a input-controlled function id
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#controlled-delegatecall
+INFO:Detectors:
+Detector: incorrect-shift
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) contains an incorrect shift operation: a = word_readUintX_asm_0 >> shift_readUintX_asm_0 & 1 << 8 * _length - 1 (examples/sequence/utils/LibBytes.sol#76)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-shift-in-assembly
+INFO:Detectors:
+Detector: uninitialized-local
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).linkedPayload (examples/sequence/modules/auth/BaseSig.sol#164) is a local variable never initialized
+BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address).snapshot (examples/sequence/modules/auth/BaseSig.sol#91) is a local variable never initialized
+BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#167) is a local variable never initialized
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-local-variables
+INFO:Detectors:
+Detector: unused-return
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) ignores return value by (threshold,weight,imageHash,None,opHash) = BaseSig.recover(_payload,_signature,BaseSig.RecoverMode.Initial,address(0)) (examples/sequence/modules/auth/BaseAuth.sol#111-112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: write-after-write
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_8,rindex) = _signature.readUintX(rindex,sizeSize_scope_7) (examples/sequence/modules/auth/BaseSig.sol#333)
+	rindex = nrindex_scope_9 (examples/sequence/modules/auth/BaseSig.sol#339)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_11,rindex) = _signature.readUint24(rindex) (examples/sequence/modules/auth/BaseSig.sol#365)
+	rindex = nrindex_scope_12 (examples/sequence/modules/auth/BaseSig.sol#369)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_25,rindex) = _signature.readUintX(rindex,sizeSize_scope_26) (examples/sequence/modules/auth/BaseSig.sol#460)
+	rindex = nrindex_scope_27 (examples/sequence/modules/auth/BaseSig.sol#468)
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes).rindex (examples/sequence/modules/auth/BaseSig.sol#218) is written in both
+	(size_scope_32,rindex) = _signature.readUintX(rindex,sizeSize_scope_31) (examples/sequence/modules/auth/BaseSig.sol#495)
+	rindex = nrindex_scope_33 (examples/sequence/modules/auth/BaseSig.sol#503)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#write-after-write
+INFO:Detectors:
+Detector: timestamp
+BaseAuth.signatureValidation(Payload.Decoded,bytes) (examples/sequence/modules/auth/BaseAuth.sol#81-120) uses timestamp for comparisons
+	Dangerous comparisons:
+	- timestamp <= block.timestamp (examples/sequence/modules/auth/BaseAuth.sol#94)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Detectors:
+Detector: assembly
+Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119) uses assembly
+	- INLINE ASM (examples/sequence/modules/Hooks.sol#113-116)
+Implementation._setImplementation(address) (examples/sequence/modules/Implementation.sol#36-42) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#39-41)
+Implementation._getImplementation() (examples/sequence/modules/Implementation.sol#44-48) uses assembly
+	- INLINE ASM (examples/sequence/modules/Implementation.sol#45-47)
+Storage.writeBytes32(bytes32,bytes32) (examples/sequence/modules/Storage.sol#9-13) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#10-12)
+Storage.readBytes32(bytes32) (examples/sequence/modules/Storage.sol#15-21) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#18-20)
+Storage.writeBytes32Map(bytes32,bytes32,bytes32) (examples/sequence/modules/Storage.sol#23-28) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#25-27)
+Storage.readBytes32Map(bytes32,bytes32) (examples/sequence/modules/Storage.sol#30-35) uses assembly
+	- INLINE ASM (examples/sequence/modules/Storage.sol#32-34)
+LibBytes.readFirstUint8(bytes) (examples/sequence/utils/LibBytes.sol#11-19) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#14-18)
+LibBytes.readUint8(bytes,uint256) (examples/sequence/utils/LibBytes.sol#21-27) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#22-26)
+LibBytes.readUint16(bytes,uint256) (examples/sequence/utils/LibBytes.sol#29-35) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#30-34)
+LibBytes.readUint24(bytes,uint256) (examples/sequence/utils/LibBytes.sol#37-43) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#38-42)
+LibBytes.readUint64(bytes,uint256) (examples/sequence/utils/LibBytes.sol#45-51) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#46-50)
+LibBytes.readUint160(bytes,uint256) (examples/sequence/utils/LibBytes.sol#53-59) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#54-58)
+LibBytes.readUint256(bytes,uint256) (examples/sequence/utils/LibBytes.sol#61-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#62-65)
+LibBytes.readUintX(bytes,uint256,uint256) (examples/sequence/utils/LibBytes.sol#68-79) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#73-78)
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#82-86)
+LibBytes.readBytes32(bytes,uint256) (examples/sequence/utils/LibBytes.sol#89-94) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#90-93)
+LibBytes.readAddress(bytes,uint256) (examples/sequence/utils/LibBytes.sol#96-102) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#97-101)
+LibBytes.readRSVCompact(bytes,uint256) (examples/sequence/utils/LibBytes.sol#105-118) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibBytes.sol#110-114)
+LibOptim.fkeccak256(bytes32,bytes32) (examples/sequence/utils/LibOptim.sol#16-22) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#17-21)
+LibOptim.returnData() (examples/sequence/utils/LibOptim.sol#28-37) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#29-36)
+LibOptim.call(address,uint256,uint256,bytes) (examples/sequence/utils/LibOptim.sol#48-52) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#49-51)
+LibOptim.delegatecall(address,uint256,bytes) (examples/sequence/utils/LibOptim.sol#62-66) uses assembly
+	- INLINE ASM (examples/sequence/utils/LibOptim.sol#63-65)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+4 different versions of Solidity are used:
+	- Version constraint ^0.8.27 is used by:
+		-^0.8.27 (examples/sequence/Simulator.sol#2)
+		-^0.8.27 (examples/sequence/Stage2Module.sol#2)
+		-^0.8.27 (examples/sequence/modules/Calls.sol#2)
+		-^0.8.27 (examples/sequence/modules/Hooks.sol#2)
+		-^0.8.27 (examples/sequence/modules/Implementation.sol#2)
+		-^0.8.27 (examples/sequence/modules/Nonce.sol#2)
+		-^0.8.27 (examples/sequence/modules/Payload.sol#2)
+		-^0.8.27 (examples/sequence/modules/Storage.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/BaseSig.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/SelfAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/auth/Stage2Auth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ICheckpointer.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IDelegatedExtension.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/IPartialAuth.sol#2)
+		-^0.8.27 (examples/sequence/modules/interfaces/ISapient.sol#2)
+	- Version constraint ^0.8.18 is used by:
+		-^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+		-^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+		-^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+	- Version constraint ^0.8.0 is used by:
+		-^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+	- Version constraint ^0.8.28 is used by:
+		-^0.8.28 (examples/sequence/modules/interfaces/IAccount.sol#2)
+		-^0.8.28 (examples/sequence/modules/interfaces/IEntryPoint.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: cyclomatic-complexity
+BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes) (examples/sequence/modules/auth/BaseSig.sol#212-514) has a high cyclomatic complexity (35).
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#cyclomatic-complexity
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.18 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.18 (examples/sequence/modules/ERC4337v07.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1155Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC1271.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC223Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC721Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/modules/interfaces/IERC777Receiver.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibBytes.sol#2)
+	- ^0.8.18 (examples/sequence/utils/LibOptim.sol#2)
+Version constraint ^0.8.0 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess
+	- AbiReencodingHeadOverflowWithStaticArrayCleanup
+	- DirtyBytesArrayToStorage
+	- DataLocationChangeInInternalOverride
+	- NestedCalldataArrayAbiReencodingSizeValidation
+	- SignedImmutables
+	- ABIDecodeTwoDimensionalArrayMemory
+	- KeccakCaching.
+It is used by:
+	- ^0.8.0 (examples/sequence/modules/ReentrancyGuard.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in Hooks.fallback() (examples/sequence/modules/Hooks.sol#108-119):
+	- (success,result) = target.delegatecall(msg.data) (examples/sequence/modules/Hooks.sol#112)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Parameter Simulator.simulate(Payload.Call[])._calls (examples/sequence/Simulator.sol#40) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._payload (examples/sequence/modules/Calls.sol#37) is not in mixedCase
+Parameter Calls.execute(bytes,bytes)._signature (examples/sequence/modules/Calls.sol#38) is not in mixedCase
+Parameter Calls.selfExecute(bytes)._payload (examples/sequence/modules/Calls.sol#57) is not in mixedCase
+Parameter ERC4337v07.executeUserOp(bytes)._payload (examples/sequence/modules/ERC4337v07.sol#60) is not in mixedCase
+Parameter Implementation.updateImplementation(address)._implementation (examples/sequence/modules/Implementation.sol#18) is not in mixedCase
+Parameter Nonce.readNonce(uint256)._space (examples/sequence/modules/Nonce.sol#24) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._noChainId (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.domainSeparator(bool,address)._wallet (examples/sequence/modules/Payload.sol#30) is not in mixedCase
+Parameter Payload.toEIP712(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#249) is not in mixedCase
+Parameter Payload.hash(Payload.Decoded)._decoded (examples/sequence/modules/Payload.sol#270) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._decoded (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Payload.hashFor(Payload.Decoded,address)._wallet (examples/sequence/modules/Payload.sol#277) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.writeBytes32(bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#9) is not in mixedCase
+Parameter Storage.readBytes32(bytes32)._key (examples/sequence/modules/Storage.sol#16) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.writeBytes32Map(bytes32,bytes32,bytes32)._val (examples/sequence/modules/Storage.sol#23) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._key (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter Storage.readBytes32Map(bytes32,bytes32)._subKey (examples/sequence/modules/Storage.sol#30) is not in mixedCase
+Parameter BaseAuth.getStaticSignature(bytes32)._hash (examples/sequence/modules/auth/BaseAuth.sol#57) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._hash (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._address (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.setStaticSignature(bytes32,address,uint96)._timestamp (examples/sequence/modules/auth/BaseAuth.sol#67) is not in mixedCase
+Parameter BaseAuth.updateImageHash(bytes32)._imageHash (examples/sequence/modules/auth/BaseAuth.sol#76) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#82) is not in mixedCase
+Parameter BaseAuth.signatureValidation(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#83) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#124) is not in mixedCase
+Parameter BaseAuth.recoverSapientSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#125) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._hash (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.isValidSignature(bytes32,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#146) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._payload (examples/sequence/modules/auth/BaseAuth.sol#159) is not in mixedCase
+Parameter BaseAuth.recoverPartialSignature(Payload.Decoded,bytes)._signature (examples/sequence/modules/auth/BaseAuth.sol#160) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._payload (examples/sequence/modules/auth/BaseSig.sol#76) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._signature (examples/sequence/modules/auth/BaseSig.sol#77) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._recoverMode (examples/sequence/modules/auth/BaseSig.sol#78) is not in mixedCase
+Parameter BaseSig.recover(Payload.Decoded,bytes,BaseSig.RecoverMode,address)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#79) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#159) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._checkpointer (examples/sequence/modules/auth/BaseSig.sol#160) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._snapshot (examples/sequence/modules/auth/BaseSig.sol#161) is not in mixedCase
+Parameter BaseSig.recoverChained(Payload.Decoded,address,Snapshot,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#162) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._payload (examples/sequence/modules/auth/BaseSig.sol#213) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._opHash (examples/sequence/modules/auth/BaseSig.sol#214) is not in mixedCase
+Parameter BaseSig.recoverBranch(Payload.Decoded,bytes32,bytes)._signature (examples/sequence/modules/auth/BaseSig.sol#215) is not in mixedCase
+Parameter LibBytes.readFirstUint8(bytes)._data (examples/sequence/utils/LibBytes.sol#12) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint8(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#21) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint16(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#29) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint24(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#37) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint64(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#45) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint160(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#53) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUint256(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#61) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._data (examples/sequence/utils/LibBytes.sol#69) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._index (examples/sequence/utils/LibBytes.sol#70) is not in mixedCase
+Parameter LibBytes.readUintX(bytes,uint256,uint256)._length (examples/sequence/utils/LibBytes.sol#71) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes4(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#81) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readBytes32(bytes,uint256)._pointer (examples/sequence/utils/LibBytes.sol#89) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readAddress(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#96) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._data (examples/sequence/utils/LibBytes.sol#106) is not in mixedCase
+Parameter LibBytes.readRSVCompact(bytes,uint256)._index (examples/sequence/utils/LibBytes.sol#107) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._a (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.fkeccak256(bytes32,bytes32)._b (examples/sequence/utils/LibOptim.sol#16) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._val (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.call(address,uint256,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#48) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._to (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._gas (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Parameter LibOptim.delegatecall(address,uint256,bytes)._data (examples/sequence/utils/LibOptim.sol#62) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: too-many-digits
+LibBytes.readBytes4(bytes,uint256) (examples/sequence/utils/LibBytes.sol#81-87) uses literals with too many digits:
+	- a = word_readBytes4_asm_0 & 0xffffffff00000000000000000000000000000000000000000000000000000000 (examples/sequence/utils/LibBytes.sol#84)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#too-many-digits
+INFO:Detectors:
+Detector: unindexed-event-address
+Event Hooks.DefinedHook(bytes4,address) (examples/sequence/modules/Hooks.sol#20) has address parameters but no indexed parameters
+Event Implementation.ImplementationUpdated(address) (examples/sequence/modules/Implementation.sol#12) has address parameters but no indexed parameters
+Event BaseAuth.StaticSignatureSet(bytes32,address,uint96) (examples/sequence/modules/auth/BaseAuth.sol#37) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Slither:examples/sequence/ analyzed (146 contracts with 101 detectors), 620 result(s) found
