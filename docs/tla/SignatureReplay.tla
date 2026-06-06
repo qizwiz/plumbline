@@ -48,15 +48,21 @@ CONSTANTS
                            \* (signer, recipient, amount) triple. In the
                            \* concrete bridge, sig = ECDSA over
                            \* keccak256(abi.encode(token,0,calldata))
-    AuthAmount,            \* Function Sigs -> Nat: how much each sig
-                           \* authorizes the bridge to pay out (the
-                           \* contract's promised semantics)
+    SigAuth,               \* Scalar Nat: the authorized payout per sig.
+                           \* Modeled uniformly so the TLC config grammar
+                           \* doesn't need function literals (cfg has a
+                           \* more restrictive grammar than .tla).
     MaxSubmissions         \* Bound on how many times any one sig may be
                            \* submitted to the bridge. Finite for TLC.
 
 ASSUME IsFiniteSet(Sigs)
-ASSUME \A s \in Sigs : AuthAmount[s] \in Nat
+ASSUME SigAuth \in Nat
 ASSUME MaxSubmissions \in Nat
+
+\* Derived: each sig authorizes SigAuth (uniformly, for the model).
+\* In a richer spec, AuthAmount could vary per-sig; keeping it uniform
+\* keeps the cfg simple and TLC's grammar happy.
+AuthAmount(s) == SigAuth
 
 (* ---------------------------------------------------------------------------
    State variables
@@ -97,7 +103,7 @@ SubmitBuggy(s) ==
     /\ s \in Sigs
     /\ submissions[s] < MaxSubmissions     \* finite-model bound; not a fix
     /\ submissions' = [submissions EXCEPT ![s] = @ + 1]
-    /\ paid_total'  = [paid_total  EXCEPT ![s] = @ + AuthAmount[s]]
+    /\ paid_total'  = [paid_total  EXCEPT ![s] = @ + AuthAmount(s)]
 
 (* ---------------------------------------------------------------------------
    SubmitCorrect(s) — the CORRECT bridge's action.
@@ -115,7 +121,7 @@ SubmitCorrect(s) ==
     /\ s \in Sigs
     /\ submissions[s] = 0                  \* one-shot gate (the missing nonce)
     /\ submissions' = [submissions EXCEPT ![s] = 1]
-    /\ paid_total'  = [paid_total  EXCEPT ![s] = AuthAmount[s]]
+    /\ paid_total'  = [paid_total  EXCEPT ![s] = AuthAmount(s)]
 
 (* ---------------------------------------------------------------------------
    State machine + fairness
@@ -139,7 +145,7 @@ Spec == Init /\ [][Next]_vars /\ Fairness
  * driving paid_total[s] = k * AuthAmount[s] > AuthAmount[s]. That
  * counterexample IS the bug. *)
 NoOverpayment ==
-    \A s \in Sigs : paid_total[s] <= AuthAmount[s]
+    \A s \in Sigs : paid_total[s] <= AuthAmount(s)
 
 (* The lighter property — the same sig is never paid twice — is implied
  * by NoOverpayment for any AuthAmount[s] > 0; we name it explicitly as
