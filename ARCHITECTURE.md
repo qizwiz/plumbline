@@ -91,7 +91,30 @@ Per JH (2026-06-06): "you might need NCA (or something else) to teach
 yourself model-checker fluency." The NCA does TWO things, which may be
 two models or one joint model over `(program × spec)`.
 
-#### 3a. NCA-as-bug-finder (Solidity grammar)
+#### 3a. NCA-as-verifier-router (Solidity grammar)
+
+**WARNING from the literature (RESEARCH-NOTES-2026-06-06.md):** Building
+this layer as a primary bug-finder is the trap. ReVeal trained on
+BigVul drops to F1=0.5 on Devign. GPT-4o on May-2025 Linux CVEs hits
+96% accuracy with F1=0. No DL bug-classifier discriminates before-fix
+vs after-fix on VentiVul. The OOD collapse is *categorical*, not a
+tuning issue.
+
+**Corrected framing**: the NCA's job is **verifier-routing**, not
+bug-classification. Given a lead from sol_intent (or any proposer),
+predict *which verifier in our stack will discharge it successfully*.
+That problem doesn't OOD-collapse because the verifiers themselves are
+sound regardless of which lead they receive. The router only has to
+learn the **taxonomy of leads**, not the **truth of bugs**.
+
+Concretely, the NCA's output per lead is a distribution over:
+`{slither_will_catch, halmos_will_decide, tlc_will_decide,
+human_only}`. The lead is then sent to the predicted-cheapest verifier
+that can handle it. Wrong predictions cost wasted verifier time but
+never produce false-positive findings — because the downstream verifier
+either confirms or refutes mechanically.
+
+**Original bug-finder framing (kept for reference, not endorsed)**:
 
 A neural cellular automaton over the program lattice:
 - Cells = SlithIR statements (or AST nodes; resolution choice TBD)
