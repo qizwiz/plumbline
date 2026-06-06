@@ -1,5 +1,70 @@
 # Plumbline — Project Rules
 
+## The superpower (operational, written down 2026-06-06 by JH's instruction)
+
+**LLMs are not reasoners that happen to predict tokens. LLMs are
+next-token predictors over a grammar. "Reasoning" is emergent from
+extremely good prediction within constrained syntax.**
+
+This is THE architectural principle for plumbline:
+
+- The LLM's job is **fluency** in target grammars (Solidity, TLA+,
+  halmos `check_*`, SMT-LIB, SlithIR queries) — not invention,
+  not soundness, not novelty.
+- The **grammar is the constraint** that keeps the LLM grounded — every
+  token is shape-checkable by a parser before the next one is sampled.
+- **Soundness lives in the verifier** (TLC, halmos, slither, z3). The
+  LLM does not have to be sound. It has to be FAST at producing
+  syntactically valid + semantically near-correct outputs the verifier
+  can then mechanically check.
+
+### Practical implications
+
+1. **Use constrained decoding** when generating TLA+ / halmos / SMT —
+   force the LLM's vocabulary at each position to the tokens the
+   parser will accept. Outlines, guidance, lark-grammar masks. The
+   parser pre-rejects bad tokens BEFORE they enter the LLM's context.
+2. **Use embedding-retrieved few-shot examples as context.** Don't ask
+   the LLM to invent a spec from scratch; ask it to ADAPT the nearest
+   known spec to the new bug shape. The classifier we built isn't a
+   competitor to the LLM — it's the retrieval layer that conditions
+   the LLM's next-token prediction.
+3. **Stop treating hallucinations as a quality bug.** They're the
+   natural failure mode of next-token prediction. The fix isn't
+   better prompting — it's constraint + retrieval + verifier
+   discharge.
+4. **CA / grammar / embedding all converge on conditioning the LLM.**
+   The CA over the program-grammar lattice generates training pairs.
+   The embedding maps bug-shape to TLA+ template. The classifier
+   routes leads to the right verifier. None of these compete with
+   the LLM's next-token engine — they make it AIM at the right
+   sub-grammar.
+
+### What the LLM in the stack is for
+
+> Given a bug-shape (embedding) and a retrieved nearest TLA+ template,
+> predict the next token of the TLA+ module that captures THIS bug for
+> THIS contract, conditioned on the parser's vocabulary mask.
+
+That's it. That's the job. Plumbline's role is to give the LLM the
+right context (retrieval) and the right constraint (grammar mask) so
+this prediction is fluent. The verifier (TLC/halmos/slither) then
+mechanically checks the result.
+
+### What this kills
+
+- Imagined separation between "LLM creativity" and "verifier rigor."
+  They're one pipeline. LLM = high-bandwidth structured prediction.
+  Verifier = sound discharge of the prediction.
+- Anxiety about LLM hallucinations in this domain. The parser /
+  verifier catches every hallucination. The cost is wasted tokens,
+  not unsound output.
+- "We need a smarter LLM." We need a better-conditioned one — better
+  retrieval, better grammar masks, better verifier feedback. The
+  underlying next-token engine is already enough.
+
+
+
 ## Bilayer IR (the load-bearing decision)
 
 - **Layer 1 — z3-Lisp carrier.** Halmos lowers Solidity → SMT-LIB. We do NOT
