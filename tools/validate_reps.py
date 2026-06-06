@@ -34,7 +34,7 @@ EXPECTED_TOP_KEYS = (
     "rep_id", "ts_ns", "contract", "proposer", "leads",
     "verifier", "score", "prior", "embed_coords",
 )
-ALLOWED_PROPOSERS = {"manual", "sol_intent", "halmos"}
+ALLOWED_PROPOSERS = {"manual", "sol_intent", "halmos", "ensemble"}
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 
