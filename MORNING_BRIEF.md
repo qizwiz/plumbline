@@ -1,4 +1,4 @@
-# Morning Brief — 2026-06-06 ~05:00
+# Morning Brief — 2026-06-06 ~05:30
 
 For when JH wakes. Updated continuously by overnight pulses.
 
@@ -16,6 +16,8 @@ For when JH wakes. Updated continuously by overnight pulses.
   - **M-04 Create2NonIdempotent** (sequence) — same salt, two calls, two outcomes (Deployed then Reverted). Bundler/relayer crash captured.
 - **T16 (TLA+ Lark grammar)**: ✅ vendored. `grammar/tla_failuremode.lark` validated against all 5 specs (5/5 PASS via `tools/validate_tla_grammar.py`). Covers the structural form (module header, sections, definitions, expressions, temporal ops, fairness, bulleted conjunctions, primed names). T8 (constrained decoding) is now unblocked — the grammar is the S lever per LTLGuard (V3 → 15.7%, V4 → 87.1% syntactic validity).
 - **T14 (contest-day runbook)**: ✅ `docs/CONTEST_RUNBOOK.md`. 8-line TL;DR + 8 sections (pre-contest, scope-drop, baselines, TLA+ match with bug-class lookup table, mechanical verify, submission, triage under time pressure, troubleshooting, post-contest). Every command verified to exist in the repo. Two appendices document what the runbook deliberately doesn't do + memory of past mistakes (halmos `--ast` requirement, oracle-silently-broken episode).
+- **T12 (Solidity→TLA+ pipeline note)**: ✅ `docs/research/solidity-to-tla-pipeline.md`. Arxiv-shaped working note. 8 sections: abstract, problem, architecture diagram, bug-class taxonomy table, engineering findings (including honest report of embedder-discrimination gap), NOT-scope (not slither/halmos replacement, not CA system yet), future work, reproducibility. Frames the LTLGuard-shaped pipeline as substrate for the CA work, not a replacement.
+- **T4 (verifier-router ADR)**: ✅ `docs/adr/ADR-006-verifier-router.md`. Reframes ml_classifier from binary-confidence to multi-class router. Labels: `{slither_will_catch, halmos_will_decide, tlc_will_decide, human_only}`. Key insight: classifier outputs work-allocation, not truth — verifiers remain the soundness layer, so OOD mis-routing only costs runs, never causes missed bugs. Includes 5-step implementation plan (schema change → relabel → multi-class trainer → inference → wire-up). Steps 1-4 self-contained; step 5 waits on T15 marginal-recall data.
 
 ### ⚠️ Honest gap
 - **T19**: retrieval recall is imperfect — "missing await coroutine" query did NOT return MissingAwait in top-5. The bge-small-en-v1.5 embedder lacks bug-shape vocabulary and clusters all specs in a ~0.12 cos range. Workaround used overnight: hand-pick a second precedent when authoring. Longer-term fix: hybrid BM25+dense, or a domain-tuned embedder.
@@ -27,6 +29,9 @@ For when JH wakes. Updated continuously by overnight pulses.
 
 ## Commit log overnight (latest first)
 ```
+d85afab  doc(adr): ADR-006 — reframe ml_classifier as verifier-router (T4)
+450b40b  doc(research): T12 — Solidity→TLA+ pipeline note (arxiv-shaped working note)
+ca85874  doc(brief): T14 done — CONTEST_RUNBOOK.md landed
 c15de79  doc(contest): T14 — CONTEST_RUNBOOK.md, the keyboard sequence for scope-drop day
 c7c3508  doc(brief): T16 done — Lark grammar 5/5 PASS, T8 unblocked
 963ec17  feat(grammar): T16 — vendor minimal Lark CFG for plumbline TLA+ subset
@@ -54,12 +59,13 @@ f5b8d0a  doc(research): T1 done — LTLGuard pipeline notes
 This is the seed library. Each addition to the corpus increases the cone of bug shapes the LLM-as-fluency-prosthesis can pattern-match against.
 
 ## What I'm doing next (and why)
-- T14 done. Next zero-spend candidates: T15 (slither on the 5 corpora — local-tool baseline that gives T5 a head start), T12 (Solidity→TLA+ pipeline note — formalize what we built tonight as an arxiv-shaped writeup), or T4 (reframe ml_classifier as verifier-router — schema design only, no retraining yet). Scheduling toward T15 first since it produces measured data.
+- T14, T12, T4 done. Next zero-spend candidates: T17 (always-fires checklist), T13 (verify cloud loop via gh CLI). T15 requires slither which isn't local (codespace only). T8/T11 require LLM spend — paused. T9/T10 require JH directly. Scheduling toward T17 (checklist gives JH a clean status surface for any pulse) then T13 (loop-alive check).
 
 ## Task list at this moment
-- ✅ T1, T2, T3, T6, T14, T16, T18 complete (7 tasks closed overnight)
-- ⏸️ T4-T5, T7, T9-T13, T15, T17 pending — see TODO.md for full plan
-- ⛔ T8 paused — needs JH approval before LLM spend
+- ✅ T1, T2, T3, T4, T6, T12, T14, T16, T18 complete (9 tasks closed overnight)
+- ⏸️ T5, T7, T13, T15, T17 pending zero-spend
+- ⛔ T8, T11 paused — needs JH approval before LLM spend
+- ⏸️ T9, T10 — JH directly
 - 🆕 T19 — retrieval embedder gap, investigation-track
 
 ## Honest cost ledger overnight
