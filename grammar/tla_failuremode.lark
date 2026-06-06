@@ -1,0 +1,209 @@
+// Lark grammar for the TLA+ subset plumbline emits.
+//
+// Scope: this grammar describes the STRUCTURAL FORM of a plumbline
+// FailureMode module — not full TLA+. It's tight enough to STEER a
+// constrained decoder (no malformed module headers, no unbalanced
+// delimiters, no out-of-order sections) and loose enough to let
+// expressions be flexible (since TLA+'s expression sub-language is
+// rich and SANY/TLC is the soundness layer that catches the rest).
+//
+// Validated against:
+//   docs/tla/SignatureReplay.tla
+//   docs/tla/ERC4337StaticSigDoS.tla
+//   docs/tla/ReentrancyDrain.tla
+//   docs/tla/Uint64FeeOverflow.tla
+//   docs/tla/Create2NonIdempotent.tla
+//
+// Run validation:
+//   pip install lark
+//   python tools/validate_tla_grammar.py
+//
+// Used by (planned T8):
+//   constrained-decoding generation with llguidance or XGrammar so
+//   the LLM cannot emit a module that fails SANY parse. Per LTLGuard
+//   V3→V4 in docs/research/ltlguard-notes.md, constrained decoding
+//   takes Mistral-7B syntactic validity from 5.7% to 87.1%.
+
+start: module
+
+// =====================================================================
+// MODULE structure
+// =====================================================================
+//
+// Real TLA+ requires the dashes on the MODULE/end markers to be
+// "matched" in length. SANY enforces this; we accept any run of
+// dashes/equals of length ≥ 4.
+
+module: DASHES "MODULE" NAME DASHES section* EQUALS
+
+// =====================================================================
+// Sections — order is flexible; the TEMPLATE prompt enforces our
+// canonical order (EXTENDS → CONSTANTS → ASSUME → VARIABLES → defs).
+// =====================================================================
+
+section: extends_section
+       | constants_section
+       | assume_section
+       | variables_section
+       | definition
+
+extends_section: "EXTENDS" name_list
+constants_section: "CONSTANTS" name_list
+assume_section: "ASSUME" expr
+variables_section: "VARIABLES" name_list
+
+name_list: NAME ("," NAME)*
+
+// =====================================================================
+// Definitions — `name == expr` or `name(args) == expr`
+// =====================================================================
+
+definition: NAME ("(" name_list ")")? "==" expr
+
+// =====================================================================
+// Expressions — KEPT LOOSE on purpose.
+//
+// The grammar's job is STRUCTURE, not semantic equivalence:
+//   1. balanced delimiters (parens, brackets, braces)
+//   2. correct quantifier shape (\A x \in S : body)
+//   3. correct function shape ([x \in S |-> body])
+//   4. correct EXCEPT shape ([f EXCEPT ![k] = v])
+//   5. correct IF/THEN/ELSE shape
+//   6. correct temporal shape ([][body]_vars, []body, <>body)
+// SANY catches the rest.
+// =====================================================================
+
+// Leading "/\" or "\/" allowed for TLA+'s bulleted-conjunction style:
+//   TypeInvariant ==
+//       /\ A
+//       /\ B
+// Without modeling precedence, the grammar flattens this to a single
+// expr (the leading conjunct is just an extra optional token).
+expr: bullet_lead? atom (op atom)*
+
+bullet_lead: "/\\" | "\\/"
+
+// Infix operators — kept as a rule (not terminal) so Lark/Earley can
+// see `\in` both as a binary op here AND as the structural token in
+// quantifier_expr / function_literal without tokenizer conflict.
+op: "/\\"     // /\ logical and
+  | "\\/"     // \/ logical or
+  | "=>"      // implication
+  | "<=>"     // iff
+  | "~>"      // leads-to
+  | "="
+  | "#"       // not equal
+  | "<="
+  | ">="
+  | "<"
+  | ">"
+  | "+"
+  | "-"
+  | "*"
+  | "%"
+  | "^"
+  | "\\in"    // membership (also appears in quantifier_expr / function_literal)
+  | "\\notin"
+  | "\\subseteq"
+  | "\\union"
+  | "\\cup"
+  | "\\intersect"
+  | "\\cap"
+  | "."
+
+atom: NAME
+    | NUMBER
+    | STRING
+    | "TRUE"
+    | "FALSE"
+    | "BOOLEAN"
+    | "Nat"
+    | empty_set
+    | set_literal
+    | tuple_literal
+    | function_type
+    | function_literal
+    | function_app
+    | operator_app
+    | except_expr
+    | record_expr
+    | if_expr
+    | quantifier_expr
+    | paren_expr
+    | unary_op_expr
+    | temporal_expr
+    | fairness_expr
+    | "@"       // EXCEPT placeholder (refers to current value)
+
+empty_set: "{" "}"
+paren_expr: "(" expr ")"
+set_literal: "{" expr ("," expr)* "}"
+tuple_literal: "<<" expr ("," expr)* ">>"
+
+// Function type: [Domain -> Range] — TypeInvariant uses these a lot.
+// Distinguished from function_literal by absence of `x \in ... |-> ...`.
+function_type: "[" expr "->" expr "]"
+
+// Function literal: [x \in S |-> expr]
+function_literal: "[" NAME "\\in" expr "|->" expr "]"
+
+// Function application: f[x]  or  f[x, y]  (square brackets — TLA+ fn app)
+function_app: NAME "[" expr ("," expr)* "]"
+
+// Operator application: f(x)  or  f(x, y)  (parens — TLA+ operator app)
+// e.g. IsFiniteSet(Salts), AuthAmount(s)
+operator_app: NAME "(" expr ("," expr)* ")"
+
+// EXCEPT: [f EXCEPT ![k] = v]  ; @ is allowed inside as `@ + 1` style
+except_expr: "[" expr "EXCEPT" "!" "[" expr "]" "=" expr "]"
+
+// IF c THEN a ELSE b
+if_expr: "IF" expr "THEN" expr "ELSE" expr
+
+// \A x \in S : body  or  \E x \in S : body
+quantifier_expr: QUANTIFIER NAME "\\in" expr ":" expr
+
+// Records: [field |-> value, ...]
+record_expr: "[" record_field ("," record_field)* "]"
+record_field: NAME "|->" expr
+
+// Unary: ~, -, []  (no operand sometimes — handled in temporal)
+unary_op_expr: ("~" | "-") atom
+
+// Temporal: []expr, <>expr, [][next]_vars
+temporal_expr: ALWAYS atom
+             | EVENTUALLY atom
+             | ALWAYS "[" expr "]" UNDERSCORE_VARS
+             | "[" expr "]" UNDERSCORE_VARS
+
+// Fairness: WF_vars(expr) and SF_vars(expr)
+fairness_expr: FAIRNESS_OP "(" expr ")"
+
+// =====================================================================
+// Terminals
+// =====================================================================
+
+DASHES: /-{4,}/
+EQUALS: /={4,}/
+// TLA+ uses `x'` to denote next-state value. At most one trailing prime.
+NAME: /[A-Z_a-z][A-Za-z0-9_]*'?/
+NUMBER: /\d+/
+STRING: /"[^"]*"/
+
+QUANTIFIER: "\\A" | "\\E"
+ALWAYS: "[]"
+EVENTUALLY: "<>"
+UNDERSCORE_VARS: /_[A-Za-z_][A-Za-z0-9_]*/
+FAIRNESS_OP: /WF_[A-Za-z_][A-Za-z0-9_]*/ | /SF_[A-Za-z_][A-Za-z0-9_]*/
+
+// =====================================================================
+// Comments + whitespace — IGNORED
+// =====================================================================
+
+BLOCK_COMMENT: /\(\*[\s\S]*?\*\)/
+LINE_COMMENT: /\\\*[^\n]*/
+
+%import common.WS
+%ignore WS
+%ignore BLOCK_COMMENT
+%ignore LINE_COMMENT
