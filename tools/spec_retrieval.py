@@ -224,10 +224,14 @@ def build():
         print(f"  {s['name']:36s} ({s['path']})")
 
 
-def query(query_text: str, k: int = 3):
+def query_top(query_text: str, k: int = 3) -> list[dict]:
+    """Returns top-k spec matches as a list of dicts:
+        [{name, cos, path, description_head}, ...]
+    No printing. Suitable for composition (e.g. route_lead_hybrid).
+    """
     if not os.path.isfile(INDEX_PATH):
-        print(f"no index at {INDEX_PATH} — run: python tools/spec_retrieval.py build")
-        sys.exit(1)
+        raise FileNotFoundError(
+            f"no index at {INDEX_PATH} — run: python tools/spec_retrieval.py build")
     sys.path.insert(0, HERE)
     import sol_match
     import numpy as np
@@ -237,18 +241,24 @@ def query(query_text: str, k: int = 3):
     specs = payload["specs"]
     embs = payload["embeddings"]
 
-    # Lift the query too — its identifiers should map to the same
-    # generic placeholders so geometry aligns with the indexed specs.
     q_lifted = _lift_idents(query_text)
     q = sol_match._embed([q_lifted])[0]
     sims = embs @ q  # cosine, since fastembed already unit-norms
     order = np.argsort(-sims)[:k]
+    return [
+        {"name": specs[i]["name"], "cos": float(sims[i]),
+         "path": specs[i]["path"],
+         "description_head": specs[i]["description_head"]}
+        for i in order
+    ]
 
+
+def query(query_text: str, k: int = 3):
+    results = query_top(query_text, k)
     print(f"query: {query_text}")
     print(f"top {k}:\n")
-    for rank, i in enumerate(order, 1):
-        s = specs[i]
-        print(f"  {rank}. {s['name']:36s}  cos={sims[i]:.3f}  ({s['path']})")
+    for rank, s in enumerate(results, 1):
+        print(f"  {rank}. {s['name']:36s}  cos={s['cos']:.3f}  ({s['path']})")
         print(f"     {s['description_head']}")
         print()
 

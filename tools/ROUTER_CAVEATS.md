@@ -90,3 +90,74 @@ hit a bar that turned out to measure the wrong thing on this data.
 Logging this as a known limitation so that future work doesn't claim
 the router is "validated" when it's really "validated for the
 slither-dominant lead distribution we have."
+
+---
+
+## Hybrid router attempt (HYBRID_ROUTER.goal.md, 2026-06-06)
+
+**Attempted Option 3** above. `tools/route_lead_hybrid.py` ships
+working code: `spec_retrieval.query_top` pre-check at cos > 0.55,
+fall through to ML router. The signature-replay test case routes
+correctly to tlc (matched CrossWalletSigReplay cos=0.662).
+
+But the negative tests revealed the empirical floor:
+
+| query (semantic class) | top match | cos |
+|------|----|-----|
+| "signature accepted twice no nonce" (true tlc) | CrossWalletSigReplay | 0.662 |
+| "owner can set fee address to zero" (access control) | Create2NonIdempotent | 0.661 |
+| "balance equals total supply invariant" (halmos) | Uint64FeeOverflow | 0.673 |
+| "oracle returns stale price after long block" (human) | Uint64FeeOverflow | 0.652 |
+
+**All four queries land in 0.65-0.67.** The BAAI/bge-small embedder
+gives any short technical query a high baseline cos against any
+technical spec because the vocabulary overlap dominates the
+structural-shape signal. There is NO scalar threshold that admits
+the true tlc case and rejects the others.
+
+### Why this happens (honest)
+
+The lifted-identifier preprocessing (`spec_retrieval._lift_idents`)
+strips identifiers to `<ident>` placeholders, but doesn't strip
+*technical vocabulary* like "signature", "owner", "balance", "oracle"
+— which are also the words in the spec descriptions. So the cos
+becomes a vocabulary-overlap score, not a structural-shape score.
+
+### What WOULD work (deferred)
+
+Three options for between-contest exploration, none of which fit
+this goal's scope:
+
+1. **Re-rank instead of gate.** Send the lead to the ML router AND
+   the top-3 spec_retrieval matches. Use a learned re-ranker (small
+   classifier) that combines (ML proba, top-3 cos, lead length,
+   ident count, lens prefix) to pick tlc vs not. Needs labels — at
+   least 30-50 tlc-labeled leads vs 100+ non-tlc leads.
+
+2. **Different embedder.** Try an instruction-tuned embedder
+   (e5-mistral, BGE-large) where the description "a withdrawal
+   protocol that does NOT bind each signature" encodes the
+   STRUCTURAL pattern, not just vocabulary. Likely better separation
+   but disk-heavy.
+
+3. **Whitelist+embedder.** Don't gate on cos alone; gate on
+   `(top match name in TLC_NAMES) AND (cos > 0.6) AND (lead contains
+   one of {replay, nonce, idempot, msg.sender, ...})`. Hand-crafted
+   compound rule that combines the embedder's similarity signal
+   with explicit anchor terms. Higher precision but introduces a
+   second relabel-table-style component.
+
+### Current state
+
+`tools/route_lead_hybrid.py` is checked in but **should be treated
+as an experiment, not a production router.** It will fire `tlc` on
+many non-tlc leads at the 0.55 threshold. For now, the production
+recommendation for contest day is:
+
+- Use `tools/route_lead.py` (pure ML) for the routing distribution
+- Use `tools/spec_retrieval.py query <lead>` as a SEPARATE manual
+  check when JH has reason to suspect a tlc-shape bug
+
+The hybrid layer was a clean idea that didn't survive contact with
+the data. The data taught us: the cos signal needs a re-ranker or a
+better embedder, not a threshold.
