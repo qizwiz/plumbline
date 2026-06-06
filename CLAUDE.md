@@ -1,5 +1,19 @@
 # Plumbline — Project Rules
 
+## The ambition (top-of-mind, every turn)
+
+**Find ALL bugs reachable by the right kind of cellular automaton over
+the Solidity grammar lattice.** Not a curated answer key. Not "improve
+this number." The full mathematical space, defined topologically,
+sampled exhaustively by an NCA, discharged by sound verifiers.
+
+The 0.60 ± 0.08 novel-code recall tonight is the *slice* the current
+stack reaches. The reframed loop expands the reachable set; the
+reframed scoreboard measures the expansion per bug class.
+
+See `ARCHITECTURE.md` for the full layered stack. Read it on every
+session start before reaching for a tool.
+
 ## The superpower (operational, written down 2026-06-06 by JH's instruction)
 
 **LLMs are not reasoners that happen to predict tokens. LLMs are
