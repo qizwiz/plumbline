@@ -10,6 +10,13 @@ name: rep-loop
 # expect ~$1/push. Set the secret only when you want the auto-rep on; unset
 # it to keep CI cheap.
 
+# Grant write access so the auto-commit step can push reps.jsonl + classifier
+# + (when it fires) prompts/sol_find.md back to main. Without this, the
+# default GITHUB_TOKEN is read-only and the bot's push hits 403 — caught by
+# inspecting the failed run log on 2026-06-06.
+permissions:
+  contents: write
+
 on:
   push:
     branches: [main]
