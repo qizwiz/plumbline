@@ -1,0 +1,328 @@
+{
+  "summary": "Deep research harness — fan-out web searches, fetch sources, adversarially verify claims, synthesize a cited report.",
+  "agentCount": 114,
+  "logs": [
+    "Q: Research the state of the art across five threads, with emphasis on what is BUIL…",
+    "Decomposed into 6 angles: LLM → TLA+ / model-checker spec generation (built + measured), Neural CA / GNN code analysis & vulnerability detection benchmarks, Grammar-constrained LLM decoding for rare formal grammars, Smart contract bug detector recall/precision on standard datasets, Solidity → TLA+ / formal-spec translation & NatSpec spec mining, Recent surveys + skeptical limits across the stack (synthesis input)",
+    "LLM → TLA+ / model-checker spec generation (built + measured): 6 results",
+    "Smart contract bug detector recall/precision on standard datasets: 6 results",
+    "Neural CA / GNN code analysis & vulnerability detection benchmarks: 6 results",
+    "Neural CA / GNN code analysis & vulnerability detection benchmarks: 5 novel (1 filtered)",
+    "Solidity → TLA+ / formal-spec translation & NatSpec spec mining: 6 results",
+    "Solidity → TLA+ / formal-spec translation & NatSpec spec mining: 5 novel (1 filtered)",
+    "Recent surveys + skeptical limits across the stack (synthesis input): 6 results",
+    "Recent surveys + skeptical limits across the stack (synthesis input): 4 novel (2 filtered)",
+    "Grammar-constrained LLM decoding for rare formal grammars: 6 results",
+    "Grammar-constrained LLM decoding for rare formal grammars: 5 novel (1 filtered)",
+    "Fetched 31 sources → 144 claims → verifying top 25",
+    "\"SysMoBench is a benchmark specifically designed to…\": 3-0 ✓",
+    "\"SysMoBench targets TLA+ as the primary specificati…\": 3-0 ✓",
+    "\"LLM performance on formal model constructs is high…\": 2-1 ✓",
+    "\"Common LLM enhancement techniques (few-shot, chain…\": 3-0 ✓",
+    "\"FormalBench evaluates LLM ability to synthesize fo…\": 3-0 ✓",
+    "\"FM-Bench is a benchmark spanning five formal speci…\": 2-1 ✓",
+    "\"Self-repair prompts improve LLM formal-specificati…\": 0-3 ✗",
+    "\"Fine-tuning small (7-8B) models on formal data bro…\": 0-3 ✗",
+    "\"LTLGuard with Mistral-7B improves syntactic LTL va…\": 3-0 ✓",
+    "\"On the nl2spec 'hard' 36-instance benchmark, LTLGu…\": 3-0 ✓",
+    "\"LTLGuard instantiates grammar-constrained decoding…\": 3-0 ✓",
+    "\"The paper reproduced 9 state-of-the-art deep learn…\": 3-0 ✓",
+    "\"Different runs of the same DL vulnerability-detect…\": 3-0 ✓",
+    "\"DL vulnerability detection models suffer dramatic …\": 3-0 ✓",
+    "\"On the VentiVul out-of-distribution test set of 20…\": 3-0 ✓",
+    "\"On VentiVul function-pair discrimination (before-f…\": 2-1 ✓",
+    "\"Existing GNN-based vulnerability detection methods…\": 3-0 ✓",
+    "\"ANGLE reports accuracy improvements of 34.27%-161.…\": 2-1 ✓",
+    "\"MCR-VD is a GNN-based smart contract vulnerability…\": 3-0 ✓",
+    "\"On three benchmarks (SmartBugs Curated, SolidiFI-B…\": 2-1 ✓",
+    "\"XGrammar achieves up to 100x speedup over existing…\": 3-0 ✓",
+    "\"llguidance supports context-free grammars via a La…\": 3-0 ✓",
+    "\"XGrammar enables near-zero overhead structured gen…\": 3-0 ✓",
+    "\"llguidance achieves approximately 50μs of single-c…\": 3-0 ✓",
+    "\"llguidance documentation provides no specific supp…\": 3-0 ✓",
+    "Verify done: 25 claims → 23 confirmed, 2 killed"
+  ],
+  "result": {
+    "question": "Research the state of the art across five threads, with emphasis on what is BUILT, what is MEASURED, and where the gaps are — so we know what to integrate vs avoid reinventing:\n\n(1) **LLM-driven generation of TLA+ and model-checker specifications.** Papers, tools, measured success rates of LLMs producing TLA+ / Apalache / Promela / NuSMV specs from natural-language requirements or source code. AWS, Microsoft Research, Apple, Amazon's TLA+ team. What grammars do LLMs handle well vs poorly? Is there a measured \"TLA+ fluency\" curve as models scale? Any retrieval-augmented or fine-tuned approaches for spec generation specifically?\n\n(2) **Neural Cellular Automata (NCA) and graph neural networks for code / program analysis and vulnerability detection.** Mordvintsev-style growing NCAs; Devign, ReVeal, LineVul, similar GNN-based smart-contract bug detectors. Has anyone explicitly framed bug detection as an NCA over the program graph with iterative diffusion? What's the measured recall/precision on standard benchmarks? Any work on \"incompressible\" vs \"compressible\" bug classes via complexity analysis?\n\n(3) **Grammar-constrained LLM decoding for rare structured grammars.** Outlines, Guidance, lm-format-enforcer, llguidance, XGrammar. Specifically: how well do these handle context-free grammars like TLA+, Lean, Coq tactics, SMT-LIB? Any benchmarks of grammar-constrained decoding lifting LLM accuracy on rare formal-method grammars?\n\n(4) **Smart contract bug detection: measured state of the art.** Recall/precision numbers for slither, aderyn, mythril, halmos, certora, semgrep-sol on standard datasets (SmartBugs, SolidiFI, Code4rena past contests). What fraction of real-world bugs do pattern-matchers catch? What does symbolic execution add? Any published comparison of human-auditor recall vs tool recall on identical scopes?\n\n(5) **Solidity → TLA+ / formal-spec translation.** VeriSol, K-Framework, Solidity SMTChecker, Certora Prover, any LLM-driven Solidity → TLA+ work. Spec mining from NatSpec or README comments — Amazon, Apple research on natural-language-to-spec. What's been tried for Solidity specifically?\n\nFor each thread: prefer recent (2023-2026), prefer papers with concrete numbers, prefer tools with public benchmarks. End with a synthesis that identifies (a) what's published and we can use directly, (b) what's published and gives us patterns to adapt, (c) what's genuinely novel about applying this stack to Solidity contest auditing.",
+    "summary": "Across the five threads, the state of the art is uneven and partially measured. LLM generation of formal specs (TLA+, Lean, Coq, Dafny, ACSL, LTL) now has real benchmarks (SysMoBench, FM-Bench, FormalBench, SysMBench, nl2spec) and the consistent finding is that vanilla LLMs are weak on structural/loop-heavy constructs, common enhancements (few-shot, CoT, grammar prompting) often degrade semantic accuracy, but lightweight pipelines combining grammar-constrained decoding (SynCode/XGrammar/llguidance) with retrieval-augmented few-shot can take a 7-14B open model from ~10% to >90% syntactic validity and ~75-78% semantic accuracy on LTL — without fine-tuning. GNN-based vulnerability and smart-contract bug detection has strong self-reported numbers on curated benchmarks (MCR-VD F1=92.7% on SmartBugs/SolidiFI; ANGEL +34-162% accuracy over AMPLE on large graphs) but collapses out-of-distribution: ReVeal/LineVul drop to ~0-39 F1 cross-dataset, GPT-4o hits 96% accuracy with F1=0 on May-2025 Linux CVEs, and no DL model meaningfully discriminates before-fix vs after-fix function pairs on VentiVul. Grammar-constrained decoding infrastructure is production-grade (XGrammar 100x speedup, llguidance ~50μs/token mask on 128k vocab, both deployed in vLLM/SGLang/TensorRT-LLM) and exposes generic CFG support, but there are no published benchmarks of these tools specifically on Lean/Coq/TLA+/SMT-LIB grammars — only LTL via LTLGuard demonstrates the off-the-shelf integration works. Solidity→TLA+ remains a gap in the evidence collected: nothing in the verified claim set directly measures VeriSol, K-Framework, SMTChecker, Certora, or LLM-driven Solidity→TLA+ on contest benchmarks.",
+    "findings": [
+      {
+        "claim": "Benchmarks for LLM formal-spec generation now exist across TLA+, Lean4, Coq, Dafny, ACSL, SysML, and full distributed systems — but consistently show LLMs are weak on structural and loop-heavy constructs.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/pdf/2509.23130",
+          "https://arxiv.org/pdf/2501.16207",
+          "https://arxiv.org/pdf/2503.04779",
+          "https://arxiv.org/html/2508.03215v1"
+        ],
+        "evidence": "SysMoBench (arxiv 2509.23130) evaluates AI on TLA+ modeling of 11 real distributed systems (Etcd Raft, ZooKeeper, Redis Raft, Xline CURP, Asterinas) with syntax/runtime/trace/invariant metrics, explicitly extensible to other spec languages. FM-Bench (arxiv 2501.16207) provides 18k GPT-4o-distilled pairs across Coq/Lean4/Dafny/ACSL/TLA+ (4k eval split). FormalBench (arxiv 2503.04779, ACL 2025) shows LLMs ~10% zero-shot, >50% failure, struggle especially on loops. SysMBench (arxiv 2508.03215) finds dramatic per-construct variance: Generalization 100% P/R, Binding Connector 18.8% P / 28.3% R, Item 62.5% P / 10% R for Qwen3-32B."
+      },
+      {
+        "claim": "Common LLM enhancement techniques (few-shot, chain-of-thought, grammar prompting) often DEGRADE semantic accuracy on formal-spec generation, even when they improve surface syntax.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/html/2508.03215v1",
+          "https://arxiv.org/pdf/2503.04779"
+        ],
+        "evidence": "SysMBench measures Claude 3 SysM-R dropping from 56% to 47% with few-shot and to 43% with CoT; grammar prompting raises BLEU from 2.6% to 10.2% but drops SysM-P from 70% to 57%; CoT 'intermediate rationales frequently introduce redundant or partially formed constructs.' FormalBench independently corroborates that few-shot 'often declined across different evaluation dimensions' for CodeLLaMA-34B, LLaMA3-70B, DeepSeek-V3."
+      },
+      {
+        "claim": "Grammar-constrained decoding plus retrieval-augmented few-shot can lift a 7-14B open model on LTL from ~10% syntactic validity to >90%, and to ~75-78% semantic accuracy on the nl2spec hard benchmark — without fine-tuning, and approaching the Codex interactive ceiling of 86.1%.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/pdf/2603.05728"
+        ],
+        "evidence": "LTLGuard (arxiv 2603.05728) Table 1: Mistral-7B syntactic validity V1=10.0% → V7=92.8%; semantic correctness V1=7.1% → V6=40.0% / V7=38.5%. Table 3: Qwen2.5-14B reaches 100% syntactic validity and 75.0-77.8% semantic accuracy on the 36-instance nl2spec 'hard' set, vs T5 fine-tuned 5.5%, Bloom-176B nl2spec 13.8%, Codex interactive 86.1%. Pipeline uses SynCode's precomputed DFA mask store, retrieval-augmented few-shot, and parser feedback."
+      },
+      {
+        "claim": "Grammar-constrained decoding infrastructure (SynCode, XGrammar, llguidance) supports arbitrary context-free grammars at production speeds and is deployed in major LLM serving stacks — but published benchmarks are concentrated on JSON/JSON-Schema and (via LTLGuard) LTL, with no public numbers on Lean, Coq, TLA+, or SMT-LIB grammars.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/abs/2411.15100",
+          "https://github.com/guidance-ai/llguidance",
+          "https://arxiv.org/pdf/2603.05728"
+        ],
+        "evidence": "XGrammar (arxiv 2411.15100, MLSys 2025) reports up to 100x speedup on CFG vs prior decoders via context-independent/dependent token partitioning, integrated into vLLM, SGLang, TensorRT-LLM, MLC-LLM. llguidance README: ~50μs/token mask on 128k-token tokenizer, <1% over 1ms on JSON Schema Bench, supports Lark-format CFG with embedded JSON schemas + regex; no Lean/Coq/TLA+/SMT-LIB mentions or benchmarks in docs. LTLGuard is the verified case of off-the-shelf CFG decoder (SynCode) applied to a formal-method grammar (LTL)."
+      },
+      {
+        "claim": "GNN-based vulnerability detection (Devign, ReVeal, LineVul and successors) shows strong in-distribution numbers but suffers severe reproducibility and cross-dataset collapse, making the published SOTA unreliable as a basis for real-world bug-finding.",
+        "confidence": "high",
+        "sources": [
+          "https://arxiv.org/pdf/2212.08109",
+          "https://arxiv.org/html/2512.10485"
+        ],
+        "evidence": "Steenhoek et al. (arxiv 2212.08109, ICSE 2023) reproduce 9 SOTA DL detectors on Devign + MSR and demonstrate run-to-run variability and low inter-model agreement (only ~22% of test examples agreed across 5 transformers). 'From Lab to Reality' (arxiv 2512.10485) reports LineVul trained on Juliet drops to 38.77 F1 on ICVul and ReVeal trained on BigVul drops to 0.5 F1 on Devign. On VentiVul (20 May-2025 Linux CVEs), GPT-4o hits 96.24% whole-file accuracy with F1=0; ReVeal differentiates 0 of 25 before/after-fix function pairs, LineVul 3, GPT-4o 5."
+      },
+      {
+        "claim": "New GNN architectures explicitly address the limitations of prior smart-contract / vulnerability GNNs — noise interference and inability to capture long-range dependencies in large code graphs — with strong self-reported gains, though independent replication on real-contest data is missing.",
+        "confidence": "medium",
+        "sources": [
+          "https://arxiv.org/pdf/2412.10164",
+          "https://dl.acm.org/doi/10.1016/j.asoc.2025.113435"
+        ],
+        "evidence": "ANGEL (arxiv 2412.10164, Dec 2024) explicitly motivates its architecture by noise + long-distance-dependency failures of prior GNNs and reports 34.27-161.93% accuracy improvement over AMPLE on large code graphs (>300 nodes, where AMPLE drops from 92.25% to 46.85%). MCR-VD (Applied Soft Computing 2025, DOI 10.1016/j.asoc.2025.113435) fuses AST+CFG+PDG into a CPG, transforms to GVRCs, applies graph attention for line-level localization, reports F1=92.7%, acc=94.1%, P=93.5%, R=91.9% on SmartBugs Curated + SolidiFI + Clean Smart Contracts. Caveat: SolidiFI uses synthetic AST-template injection known to inflate pattern-style detector metrics; no third-party replication on Code4rena/Sherlock contests."
+      },
+      {
+        "claim": "The evidence collected does NOT cover key threads requested: there is no verified benchmark on slither/aderyn/mythril/halmos/certora/semgrep-sol vs human auditors, and no verified work on Solidity→TLA+ translation (VeriSol, K-Framework, SMTChecker, Certora, NatSpec/README spec mining).",
+        "confidence": "high",
+        "sources": [
+          "internal-claim-set"
+        ],
+        "evidence": "Across the 23 verified claims, none address smart-contract symbolic execution tool recall/precision on SmartBugs/SolidiFI/Code4rena, none compare human auditor recall to tool recall on identical scopes, and none cover VeriSol, K-Framework, SMTChecker, Certora Prover, or LLM-driven Solidity→TLA+. This is a thread-coverage gap that should drive a second targeted research pass, not a claim that the literature is silent."
+      }
+    ],
+    "caveats": "Several time- and scope-sensitive limits: (1) LTLGuard's 92.8% / 77.8% numbers are a single-paper v1 arXiv preprint (Mar 2026), self-reported on one benchmark — not yet replicated. (2) MCR-VD and ANGEL numbers are self-reported by paper authors on benchmarks (SmartBugs Curated, SolidiFI, Devign) that are known to be either small/curated or synthetically injected, which historically inflates GNN/pattern-matcher metrics vs real-world contest data; no independent Code4rena/Sherlock replication is in the evidence. (3) SysMBench per-construct numbers (e.g., Binding Connector 18.8% P) are for one model (Qwen3-32B) and concern SysML rather than TLA+ specifically — the unevenness pattern generalizes but the exact percentages do not. (4) XGrammar's '100x' is the CFG-best number; JSON-Schema speedup is ~3x, so 'up to' language matters. (5) llguidance and XGrammar latency numbers are self-reported by tool authors on their own benchmarks (MaskBench, JSON Schema Bench) — production adoption corroborates plausibility but not exact figures. (6) Two claims were refuted by adversarial verification and excluded: self-repair prompts as a ~25% fix, and fine-tuning closing the small-vs-DeepSeek-R1-671B gap. (7) Threads (4) smart-contract tool measurement and (5) Solidity→TLA+ are essentially unrepresented in the verified claim set — absence of evidence here is not evidence of absence in the broader literature.</caveats>\n<parameter name=\"openQuestions\">[\"What are measured recall/precision numbers for slither, aderyn, mythril, halmos, certora, and semgrep-sol on SmartBugs/SolidiFI/Code4rena, and how do they compare head-to-head with human auditor recall on identical scopes?\", \"What is the published state of Solidity→TLA+ / formal-spec translation (VeriSol, K-Framework, SMTChecker, Certora Prover, LLM-driven Solidity→TLA+) and of NatSpec/README spec mining — none of which surfaced in the verified claim set?\", \"Do XGrammar, llguidance, or SynCode have any third-party benchmarks on Lean 4 tactic grammars, Coq Ltac, TLA+ syntax, or SMT-LIB beyond the LTLGuard LTL case — and do the LTLGuard syntactic/semantic gains transfer to grammars with deeper context-sensitivity (e.g., TLA+ with module/instance/binding scope)?\", \"Has anyone explicitly framed program-graph bug detection as a Mordvintsev-style growing/diffusion NCA (rather than a standard GNN classifier), and is there a measured 'incompressible vs compressible' bug-class taxonomy via complexity analysis as the research question hypothesizes?\"]",
+    "refuted": [
+      {
+        "claim": "Self-repair prompts improve LLM formal-specification success rates by approximately 25%, indicating syntactic/semantic errors are correctable via iterative refinement rather than requiring fundamentally different model capabilities.",
+        "vote": "0-3",
+        "source": "https://arxiv.org/pdf/2503.04779"
+      },
+      {
+        "claim": "Fine-tuning small (7-8B) models on formal data brought their performance to comparable level with the much larger DeepSeek-R1-671B model — evidence that targeted fine-tuning, not just scale, drives formal-spec fluency.",
+        "vote": "0-3",
+        "source": "https://arxiv.org/pdf/2501.16207"
+      }
+    ],
+    "sources": [
+      {
+        "url": "https://arxiv.org/pdf/2509.23130",
+        "quality": "primary",
+        "angle": "LLM → TLA+ / model-checker spec generation (built + measured)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2508.03215v1",
+        "quality": "primary",
+        "angle": "LLM → TLA+ / model-checker spec generation (built + measured)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2503.04779",
+        "quality": "primary",
+        "angle": "LLM → TLA+ / model-checker spec generation (built + measured)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2501.16207",
+        "quality": "primary",
+        "angle": "LLM → TLA+ / model-checker spec generation (built + measured)",
+        "claimCount": 4
+      },
+      {
+        "url": "https://arxiv.org/pdf/2603.05728",
+        "quality": "primary",
+        "angle": "LLM → TLA+ / model-checker spec generation (built + measured)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://conf.researchr.org/details/ase-2025/agenticse-2025-papers/6/Transforming-Natural-Language-into-Formal-Specifications",
+        "quality": "primary",
+        "angle": "LLM → TLA+ / model-checker spec generation (built + measured)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2212.08109",
+        "quality": "primary",
+        "angle": "Neural CA / GNN code analysis & vulnerability detection benchmarks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2512.10485",
+        "quality": "primary",
+        "angle": "Neural CA / GNN code analysis & vulnerability detection benchmarks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2412.10164",
+        "quality": "primary",
+        "angle": "Neural CA / GNN code analysis & vulnerability detection benchmarks",
+        "claimCount": 4
+      },
+      {
+        "url": "https://dl.acm.org/doi/10.1016/j.asoc.2025.113435",
+        "quality": "primary",
+        "angle": "Neural CA / GNN code analysis & vulnerability detection benchmarks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://github.com/MECLabTUDA/awesome-nca",
+        "quality": "secondary",
+        "angle": "Neural CA / GNN code analysis & vulnerability detection benchmarks",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/abs/2411.15100",
+        "quality": "primary",
+        "angle": "Grammar-constrained LLM decoding for rare formal grammars",
+        "claimCount": 5
+      },
+      {
+        "url": "https://github.com/guidance-ai/llguidance",
+        "quality": "primary",
+        "angle": "Grammar-constrained LLM decoding for rare formal grammars",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2501.10868",
+        "quality": "primary",
+        "angle": "Grammar-constrained LLM decoding for rare formal grammars",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2502.05111",
+        "quality": "primary",
+        "angle": "Grammar-constrained LLM decoding for rare formal grammars",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2512.09758v1",
+        "quality": "primary",
+        "angle": "Grammar-constrained LLM decoding for rare formal grammars",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2505.15756v1",
+        "quality": "primary",
+        "angle": "Smart contract bug detector recall/precision on standard datasets",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2605.09350",
+        "quality": "primary",
+        "angle": "Smart contract bug detector recall/precision on standard datasets",
+        "claimCount": 5
+      },
+      {
+        "url": "https://github.com/DependableSystemsLab/SolidiFI-benchmark",
+        "quality": "primary",
+        "angle": "Smart contract bug detector recall/precision on standard datasets",
+        "claimCount": 4
+      },
+      {
+        "url": "https://arxiv.org/pdf/1910.10601",
+        "quality": "primary",
+        "angle": "Smart contract bug detector recall/precision on standard datasets",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/html/2402.09094",
+        "quality": "primary",
+        "angle": "Smart contract bug detector recall/precision on standard datasets",
+        "claimCount": 5
+      },
+      {
+        "url": "https://repositum.tuwien.at/bitstream/20.500.12708/220353/1/Bodner%20Theresa%20-%202025%20-%20Investigating%20Vulnerability%20Detection%20Tools%20and%20Solidity...pdf",
+        "quality": "primary",
+        "angle": "Smart contract bug detector recall/precision on standard datasets",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2509.19153",
+        "quality": "primary",
+        "angle": "Solidity → TLA+ / formal-spec translation & NatSpec spec mining",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2510.21401",
+        "quality": "primary",
+        "angle": "Solidity → TLA+ / formal-spec translation & NatSpec spec mining",
+        "claimCount": 5
+      },
+      {
+        "url": "https://www.microsoft.com/en-us/research/project/verisol-a-formal-verifier-for-solidity-based-smart-contracts/",
+        "quality": "primary",
+        "angle": "Solidity → TLA+ / formal-spec translation & NatSpec spec mining",
+        "claimCount": 4
+      },
+      {
+        "url": "https://arxiv.org/pdf/2402.10750",
+        "quality": "primary",
+        "angle": "Solidity → TLA+ / formal-spec translation & NatSpec spec mining",
+        "claimCount": 4
+      },
+      {
+        "url": "https://arxiv.org/pdf/2403.13279",
+        "quality": "primary",
+        "angle": "Solidity → TLA+ / formal-spec translation & NatSpec spec mining",
+        "claimCount": 4
+      },
+      {
+        "url": "https://arxiv.org/abs/2512.02080",
+        "quality": "primary",
+        "angle": "Recent surveys + skeptical limits across the stack (synthesis input)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2602.08384",
+        "quality": "primary",
+        "angle": "Recent surveys + skeptical limits across the stack (synthesis input)",
+        "claimCount": 5
+      },
+      {
+        "url": "https://arxiv.org/pdf/2509.07131",
+        "quality": "secondary",
+        "angle": "Recent surveys + skeptical limits across the stack (synthesis input)",
+        "claimCount": 0
+      },
+      {
+        "url": "https://arxiv.org/html/2410.09381v1",
+        "quality": "primary",
+        "angle": "Recent surveys + skeptical limits across the stack (synthesis input)",
+        "claimCount": 5
+      }
+    ],
+    "stats": {
+      "angles": 6,
+      "sourcesFetched": 31,
+      "claimsExtracted": 144,
+      "claimsVerified": 25,
+      "confirmed": 23,
+      "killed": 2,
+      "afterSynthesis": 7,
+      "urlDupes": 1,
+      "budgetDropped": 4,
+      "agentCalls": 114
+    }
+  }
+}
