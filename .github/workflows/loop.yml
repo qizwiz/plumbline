@@ -56,7 +56,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: deps
-        run: pip install -r requirements.txt fastembed numpy
+        run: pip install -r requirements.txt fastembed numpy scikit-learn
       - name: gate on secret
         id: gate
         env:
@@ -68,7 +68,7 @@ jobs:
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
-      - name: run reps on curated corpora
+      - name: run reps on curated corpora (--recall mode for novel-code coverage)
         if: steps.gate.outputs.skip != 'true'
         env:
           PACT_LLM_API_KEY: ${{ secrets.PACT_LLM_API_KEY }}
@@ -76,21 +76,29 @@ jobs:
           PACT_LLM_MODEL: ${{ secrets.PACT_LLM_MODEL }}
         run: |
           set -e
-          for ex in examples/puppy-raffle examples/t-swap examples/thunder-loan; do
+          # --recall mode: tonight's finding was that intent-mode exhausts the
+          # output budget on Promises and never emits Violations on large corpora
+          # (sequence, 50 files). --recall uses prompts/sol_find.md (8 lenses,
+          # short bullets) which scales.
+          for ex in examples/puppy-raffle examples/t-swap examples/thunder-loan examples/boss-bridge examples/sequence; do
             if [ -f "$ex/.ANSWERS.md" ]; then
-              python model_rep.py "$ex" || true
+              python model_rep.py --recall "$ex" || true
             fi
           done
           python tools/validate_reps.py
-      - name: commit new rows
+      - name: retrain classifier (no LLM, free)
+        if: steps.gate.outputs.skip != 'true'
+        run: |
+          python tools/lead_classifier.py train || true
+      - name: commit new rows + classifier
         if: steps.gate.outputs.skip != 'true'
         run: |
           set -e
           git config user.name "plumbline-bot"
           git config user.email "bot@plumbline.local"
-          if ! git diff --quiet reps.jsonl; then
-            git add reps.jsonl
-            git commit -m "ci(reps): auto-append $(git diff --cached --stat reps.jsonl | tail -1 | awk '{print $4}') new rows"
+          git add reps.jsonl tools/lead_classifier.pkl 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "ci(reps): cloud-loop auto-append + classifier retrain"
             git push
           else
             echo "no new rows"
