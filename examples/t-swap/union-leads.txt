@@ -1,0 +1,194 @@
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ forge-std/=/tmp/oz-vendor/forge-std/src/ examples/t-swap/TSwapPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/t-swap' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ forge-std/=/tmp/oz-vendor/forge-std/src/ examples/t-swap/PoolFactory.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/t-swap' running
+INFO:Detectors:
+Detector: incorrect-equality
+TSwapPool.revertIfZero(uint256) (examples/t-swap/TSwapPool.sol#80-85) uses a dangerous strict equality:
+	- amount == 0 (examples/t-swap/TSwapPool.sol#81)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in TSwapPool._swap(IERC20,uint256,IERC20,uint256) (examples/t-swap/TSwapPool.sol#385-414):
+	External calls:
+	- outputToken.safeTransfer(msg.sender,1_000_000_000_000_000_000) (examples/t-swap/TSwapPool.sol#402)
+	Event emitted after the call(s):
+	- Swap(msg.sender,inputToken,inputAmount,outputToken,outputAmount) (examples/t-swap/TSwapPool.sol#404-410)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: assembly
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Variable TSwapPool.swap_count (examples/t-swap/TSwapPool.sol#46) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+ERROR:ConvertToIR:Function not found name
+ERROR:ContractSolcParsing:Impossible to generate IR for PoolFactory.createPool (examples/t-swap/PoolFactory.sol#47-58):
+ 'NoneType' object has no attribute 'type'
+INFO:Detectors:
+Detector: uninitialized-state
+PoolFactory.s_pools (examples/t-swap/PoolFactory.sol#27) is never initialized. It is used in:
+	- PoolFactory.createPool(address) (examples/t-swap/PoolFactory.sol#47-58)
+	- PoolFactory.getPool(address) (examples/t-swap/PoolFactory.sol#63-65)
+PoolFactory.s_tokens (examples/t-swap/PoolFactory.sol#28) is never initialized. It is used in:
+	- PoolFactory.getToken(address) (examples/t-swap/PoolFactory.sol#67-69)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+INFO:Detectors:
+Detector: incorrect-equality
+TSwapPool.revertIfZero(uint256) (examples/t-swap/TSwapPool.sol#80-85) uses a dangerous strict equality:
+	- amount == 0 (examples/t-swap/TSwapPool.sol#81)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Detector: missing-zero-check
+PoolFactory.constructor(address).wethToken (examples/t-swap/PoolFactory.sol#40) lacks a zero-check on :
+		- i_wethToken = wethToken (examples/t-swap/PoolFactory.sol#41)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in TSwapPool._swap(IERC20,uint256,IERC20,uint256) (examples/t-swap/TSwapPool.sol#385-414):
+	External calls:
+	- outputToken.safeTransfer(msg.sender,1_000_000_000_000_000_000) (examples/t-swap/TSwapPool.sol#402)
+	Event emitted after the call(s):
+	- Swap(msg.sender,inputToken,inputAmount,outputToken,outputAmount) (examples/t-swap/TSwapPool.sol#404-410)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: assembly
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+3 different versions of Solidity are used:
+	- Version constraint >=0.8.13<0.9.0 is used by:
+		->=0.8.13<0.9.0 (../../../../tmp/oz-vendor/forge-std/src/interfaces/IERC20.sol#2)
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/t-swap/PoolFactory.sol#15)
+		-0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint >=0.8.13<0.9.0 is too complex.
+It is used by:
+	- >=0.8.13<0.9.0 (../../../../tmp/oz-vendor/forge-std/src/interfaces/IERC20.sol#2)
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/t-swap/PoolFactory.sol#15)
+	- 0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Variable TSwapPool.swap_count (examples/t-swap/TSwapPool.sol#46) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: unindexed-event-address
+Event PoolFactory.PoolCreated(address,address) (examples/t-swap/PoolFactory.sol#35) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Slither:examples/t-swap/ analyzed (24 contracts with 101 detectors), 33 result(s) found
+1. ACCESS CONTROL & INIT — - [ACCESS CONTROL] TSwapPool::constructor — no validation on poolToken/wethToken addresses — zero address or duplicate tokens could brick the pool - [ACCESS CONTROL] PoolFactory::constructor — no validation on wethToken address — zero address would brick all future pools - [ACCESS CONTROL] PoolFactory::createPool — permissionless pool creation — malicious tokens (reentrancy hooks, fake WETH) can be used - [ACCESS CONTROL] TSwapPool::deposit — no deadline modifier applied — deadline parameter accepted but never checked, expired transactions will execute - [ACCESS CONTROL] TSwapPool::_addLiquidityMintAndTransfer — private but called with user-controlled amounts — if deposit logic is wrong, mint/transfer ratio mismatch
+2. ORACLE / PRICE FEED — - [ORACLE] TSwapPool::getPriceOfOneWethInPoolTokens — uses spot balanceOf for price — flash-loan or sandwich attack can manipulate price oracle - [ORACLE] TSwapPool::getPriceOfOnePoolTokenInWeth — uses spot balanceOf for price — same manipulation vector as above - [ORACLE] TSwapPool::getOutputAmountBasedOnInput — no staleness check — relies on current reserves which can be stale after paused state - [ORACLE] TSwapPool::swapExactInput — reads balanceOf before transfer — inputReserves is stale, doesn't include the incoming inputAmount
+3. ARITHMETIC — - [ARITHMETIC] TSwapPool::getOutputAmountBasedOnInput — division truncation — `numerator / denominator` floors, user receives less output - [ARITHMETIC] TSwapPool::getInputAmountBasedOnOutput — division truncation — `((inputReserves * outputAmount) * 10000) / ((outputReserves - outputAmount) * 997)` rounds down, protocol receives less input - [ARITHMETIC] TSwapPool::deposit — liquidityTokensToMint division — `(wethToDeposit * totalLiquidityTokenSupply()) / wethReserves` truncates, user minted fewer LP tokens than fair share - [ARITHMETIC] TSwapPool::withdraw — wethToWithdraw/poolTokensToWithdraw division — both truncate, user receives less than proportional share - [ARITHMETIC] TSwapPool::getPoolTokensToDepositBasedOnWeth — division truncation — `(wethToDeposit * poolTokenReserves) / wethReserves` rounds down, deposit ratio mismatch - [ARITHMETIC] TSwapPool::getInputAmountBasedOnOutput — potential overflow on `(inputReserves * outputAmount) * 10000` — large reserves * outputAmount could overflow uint256 - [ARITHMETIC] TSwapPool::_swap — outputToken.safeTransfer 1e18 extra tokens — hardcoded 1e18 ignores token decimals, breaks for non-18-decimal tokens
+4. TOKEN ACCOUNTING — - [TOKEN ACCOUNTING] TSwapPool::swapExactInput — reserves read before transfer — `inputReserves = inputToken.balanceOf(address(this))` doesn't include inputAmount user is about to send, breaks invariant - [TOKEN ACCOUNTING] TSwapPool::swapExactOutput — same issue — reserves read before transfer, calculation uses wrong base - [TOKEN ACCOUNTING] TSwapPool::_swap — extra token incentive sent before input received — CEI violation, outputToken balance changes before inputToken received, breaks invariant - [TOKEN ACCOUNTING] TSwapPool::_swap — 1e18 extra token assumes 18 decimals — if outputToken has 6 decimals (USDC), sends 1e18 base units = massive overpayment - [TOKEN ACCOUNTING] TSwapPool::deposit — no fee-on-transfer check — if poolToken or wethToken has transfer fee, balanceOf won't match expected, ratio broken - [TOKEN ACCOUNTING] TSwapPool::withdraw — burns before transfer — if transfer fails (paused token), liquidity tokens already burned, user loses funds - [TOKEN ACCOUNTING] TSwapPool::sellPoolTokens — wrong parameter order — passes poolTokenAmount as outputAmount to swapExactOutput, but should be inputAmount - [TOKEN ACCOUNTING] PoolFactory::createPool — no check if tokenAddress is valid ERC20 — calling name() on non-ERC20 will revert, but after pool created
+5. ARRAY / INDEX / INPUT VALIDATION — - [INPUT VALIDATION] TSwapPool::deposit — no deadline validation — deadline parameter ignored, transactions can execute after user's intended expiry - [INPUT VALIDATION] TSwapPool::swapExactInput — minOutputAmount can be 0 — user sets minOutputAmount=0, no slippage protection - [INPUT VALIDATION] TSwapPool::swapExactOutput — no minInputAmount parameter — user has no protection against paying too much input - [INPUT VALIDATION] TSwapPool::sellPoolTokens — no minWethAmount parameter — user has no slippage protection on WETH received - [INPUT VALIDATION] TSwapPool::deposit — maximumPoolTokensToDeposit can equal poolTokensToDeposit — off-by-one, should be strictly greater - [INPUT VALIDATION] TSwapPool::withdraw — no check liquidityTokensToBurn <= balanceOf(msg.sender) — revert happens in _burn but after event emission - [INPUT VALIDATION] TSwapPool::getInputAmountBasedOnOutput — outputAmount >= outputReserves causes underflow — `(outputReserves - outputAmount)` underflows if outputAmount too large - [INPUT VALIDATION] TSwapPool::constructor — poolToken == wethToken allowed — same token for both sides breaks AMM logic
+6. EXTERNAL CALLS & REENTRANCY — - [REENTRANCY] TSwapPool::_swap — outputToken transfer before inputToken transfer — if outputToken is malicious ERC777 with hook, can reenter and drain pool - [REENTRANCY] TSwapPool::_swap — swap_count increment before output transfer — malicious token hook can reenter, get multiple 1e18 bonuses in one tx - [REENTRANCY] TSwapPool::deposit — _mint before safeTransferFrom — LP tokens minted before tokens received, user can reenter with LP tokens before providing liquidity - [REENTRANCY] TSwapPool::withdraw — safeTransfer after _burn — correct CEI, but if token has hook, user can reenter other functions with withdrawn funds - [REENTRANCY] TSwapPool::_addLiquidityMintAndTransfer — event emitted with wrong parameter order — `emit LiquidityAdded(msg.sender, poolTokensToDeposit, wethToDeposit)` has poolTokens and weth swapped
+7. CROSS-CHAIN / BRIDGE — - [CROSS-CHAIN] TSwapPool::_swap — 1e18 hardcoded bonus — assumes 18 decimals, on L2 with 6-decimal USDC, sends 1 trillion USDC - [CROSS-CHAIN] TSwapPool (general) — no chain-id validation — if deployed on multiple chains, pools can't be distinguished
+8. ECONOMIC / INCENTIVE LOGIC — - [ECONOMIC] TSwapPool::_swap — extra 1e18 token every 10 swaps breaks invariant — protocol bleeds value, x*y=k violated, LPs lose funds - [ECONOMIC] TSwapPool::_swap — swap_count is global not per-user — attacker can do 9 small swaps then 1 large swap to get 1e18 bonus on large amount - [ECONOMIC] TSwapPool::_swap — swap_count never resets on liquidity changes — if pool paused/unpaused or liquidity changes, count persists incorrectly - [ECONOMIC] TSwapPool::getOutputAmountBasedOnInput — inputAmountMinusFee = inputAmount * 997 — fee is 0.3% but math uses 997/1000 = 0.3% fee applied correctly, but asymmetric with getInputAmountBasedOnOutput - [ECONOMIC] TSwapPool::getInputAmountBasedOnOutput — uses 10000 and 997 — fee math inconsistent with getOutputAmountBasedOnInput (uses 1000), could lead to arbitrage - [ECONOMIC] TSwapPool::deposit — initial deposit liquidityTokensToMint = wethToDeposit — first depositor can mint arbitrary LP tokens by depositing 1 wei WETH, then donating tokens to inflate ratio - [ECONOMIC] TSwapPool::deposit — no minimum liquidity burn on first deposit — first depositor can withdraw all liquidity, reset pool state - [ECONOMIC] TSwapPool::swapExactInput — no max input amount — user can accidentally approve and send entire balance - [ECONOMIC] TSwapPool::sellPoolTokens — function name implies selling but actually buying — user confusion, they think they're selling poolToken but getting poolToken out - [ECONOMIC] TSwapPool::sellPoolTokens — swapExactOutput with poolTokenAmount as outputAmount — user wants to sell X poolTokens, function tries to output X poolTokens (buys instead of sells) - [ECONOMIC] TSwapPool::withdraw — proportional withdrawal — if pool imbalanced from fee accrual, later withdrawers get more fees than earlier ones (last-mover advantage) - [ECONOMIC] TSwapPool::deposit — poolTokensToDeposit rounds down — attacker can repeatedly deposit/withdraw to extract rounding errors - [ECONOMIC] TSwapPool::_swap — bonus paid in outputToken — if outputToken is WETH (valuable), attacker drains WETH; if poolToken (less liquid), attacker dumps on market ---

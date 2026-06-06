@@ -1,0 +1,56 @@
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ examples/puppy-raffle/src/PuppyRaffle.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/puppy-raffle/src' running
+Traceback (most recent call last):
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/platform/solc.py", line 581, in _run_solc
+    ret: Dict = json.loads(stdout)
+                ~~~~~~~~~~^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/__init__.py", line 352, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.14/3.14.5/Frameworks/Python.framework/Versions/3.14/lib/python3.14/json/decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jonathanhill/Library/Python/3.14/bin/slither", line 6, in <module>
+    sys.exit(main())
+             ~~~~^^
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/slither/__main__.py", line 760, in main
+    main_impl(all_detector_classes=detectors, all_printer_classes=printers)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/slither/__main__.py", line 865, in main_impl
+    ) = process_all(filename, args, detector_classes, printer_classes)
+        ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/slither/__main__.py", line 95, in process_all
+    compilations = compile_all(target, **vars(args))
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/crytic_compile.py", line 737, in compile_all
+    compilations.append(CryticCompile(filename, **kwargs))
+                        ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/crytic_compile.py", line 211, in __init__
+    self._compile(**kwargs)
+    ~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/crytic_compile.py", line 633, in _compile
+    self._platform.compile(self, **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/platform/solc.py", line 150, in compile
+    targets_json = _get_targets_json(compilation_unit, self._target, **kwargs)
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/platform/solc.py", line 279, in _get_targets_json
+    return _run_solc(
+        compilation_unit,
+    ...<6 lines>...
+        force_legacy_json=force_legacy_json,
+    )
+  File "/Users/jonathanhill/Library/Python/3.14/lib/python/site-packages/crytic_compile/platform/solc.py", line 585, in _run_solc
+    raise InvalidCompilation(f"Invalid solc compilation {stderr}")
+crytic_compile.platform.exceptions.InvalidCompilation: Invalid solc compilation Error: Source file requires different compiler version (current compiler is 0.8.20+commit.a1b79de6.Darwin.appleclang) - note that nightly builds are considered to be strictly less than the released version
+ --> examples/puppy-raffle/src/PuppyRaffle.sol:2:1:
+  |
+2 | pragma solidity ^0.7.6;
+  | ^^^^^^^^^^^^^^^^^^^^^^^
+
+

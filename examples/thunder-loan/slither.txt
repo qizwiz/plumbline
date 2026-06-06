@@ -1,0 +1,308 @@
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/thunder-loan/protocol/AssetToken.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/thunder-loan/protocol' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/thunder-loan/protocol/ThunderLoan.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/thunder-loan/protocol' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/thunder-loan/protocol/OracleUpgradeable.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/thunder-loan/protocol' running
+INFO:Detectors:
+Detector: assembly
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/thunder-loan/protocol/AssetToken.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/thunder-loan/protocol/AssetToken.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: reentrancy-balance
+Reentrancy in ThunderLoan.flashloan(address,IERC20,uint256,bytes) (examples/thunder-loan/protocol/ThunderLoan.sol#181-229):
+	External call allowing reentrancy:
+	- assetToken.updateExchangeRate(fee) (examples/thunder-loan/protocol/ThunderLoan.sol#204)
+	Balance read before the call:
+	- startingBalance = IERC20(token).balanceOf(address(assetToken)) (examples/thunder-loan/protocol/ThunderLoan.sol#192)
+	Possible stale balance used after the call in a condition:
+	- endingBalance < startingBalance + fee (examples/thunder-loan/protocol/ThunderLoan.sol#225)
+		- stale variable `startingBalance`
+Reentrancy in ThunderLoan.flashloan(address,IERC20,uint256,bytes) (examples/thunder-loan/protocol/ThunderLoan.sol#181-229):
+	External call allowing reentrancy:
+	- assetToken.transferUnderlyingTo(receiverAddress,amount) (examples/thunder-loan/protocol/ThunderLoan.sol#209)
+	Balance read before the call:
+	- startingBalance = IERC20(token).balanceOf(address(assetToken)) (examples/thunder-loan/protocol/ThunderLoan.sol#192)
+	Possible stale balance used after the call in a condition:
+	- endingBalance < startingBalance + fee (examples/thunder-loan/protocol/ThunderLoan.sol#225)
+		- stale variable `startingBalance`
+Reentrancy in ThunderLoan.flashloan(address,IERC20,uint256,bytes) (examples/thunder-loan/protocol/ThunderLoan.sol#181-229):
+	External call allowing reentrancy:
+	- receiverAddress.functionCall(abi.encodeCall(IFlashLoanReceiver.executeOperation,(address(token),amount,fee,msg.sender,params))) (examples/thunder-loan/protocol/ThunderLoan.sol#211-222)
+	Balance read before the call:
+	- startingBalance = IERC20(token).balanceOf(address(assetToken)) (examples/thunder-loan/protocol/ThunderLoan.sol#192)
+	Possible stale balance used after the call in a condition:
+	- endingBalance < startingBalance + fee (examples/thunder-loan/protocol/ThunderLoan.sol#225)
+		- stale variable `startingBalance`
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities
+INFO:Detectors:
+Detector: unused-return
+ERC1967Utils.upgradeToAndCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#83-92) ignores return value by Address.functionDelegateCall(newImplementation,data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#88)
+ERC1967Utils.upgradeBeaconToAndCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#173-182) ignores return value by Address.functionDelegateCall(IBeacon(newBeacon).implementation(),data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#178)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: events-maths
+ThunderLoan.updateFlashLoanFee(uint256) (examples/thunder-loan/protocol/ThunderLoan.sol#265-270) should emit an event for: 
+	- s_flashLoanFee = newFee (examples/thunder-loan/protocol/ThunderLoan.sol#269) 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-events-arithmetic
+INFO:Detectors:
+Detector: reentrancy-benign
+Reentrancy in ThunderLoan.flashloan(address,IERC20,uint256,bytes) (examples/thunder-loan/protocol/ThunderLoan.sol#181-229):
+	External calls:
+	- assetToken.updateExchangeRate(fee) (examples/thunder-loan/protocol/ThunderLoan.sol#204)
+	State variables written after the call(s):
+	- s_currentlyFlashLoaning[token] = true (examples/thunder-loan/protocol/ThunderLoan.sol#208)
+Reentrancy in ThunderLoan.flashloan(address,IERC20,uint256,bytes) (examples/thunder-loan/protocol/ThunderLoan.sol#181-229):
+	External calls:
+	- assetToken.updateExchangeRate(fee) (examples/thunder-loan/protocol/ThunderLoan.sol#204)
+	- assetToken.transferUnderlyingTo(receiverAddress,amount) (examples/thunder-loan/protocol/ThunderLoan.sol#209)
+	- receiverAddress.functionCall(abi.encodeCall(IFlashLoanReceiver.executeOperation,(address(token),amount,fee,msg.sender,params))) (examples/thunder-loan/protocol/ThunderLoan.sol#211-222)
+	State variables written after the call(s):
+	- s_currentlyFlashLoaning[token] = false (examples/thunder-loan/protocol/ThunderLoan.sol#228)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-3
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in ThunderLoan.flashloan(address,IERC20,uint256,bytes) (examples/thunder-loan/protocol/ThunderLoan.sol#181-229):
+	External calls:
+	- assetToken.updateExchangeRate(fee) (examples/thunder-loan/protocol/ThunderLoan.sol#204)
+	Event emitted after the call(s):
+	- FlashLoan(receiverAddress,token,amount,fee,params) (examples/thunder-loan/protocol/ThunderLoan.sol#206)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: assembly
+OwnableUpgradeable._getOwnableStorage() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#30-34) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#31-33)
+Initializable._getInitializableStorage() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#223-227) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#224-226)
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+StorageSlot.getAddressSlot(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#59-64) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#61-63)
+StorageSlot.getBooleanSlot(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#69-74) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#71-73)
+StorageSlot.getBytes32Slot(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#79-84) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#81-83)
+StorageSlot.getUint256Slot(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#89-94) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#91-93)
+StorageSlot.getStringSlot(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#99-104) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#101-103)
+StorageSlot.getStringSlot(string) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#109-114) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#111-113)
+StorageSlot.getBytesSlot(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#119-124) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#121-123)
+StorageSlot.getBytesSlot(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#129-134) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#131-133)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#5)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/thunder-loan/interfaces/IFlashLoanReceiver.sol#2)
+		-0.8.20 (examples/thunder-loan/interfaces/IPoolFactory.sol#2)
+		-0.8.20 (examples/thunder-loan/interfaces/ITSwapPool.sol#2)
+		-0.8.20 (examples/thunder-loan/interfaces/IThunderLoan.sol#2)
+		-0.8.20 (examples/thunder-loan/protocol/AssetToken.sol#2)
+		-0.8.20 (examples/thunder-loan/protocol/OracleUpgradeable.sol#2)
+		-0.8.20 (examples/thunder-loan/protocol/ThunderLoan.sol#64)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ContextUpgradeable.__Context_init() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#18-19) is never used and should be removed
+ContextUpgradeable.__Context_init_unchained() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#21-22) is never used and should be removed
+ContextUpgradeable._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#27-29) is never used and should be removed
+Initializable._getInitializedVersion() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#208-210) is never used and should be removed
+UUPSUpgradeable.__UUPSUpgradeable_init_unchained() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#68-69) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC1822.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/beacon/IBeacon.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol#5)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/thunder-loan/interfaces/IFlashLoanReceiver.sol#2)
+	- 0.8.20 (examples/thunder-loan/interfaces/IPoolFactory.sol#2)
+	- 0.8.20 (examples/thunder-loan/interfaces/ITSwapPool.sol#2)
+	- 0.8.20 (examples/thunder-loan/interfaces/IThunderLoan.sol#2)
+	- 0.8.20 (examples/thunder-loan/protocol/AssetToken.sol#2)
+	- 0.8.20 (examples/thunder-loan/protocol/OracleUpgradeable.sol#2)
+	- 0.8.20 (examples/thunder-loan/protocol/ThunderLoan.sol#64)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function OwnableUpgradeable.__Ownable_init(address) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#51-53) is not in mixedCase
+Function OwnableUpgradeable.__Ownable_init_unchained(address) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#55-60) is not in mixedCase
+Constant OwnableUpgradeable.OwnableStorageLocation (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol#28) is not in UPPER_CASE_WITH_UNDERSCORES
+Function UUPSUpgradeable.__UUPSUpgradeable_init() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#65-66) is not in mixedCase
+Function UUPSUpgradeable.__UUPSUpgradeable_init_unchained() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#68-69) is not in mixedCase
+Variable UUPSUpgradeable.__self (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#22) is not in mixedCase
+Function ContextUpgradeable.__Context_init() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#18-19) is not in mixedCase
+Function ContextUpgradeable.__Context_init_unchained() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#21-22) is not in mixedCase
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Function OracleUpgradeable.__Oracle_init(address) (examples/thunder-loan/protocol/OracleUpgradeable.sol#11-13) is not in mixedCase
+Function OracleUpgradeable.__Oracle_init_unchained(address) (examples/thunder-loan/protocol/OracleUpgradeable.sol#15-17) is not in mixedCase
+Variable ThunderLoan.s_tokenToAssetToken (examples/thunder-loan/protocol/ThunderLoan.sol#94) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: unindexed-event-address
+Event ERC1967Utils.AdminChanged(address,address) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol#25) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Detectors:
+Detector: assembly
+Initializable._getInitializableStorage() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#223-227) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#224-226)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/thunder-loan/interfaces/IPoolFactory.sol#2)
+		-0.8.20 (examples/thunder-loan/interfaces/ITSwapPool.sol#2)
+		-0.8.20 (examples/thunder-loan/protocol/OracleUpgradeable.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Initializable._checkInitializing() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#178-182) is never used and should be removed
+Initializable._disableInitializers() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#192-203) is never used and should be removed
+Initializable._getInitializableStorage() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#223-227) is never used and should be removed
+Initializable._getInitializedVersion() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#208-210) is never used and should be removed
+Initializable._isInitializing() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#215-217) is never used and should be removed
+OracleUpgradeable.__Oracle_init(address) (examples/thunder-loan/protocol/OracleUpgradeable.sol#11-13) is never used and should be removed
+OracleUpgradeable.__Oracle_init_unchained(address) (examples/thunder-loan/protocol/OracleUpgradeable.sol#15-17) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/thunder-loan/interfaces/IPoolFactory.sol#2)
+	- 0.8.20 (examples/thunder-loan/interfaces/ITSwapPool.sol#2)
+	- 0.8.20 (examples/thunder-loan/protocol/OracleUpgradeable.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: naming-convention
+Function OracleUpgradeable.__Oracle_init(address) (examples/thunder-loan/protocol/OracleUpgradeable.sol#11-13) is not in mixedCase
+Function OracleUpgradeable.__Oracle_init_unchained(address) (examples/thunder-loan/protocol/OracleUpgradeable.sol#15-17) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Slither:examples/thunder-loan/protocol/ analyzed (40 contracts with 101 detectors), 71 result(s) found

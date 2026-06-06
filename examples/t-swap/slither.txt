@@ -1,0 +1,186 @@
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ forge-std/=/tmp/oz-vendor/forge-std/src/ examples/t-swap/TSwapPool.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/t-swap' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ forge-std/=/tmp/oz-vendor/forge-std/src/ examples/t-swap/PoolFactory.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/t-swap' running
+INFO:Detectors:
+Detector: incorrect-equality
+TSwapPool.revertIfZero(uint256) (examples/t-swap/TSwapPool.sol#80-85) uses a dangerous strict equality:
+	- amount == 0 (examples/t-swap/TSwapPool.sol#81)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in TSwapPool._swap(IERC20,uint256,IERC20,uint256) (examples/t-swap/TSwapPool.sol#385-414):
+	External calls:
+	- outputToken.safeTransfer(msg.sender,1_000_000_000_000_000_000) (examples/t-swap/TSwapPool.sol#402)
+	Event emitted after the call(s):
+	- Swap(msg.sender,inputToken,inputAmount,outputToken,outputAmount) (examples/t-swap/TSwapPool.sol#404-410)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: assembly
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Variable TSwapPool.swap_count (examples/t-swap/TSwapPool.sol#46) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+ERROR:ConvertToIR:Function not found name
+ERROR:ContractSolcParsing:Impossible to generate IR for PoolFactory.createPool (examples/t-swap/PoolFactory.sol#47-58):
+ 'NoneType' object has no attribute 'type'
+INFO:Detectors:
+Detector: uninitialized-state
+PoolFactory.s_pools (examples/t-swap/PoolFactory.sol#27) is never initialized. It is used in:
+	- PoolFactory.createPool(address) (examples/t-swap/PoolFactory.sol#47-58)
+	- PoolFactory.getPool(address) (examples/t-swap/PoolFactory.sol#63-65)
+PoolFactory.s_tokens (examples/t-swap/PoolFactory.sol#28) is never initialized. It is used in:
+	- PoolFactory.getToken(address) (examples/t-swap/PoolFactory.sol#67-69)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#uninitialized-state-variables
+INFO:Detectors:
+Detector: incorrect-equality
+TSwapPool.revertIfZero(uint256) (examples/t-swap/TSwapPool.sol#80-85) uses a dangerous strict equality:
+	- amount == 0 (examples/t-swap/TSwapPool.sol#81)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dangerous-strict-equalities
+INFO:Detectors:
+Detector: missing-zero-check
+PoolFactory.constructor(address).wethToken (examples/t-swap/PoolFactory.sol#40) lacks a zero-check on :
+		- i_wethToken = wethToken (examples/t-swap/PoolFactory.sol#41)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in TSwapPool._swap(IERC20,uint256,IERC20,uint256) (examples/t-swap/TSwapPool.sol#385-414):
+	External calls:
+	- outputToken.safeTransfer(msg.sender,1_000_000_000_000_000_000) (examples/t-swap/TSwapPool.sol#402)
+	Event emitted after the call(s):
+	- Swap(msg.sender,inputToken,inputAmount,outputToken,outputAmount) (examples/t-swap/TSwapPool.sol#404-410)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: assembly
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+3 different versions of Solidity are used:
+	- Version constraint >=0.8.13<0.9.0 is used by:
+		->=0.8.13<0.9.0 (../../../../tmp/oz-vendor/forge-std/src/interfaces/IERC20.sol#2)
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/t-swap/PoolFactory.sol#15)
+		-0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint >=0.8.13<0.9.0 is too complex.
+It is used by:
+	- >=0.8.13<0.9.0 (../../../../tmp/oz-vendor/forge-std/src/interfaces/IERC20.sol#2)
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/t-swap/PoolFactory.sol#15)
+	- 0.8.20 (examples/t-swap/TSwapPool.sol#15)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Variable TSwapPool.swap_count (examples/t-swap/TSwapPool.sol#46) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: unindexed-event-address
+Event PoolFactory.PoolCreated(address,address) (examples/t-swap/PoolFactory.sol#35) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Slither:examples/t-swap/ analyzed (24 contracts with 101 detectors), 33 result(s) found

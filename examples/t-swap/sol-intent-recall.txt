@@ -1,0 +1,3 @@
+RECALL    1.0
+PRECISION 0.5
+n_leads=8 n_findings=11

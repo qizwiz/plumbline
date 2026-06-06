@@ -1,0 +1,291 @@
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/boss-bridge/L1BossBridge.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/boss-bridge' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/boss-bridge/L1Token.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/boss-bridge' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/boss-bridge/L1Vault.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/boss-bridge' running
+'solc --version' running
+'solc @openzeppelin/contracts/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts/ @openzeppelin/contracts-upgradeable/=/tmp/oz-vendor/node_modules/@openzeppelin/contracts-upgradeable/ examples/boss-bridge/TokenFactory.sol --combined-json abi,ast,bin,bin-runtime,srcmap,srcmap-runtime,userdoc,devdoc,hashes --allow-paths .,/Users/jonathanhill/src/plumbline/examples/boss-bridge' running
+INFO:Detectors:
+Detector: arbitrary-send-erc20
+L1BossBridge.depositTokensToL2(address,address,uint256) (examples/boss-bridge/L1BossBridge.sol#70-78) uses arbitrary from in transferFrom: token.safeTransferFrom(from,address(vault),amount) (examples/boss-bridge/L1BossBridge.sol#74)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#arbitrary-from-in-transferfrom
+INFO:Detectors:
+Detector: arbitrary-send-eth
+L1BossBridge.sendToL1(uint8,bytes32,bytes32,bytes) (examples/boss-bridge/L1BossBridge.sol#112-125) sends eth to arbitrary user
+	Dangerous calls:
+	- (success,None) = target.call{value: value}(data) (examples/boss-bridge/L1BossBridge.sol#121)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#functions-that-send-ether-to-arbitrary-destinations
+INFO:Detectors:
+Detector: incorrect-exp
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) has bitwise-xor operator ^ instead of the exponentiation operator **: 
+	 - inverse = (3 * denominator) ^ 2 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#184)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-exponentiation
+INFO:Detectors:
+Detector: divide-before-multiply
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse = (3 * denominator) ^ 2 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#184)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse *= 2 - denominator * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#188)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse *= 2 - denominator * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#189)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse *= 2 - denominator * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#190)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse *= 2 - denominator * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#191)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse *= 2 - denominator * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#192)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- denominator = denominator / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#169)
+	- inverse *= 2 - denominator * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#193)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) performs a multiplication on the result of a division:
+	- prod0 = prod0 / twos (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#172)
+	- result = prod0 * inverse (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#199)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#divide-before-multiply
+INFO:Detectors:
+Detector: unused-return
+L1Vault.approveTo(address,uint256) (examples/boss-bridge/L1Vault.sol#19-21) ignores return value by token.approve(target,amount) (examples/boss-bridge/L1Vault.sol#20)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: missing-zero-check
+L1BossBridge.sendToL1(uint8,bytes32,bytes32,bytes).target (examples/boss-bridge/L1BossBridge.sol#119) lacks a zero-check on :
+		- (success,None) = target.call{value: value}(data) (examples/boss-bridge/L1BossBridge.sol#121)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#missing-zero-address-validation
+INFO:Detectors:
+Detector: reentrancy-events
+Reentrancy in L1BossBridge.depositTokensToL2(address,address,uint256) (examples/boss-bridge/L1BossBridge.sol#70-78):
+	External calls:
+	- token.safeTransferFrom(from,address(vault),amount) (examples/boss-bridge/L1BossBridge.sol#74)
+	Event emitted after the call(s):
+	- Deposit(from,l2Recipient,amount) (examples/boss-bridge/L1BossBridge.sol#77)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#reentrancy-vulnerabilities-4
+INFO:Detectors:
+Detector: assembly
+Address._revert(bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#146-158) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#151-154)
+Strings.toString(uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Strings.sol#24-44) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Strings.sol#30-32)
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Strings.sol#36-38)
+ECDSA.tryRecover(bytes32,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#56-73) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#64-68)
+MessageHashUtils.toEthSignedMessageHash(bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol#30-37) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol#32-36)
+MessageHashUtils.toTypedDataHash(bytes32,bytes32) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol#76-85) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol#78-84)
+Math.mulDiv(uint256,uint256,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#123-202) uses assembly
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#130-133)
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#154-161)
+	- INLINE ASM (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#167-176)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Pausable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/boss-bridge/L1BossBridge.sol#15)
+		-0.8.20 (examples/boss-bridge/L1Vault.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ReentrancyGuard._reentrancyGuardEntered() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol#81-83) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Pausable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/ReentrancyGuard.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Strings.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/Math.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/math/SignedMath.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/boss-bridge/L1BossBridge.sol#15)
+	- 0.8.20 (examples/boss-bridge/L1Vault.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: low-level-calls
+Low level call in SafeERC20._callOptionalReturnBool(IERC20,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#110-117):
+	- (success,returndata) = address(token).call(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#115)
+Low level call in Address.sendValue(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#41-50):
+	- (success,None) = recipient.call{value: amount}() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#46)
+Low level call in Address.functionCallWithValue(address,bytes,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#83-89):
+	- (success,returndata) = target.call{value: value}(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#87)
+Low level call in Address.functionStaticCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#95-98):
+	- (success,returndata) = target.staticcall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#96)
+Low level call in Address.functionDelegateCall(address,bytes) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#104-107):
+	- (success,returndata) = target.delegatecall(data) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Address.sol#105)
+Low level call in L1BossBridge.sendToL1(uint8,bytes32,bytes32,bytes) (examples/boss-bridge/L1BossBridge.sol#112-125):
+	- (success,None) = target.call{value: value}(data) (examples/boss-bridge/L1BossBridge.sol#121)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#low-level-calls
+INFO:Detectors:
+Detector: naming-convention
+Function IERC20Permit.DOMAIN_SEPARATOR() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol#89) is not in mixedCase
+Variable L1BossBridge.DEPOSIT_LIMIT (examples/boss-bridge/L1BossBridge.sol#30) is not in mixedCase
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#conformance-to-solidity-naming-conventions
+INFO:Detectors:
+Detector: unindexed-event-address
+Event Pausable.Paused(address) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Pausable.sol#23) has address parameters but no indexed parameters
+Event Pausable.Unpaused(address) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Pausable.sol#28) has address parameters but no indexed parameters
+Event L1BossBridge.Deposit(address,address,uint256) (examples/boss-bridge/L1BossBridge.sol#40) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Detectors:
+Detector: constable-states
+L1BossBridge.DEPOSIT_LIMIT (examples/boss-bridge/L1BossBridge.sol#30) should be constant 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-constant
+INFO:Detectors:
+Detector: immutable-states
+L1Vault.token (examples/boss-bridge/L1Vault.sol#13) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/boss-bridge/L1Token.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+ERC20._burn(address,uint256) (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#241-246) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol#3)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/boss-bridge/L1Token.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: unused-return
+L1Vault.approveTo(address,uint256) (examples/boss-bridge/L1Vault.sol#19-21) ignores return value by token.approve(target,amount) (examples/boss-bridge/L1Vault.sol#20)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unused-return
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/boss-bridge/L1Vault.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/interfaces/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/boss-bridge/L1Vault.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: immutable-states
+L1Vault.token (examples/boss-bridge/L1Vault.sol#13) should be immutable 
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#state-variables-that-could-be-declared-immutable
+INFO:Detectors:
+Detector: assembly
+TokenFactory.deployToken(string,bytes) (examples/boss-bridge/TokenFactory.sol#23-29) uses assembly
+	- INLINE ASM (examples/boss-bridge/TokenFactory.sol#24-26)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#assembly-usage
+INFO:Detectors:
+Detector: pragma
+2 different versions of Solidity are used:
+	- Version constraint ^0.8.20 is used by:
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+		-^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+	- Version constraint 0.8.20 is used by:
+		-0.8.20 (examples/boss-bridge/TokenFactory.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#different-pragma-directives-are-used
+INFO:Detectors:
+Detector: dead-code
+Context._msgData() (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#21-23) is never used and should be removed
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#dead-code
+INFO:Detectors:
+Detector: solc-version
+Version constraint ^0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/access/Ownable.sol#4)
+	- ^0.8.20 (../../../../tmp/oz-vendor/node_modules/@openzeppelin/contracts/utils/Context.sol#4)
+Version constraint 0.8.20 contains known severe issues (https://solidity.readthedocs.io/en/latest/bugs.html)
+	- VerbatimInvalidDeduplication
+	- FullInlinerNonExpressionSplitArgumentEvaluationOrder
+	- MissingSideEffectsOnSelectorAccess.
+It is used by:
+	- 0.8.20 (examples/boss-bridge/TokenFactory.sol#2)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#incorrect-versions-of-solidity
+INFO:Detectors:
+Detector: unindexed-event-address
+Event TokenFactory.TokenDeployed(string,address) (examples/boss-bridge/TokenFactory.sol#14) has address parameters but no indexed parameters
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#unindexed-event-address-parameters
+INFO:Slither:examples/boss-bridge/ analyzed (30 contracts with 101 detectors), 55 result(s) found
