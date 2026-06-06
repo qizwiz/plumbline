@@ -1,0 +1,162 @@
+sol_intent: RECALL-first pass for examples/sequence
+
+
+===== CHUNK 1/2 =====
+# Findings
+
+## ACCESS CONTROL & INIT
+
+- [ACCESS CONTROL] ERC4337FactoryWrapper::deploy — only senderCreator can deploy — if senderCreator is compromised or set incorrectly at construction, all deployments are controlled by wrong party
+- [ACCESS CONTROL] Estimator::_isValidImage — always returns true — any imageHash is considered valid, bypassing signature validation entirely
+- [ACCESS CONTROL] Factory::deploy — no access control on deploy — anyone can deploy wallets with arbitrary mainModule and salt
+- [ACCESS CONTROL] Hooks::addHook — onlySelf modifier — if wallet loses control or delegatecall path exists, attacker can add malicious hooks
+- [ACCESS CONTROL] Hooks::removeHook — onlySelf modifier — hook removal can be front-run or blocked if wallet state is compromised
+- [ACCESS CONTROL] Stage1Auth/Stage2Auth — _isValidImage override — multiple inheritance paths could lead to unexpected validation behavior
+- [ACCESS CONTROL] PermissionValidator::setLimitUsage — internal visibility — no direct external access control, relies on calling context validation
+
+## ORACLE / PRICE FEED
+
+- None found after checking — no oracle or price feed integrations detected in this codebase
+
+## ARITHMETIC
+
+- [ARITHMETIC] LibBytes::readUintX — shift calculation `sub(256, mul(_length, 8))` — if _length > 32 underflow could corrupt data extraction
+- [ARITHMETIC] Base64::encode — `shl(2, div(add(dataLength, 2), 3))` — potential overflow for very large dataLength inputs
+- [ARITHMETIC] WebAuthn::verify — challenge/type index bounds — if clientDataJSON is malformed, `add(q, c)` could overflow and pass validation incorrectly
+- [ARITHMETIC] SessionSig::recoverSignature — pointer arithmetic — multiple pointer increments without overflow checks could skip past buffer end
+- [ARITHMETIC] PermissionValidator::validatePermission — cumulative value addition `value256 += previousUsage` — unchecked addition could overflow limit checks
+- [ARITHMETIC] ExplicitSessionManager::_validateExplicitCall — `sessionUsageLimits.totalValueUsed += call.value` — unchecked addition could overflow valueLimit validation
+- [ARITHMETIC] LibBytes::readUintX — `and(shr(shift, word), sub(shl(mul(8, _length), 1), 1))` — if _length causes shl overflow, mask becomes zero
+
+## TOKEN ACCOUNTING
+
+- [TOKEN ACCOUNTING] ExplicitSessionManager::VALUE_TRACKING_ADDRESS — uses 0xEeeeeEee for native token tracking — collisions with real ERC20 at that address could corrupt limit tracking
+- [TOKEN ACCOUNTING] Calls::_execute — call.value sent without balance check — if wallet balance < call.value, execution continues with other calls potentially in inconsistent state
+- [TOKEN ACCOUNTING] ERC4337v07::validateUserOp — `depositTo{ value: missingAccountFunds }` — if wallet balance < missingAccountFunds, low-level call fails silently
+- [TOKEN ACCOUNTING] Hooks::fallback — delegatecall to hook — malicious hook could steal tokens via delegatecall context
+
+## ARRAY / INDEX / INPUT VALIDATION
+
+- [ARRAY] SessionSig::recoverSignature — `attestationList[i]` access — attestationIndex from call_flags not bounds-checked against attestationList.length before use
+- [ARRAY] LibBytes — all read functions — no bounds checking on _data.length vs read size, dirty values returned on out-of-bounds
+- [ARRAY] Payload::fromPackedCalls — no validation on calls.length — empty calls array could cause division by zero or unexpected behavior
+- [ARRAY] SessionSig::recoverConfiguration — `sig.sessionPermissions[permissionsCount++]` — if maxPermissionsSize calculation is wrong, could write out of bounds
+- [ARRAY] ExplicitSessionManager::_validateLimitUsageIncrement — `sessionUsageLimits[limitsIdx]` — limitsIdx could exceed array bounds if limits allocation logic fails
+- [INPUT VALIDATION] Recovery::queuePayload — no validation on _payload.nonce — could queue same payload multiple times with different nonces
+- [INPUT VALIDATION] SessionManager::recoverSapientSignature — payload.space check `> MAX_SPACE` — allows space == MAX_SPACE which might conflict with internal nonce tracking
+- [INPUT VALIDATION] Passkeys::_decodeSignature — flag parsing with no validation — malformed flags could lead to incorrect decoding paths
+- [INPUT VALIDATION] WebAuthn::verify — challengeIndex/typeIndex — no upper bound checks, malformed JSON could cause out-of-bounds reads
+- [INPUT VALIDATION] PermissionValidator::validatePermission — rule.offset — no validation that offset + 32 <= call.data.length, reads could return dirty memory
+
+## EXTERNAL CALLS & REENTRANCY
+
+- [REENTRANCY] Calls::_execute — multiple external calls in loop without reentrancy guard per call — errorFlag state could be manipulated mid-execution
+- [REENTRANCY] Simulator::simulate — no reentrancy protection — malicious call could reenter and manipulate results array
+- [REENTRANCY] Guest::fallback — dispatches calls without reentrancy guard — attacker could reenter via nested calls
+- [EXTERNAL CALLS] Calls::_execute — LibOptim.call/delegatecall with gasLimit == 0 uses gasleft() — if parent has limited gas, could fail unexpectedly
+- [EXTERNAL CALLS] ISignalsImplicitMode::acceptImplicitRequest — external view call — malicious contract could return fake magic value to bypass validation
+- [EXTERNAL CALLS] Recovery::isValidSignature — IERC1271 call to _signer — malicious contract could always return valid signature
+- [EXTERNAL CALLS] Hooks::fallback — delegatecall to arbitrary address — malicious hook could corrupt storage or steal funds
+
+## CROSS-CHAIN / BRIDGE
+
+- [CROSS-CHAIN] SessionPermissions::chainId — 0 means any chain — cross-chain replay possible if signature valid on multiple chains with chainId=0
+- [CROSS-CHAIN] Payload::noChainId flag — when true, domain separator excludes chainId — enables intentional cross-chain replay attacks
+- [CROSS-CHAIN] Recovery::domainSeparator — _noChainId parameter — if set incorrectly, recovery signatures could be replayed across chains
+- [CROSS-CHAIN] SessionSig::recoverConfiguration — chainId stored as uint256 — no validation that chainId fits in expected range for EVM chains
+
+## ECONOMIC / INCENTIVE LOGIC
+
+- [ECONOMIC] Recovery::queuePayload — no expiry on queued payloads — attacker could queue old payloads and execute them later when imageHash changes
+- [ECONOMIC] Recovery::timestampForQueuedPayload — requiredDeltaTime countdown starts from queue time — attacker could queue, wait, then execute unauthorized config changes
+- [ECONOMIC] ExplicitSessionManager::incrementUsageLimit — first call must be increment — user error in ordering calls could cause entire transaction to revert
+- [ECONOMIC] SessionPermissions::deadline — 0 means no deadline — sessions without expiry could be used indefinitely after compromise
+- [ECONOMIC] SessionPermissions::valueLimit — cumulative across session — attacker could drain valueLimit across many small transactions
+- [ECONOMIC] PermissionValidator::getLimitUsage — usage tracked in storage — no garbage collection mechanism, storage grows unbounded
+- [ECONOMIC] Attestation::issuedAt — no validation against current time — future-dated attestations could be valid immediately
+- [ECONOMIC] ImplicitSessionManager::_validateImplicitCall — blacklist check only — whitelist approach might be safer for high-value operations
+- [ECONOMIC] Passkeys::_decodeSignature — no nonce/replay protection — same passkey signature could be reused if payload hash collides
+- [ECONOMIC] ERC4337v07::validateUserOp — deposits missingAccountFunds to entrypoint — user pays gas for deposit even if userOp ultimately fails
+- [ECONOMIC] Calls::_execute — BEHAVIOR_IGNORE_ERROR continues execution — failed calls with side effects could leave wallet in inconsistent state
+- [ECONOMIC] Wallet proxy — immutable mainModule in constructor — if mainModule has bugs, all wallets deployed with same mainModule are affected
+- [ECONOMIC] Factory::deploy — uses create2 with salt — salt collisions could prevent legitimate deployments or enable front-running
+- [ECONOMIC] SessionSig::FLAG_BLACKLIST — blacklist stored in merkle tree — large blacklists increase signature size and gas costs linearly
+
+===== CHUNK 2/2 =====
+# Findings
+
+## 1. ACCESS CONTROL & INIT
+
+- [ACCESS CONTROL] Implementation::_setImplementation — storage slot collision risk — stores implementation at `address()` slot (slot 0 of `address(this)`), could collide with other data or be manipulated via CREATE2 address selection
+- [ACCESS CONTROL] Implementation::updateImplementation — callable only by self but no initialization guard — if wallet not initialized, first caller could potentially trigger self-call via fallback/proxy mechanics
+- [ACCESS CONTROL] Stage1Auth::_updateImageHash — auto-upgrades to stage2 after first config — one-way upgrade without explicit admin consent or timelocking
+- [ACCESS CONTROL] BaseAuth::setStaticSignature — no validation on timestamp — can set arbitrary future expiry allowing indefinite signature validity
+- [ACCESS CONTROL] Stage2Auth::_updateImageHash — no old imageHash validation — can switch from valid imageHash to another valid one without threshold signature on the update itself
+- [ACCESS CONTROL] Implementation::_updateImplementation — no validation implementation is contract — could set EOA as implementation, breaking delegatecall assumptions
+
+## 2. ORACLE / PRICE FEED
+
+- None found (no oracle/price feed interactions in provided code)
+
+## 3. ARITHMETIC
+
+- [ARITHMETIC] Nonce::_consumeNonce — unchecked increment can overflow — `unchecked { newNonce = _nonce + 1 }` wraps at `type(uint256).max`, replay possible after overflow
+- [ARITHMETIC] Payload::fromPackedCalls — shift operations without overflow checks — `(globalFlag >> 1) & 0x07` and similar bit manipulations assume valid flag structure
+- [ARITHMETIC] BaseSig::recoverBranch — unchecked weight accumulation — `weight += addrWeight` can overflow in loop, producing incorrect threshold comparison
+- [ARITHMETIC] Payload::fromPackedCalls — pointer arithmetic unbounded — `pointer += calldataSize` can exceed calldata bounds if malformed
+- [ARITHMETIC] BaseSig::_leafForAddressAndWeight — weight cast to bytes — `_weight` is uint256 but used in keccak packing, no validation it fits expected size
+- [ARITHMETIC] Payload::fromPackedCalls — nonceSize can be 7 — `(globalFlag >> 1) & 0x07` allows 7-byte nonce (56 bits), `readUintX` may mishandle
+
+## 4. TOKEN ACCOUNTING
+
+- None found (no direct ERC20 transfer/approval logic in provided contracts; calls are in separate Calls module not shown)
+
+## 5. ARRAY / INDEX / INPUT VALIDATION
+
+- [INPUT VALIDATION] Payload::fromPackedCalls — no bounds check before slice — `packed[pointer:pointer + calldataSize]` can read out-of-bounds if calldataSize malicious
+- [INPUT VALIDATION] Payload::fromPackedCalls — numCalls can be zero — if `numCalls = 0`, allocates zero-length array, but later loop never executes; may break caller assumptions
+- [INPUT VALIDATION] BaseSig::recoverBranch — rindex can exceed signature length — loop `while (rindex < _signature.length)` but internal reads via `readUintX` can advance rindex past length
+- [INPUT VALIDATION] Payload::fromPackedCalls — final pointer != length check insufficient — `InvalidPackedLength` revert only at end, intermediate out-of-bounds reads can occur
+- [INPUT VALIDATION] BaseSig::recoverBranch — firstByte read without length check — `readUint8` at start of loop assumes at least 1 byte remains
+- [INPUT VALIDATION] Payload::fromPackedCalls — no validation of space=0 consistency — flag 0x01 sets space=0 but not checked against actual nonce usage
+- [INPUT VALIDATION] BaseAuth::signatureValidation — _payload.parentWallets unchecked length — large array could cause DoS in hash computation or loop
+- [INPUT VALIDATION] BaseSig::recoverBranch — delegateCall flag read from signature — no validation of bool value, bit 0x10 interpreted as true but no sanitization
+
+## 6. EXTERNAL CALLS & REENTRANCY
+
+- [REENTRANCY] BaseAuth::signatureValidation — external call to ICheckpointer::snapshotFor before validation — checkpointer could reenter via fallback, though nonReentrant not on this path
+- [REENTRANCY] BaseSig::recoverBranch — IERC1271::isValidSignature external call — nested signer could reenter, potentially manipulating storage if wallet uses shared state
+- [REENTRANCY] BaseSig::recoverBranch — ISapient::recoverSapientSignature external call — sapient signer can reenter during signature recovery, before weight/threshold finalized
+- [REENTRANCY] BaseAuth::recoverSapientSignature — external call in view function — sapient signer could have side effects or revert, breaking view guarantee
+- [EXTERNAL CALLS] BaseSig::recoverBranch — no return value check on ecrecover — if ecrecover returns address(0), still used as valid signer, weight added
+- [EXTERNAL CALLS] BaseSig::recoverBranch — unchecked IERC1271 magic value — compares `!= IERC1271_MAGIC_VALUE_HASH` but doesn't validate contract exists or call succeeded
+
+## 7. CROSS-CHAIN / BRIDGE
+
+- [CROSS-CHAIN] Payload::domainSeparator — noChainId flag allows chain-agnostic signatures — signature valid on all chains, enables replay across forks or testnets
+- [CROSS-CHAIN] BaseAuth::signatureValidation — noChainId flag set from signature byte — attacker can toggle chain-id inclusion, replaying signature cross-chain if threshold allows
+- [CROSS-CHAIN] Stage1Auth::_isValidImage — FACTORY/INIT_CODE_HASH immutable per deployment — wallet on different chain may have different factory address, breaking counterfactual assumption
+
+## 8. ECONOMIC / INCENTIVE LOGIC
+
+- [ECONOMIC] BaseAuth::_setStaticSignature — timestamp is uint96 truncation — `_timestamp & 0xffffffffffffffffffffffff` truncates to 96 bits but input is uint256, silent data loss
+- [ECONOMIC] Nonce::_consumeNonce — nonce space separate per _space — attacker can exhaust nonces in one space without affecting others, but space selection in signature could be manipulated
+- [ECONOMIC] Payload::fromPackedCalls — gasLimit per call but no global cap — sum of all gasLimits could exceed block gas limit, causing entire batch to fail
+- [ECONOMIC] BaseSig::recoverBranch — weight can reach type(uint256).max via FLAG_SUBDIGEST — hardcoded subdigest bypasses threshold, allows single-signer override
+- [ECONOMIC] BaseSig::recoverBranch — FLAG_SIGNATURE_ANY_ADDRESS_SUBDIGEST uses hashFor(address(0)) — counterfactual signature valid before wallet deployed, front-running risk
+- [ECONOMIC] Payload::Call.behaviorOnError — BEHAVIOR_IGNORE_ERROR can hide failures — failed call doesn't revert batch, user may not notice loss of funds
+- [ECONOMIC] Payload::fromPackedCalls — onlyFallback flag determined by signature — attacker can set calls to only execute on error, inverting intended execution order
+- [ECONOMIC] BaseSig::recoverChained — chained signatures require weight >= threshold at each link — intermediate config with low threshold can be chained to upgrade, bypassing current threshold
+- [ECONOMIC] BaseAuth::_getStaticSignature — expires timestamp checked with <= — staticSig expires at block.timestamp, off-by-one allows one extra block of validity
+- [ECONOMIC] Stage1Auth::_isValidImage — CREATE2 address check as validation — wallet address must match predicted address, but salt is imageHash, attacker can grind imageHash collisions
+
+---
+
+## Additional observations (HIGH RISK)
+
+- **Nonce overflow at 2^256**: After `type(uint256).max` transactions in a space, nonce wraps to 0, enabling replay of original transactions
+- **Static signature caller = address(0) bypass**: If `_setStaticSignature(hash, address(0), future)` is set, any caller passes the check `if (addr != address(0) && addr != msg.sender)`, allowing universal static sig
+- **Chained signature downgrade**: Attacker can craft chain with valid current signature → transition to weak imageHash → weak imageHash signs malicious payload
+- **Sapient signer reentrancy to poison weight**: Malicious sapient contract can call back into wallet during `recoverSapientSignature`, potentially reading stale storage
+- **ecrecover address(0) = valid signer**: Invalid signature returns `address(0)` from ecrecover, but code treats it as valid address and adds weight
+- **Hardcoded subdigest bypasses all security**: `FLAG_SUBDIGEST` and `FLAG_SIGNATURE_ANY_ADDRESS_SUBDIGEST` set weight to `type(uint256).max`, single leaf in tree overrides entire config
