@@ -29,6 +29,7 @@ Goal state is restored on `--resume`.
 | `ENSEMBLE.goal.md` | Want measured variance bands on sol_intent recall before contest day | 1-2 hours | ~$15 (3 runs × $5) |
 | `RECALL_PROMPT.goal.md` | Cold sol_intent recall on a known corpus is bad and you want to fix it via prompt edit + A/B | 1-2 hours | ~$5 (one re-run) |
 | `ROUTER_TRAIN.goal.md` | Implement ADR-006 verifier-router (schema → relabel → trainer → CLI) | 2-4 hours | $0 |
+| `HYBRID_ROUTER.goal.md` | Close the tlc-routing gap by composing spec_retrieval as a pre-check before the ML router | 30-60 min | $0 |
 | `CORPUS_GROWTH.goal.md` | Add ONE new TLA+ FailureMode shape (pair with `SHAPES_BACKLOG.md`) | 1-3 hours | $0 |
 | `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
 
