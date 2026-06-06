@@ -14,6 +14,32 @@ reframed scoreboard measures the expansion per bug class.
 See `ARCHITECTURE.md` for the full layered stack. Read it on every
 session start before reaching for a tool.
 
+## My fluency is shallow in rare grammars — the prosthesis fixes it (added 2026-06-06)
+
+My next-token fluency varies sharply by training-data abundance:
+
+- Solidity / Python / TS / JS → high fluency
+- TLA+ / Coq / Lean / Apalache → **low-to-medium fluency**; I produce
+  syntactically valid output, often semantically wrong outside known
+  bug shapes
+
+**My weights don't change in a session.** What can change is the
+prosthesis: retrieval corpus, constrained-decoding masks, learned
+verdict-prediction models. Per ARCHITECTURE.md §3b ("NCA-as-fluency-
+teacher"), this is the loop that makes my effective TLA+ fluency
+ratchet up over weekends, not in single turns.
+
+Practical implication for any TLA+ work this session:
+- **Always retrieve nearest existing FailureMode first.** Don't
+  generate from blank context. Pact has 12 hand-authored modules;
+  plumbline now has 1 (`SignatureReplay.tla`). Total corpus = 13.
+  Retrieve from that corpus; condition on the nearest.
+- **Treat my first-pass spec as a draft.** TLC's verdict is the
+  oracle. Iterate until verdict matches the bug-class expectation
+  (counterexample matches the `.ANSWERS.md` description).
+- **Add every TLC-verified spec to the corpus.** That's how the
+  prosthesis grows. The next FailureMode benefits from this one.
+
 ## The superpower (operational, written down 2026-06-06 by JH's instruction)
 
 **LLMs are not reasoners that happen to predict tokens. LLMs are

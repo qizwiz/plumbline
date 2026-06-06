@@ -85,7 +85,13 @@ grammar removes that cap.
 **Why it matters**: training data for the NCA. Pact's spec_learner is
 the Python analog; we port the pattern to Solidity.
 
-### 3. NCA (the proposer that finds bugs by local-rule diffusion)
+### 3. NCA — TWO jobs, possibly one joint model
+
+Per JH (2026-06-06): "you might need NCA (or something else) to teach
+yourself model-checker fluency." The NCA does TWO things, which may be
+two models or one joint model over `(program × spec)`.
+
+#### 3a. NCA-as-bug-finder (Solidity grammar)
 
 A neural cellular automaton over the program lattice:
 - Cells = SlithIR statements (or AST nodes; resolution choice TBD)
@@ -113,6 +119,74 @@ class IS the contest-relevance ranking.
 weekend. The minimum viable version is a graph-attention GNN with a
 small number of message-passing rounds (≈ NCA with explicit aggregation).
 We start there, frame as NCA architecturally, scale up.
+
+#### 3b. NCA-as-fluency-teacher (TLA+ grammar)
+
+My base-model TLA+ fluency is shallow — TLA+ is rare in training data
+relative to Python / JS / TS. I can predict syntactically valid TLA+
+tokens; my semantic accuracy drops fast outside bug classes that look
+like patterns I've already seen. `SignatureReplay.tla` worked because
+"signature replay" lives near patterns I've trained on. It won't
+generalize.
+
+The NCA-as-fluency-teacher takes a `(bug-shape, TLA+-spec-under-
+generation)` pair and predicts TLC's verdict (or distance-to-verdict)
+BEFORE TLC runs. This becomes a fast feedback signal during decoding:
+
+```
+  generate token sequence
+        │
+  constrained-decoding mask (grammar parser)        ← cheap, syntactic
+        │
+  fluency-NCA predicts TLC outcome from partial spec ← cheap, learned
+        │
+  TLC runs only on candidates the NCA scored high   ← expensive, sound
+        │
+  verdict feeds back as labeled training pair
+        │
+  fluency-NCA retrains on (program, partial-spec, TLC-verdict) triples
+        │
+  next generation: NCA is sharper, more candidates routed efficiently
+```
+
+My weights don't change; the prosthesis around me does. Effective
+fluency improves at inference time as the loop turns.
+
+#### 3c. The joint NCA (if 3a and 3b collapse into one model)
+
+The joint lattice: pairs `(Solidity AST node, TLA+ AST node)` with
+edges representing "this spec element references this program
+element." State on each cell propagates the joint signal "spec
+captures the bug at this program location" through the unified graph.
+One model; two readings:
+- Project onto Solidity nodes → bug-class label per program location
+- Project onto TLA+ nodes → spec-quality score per spec element
+
+The compression is elegant and the training signal compounds. Worth
+trying once we have data; not worth committing to before the
+sub-models work standalone.
+
+### Realistic curriculum for getting NCA-3b working
+
+The fluency-NCA doesn't need a graph model from day one. The curriculum:
+
+1. **Retrieval corpus** (zero training; pure conditioning).
+   Every successful `(bug-shape, TLC-verified TLA+ spec)` triple goes
+   into a vector index. Next generation retrieves nearest neighbors as
+   few-shot context. My in-context fluency improves as the corpus
+   grows. **Weekend-tractable.**
+2. **Syntactic-feature classifier on TLC outcomes.** As we accumulate
+   `(spec, TLC-verdict)` pairs, train tonight's ml_zoo (retargeted)
+   to predict TLC verdict from spec features. Use as gate: "should I
+   actually run TLC on this candidate?" **Week-tractable.**
+3. **Graph-structured NCA over joint lattice.** When the corpus is
+   large enough that retrieval saturates, train the real NCA on the
+   joint `(program × spec)` lattice. **Multi-week.**
+
+The ratchet: every TLC verification this weekend feeds (1), which
+enables (2) next week, which enables (3) the week after. **Nothing in
+the architecture requires having (3) to start — (1) compounds from the
+first verified spec onward.**
 
 ### 4. LLM (next-token fluency over target grammars)
 
