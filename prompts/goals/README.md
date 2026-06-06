@@ -1,0 +1,67 @@
+# Plumbline `/goal` library
+
+Three goal-prompts, one per plumbline operating mode. Each is
+≤4000 chars (the documented `/goal` hard limit), decomposed into
+≤8 self-progressing steps (the documented Stop-hook block cap),
+and built around the Anthropic-prescribed structure: one
+measurable end state, a stated check, constraints that hold along
+the way.
+
+## Use
+
+```bash
+# Pick the one matching the session's mode, paste into Claude Code:
+/goal "$(cat prompts/goals/CONTEST.goal.md)"
+
+# or for between-contest:
+/goal "$(cat prompts/goals/CORPUS_GROWTH.goal.md)"
+```
+
+`/goal` clears automatically when its condition is met. To pause
+mid-session, use `/goal pause`. To force-clear, use `/goal clear`.
+Goal state is restored on `--resume`.
+
+## Which goal for which mode?
+
+| Goal | When | Time budget | Cost |
+|------|------|-------------|------|
+| `CONTEST.goal.md` | An active contest is open and JH wants plumbline driving it | 1-3 days | ~$20 LLM ceiling enforced as a constraint |
+| `CORPUS_GROWTH.goal.md` | No active contest; want plumbline more capable for the next one | 1-3 hours | $0 budget |
+| `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
+
+## Design notes
+
+These are written against verified Anthropic guidance (see
+`docs/research/CLAUDE_GOAL_DESIGN_RESEARCH.md` for the deep-research
+verdict). Material constraints:
+
+1. **The evaluator (Haiku by default) sees only the transcript.** It
+   cannot read files independently. Every "done when" check is
+   written so its verification surfaces in Claude's own stdout
+   (`grep`, `git log`, TLC's `Invariant ... violated`, etc.).
+
+2. **8-block Stop-hook cap.** Each goal decomposes into 8 steps.
+   Going beyond 8 requires `CLAUDE_CODE_STOP_HOOK_BLOCK_CAP=N` in
+   the environment.
+
+3. **Append-only data contracts.** All goals preserve the
+   reps.jsonl + retrieval corpus invariants from CLAUDE.md.
+
+4. **"Human only" is a legitimate terminal.** A goal can complete
+   by routing to JH explicitly. This is by design — see
+   ADR-006-verifier-router.md.
+
+## What these goals deliberately don't do
+
+- They don't require the CA / NCA layer (ARCHITECTURE.md §3 future
+  work, out of scope per JH's "deliberately future" framing).
+- They don't require constrained-decoding (T8 still pending).
+- They don't blanket-trust LLM output. Every claim cited.
+
+## Updating
+
+These prompts are append-only-history (track changes in git, but
+don't break old contest sessions that reference them by hash). If
+a goal needs structural change, fork it as `CONTEST_v2.goal.md`
+and leave v1 alone for any in-flight session resuming via
+`--resume`.
