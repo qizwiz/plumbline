@@ -34,7 +34,15 @@ EXPECTED_TOP_KEYS = (
     "rep_id", "ts_ns", "contract", "proposer", "leads",
     "verifier", "score", "prior", "embed_coords",
 )
+# Optional fields (ADR-006 verifier-router). Type-validated when present;
+# absence is OK — historical rows pre-date the schema migration.
+OPTIONAL_KEYS_TYPED = {
+    "verifier_route": list,           # ['tlc', 'halmos', ...]
+    "verifier_outcome": dict,         # {'tlc': 'discharged', ...}
+}
 ALLOWED_PROPOSERS = {"manual", "sol_intent", "halmos", "ensemble"}
+ALLOWED_VERIFIER_ROUTES = {"slither_will_catch", "halmos_will_decide",
+                           "tlc_will_decide", "human_only"}
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
 
@@ -76,6 +84,21 @@ def validate(path: str) -> tuple[int, list[str]]:
 
         if not isinstance(row.get("ts_ns"), int):
             errors.append(f"line {ln_no}: ts_ns must be int, got {type(row.get('ts_ns')).__name__}")
+
+        # ADR-006 verifier-router fields — optional but type-checked when present
+        for key, want_type in OPTIONAL_KEYS_TYPED.items():
+            if key in row and not isinstance(row[key], want_type):
+                errors.append(
+                    f"line {ln_no}: {key!r} must be {want_type.__name__}, "
+                    f"got {type(row[key]).__name__}"
+                )
+        if isinstance(row.get("verifier_route"), list):
+            for v in row["verifier_route"]:
+                if v not in ALLOWED_VERIFIER_ROUTES:
+                    errors.append(
+                        f"line {ln_no}: verifier_route entry {v!r} not in "
+                        f"{sorted(ALLOWED_VERIFIER_ROUTES)}"
+                    )
 
         rows.append(row)
 
