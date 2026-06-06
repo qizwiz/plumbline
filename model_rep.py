@@ -28,7 +28,8 @@ PY = os.path.join(HERE, ".venv/bin/python")
 
 
 def run_one(ex_path: str, truth_override: str | None = None,
-            recall_mode: bool = False) -> dict:
+            recall_mode: bool = False,
+            classifier_threshold: float | None = None) -> dict:
     ex_abs = os.path.join(HERE, ex_path) if not os.path.isabs(ex_path) else ex_path
     if truth_override:
         truth = (os.path.join(HERE, truth_override)
@@ -72,6 +73,24 @@ def run_one(ex_path: str, truth_override: str | None = None,
     leads_tmp.close()
     leads = sol_match._lines(leads_tmp.name)
 
+    classifier_info = None
+    if classifier_threshold is not None and leads:
+        # Post-filter through the supervised lead classifier. No new LLM call —
+        # just embedding cosine + logistic regression. Drops leads with
+        # P(real) < threshold; keeps the rest.
+        sys.path.insert(0, os.path.join(HERE, "tools"))
+        import lead_classifier
+        probs = lead_classifier.predict(leads)
+        kept_idx = [i for i, p in enumerate(probs) if p >= classifier_threshold]
+        kept_leads = [leads[i] for i in kept_idx]
+        classifier_info = {
+            "threshold": classifier_threshold,
+            "n_in": len(leads),
+            "n_out": len(kept_leads),
+            "probs": [round(p, 3) for p in probs],
+        }
+        leads = kept_leads
+
     if truth is not None:
         findings = sol_match._lines(truth)
         score = sol_match.match(leads, findings, threshold=0.80)
@@ -100,6 +119,7 @@ def run_one(ex_path: str, truth_override: str | None = None,
             "mode": "recall" if recall_mode else "intent",
             "model": os.environ.get("ANTHROPIC_MODEL", "default"),
             "exit": proc.returncode,
+            "classifier_filter": classifier_info,
         },
         "leads": leads,
         "verifier": {
@@ -116,13 +136,24 @@ def run_one(ex_path: str, truth_override: str | None = None,
 def main():
     args = sys.argv[1:]
     recall_mode = "--recall" in args
-    exes = [a for a in args if not a.startswith("--")]
+    classifier_threshold: float | None = None
+    if "--filter" in args:
+        i = args.index("--filter")
+        try:
+            classifier_threshold = float(args[i + 1])
+        except (IndexError, ValueError):
+            print("usage: --filter <threshold> (e.g. --filter 0.5)")
+            sys.exit(1)
+    exes = [a for a in args
+            if not a.startswith("--")
+            and (classifier_threshold is None or a != args[args.index("--filter") + 1])]
     if not exes:
         print(__doc__)
         sys.exit(1)
     for ex in exes:
         try:
-            r = run_one(ex, recall_mode=recall_mode)
+            r = run_one(ex, recall_mode=recall_mode,
+                        classifier_threshold=classifier_threshold)
             print(json.dumps({
                 "ex": ex,
                 "rep_id": r["rep_id"],
