@@ -24,7 +24,12 @@ sys.path.insert(0, HERE)
 import sol_match
 import rep_log
 
-PY = os.path.join(HERE, ".venv/bin/python")
+# Use the Python that's running this module so the loop works in GH Actions
+# (no .venv) and in the codespace (which has .venv but runs `.venv/bin/python
+# model_rep.py` — sys.executable is then the venv python). The earlier
+# hard-coded ".venv/bin/python" silently failed every cloud-rep with
+# "No such file or directory" — caught only by inspecting the workflow log.
+PY = sys.executable
 
 
 def run_one(ex_path: str, truth_override: str | None = None,

@@ -90,6 +90,44 @@ jobs:
         if: steps.gate.outputs.skip != 'true'
         run: |
           python tools/lead_classifier.py train || true
+      - name: prompt_improve if weakest corpus recall < 0.50 (closes the gradient)
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          PACT_LLM_API_KEY: ${{ secrets.PACT_LLM_API_KEY }}
+          PACT_LLM_BASE_URL: ${{ secrets.PACT_LLM_BASE_URL }}
+          PACT_LLM_MODEL: ${{ secrets.PACT_LLM_MODEL }}
+        run: |
+          python - <<'EOF'
+          import json, os, statistics, sys
+          rows = [json.loads(l) for l in open("reps.jsonl") if l.strip()]
+          recent = rows[-5:]  # the reps just appended this iteration
+          per_corpus = {}
+          for r in recent:
+              c = os.path.basename(r.get("contract", {}).get("path", "").rstrip("/"))
+              rec = r.get("score", {}).get("recall")
+              if c and rec is not None:
+                  per_corpus[c] = rec
+          if not per_corpus:
+              print("no scored reps in tail; skipping prompt_improve"); sys.exit(0)
+          weakest = min(per_corpus.items(), key=lambda kv: kv[1])
+          print(f"weakest corpus this iter: {weakest[0]} recall={weakest[1]:.2f}")
+          THRESH = 0.50
+          if weakest[1] >= THRESH:
+              print(f"recall >= {THRESH}; no rewrite needed"); sys.exit(0)
+          # Below threshold — fire prompt_improve.improve_if_weak. The LLM
+          # rewrites prompts/sol_find.md given the transcript of misses.
+          sys.path.insert(0, ".")
+          import prompt_improve as pi
+          import invariant_agent as agent
+          transcript = (f"Corpus {weakest[0]}: grounded recall {weakest[1]:.2f} "
+                        f"below threshold {THRESH}. The .ANSWERS.md at "
+                        f"examples/{weakest[0]}/.ANSWERS.md lists the real "
+                        f"findings the model missed; rewrite the prompt to "
+                        f"surface this style of finding better.")
+          improved = pi.improve_if_weak("sol_find", weakest[1], transcript,
+                                        lambda p: agent._ask(p, 8000))
+          print(f"prompt_improve rewrote prompts/sol_find.md: {improved}")
+          EOF
       - name: mirror reps.jsonl + answer keys to HF dataset (durable backup)
         if: steps.gate.outputs.skip != 'true'
         env:
@@ -120,16 +158,22 @@ jobs:
           else
             echo "HF_TOKEN not set as Actions secret — skipping HF mirror"
           fi
-      - name: commit new rows + classifier
+      - name: commit new rows + classifier + maybe new prompt
         if: steps.gate.outputs.skip != 'true'
         run: |
           set -e
           git config user.name "plumbline-bot"
           git config user.email "bot@plumbline.local"
-          git add reps.jsonl tools/lead_classifier.pkl 2>/dev/null || true
+          git add reps.jsonl tools/lead_classifier.pkl prompts/sol_find.md 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "ci(reps): cloud-loop auto-append + classifier retrain"
+            # If prompts/sol_find.md changed, prompt_improve fired; commit
+            # message records it so the audit trail shows the gradient closing
+            if git diff --cached --name-only | grep -q "prompts/sol_find.md"; then
+              git commit -m "ci(loop): reps + classifier + PROMPT REWRITE (gradient closed)"
+            else
+              git commit -m "ci(loop): cloud-loop auto-append + classifier retrain"
+            fi
             git push
           else
-            echo "no new rows"
+            echo "no changes to commit"
           fi

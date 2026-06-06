@@ -63,7 +63,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.join(HERE, "tools"))
 
-PY = os.path.join(HERE, ".venv/bin/python")
+PY = sys.executable  # works in codespace AND in GH Actions runners
 REPS = os.path.join(HERE, "reps.jsonl")
 
 # All curated corpora. Each must have .ANSWERS.md.
