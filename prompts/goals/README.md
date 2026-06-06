@@ -26,7 +26,10 @@ Goal state is restored on `--resume`.
 | Goal | When | Time budget | Cost |
 |------|------|-------------|------|
 | `CONTEST.goal.md` | An active contest is open and JH wants plumbline driving it | 1-3 days | ~$20 LLM ceiling enforced as a constraint |
-| `CORPUS_GROWTH.goal.md` | No active contest; want plumbline more capable for the next one | 1-3 hours | $0 budget |
+| `ENSEMBLE.goal.md` | Want measured variance bands on sol_intent recall before contest day | 1-2 hours | ~$15 (3 runs × $5) |
+| `RECALL_PROMPT.goal.md` | Cold sol_intent recall on a known corpus is bad and you want to fix it via prompt edit + A/B | 1-2 hours | ~$5 (one re-run) |
+| `ROUTER_TRAIN.goal.md` | Implement ADR-006 verifier-router (schema → relabel → trainer → CLI) | 2-4 hours | $0 |
+| `CORPUS_GROWTH.goal.md` | Add ONE new TLA+ FailureMode shape (pair with `SHAPES_BACKLOG.md`) | 1-3 hours | $0 |
 | `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
 
 ## Design notes
