@@ -147,17 +147,43 @@ this goal's scope:
    with explicit anchor terms. Higher precision but introduces a
    second relabel-table-style component.
 
-### Current state
+### V2 — anchor-term whitelist composition (Option 3 implemented)
 
-`tools/route_lead_hybrid.py` is checked in but **should be treated
-as an experiment, not a production router.** It will fire `tlc` on
-many non-tlc leads at the 0.55 threshold. For now, the production
-recommendation for contest day is:
+Surfaced the cos-only failure, then implemented Option 3 inline
+(cos > threshold AND anchor-term match). Anchor terms are derived
+from the matched spec's camelCase tokens (e.g. CrossWalletSigReplay
+→ {cross, wallet, sig, replay}) with a small synonym map
+(sig → {sig, signature, signed}).
 
-- Use `tools/route_lead.py` (pure ML) for the routing distribution
-- Use `tools/spec_retrieval.py query <lead>` as a SEPARATE manual
-  check when JH has reason to suspect a tlc-shape bug
+**All 5 test cases route correctly:**
 
-The hybrid layer was a clean idea that didn't survive contact with
-the data. The data taught us: the cos signal needs a re-ranker or a
-better embedder, not a threshold.
+| query | route | correct? |
+|-------|-------|----------|
+| "signature accepted twice no nonce" | tlc (cos=0.66, matched CrossWalletSigReplay) | ✓ |
+| "owner can set fee address to zero" | halmos + slither (no tlc) | ✓ |
+| "cross-wallet signature replay without domain binding" | tlc (cos=0.76, matched CrossWalletSigReplay) | ✓ |
+| "balance equals total supply invariant" | halmos + slither | ✓ |
+| "oracle returns stale price after long block" | slither + halmos | ✓ |
+
+**Why this works**: the embedder's cos signal is noisy on short
+queries (vocabulary overlap dominates), but combining cos with
+the anchor-term check eliminates the false-positive class. The
+negative test "owner can set fee address to zero" still gets
+cos=0.66 against Create2NonIdempotent — but the lead contains
+no token from {create2, idempot, exist, deploy, factory},
+so the AND fails and we fall through to the ML router.
+
+**LOC count**: 59 (within the goal's ≤60 LOC budget).
+
+**Caveat that remains**: the anchor synonym table is hand-curated.
+It covers the 7 own-corpus shapes but doesn't auto-extend to new
+shapes. When CORPUS_GROWTH adds shape #9, the ANCHOR_SYNONYMS
+dict needs a new entry per camelCase token. Not great. A future
+improvement could auto-derive synonyms from the spec's description
+text (already lifted/embedded), but that's between-contest work.
+
+### Production recommendation for contest day
+
+Use `tools/route_lead_hybrid.py` as the routing CLI. The pure ML
+router `route_lead.py` remains as the fallback the hybrid wraps.
+Both files are checked in.
