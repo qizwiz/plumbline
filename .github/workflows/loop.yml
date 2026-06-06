@@ -90,6 +90,36 @@ jobs:
         if: steps.gate.outputs.skip != 'true'
         run: |
           python tools/lead_classifier.py train || true
+      - name: mirror reps.jsonl + answer keys to HF dataset (durable backup)
+        if: steps.gate.outputs.skip != 'true'
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # Gated on HF_TOKEN secret. Without it, this is a no-op. With it,
+          # every cloud-loop iteration pushes reps.jsonl to a private HF
+          # dataset (qizwiz/plumbline-reps) — versioned, browseable, survives
+          # local disk wipes. The .ANSWERS.md files go too, so the ground
+          # truth is durably backed up alongside the measurements.
+          if [ -n "$HF_TOKEN" ]; then
+            pip -q install huggingface_hub
+            python hf_mirror.py || true
+            python -c "
+          import os
+          from huggingface_hub import HfApi, create_repo
+          token = os.environ['HF_TOKEN']
+          repo = 'qizwiz/plumbline-reps'
+          create_repo(repo, repo_type='dataset', private=True, exist_ok=True, token=token)
+          api = HfApi(token=token)
+          for ex in ['puppy-raffle','t-swap','thunder-loan','boss-bridge','sequence']:
+              p = f'examples/{ex}/.ANSWERS.md'
+              if os.path.isfile(p):
+                  api.upload_file(path_or_fileobj=p, path_in_repo=f'answers/{ex}.md',
+                                  repo_id=repo, repo_type='dataset')
+          print('mirrored reps + answer keys to', repo)
+          " || true
+          else
+            echo "HF_TOKEN not set as Actions secret — skipping HF mirror"
+          fi
       - name: commit new rows + classifier
         if: steps.gate.outputs.skip != 'true'
         run: |
