@@ -102,6 +102,7 @@ op: "/\\"     // /\ logical and
   | "*"
   | "%"
   | "^"
+  | ".."                  // range operator (1..N)
   | "\\in"    // membership (also appears in quantifier_expr / function_literal)
   | "\\notin"
   | "\\subseteq"
@@ -109,6 +110,8 @@ op: "/\\"     // /\ logical and
   | "\\cup"
   | "\\intersect"
   | "\\cap"
+  | "\\X"                 // Cartesian product (\X)
+  | "\\times"             // alternate Cartesian (\times)
   | "."
 
 atom: NAME

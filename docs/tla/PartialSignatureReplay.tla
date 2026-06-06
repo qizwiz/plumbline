@@ -62,8 +62,9 @@ CONSTANTS
                      \* simple (TLC's .cfg can't take function literals).
     MaxSubmissions   \* Bound for TLC
 
-ASSUME NumCalls       \in Nat \ {0}
+ASSUME NumCalls       \in Nat
 ASSUME MaxSubmissions \in Nat
+ASSUME NumCalls > 0
 
 Calls   == 1..NumCalls
 Batches == 1..NumCalls
