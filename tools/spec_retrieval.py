@@ -45,7 +45,7 @@ INDEX_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                           "spec_retrieval_index.pkl")
 
 
-def _read_header(path: str) -> tuple[str, str]:
+def _read_header(path: str) -> tuple[str, str | None]:
     """Return (module_name, header_description). The header is everything
     between the `(* ... *)` directly after the MODULE line."""
     text = open(path, encoding="utf-8", errors="replace").read()
@@ -71,10 +71,12 @@ def _read_header(path: str) -> tuple[str, str]:
         desc, re.DOTALL
     )
     if bug_class_match:
-        focused = bug_class_match.group(1).strip()
-        # Keep the focused description; full original still available in path
-        desc = focused
-    return name, desc
+        # Real FailureMode — focused description is the bug-class paragraph
+        return name, bug_class_match.group(1).strip()
+    # NO bug-class marker → this is framework/meta-documentation (Pact.tla,
+    # PactLoop.tla, PactExtractionExample.tla), NOT a FailureMode. Exclude
+    # from retrieval corpus to keep the index focused on bug-class candidates.
+    return name, None
 
 
 # Conceptual vocabulary kept as-is during atomic-proposition lifting.
@@ -177,16 +179,25 @@ def build():
     import sol_match  # for the same embedder sol_match uses
 
     specs = []
+    skipped = []
     for path in _iter_specs():
         name, desc = _read_header(path)
+        if desc is None:
+            # No "bug class:" marker — framework/meta-doc, not a FailureMode
+            skipped.append((name, os.path.relpath(path, HERE)))
+            continue
         lifted = _lift_idents(desc)
         specs.append({
             "name": name,
             "path": os.path.relpath(path, HERE),
             "description": desc,
-            "description_lifted": lifted,    # atomic-proposition-lifted; used for embedding
+            "description_lifted": lifted,
             "description_head": desc[:200].replace("\n", " "),
         })
+    if skipped:
+        print(f"skipped {len(skipped)} framework/meta modules (no 'bug class:' marker):")
+        for n, p in skipped:
+            print(f"  {n:36s} ({p})")
 
     if not specs:
         print("no TLA+ specs found under", TLA_DIRS)
