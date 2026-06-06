@@ -60,6 +60,20 @@ def _read_header(path: str) -> tuple[str, str]:
         desc = "\n".join(ln.lstrip(" *") for ln in desc.splitlines())
     else:
         desc = text[:1000]
+    # CRITICAL FIX (2026-06-06 03:48): focus the embedding on the bug-class
+    # signal. All modules share boilerplate ("Formal specification of...",
+    # section markers, fix history, TLC commands) and that boilerplate
+    # dominates cosine similarity, collapsing all 13 specs into a 0.030
+    # range regardless of bug content. Extract only the paragraph after
+    # "The bug class:" / "bug class:" as the focused description.
+    bug_class_match = re.search(
+        r"(?:^|\n)\s*(?:The )?[Bb]ug class:\s*(.+?)(?=\n\s*\n|\n\s*[A-Z][a-z]+:|\Z)",
+        desc, re.DOTALL
+    )
+    if bug_class_match:
+        focused = bug_class_match.group(1).strip()
+        # Keep the focused description; full original still available in path
+        desc = focused
     return name, desc
 
 
