@@ -38,17 +38,33 @@ jobs:
           solc-select use ${{ matrix.solc }}
           solc --version
 
+      - name: Install foundry deps for ${{ matrix.corpus }}
+        run: |
+          cd examples/${{ matrix.corpus }}
+          # Each corpus's foundry.toml uses lib/{openzeppelin-contracts,forge-std}
+          # which aren't checked in. Install matching OZ version per corpus's solc.
+          # Initialize git so forge install --no-commit works.
+          git init -q && git add -A && git -c user.email=ci@plumbline -c user.name=ci commit -qm init
+          # Pick OZ version: 0.7.6 corpora need OZ 3.x; 0.8.x corpora differ
+          case "${{ matrix.corpus }}" in
+            puppy-raffle) OZ_REF="v3.4.2" ;;
+            sequence)     OZ_REF="v5.0.0" ;;
+            *)            OZ_REF="v5.0.0" ;;
+          esac
+          forge install --no-commit OpenZeppelin/openzeppelin-contracts@$OZ_REF || true
+          forge install --no-commit foundry-rs/forge-std || true
+          # sequence/thunder-loan also use OZ upgradeable
+          if [ "${{ matrix.corpus }}" = "sequence" ] || [ "${{ matrix.corpus }}" = "thunder-loan" ] || [ "${{ matrix.corpus }}" = "boss-bridge" ]; then
+            forge install --no-commit OpenZeppelin/openzeppelin-contracts-upgradeable@v5.0.0 || true
+          fi
+          ls lib/ 2>&1 | head -5
+
       - name: Run slither on examples/${{ matrix.corpus }}
         run: |
-          set +e   # slither exits non-zero when it finds issues; that's success here
+          set +e
           cd examples/${{ matrix.corpus }}
-          # ToB image has foundry; if a foundry.toml is present, slither
-          # will use forge for compilation + remappings. If not, slither
-          # falls back to solc-standard-json on the directory.
           slither . --solc-disable-warnings 2>&1 | tee slither.txt
-          # Print final summary line for the run log
           grep -E "result\(s\) found|No contract was analyzed|Error" slither.txt | tail -3
-          # Exit 0 even if slither found bugs — that's what we want
           true
 
       - name: Upload slither.txt
