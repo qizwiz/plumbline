@@ -1,0 +1,235 @@
+sol_intent: RECALL+HYBRID-RAG pass for examples/sequence
+  (rag index excludes corpus: sequence)
+
+
+tlc_oracle_loop chunk stats: {'confirmed': 48, 'revised': 0, 'needs-larger-bound': 1, 'not-a-bug': 0, 'no-match': 12, 'error': 0}
+
+tlc_oracle_loop chunk stats: {'confirmed': 28, 'revised': 0, 'needs-larger-bound': 2, 'not-a-bug': 2, 'no-match': 1, 'error': 0}
+
+===== CHUNK 1/2 =====
+## Findings
+
+### 1. ACCESS CONTROL & INIT
+
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ACCESS_CONTROL] ERC4337FactoryWrapper::deploy — Only senderCreator can deploy, but senderCreator is immutable and set in constructor — if wrong senderCreator is set at deployment, wrapper becomes unusable
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ACCESS_CONTROL] Factory::deploy — No access control on deploy function — anyone can deploy wallets with arbitrary mainModule, potentially front-running legitimate deployments
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ACCESS_CONTROL] Hooks::addHook / removeHook — Only onlySelf modifier protects hooks modification — if signature validation is compromised, attacker can add malicious hooks that execute arbitrary code via fallback
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ACCESS_CONTROL] SessionManager::recoverSapientSignature — Called via external ISapient interface — no caller validation means any contract can trigger session validation with crafted payloads
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [ACCESS_CONTROL] ExplicitSessionManager::incrementUsageLimit — Only msg.sender == wallet check — if called directly instead of through execute flow, could manipulate usage limits without proper validation
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [ACCESS_CONTROL] Recovery::queuePayload — Anyone can queue payloads for any wallet/signer pair — could spam queue arrays causing DoS via storage bloat
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ACCESS_CONTROL] PermissionValidator::setLimitUsage — Internal function but called from ExplicitSessionManager::incrementUsageLimit — no validation that caller is authorized wallet
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+
+### 2. ORACLE / PRICE FEED
+
+- [ORACLE] None found after checking — no price feeds or oracles in scope
+
+### 3. ARITHMETIC
+
+- [ARITHMETIC] Payload::fromPackedCalls — Multiple unchecked pointer increments in assembly — out-of-bounds read if calldata malformed
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] SessionSig::recoverSignature — pointer arithmetic `pointer + dataSize` and `pointer += dataSize` — overflow if dataSize is near type(uint256).max could wrap
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] SessionSig::recoverConfiguration — `pointer + size` in branch processing — if size is maliciously large, could read beyond encoded bounds
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] ExplicitSessionManager::_validateExplicitCall — `sessionUsageLimits.totalValueUsed += call.value` — no overflow check, could wrap if total value exceeds uint256
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] PermissionValidator::validatePermission — `value256 += previousUsage` for cumulative rules — unchecked addition could overflow
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] LibBytes::readUintX — `sub(256, mul(_length, 8))` — if _length > 32, underflow causes incorrect shift
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [ARITHMETIC] ImplicitSessionManager::_isAddressBlacklisted — `left + (right - left) / 2` — if left > right due to logic error, subtraction underflows
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ARITHMETIC] Recovery::_recoverBranch — `rindex + size` when entering branch — if size malicious, could point beyond signature bounds
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+
+### 4. TOKEN ACCOUNTING
+
+- [CONFIRMED via TLC on PartialSignatureReplay] - [TOKEN] Calls::_execute — Uses LibOptim.call with call.value but no balance check — if wallet has insufficient ETH, call fails silently if behaviorOnError != REVERT
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [TOKEN] ERC4337v07::validateUserOp — `IEntryPoint(entrypoint).depositTo{ value: missingAccountFunds }` — no check wallet has sufficient balance before deposit
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [TOKEN] ExplicitSessionManager::_validateExplicitCall — Tracks call.value in sessionUsageLimits.totalValueUsed but doesn't verify wallet balance — could approve transfers that later fail
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ReentrancyDrain] - [TOKEN] Hooks::fallback — Accepts msg.value in fallback — ETH sent to unknown hooks could be locked if hook doesn't handle it
+  TLC counterexample: Error: Invariant ClaimedAtMostOnce is violated. | State 1: <Initial predicate> | State 2: <PreCheckBuggy line 132, col 5 to line 137, col 51 of module ReentrancyDrain> | State 3: <ReenterBuggy line 143, col 5 to line 148, col 51 of module ReentrancyDrain>
+
+### 5. ARRAY / INDEX / INPUT VALIDATION
+
+- [INPUT] SessionSig::recoverSignature — `attestationList[attestationIndex]` — attestationIndex is uint8(flag & 0x7f), checked < attestationList.length but list size is uint8, mismatch if attestationCount == 0
+- [CONFIRMED via TLC on Create2NonIdempotent] - [INPUT] Payload::fromPackedCalls — `calls = new Call[](callCount)` but no upper bound on callCount — extremely large callCount causes OOM/DoS
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [INPUT] SessionSig::recoverConfiguration — `sig.sessionPermissions = new SessionPermissions[](maxPermissionsSize)` — if encoded.length is huge, maxPermissionsSize calculation could allocate massive array
+- [CONFIRMED via TLC on Create2NonIdempotent] - [INPUT] Recovery::queuePayload — Pushes to unbounded array `queuedPayloadHashes[_wallet][_signer]` — no limit allows infinite growth
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [INPUT] LibBytes::readUintX — No bounds check on `_index + _length` against `_data.length` — reading past end returns dirty/zero data
+- [INPUT] SessionManager::recoverSapientSignature — `payload.calls.length == 0` reverts, but `payload.calls.length == 1` with incrementUsageLimit call and no limits passes validation — edge case
+- [INPUT] PermissionValidator::validatePermission — `call.data.readBytes32(rule.offset)` — no validation offset < call.data.length, reads dirty data if offset too large
+- [CONFIRMED via TLC on PartialSignatureReplay] - [INPUT] WebAuthn::verify — `add(ptr, 0x40)` and `add(o, c)` pointer arithmetic — if clientDataJSON or authenticatorData lengths malicious, could read beyond bounds
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+
+### 6. EXTERNAL CALLS & REENTRANCY
+
+- [CONFIRMED via TLC on ReentrancyDrain] - [REENTRANCY] Calls::execute — nonReentrant modifier but calls external contracts in loop — if call.behaviorOnError == IGNORE_ERROR, failed call returns control, next call could reenter via hooks
+  TLC counterexample: Error: Invariant ClaimedAtMostOnce is violated. | State 1: <Initial predicate> | State 2: <PreCheckBuggy line 132, col 5 to line 137, col 51 of module ReentrancyDrain> | State 3: <ReenterBuggy line 143, col 5 to line 148, col 51 of module ReentrancyDrain>
+- [CONFIRMED via TLC on ReentrancyDrain] - [REENTRANCY] Hooks::fallback — delegatecall to hook without reentrancy guard — hook can call back into wallet before state updates complete
+  TLC counterexample: Error: Invariant ClaimedAtMostOnce is violated. | State 1: <Initial predicate> | State 2: <PreCheckBuggy line 132, col 5 to line 137, col 51 of module ReentrancyDrain> | State 3: <ReenterBuggy line 143, col 5 to line 148, col 51 of module ReentrancyDrain>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [REENTRANCY] ERC4337v07::validateUserOp — Deposits to entrypoint before signature validation completes — if signature check involves external call, reentrancy possible
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ReentrancyDrain] - [REENTRANCY] Recovery::queuePayload — Calls external IERC1271::isValidSignature before updating timestampForQueuedPayload — classic CEI violation
+  TLC counterexample: Error: Invariant ClaimedAtMostOnce is violated. | State 1: <Initial predicate> | State 2: <PreCheckBuggy line 132, col 5 to line 137, col 51 of module ReentrancyDrain> | State 3: <ReenterBuggy line 143, col 5 to line 148, col 51 of module ReentrancyDrain>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [REENTRANCY] SessionManager::recoverSapientSignature — Calls ISignalsImplicitMode::acceptImplicitRequest which is external — if that contract reenters, session validation state inconsistent
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [REENTRANCY] PermissionValidator::validatePermission — Reads getLimitUsage from storage, returns newUsageLimits, but doesn't write until later — if validation called multiple times in same tx, stale limits used
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [EXTERNAL_CALL] LibOptim::call / delegatecall — No return size limit — malicious contract can return gigantic data, causing OOM when returnData() allocates
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [EXTERNAL_CALL] Simulator::simulate — staticcall to external contracts but doesn't validate success before reading return data — could process invalid data
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+
+### 7. CROSS-CHAIN / BRIDGE
+
+- [CONFIRMED via TLC on PartialSignatureReplay] - [CROSS_CHAIN] SessionPermissions::chainId — chainId == 0 means any chain, but validation uses block.chainid — replay attack if signature valid on chain A is replayed on chain B where chainId was 0
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [NEEDS-LARGER-BOUND on CrossWalletSigReplay] - [CROSS_CHAIN] Payload::noChainId flag — If true, EIP712 domain uses chainId=0, making signatures replayable across chains — intended feature but dangerous if misused (TLC tlc-error)
+- [CONFIRMED via TLC on Create2NonIdempotent] - [CROSS_CHAIN] Factory::deploy — Uses CREATE2 with wallet bytecode including mainModule address, same salt on different chains deploys to same address — cross-chain signature replay if mainModule differs
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [CROSS_CHAIN] Recovery::domainSeparator — Uses _noChainId parameter to optionally exclude chainId from EIP712 domain — replay attack vector
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+
+### 8. ECONOMIC / INCENTIVE LOGIC
+
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC] SessionPermissions::valueLimit — Tracks total value sent but doesn't account for call failures — if call reverts, value isn't actually spent but limit still consumed
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC] SessionPermissions::deadline — Uses block.timestamp which is manipulatable by ~15 seconds — miner can extend session lifetime slightly
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on ReentrancyDrain] - [ECONOMIC] Recovery::timestampForQueuedPayload — Uses block.timestamp for queue timing — miner can delay block to prevent recovery execution
+  TLC counterexample: Error: Invariant ClaimedAtMostOnce is violated. | State 1: <Initial predicate> | State 2: <PreCheckBuggy line 132, col 5 to line 137, col 51 of module ReentrancyDrain> | State 3: <ReenterBuggy line 143, col 5 to line 148, col 51 of module ReentrancyDrain>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC] PermissionValidator cumulative rules — Previous usage read from storage then added to current — if incrementUsageLimit call fails, limits not updated but validation passed
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [ECONOMIC] ExplicitSessionManager::_validateLimitUsageIncrement — Requires first call to be incrementUsageLimit if limits exist, but doesn't verify gas costs — user pays for increment even if subsequent calls fail
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on FlagBypassesValidationChain] - [ECONOMIC] Calls::_execute — gasLimit enforcement uses `gasleft() < gasLimit` check but doesn't account for gas refund from SSTORE clears — could underestimate available gas
+  TLC counterexample: Error: Invariant EnforcementHonored is violated. | State 1: <Initial predicate> | State 2: <AcceptBuggy line 116, col 5 to line 123, col 35 of module FlagBypassesValidationChain>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [ECONOMIC] ERC4337v07::validateUserOp — `missingAccountFunds` deposited to entrypoint without slippage protection — front-running could drain wallet if missingAccountFunds calculated off-chain
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ECONOMIC] ImplicitSessionManager blacklist — Blacklist checked via binary search, but insertion/removal not implemented — once blacklisted, address permanently locked out
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC] Recovery::queuedPayloadHashes — Array grows unbounded, no cleanup mechanism — old queued payloads remain in storage forever, increasing gas costs
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ECONOMIC] SessionSig::recoverSignature — Allocates multiple arrays during decoding — extremely complex signature could cause OOM/DoS via excessive memory allocation
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+
+### ADDITIONAL CRITICAL ISSUES
+
+- [CONFIRMED via TLC on CrossWalletSigReplay] - [SIGNATURE_REPLAY] SessionSig::_hashPayloadHashCallIdx — Session signature only covers payloadHash + callIdx, not wallet address — if same payload submitted to multiple wallets, session sig replays
+  TLC counterexample: Error: Invariant WalletIdentityBound is violated. | State 1: <Initial predicate> | State 2: <AcceptBuggy line 123, col 5 to line 128, col 37 of module CrossWalletSigReplay>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [SIGNATURE_REPLAY] Recovery::recoveryPayloadHash — Uses EIP712 with optional noChainId, but doesn't include recovery mode identifier in structHash — recovery sig could be replayed as normal sig
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [MALLEABILITY] BaseSig (not shown but referenced) — Compact signatures use yParity in top bit of s, but doesn't check s < N/2 for malleability — duplicate signatures possible
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [DOS] Payload::fromPackedCalls — Decodes entire payload in memory before validation — malicious payload with huge callCount or call.data causes OOM
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [DOS] SessionSig::recoverConfiguration — Recursive branch processing without depth limit — deeply nested branches cause stack overflow
+- [CONFIRMED via TLC on PartialSignatureReplay] - [DOS] Recovery::_recoverBranch — Recursive with while loop, no gas limit check — deeply nested signature tree causes out-of-gas
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [LOGIC] SessionManager::recoverSapientSignature — Returns sig.imageHash which is derived from merkle tree, but doesn't verify tree is properly balanced — attacker could construct colliding trees
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [LOGIC] ExplicitSessionManager::_validateLimitUsageIncrement — Constructs expected calldata for incrementUsageLimit but doesn't validate call.gasLimit is sufficient — could pass validation but revert in execution
+- [CONFIRMED via TLC on PartialSignatureReplay] - [LOGIC] ImplicitSessionManager::_validateImplicitCall — Checks attestation.approvedSigner == sessionSigner but doesn't validate attestation.issuedAt timestamp — old/revoked attestations remain valid
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [STORAGE_COLLISION] Storage::writeBytes32Map uses `keccak256(abi.encodePacked(key, subkey))` — if key ends with subkey prefix, collision possible
+- [UNCHECKED_RETURN] LibOptim::call / delegatecall — Return boolean success but doesn't bubble revert data on failure — caller can't distinguish revert reasons
+
+===== CHUNK 2/2 =====
+# Findings
+
+## ACCESS CONTROL & INIT
+
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ACCESS CONTROL & INIT] Implementation::_setImplementation — unprotected storage slot write — assembly write to slot `address()` can be called by any internal path, no initialization guard prevents first-caller takeover via proxy deployment
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ACCESS CONTROL & INIT] Stage1Auth::constructor — immutable values set once — if FACTORY or STAGE_2_IMPLEMENTATION addresses are wrong at deploy, no recovery path exists
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [ACCESS CONTROL & INIT] BaseAuth::setStaticSignature — onlySelf but no event validation — malicious self-call could set arbitrary static signatures with future timestamps, bypassing normal auth flow
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ACCESS CONTROL & INIT] Implementation::updateImplementation — implementation upgrade without storage layout check — upgrading to incompatible implementation could corrupt storage slots used by other modules
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+
+## ORACLE / PRICE FEED
+
+- None found (no oracle/price feed logic present)
+
+## ARITHMETIC
+
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] Nonce::_consumeNonce — unchecked increment — `unchecked { uint256 newNonce = _nonce + 1; }` could overflow at max uint256, causing nonce to wrap to 0
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ARITHMETIC] LibBytes (referenced) — narrowing casts in readUintX — if signature encoding specifies size > actual uint capacity, truncation could cause signature validation bypass
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] BaseSig::recoverBranch — weight accumulation unchecked — `weight += addrWeight` and similar additions happen in unchecked context, could overflow and wrap to low value, passing threshold check with insufficient signatures
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ARITHMETIC] Payload::fromPackedCalls — nonceSize bit manipulation — `(globalFlag >> 1) & 0x07` followed by readUintX could read beyond buffer if nonceSize is manipulated
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+
+## TOKEN ACCOUNTING
+
+- [CONFIRMED via TLC on PartialSignatureReplay] - [TOKEN ACCOUNTING] Calls (referenced via Payload.Call) — no return value check on external calls — `Call.to` external call results not validated, fee-on-transfer tokens or reverting calls could be silently ignored if `behaviorOnError` is misused
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [TOKEN ACCOUNTING] ERC4337v07 (referenced) — missingAccountFunds transfer — no check if `missingAccountFunds` transfer succeeds, EntryPoint could fail to receive required deposit
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+
+## ARRAY / INDEX / INPUT VALIDATION
+
+- [ARRAY / INDEX / INPUT VALIDATION] Payload::fromPackedCalls — out-of-bounds read possible — `_decoded.calls[i].data = packed[pointer:pointer + calldataSize]` with malicious calldataSize could read beyond packed.length despite final length check
+- [NOT-A-BUG via TLC] NOT-A-BUG: unbounded loop on user-controlled input is a DoS/griefing issue, not a safety invariant violation — the PartialSignatureReplay shape checks authorization correctness, but out-of-gas griefing doesn't violate cryptographic signature validity or authorization properties
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ARRAY / INDEX / INPUT VALIDATION] Payload::fromPackedCalls — numCalls array allocation — `_decoded.calls = new Call[](numCalls)` with large numCalls could exhaust memory or cause DoS
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ARRAY / INDEX / INPUT VALIDATION] BaseSig::recover — checkpointSize from user flag — `uint256 checkpointSize = (signatureFlag & 0x1c) >> 2` allows 0-7 bytes, readUintX with size 0 might return 0 when non-zero checkpoint intended
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [NEEDS-LARGER-BOUND on PartialSignatureReplay] - [ARRAY / INDEX / INPUT VALIDATION] Payload::hashCalls — empty calls array — if `calls.length == 0`, returns `keccak256("")` which is a fixed value, different payloads could collide (TLC tlc-error)
+
+## EXTERNAL CALLS & REENTRANCY
+
+- [CONFIRMED via TLC on PartialSignatureReplay] - [EXTERNAL CALLS & REENTRANCY] Calls (implied) — CEI violation in execute loop — state changes (nonce consumption) before external calls in transaction batch could allow reentrancy attacks
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [EXTERNAL CALLS & REENTRANCY] BaseSig::FLAG_SIGNATURE_ERC1271 — external call to untrusted signer — `IERC1271(addr).isValidSignature()` called on user-supplied address without reentrancy guard, could callback into wallet during signature validation
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [EXTERNAL CALLS & REENTRANCY] BaseSig::FLAG_SIGNATURE_SAPIENT — external call during recovery — `ISapient(addr).recoverSapientSignature()` allows arbitrary external logic during signature validation, reentrancy risk
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [EXTERNAL CALLS & REENTRANCY] ICheckpointer::snapshotFor — external call to checkpointer — checkpointer address from signature could be malicious contract, no validation before external view call
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on ERC4337StaticSigDoS] - [EXTERNAL CALLS & REENTRANCY] ReentrancyGuard::nonReentrant — status key collision risk — `STATUS_KEY` derived from fixed keccak, if storage layout overlaps with other modules, guard could be bypassed
+  TLC counterexample: Error: Invariant Authorized4337CallsExecute is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 122, col 5 to line 130, col 56 of module ERC4337StaticSigDoS>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [EXTERNAL CALLS & REENTRANCY] BaseAuth::recoverSapientSignature — parentWallets array manipulation — copying and extending `_payload.parentWallets` array modifies memory structure during validation, could affect downstream validation logic
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+
+## CROSS-CHAIN / BRIDGE
+
+- [NEEDS-LARGER-BOUND on CrossWalletSigReplay] - [CROSS-CHAIN / BRIDGE] Payload::domainSeparator — noChainId flag allows cross-chain replay — `_noChainId ? uint256(0) : uint256(block.chainid)` permits same signature on all chains when flag set, intentional but risky if misused (TLC tlc-error)
+- [CONFIRMED via TLC on CrossWalletSigReplay] - [CROSS-CHAIN / BRIDGE] Payload::hashFor — wallet address in domain separator — counter-factual wallet validation uses `address(this)` vs `_wallet`, but no validation that `_wallet` exists on target chain
+  TLC counterexample: Error: Invariant WalletIdentityBound is violated. | State 1: <Initial predicate> | State 2: <AcceptBuggy line 123, col 5 to line 128, col 37 of module CrossWalletSigReplay>
+- [CONFIRMED via TLC on CrossWalletSigReplay] - [CROSS-CHAIN / BRIDGE] Stage1Auth::_isValidImage — CREATE2 address validation — relies on FACTORY address being same across chains, if factory differs, same imageHash produces different wallet addresses
+  TLC counterexample: Error: Invariant WalletIdentityBound is violated. | State 1: <Initial predicate> | State 2: <AcceptBuggy line 123, col 5 to line 128, col 37 of module CrossWalletSigReplay>
+
+## ECONOMIC / INCENTIVE LOGIC
+
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC / INCENTIVE LOGIC] BaseAuth::getStaticSignature — timestamp encoding in 96 bits — `uint96(_timestamp)` truncates timestamps beyond year ~2500, signature expiry could wrap to past
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [NOT-A-BUG via TLC] NOT-A-BUG: chained signature validation occurs within a single wallet context with consistent threshold enforcement; the `_signatureValidation` function validates the entire chain against the original `_threshold` parameter before returning, and no cross-wallet replay or threshold bypass occurs since each signature contributes weight that is summed and checked against the same threshold value.
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC / INCENTIVE LOGIC] Payload::BEHAVIOR_IGNORE_ERROR — silent failure mode — transactions with `BEHAVIOR_IGNORE_ERROR` consume gas but produce no on-chain evidence of failure, economic griefing vector
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on Uint64FeeOverflow] - [ECONOMIC / INCENTIVE LOGIC] BaseSig::FLAG_SUBDIGEST — hardcoded digest pushes weight to max — if `hardcoded == _opHash`, sets `weight = type(uint256).max`, bypassing threshold entirely without checking if subdigest was actually approved
+  TLC counterexample: Error: Invariant TrackedMatchesActual is violated. | State 1: <Initial predicate> | State 2: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 3: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow> | State 4: <FinishRaffleBuggy line 127, col 5 to line 130, col 65 of module Uint64FeeOverflow>
+- [CONFIRMED via TLC on SignatureReplay] - [ECONOMIC / INCENTIVE LOGIC] Nonce::_consumeNonce — nonce space isolation — multiple nonce spaces allow parallel transactions, but no economic binding prevents griefing via nonce-space exhaustion
+  TLC counterexample: Error: Invariant NoOverpayment is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 103, col 5 to line 106, col 67 of module SignatureReplay> | State 3: <SubmitBuggy line 103, col 5 to line 106, col 67 of module SignatureReplay>
+- [CONFIRMED via TLC on ReentrancyDrain] - [ECONOMIC / INCENTIVE LOGIC] Implementation::_updateImplementation — implementation change without delay — immediate upgrade to new implementation could rug users mid-transaction if malicious upgrade front-runs user operations
+  TLC counterexample: Error: Invariant ClaimedAtMostOnce is violated. | State 1: <Initial predicate> | State 2: <PreCheckBuggy line 132, col 5 to line 137, col 51 of module ReentrancyDrain> | State 3: <ReenterBuggy line 143, col 5 to line 148, col 51 of module ReentrancyDrain>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ECONOMIC / INCENTIVE LOGIC] BaseAuth::setStaticSignature — unbounded future timestamp — setting `_timestamp` far in future locks in signature validation indefinitely, no revocation mechanism
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>
+- [CONFIRMED via TLC on Create2NonIdempotent] - [ECONOMIC / INCENTIVE LOGIC] BaseSig::recoverBranch — snapshot validation optional — `if (_snapshot.imageHash != bytes32(0) && ...)` allows empty snapshot to be ignored, checkpoint-based auth could be bypassed
+  TLC counterexample: Error: Invariant DeployedNeverReverts is violated. | State 1: <Initial predicate> | State 2: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent> | State 3: <DeployBuggy line 114, col 5 to line 121, col 70 of module Create2NonIdempotent>
+- [CONFIRMED via TLC on PartialSignatureReplay] - [ECONOMIC / INCENTIVE LOGIC] Payload::fromPackedCalls — gasLimit per call not enforced — `Call.gasLimit` stored but no validation that sum of gasLimits fits within block gas limit, could cause batch transaction failures
+  TLC counterexample: Error: Invariant BatchIntegrity is violated. | State 1: <Initial predicate> | State 2: <SubmitBuggy line 121, col 5 to line 127, col 50 of module PartialSignatureReplay>

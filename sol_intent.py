@@ -90,7 +90,8 @@ def _chunks(sols, budget):
 
 
 def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
-            rag_exclude_corpus=None, hybrid_rag=False, oracle_loop=False):
+            rag_exclude_corpus=None, hybrid_rag=False, oracle_loop=False,
+            tlc_oracle=False):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
@@ -121,7 +122,22 @@ def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
                            retrieved_evidence=retrieved_evidence)
         tag = f"\n===== CHUNK {i + 1}/{len(chunks)} =====\n" if len(chunks) > 1 else ""
         chunk_out = agent._ask(prompt, 8000)
-        if oracle_loop and rag_exclude_corpus is not None:
+        if tlc_oracle and rag_exclude_corpus is not None:
+            sys.path.insert(0, os.path.join(HERE, "tools"))
+            import tlc_oracle_loop as tol
+            items = tol._split_leads(chunk_out)
+            stats = {"confirmed": 0, "revised": 0, "needs-larger-bound": 0,
+                     "not-a-bug": 0, "no-match": 0, "error": 0}
+            new_lines = []
+            for kind, ln in items:
+                if kind != "LEAD":
+                    new_lines.append(ln); continue
+                new_ln, status, _ = tol.process_lead(ln, rag_exclude_corpus)
+                stats[status] = stats.get(status, 0) + 1
+                new_lines.append(new_ln)
+            chunk_out = "\n".join(new_lines)
+            sys.stderr.write(f"\ntlc_oracle_loop chunk stats: {stats}\n")
+        elif oracle_loop and rag_exclude_corpus is not None:
             sys.path.insert(0, os.path.join(HERE, "tools"))
             import oracle_loop as ol
             ol_tmpl = open(os.path.join(HERE, "prompts", "oracle_loop.md")).read()
@@ -143,6 +159,7 @@ if __name__ == "__main__":
     use_hybrid = "--hybrid-rag" in sys.argv
     use_rag = "--rag" in sys.argv
     use_oracle = "--oracle-loop" in sys.argv
+    use_tlc_oracle = "--tlc-oracle" in sys.argv
     use_mechanism = "--mechanism" in sys.argv
     if use_hybrid:
         prompt = ("prompts/sol_find_mechanism.md" if use_mechanism
@@ -164,4 +181,5 @@ if __name__ == "__main__":
         print(f"  (rag index excludes corpus: {rag_exclude})")
     print()
     print(analyze(root, prompt=prompt, rag_exclude_corpus=rag_exclude,
-                  hybrid_rag=use_hybrid, oracle_loop=use_oracle))
+                  hybrid_rag=use_hybrid, oracle_loop=use_oracle,
+                  tlc_oracle=use_tlc_oracle))
