@@ -1,15 +1,21 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 0.15552375,
+  "cumulative_usd": 0.30552375,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
       "goal": "LEAD_CONDITIONED_SPEC",
       "verdict": "DISPUTED",
       "cost_usd": 0.1555
+    },
+    {
+      "ts": "2026-06-07T19:04:34.114994",
+      "goal": "CORPUS_GROWTH for S-3",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 0.15
     }
   ],
-  "last_cycle_ts": "2026-06-07T14:24:45.822106",
+  "last_cycle_ts": "2026-06-07T19:04:34.114994",
   "version": 1
 }
