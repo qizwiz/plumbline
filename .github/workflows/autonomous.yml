@@ -1,0 +1,57 @@
+name: autonomous-loop
+# Per JH's authorization on 2026-06-07:
+#   - cap $50/week (tracked in tools/autonomous_spend.json)
+#   - any scope
+#   - LLM-based 3-judge refutation
+#   - wake every 30 min (GH Actions: */30 cron)
+#
+# Pattern matches the existing loop.yml: ANTHROPIC_API_KEY from secrets,
+# Anthropic SDK direct (no nested claude -p), commits + pushes from the
+# Actions runner.
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 min
+  workflow_dispatch:          # manual trigger for testing
+
+# Prevent concurrent runs from stepping on each other's commits
+concurrency:
+  group: autonomous-loop
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          pip install anthropic python-dotenv
+
+      - name: Configure git
+        run: |
+          git config user.name "autonomous-loop"
+          git config user.email "autonomous@plumbline.local"
+
+      - name: Run autonomous cycle
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python3 tools/autonomous_loop.py
+
+      - name: Show post-cycle state
+        run: |
+          echo "=== git log -3 ==="
+          git log --oneline -3
+          echo "=== spend ==="
+          cat tools/autonomous_spend.json | python3 -c "import sys, json; d=json.load(sys.stdin); print(f'cumulative: \${d[\"cumulative_usd\"]:.3f} / \${d[\"weekly_cap_usd\"]:.2f}'); print(f'cycles this week: {len(d[\"cycles\"])}')"
