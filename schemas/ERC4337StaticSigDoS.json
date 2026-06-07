@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "title": "ERC4337StaticSigDoS CONSTANTS",
+  "description": "TLC model constants for the ERC4337StaticSigDoS bug-class shape. The spec models a wallet whose static-signature check is keyed on msg.sender, and a call path that arrives via the EntryPoint (so msg.sender = EntryPoint, not the expected User-signer). The bug fires when EntryPoint != User.",
+  "properties": {
+    "Calls": {
+      "type": "array",
+      "description": "Set of call identities. Use 1-3 calls. Each call is a short identity token like c1, c2, c3.",
+      "items": {
+        "type": "string",
+        "pattern": "^c[0-9]+$"
+      },
+      "minItems": 1,
+      "maxItems": 3
+    },
+    "EntryPoint": {
+      "type": "string",
+      "description": "Identity of the ERC-4337 EntryPoint contract. Short lowercase token like 'ep'. MUST DIFFER from User for the bug to manifest.",
+      "pattern": "^[a-z][a-z0-9]*$"
+    },
+    "User": {
+      "type": "string",
+      "description": "Identity of the user-EOA / expected signer. Short lowercase token like 'u'. MUST DIFFER from EntryPoint for the bug to manifest.",
+      "pattern": "^[a-z][a-z0-9]*$"
+    }
+  },
+  "required": ["Calls", "EntryPoint", "User"]
+}

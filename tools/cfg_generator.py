@@ -27,7 +27,20 @@ def _is_cfg_shaped(text: str) -> bool:
 
 def generate(spec_name: str, lead_text: str) -> tuple[str, str]:
     """Returns (cfg_text, status) where status in
-    {'generated', 'default-fallback', 'spec-missing'}."""
+    {'schema-decoded', 'generated', 'default-fallback', 'spec-missing'}.
+
+    Tries cfg_decode (schema-constrained tool-use) FIRST for specs
+    with a schema in schemas/<SpecName>.json. Falls back to the
+    free-form LLM path if no schema or if tool-use fails."""
+    # Schema-first path via cfg_decode
+    try:
+        import cfg_decode
+        if cfg_decode.has_schema(spec_name):
+            cfg, status = cfg_decode.generate(spec_name, lead_text)
+            if status == "schema-decoded":
+                return cfg, "schema-decoded"
+    except Exception:
+        pass
     spec_dir = TLA_DIR
     default_cfg_path = os.path.join(spec_dir, spec_name + ".cfg")
     if not os.path.isfile(default_cfg_path):
