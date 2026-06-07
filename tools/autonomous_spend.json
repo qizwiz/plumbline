@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 3.89428275,
+  "cumulative_usd": 3.89721675,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -60,8 +60,16 @@
       "cost_usd": 0.0028,
       "exec_cost_usd": 0.0,
       "refute_cost_usd": 0.0028
+    },
+    {
+      "ts": "2026-06-07T23:23:07.318875",
+      "goal": "T19 retrieval recall gap",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 0.0029,
+      "exec_cost_usd": 0.0,
+      "refute_cost_usd": 0.0029
     }
   ],
-  "last_cycle_ts": "2026-06-07T22:49:26.960560",
+  "last_cycle_ts": "2026-06-07T23:23:07.318875",
   "version": 1
 }
