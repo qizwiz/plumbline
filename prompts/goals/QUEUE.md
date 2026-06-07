@@ -26,8 +26,8 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 - Picker SKIPS goals where `status != pending`
 - Picker SKIPS goals whose `est_cost > remaining_budget`
 - After execution, executor MUST update status: `in-progress` during run, then
-  `done` if refuter PASSES or `disputed` if refuter NULLS the claim
-- If 3 consecutive cycles produce DISPUTED on the same goal, mark it `blocked`
-  and surface in commit message
+  `done` if refuter PASSES or NULL-HONEST, or `disputed` if refuter splits
+- Disputed goals STAY disputed (the picker skips them). JH reviews each one
+  and either resets to `pending` or marks `blocked`.
 - Autonomous edits to this file allowed ONLY to update status. New rows
   added by JH explicitly.
