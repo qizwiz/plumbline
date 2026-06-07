@@ -143,11 +143,13 @@ if __name__ == "__main__":
     use_hybrid = "--hybrid-rag" in sys.argv
     use_rag = "--rag" in sys.argv
     use_oracle = "--oracle-loop" in sys.argv
+    use_mechanism = "--mechanism" in sys.argv
     if use_hybrid:
-        prompt = "prompts/sol_find_hybrid_rag.md"
+        prompt = ("prompts/sol_find_mechanism.md" if use_mechanism
+                  else "prompts/sol_find_hybrid_rag.md")
         corpus = os.path.basename(root.rstrip("/"))
         rag_exclude = corpus
-        mode = "RECALL+HYBRID-RAG"
+        mode = "RECALL+HYBRID-RAG" + ("+MECHANISM" if use_mechanism else "")
     elif use_rag:
         prompt = "prompts/sol_find_rag.md"
         corpus = os.path.basename(root.rstrip("/"))
