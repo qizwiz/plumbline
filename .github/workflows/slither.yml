@@ -1,0 +1,59 @@
+name: slither-baselines
+# Per docs/research/CODESPACE_REMOTE_COMPUTE.md: run slither on all 5
+# contest corpora using the Trail of Bits eth-security-toolbox CI image,
+# which has Foundry + Slither + solc-select pre-installed. Closes the
+# puppy-raffle T15 gap (compile chain we couldn't run locally).
+#
+# Manually fired via `gh workflow run slither.yml`. Uploads slither.txt
+# per corpus as artifacts; JH inspects + optionally commits to overwrite
+# the local versions in examples/<corpus>/slither.txt.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  slither:
+    runs-on: ubuntu-latest
+    container: ghcr.io/trailofbits/eth-security-toolbox/ci:nightly
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - corpus: boss-bridge
+            solc: 0.8.20
+          - corpus: puppy-raffle
+            solc: 0.7.6
+          - corpus: sequence
+            solc: 0.8.28
+          - corpus: t-swap
+            solc: 0.8.20
+          - corpus: thunder-loan
+            solc: 0.8.20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pin solc to ${{ matrix.solc }}
+        run: |
+          solc-select install ${{ matrix.solc }}
+          solc-select use ${{ matrix.solc }}
+          solc --version
+
+      - name: Run slither on examples/${{ matrix.corpus }}
+        run: |
+          set +e   # slither exits non-zero when it finds issues; that's success here
+          cd examples/${{ matrix.corpus }}
+          # ToB image has foundry; if a foundry.toml is present, slither
+          # will use forge for compilation + remappings. If not, slither
+          # falls back to solc-standard-json on the directory.
+          slither . --solc-disable-warnings 2>&1 | tee slither.txt
+          # Print final summary line for the run log
+          grep -E "result\(s\) found|No contract was analyzed|Error" slither.txt | tail -3
+          # Exit 0 even if slither found bugs — that's what we want
+          true
+
+      - name: Upload slither.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: slither-${{ matrix.corpus }}
+          path: examples/${{ matrix.corpus }}/slither.txt
+          retention-days: 14
