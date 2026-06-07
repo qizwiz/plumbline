@@ -39,25 +39,24 @@ jobs:
           solc --version
 
       - name: Install foundry deps for ${{ matrix.corpus }}
+        shell: bash
         run: |
+          set +e   # don't bail on forge install errors; we always want slither to run
           cd examples/${{ matrix.corpus }}
-          # Each corpus's foundry.toml uses lib/{openzeppelin-contracts,forge-std}
-          # which aren't checked in. Install matching OZ version per corpus's solc.
-          # Initialize git so forge install --no-commit works.
           git init -q && git add -A && git -c user.email=ci@plumbline -c user.name=ci commit -qm init
-          # Pick OZ version: 0.7.6 corpora need OZ 3.x; 0.8.x corpora differ
           case "${{ matrix.corpus }}" in
             puppy-raffle) OZ_REF="v3.4.2" ;;
-            sequence)     OZ_REF="v5.0.0" ;;
             *)            OZ_REF="v5.0.0" ;;
           esac
-          forge install --no-commit OpenZeppelin/openzeppelin-contracts@$OZ_REF || true
-          forge install --no-commit foundry-rs/forge-std || true
-          # sequence/thunder-loan also use OZ upgradeable
+          # Modern forge defaults to no-commit; --no-commit was removed
+          forge install OpenZeppelin/openzeppelin-contracts@$OZ_REF
+          forge install foundry-rs/forge-std
           if [ "${{ matrix.corpus }}" = "sequence" ] || [ "${{ matrix.corpus }}" = "thunder-loan" ] || [ "${{ matrix.corpus }}" = "boss-bridge" ]; then
-            forge install --no-commit OpenZeppelin/openzeppelin-contracts-upgradeable@v5.0.0 || true
+            forge install OpenZeppelin/openzeppelin-contracts-upgradeable@v5.0.0
           fi
-          ls lib/ 2>&1 | head -5
+          echo "=== installed lib/ ==="
+          ls lib/ 2>&1
+          exit 0
 
       - name: Run slither on examples/${{ matrix.corpus }}
         run: |
