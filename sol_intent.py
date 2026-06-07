@@ -89,7 +89,8 @@ def _chunks(sols, budget):
     return out
 
 
-def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md"):
+def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
+            rag_exclude_corpus=None):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
@@ -100,8 +101,17 @@ def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md"):
     # recall/precision and calls prompt_improve.improve_if_weak, which rewrites sol_intent.md when weak.
     outs = []
     for i, ch in enumerate(chunks):
+        sources_text = "\n\n".join(ch)
+        retrieved_findings = ""
+        if rag_exclude_corpus is not None:
+            sys.path.insert(0, os.path.join(HERE, "tools"))
+            import rag_query
+            retrieved_findings = rag_query.retrieve_block(
+                sources_text, rag_exclude_corpus, k=3)
         prompt = pi.render(tmpl, struggle=struggle, readme=readme or "(no README)",
-                           adrs=adrs or "(no ADRs found)", sources="\n\n".join(ch))
+                           adrs=adrs or "(no ADRs found)",
+                           sources=sources_text,
+                           retrieved_findings=retrieved_findings)
         tag = f"\n===== CHUNK {i + 1}/{len(chunks)} =====\n" if len(chunks) > 1 else ""
         outs.append(tag + agent._ask(prompt, 8000))
     return "\n".join(outs)
@@ -109,6 +119,18 @@ def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md"):
 
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else "."
-    prompt = "prompts/sol_find.md" if "--recall" in sys.argv else "prompts/sol_intent.md"
-    print(f"sol_intent: {'RECALL-first' if '--recall' in sys.argv else 'intent'} pass for {root}\n")
-    print(analyze(root, prompt=prompt))
+    use_rag = "--rag" in sys.argv
+    if use_rag:
+        # Use RAG-augmented recall prompt; corpus = last path component of root
+        prompt = "prompts/sol_find_rag.md"
+        corpus = os.path.basename(root.rstrip("/"))
+        rag_exclude = corpus
+    else:
+        prompt = "prompts/sol_find.md" if "--recall" in sys.argv else "prompts/sol_intent.md"
+        rag_exclude = None
+    mode = "RECALL+RAG" if use_rag else ("RECALL-first" if "--recall" in sys.argv else "intent")
+    print(f"sol_intent: {mode} pass for {root}")
+    if use_rag:
+        print(f"  (rag index excludes corpus: {rag_exclude})")
+    print()
+    print(analyze(root, prompt=prompt, rag_exclude_corpus=rag_exclude))
