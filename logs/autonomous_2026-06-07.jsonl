@@ -4,3 +4,4 @@
 {"ts": "2026-06-07T20:56:17.990474", "goal": "LEAD_CONDITIONED_SPEC", "verdict": "DISPUTED", "cost_usd": 1.0241, "remaining_after": 48.52}
 {"ts": "2026-06-07T21:31:26.703224", "goal": "CORPUS_GROWTH for S-3", "verdict": "DISPUTED", "cost_usd": 1.6312, "remaining_after": 46.89}
 {"ts": "2026-06-07T21:56:35.736802", "goal": "CORPUS_GROWTH for S-4", "verdict": "DISPUTED", "cost_usd": 0.7775, "remaining_after": 46.11}
+{"ts": "2026-06-07T22:22:38.364832", "goal": "CFG_DECODE extension (4 specs)", "verdict": "NULL-HONEST", "cost_usd": 0.0032, "remaining_after": 46.11}

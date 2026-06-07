@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 3.88832175,
+  "cumulative_usd": 3.8915017499999998,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -44,8 +44,16 @@
       "cost_usd": 0.7775,
       "exec_cost_usd": 0.768,
       "refute_cost_usd": 0.0095
+    },
+    {
+      "ts": "2026-06-07T22:22:38.364832",
+      "goal": "CFG_DECODE extension (4 specs)",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 0.0032,
+      "exec_cost_usd": 0.0,
+      "refute_cost_usd": 0.0032
     }
   ],
-  "last_cycle_ts": "2026-06-07T21:56:35.736802",
+  "last_cycle_ts": "2026-06-07T22:22:38.364832",
   "version": 1
 }
