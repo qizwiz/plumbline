@@ -431,9 +431,7 @@ def cycle():
 
     if not DRY_RUN:
         try:
-            subprocess.run(["git", "add", "prompts/goals/QUEUE.md",
-                            "tools/autonomous_spend.json", "logs/"],
-                           cwd=HERE, check=False)
+            subprocess.run(["git", "add", "-A"], cwd=HERE, check=False)
             msg = (f"autonomous: true — cycle on goal '{g['goal']}' → "
                    f"verdict={verdict}, cost=${total_cost:.3f}, "
                    f"remaining=${spend['weekly_cap_usd'] - spend['cumulative_usd']:.2f}")
