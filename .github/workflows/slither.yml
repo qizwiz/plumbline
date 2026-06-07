@@ -54,6 +54,12 @@ jobs:
           if [ "${{ matrix.corpus }}" = "sequence" ] || [ "${{ matrix.corpus }}" = "thunder-loan" ] || [ "${{ matrix.corpus }}" = "boss-bridge" ]; then
             forge install OpenZeppelin/openzeppelin-contracts-upgradeable@v5.0.0
           fi
+          # Strip OZ-upgradeable's certora harnesses + tests; they reference
+          # patched/ files that aren't shipped and break forge build.
+          rm -rf lib/openzeppelin-contracts-upgradeable/certora 2>/dev/null
+          rm -rf lib/openzeppelin-contracts-upgradeable/test 2>/dev/null
+          rm -rf lib/openzeppelin-contracts/certora 2>/dev/null
+          rm -rf lib/openzeppelin-contracts/test 2>/dev/null
           echo "=== installed lib/ ==="
           ls lib/ 2>&1
           exit 0
