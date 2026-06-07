@@ -61,11 +61,23 @@ CONSTANTS
     EntryPoint,            \* Scalar tag identifying the ERC-4337 EntryPoint
                            \* as a distinct msg.sender from the user EOA.
                            \* Modeled as an opaque identity.
-    User                   \* Scalar tag identifying the user EOA (the
+    User,                  \* Scalar tag identifying the user EOA (the
                            \* expectedSigner from the wallet's perspective).
+    PathChoice             \* Which call path to model in this run: Direct
+                           \* or ViaEntryPoint. Lead-conditioned parameter:
+                           \* set by cfg_decode based on the audit lead's
+                           \* vocabulary. If the lead describes ERC-4337 /
+                           \* EntryPoint context, PathChoice=ViaEntryPoint
+                           \* and TLC explores the buggy path. If the lead
+                           \* is unrelated (different bug class), PathChoice
+                           \* =Direct and TLC does NOT fire the invariant.
+                           \* This gates SubmitBuggy: the action only fires
+                           \* when p=PathChoice, so unrelated leads produce
+                           \* no state-machine progress → no bug discharge.
 
 ASSUME IsFiniteSet(Calls)
 ASSUME EntryPoint # User    \* The crux of the bug: these identities differ.
+ASSUME PathChoice \in {"Direct", "ViaEntryPoint"}
 
 Paths == {"Direct", "ViaEntryPoint"}
 
@@ -116,11 +128,18 @@ Init ==
    unwrapping the 4337 submitter identity. On Direct calls it passes
    (msg.sender == User); on ViaEntryPoint calls it reverts (msg.sender
    == EntryPoint != User).
+
+   LEAD-CONDITIONED GATING: SubmitBuggy only fires when p = PathChoice.
+   This ensures the spec's behavior is controlled by the lead-derived
+   PathChoice constant: if cfg_decode produces PathChoice=Direct (because
+   the lead is unrelated to ERC-4337), TLC never explores the ViaEntryPoint
+   path → no invariant violation → no false positive.
    --------------------------------------------------------------------------- *)
 
 SubmitBuggy(c, p) ==
     /\ c \in Calls
     /\ p \in Paths
+    /\ p = PathChoice                      \* LEAD-GATED: only fire on PathChoice path
     /\ path[c] = "None"                    \* one-shot per call
     /\ path' = [path EXCEPT ![c] = p]
     /\ IF MsgSenderFor(p) = User
