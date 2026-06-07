@@ -31,6 +31,8 @@ Goal state is restored on `--resume`.
 | `ROUTER_TRAIN.goal.md` | Implement ADR-006 verifier-router (schema → relabel → trainer → CLI) | 2-4 hours | $0 |
 | `HYBRID_ROUTER.goal.md` | Close the tlc-routing gap by composing spec_retrieval as a pre-check before the ML router | 30-60 min | $0 |
 | `CORPUS_GROWTH.goal.md` | Add ONE new TLA+ FailureMode shape (pair with `SHAPES_BACKLOG.md`) | 1-3 hours | $0 |
+| `CA_SVM.goal.md` | Smallest viable kernel for grammar-driven evolution (mutator + 4-bucket measurement) | 30 min | $0 |
+| `MARGINAL_RECALL.goal.md` | T15 — per-verifier marginal recall across 5 corpora; ADR-006 step 5 prerequisite | 1-2 hours | $0 |
 | `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
 
 ## Design notes
