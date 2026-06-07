@@ -90,7 +90,7 @@ def _chunks(sols, budget):
 
 
 def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
-            rag_exclude_corpus=None):
+            rag_exclude_corpus=None, hybrid_rag=False):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
@@ -103,15 +103,22 @@ def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
     for i, ch in enumerate(chunks):
         sources_text = "\n\n".join(ch)
         retrieved_findings = ""
+        retrieved_evidence = ""
         if rag_exclude_corpus is not None:
             sys.path.insert(0, os.path.join(HERE, "tools"))
-            import rag_query
-            retrieved_findings = rag_query.retrieve_block(
-                sources_text, rag_exclude_corpus, k=3)
+            if hybrid_rag:
+                import hybrid_rag_query
+                retrieved_evidence = hybrid_rag_query.retrieve_block(
+                    sources_text, rag_exclude_corpus, k=3)
+            else:
+                import rag_query
+                retrieved_findings = rag_query.retrieve_block(
+                    sources_text, rag_exclude_corpus, k=3)
         prompt = pi.render(tmpl, struggle=struggle, readme=readme or "(no README)",
                            adrs=adrs or "(no ADRs found)",
                            sources=sources_text,
-                           retrieved_findings=retrieved_findings)
+                           retrieved_findings=retrieved_findings,
+                           retrieved_evidence=retrieved_evidence)
         tag = f"\n===== CHUNK {i + 1}/{len(chunks)} =====\n" if len(chunks) > 1 else ""
         outs.append(tag + agent._ask(prompt, 8000))
     return "\n".join(outs)
@@ -119,18 +126,25 @@ def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
 
 if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else "."
+    use_hybrid = "--hybrid-rag" in sys.argv
     use_rag = "--rag" in sys.argv
-    if use_rag:
-        # Use RAG-augmented recall prompt; corpus = last path component of root
+    if use_hybrid:
+        prompt = "prompts/sol_find_hybrid_rag.md"
+        corpus = os.path.basename(root.rstrip("/"))
+        rag_exclude = corpus
+        mode = "RECALL+HYBRID-RAG"
+    elif use_rag:
         prompt = "prompts/sol_find_rag.md"
         corpus = os.path.basename(root.rstrip("/"))
         rag_exclude = corpus
+        mode = "RECALL+RAG"
     else:
         prompt = "prompts/sol_find.md" if "--recall" in sys.argv else "prompts/sol_intent.md"
         rag_exclude = None
-    mode = "RECALL+RAG" if use_rag else ("RECALL-first" if "--recall" in sys.argv else "intent")
+        mode = "RECALL-first" if "--recall" in sys.argv else "intent"
     print(f"sol_intent: {mode} pass for {root}")
-    if use_rag:
+    if use_rag or use_hybrid:
         print(f"  (rag index excludes corpus: {rag_exclude})")
     print()
-    print(analyze(root, prompt=prompt, rag_exclude_corpus=rag_exclude))
+    print(analyze(root, prompt=prompt, rag_exclude_corpus=rag_exclude,
+                  hybrid_rag=use_hybrid))
