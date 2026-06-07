@@ -1,7 +1,7 @@
 {
   "type": "object",
   "title": "ERC4337StaticSigDoS CONSTANTS",
-  "description": "TLC model constants for the ERC4337StaticSigDoS bug-class shape. The spec models a wallet whose static-signature check is keyed on msg.sender, and a call path that arrives via the EntryPoint (so msg.sender = EntryPoint, not the expected User-signer). The bug fires when EntryPoint != User AND when the call path is ViaEntryPoint (controlled by PathChoice).",
+  "description": "TLC model constants for the ERC4337StaticSigDoS bug-class shape. The spec models a wallet whose static-signature check is keyed on msg.sender, and a call path that arrives via the EntryPoint (so msg.sender = EntryPoint, not the expected User-signer). The bug fires when EntryPoint != User.",
   "properties": {
     "Calls": {
       "type": "array",
@@ -22,12 +22,7 @@
       "type": "string",
       "description": "Identity of the user-EOA / expected signer. Short lowercase token like 'u'. MUST DIFFER from EntryPoint for the bug to manifest.",
       "pattern": "^[a-z][a-z0-9]*$"
-    },
-    "PathChoice": {
-      "type": "string",
-      "enum": ["Direct", "ViaEntryPoint"],
-      "description": "Which call path to model: 'Direct' (EOA → wallet, msg.sender=User) or 'ViaEntryPoint' (EOA → EntryPoint → wallet, msg.sender=EntryPoint). LEAD-CONDITIONED: if the audit lead mentions EntryPoint, ERC-4337, 4337, validateUserOp, UserOperation, msg.sender forwarding in a 4337 context, bundler, or account abstraction with EntryPoint, set PathChoice='ViaEntryPoint'. Otherwise (unrelated bug class, e.g., reentrancy, overflow, replay without 4337 context) set PathChoice='Direct'. This gates the buggy action: only ViaEntryPoint fires the invariant violation."
     }
   },
-  "required": ["Calls", "EntryPoint", "User", "PathChoice"]
+  "required": ["Calls", "EntryPoint", "User"]
 }
