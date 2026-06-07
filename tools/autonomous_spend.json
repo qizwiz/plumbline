@@ -1,8 +1,15 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 0.0,
-  "cycles": [],
-  "last_cycle_ts": null,
+  "cumulative_usd": 0.15552375,
+  "cycles": [
+    {
+      "ts": "2026-06-07T14:24:45.822106",
+      "goal": "LEAD_CONDITIONED_SPEC",
+      "verdict": "DISPUTED",
+      "cost_usd": 0.1555
+    }
+  ],
+  "last_cycle_ts": "2026-06-07T14:24:45.822106",
   "version": 1
 }
