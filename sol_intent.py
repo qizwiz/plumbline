@@ -90,7 +90,7 @@ def _chunks(sols, budget):
 
 
 def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
-            rag_exclude_corpus=None, hybrid_rag=False):
+            rag_exclude_corpus=None, hybrid_rag=False, oracle_loop=False):
     readme, adrs, sols = collect(root)
     if not sols:
         return "(no Solidity sources found under " + root + ")"
@@ -120,7 +120,21 @@ def analyze(root, model=None, budget=120000, prompt="prompts/sol_intent.md",
                            retrieved_findings=retrieved_findings,
                            retrieved_evidence=retrieved_evidence)
         tag = f"\n===== CHUNK {i + 1}/{len(chunks)} =====\n" if len(chunks) > 1 else ""
-        outs.append(tag + agent._ask(prompt, 8000))
+        chunk_out = agent._ask(prompt, 8000)
+        if oracle_loop and rag_exclude_corpus is not None:
+            sys.path.insert(0, os.path.join(HERE, "tools"))
+            import oracle_loop as ol
+            ol_tmpl = open(os.path.join(HERE, "prompts", "oracle_loop.md")).read()
+            items = ol._split_leads(chunk_out)
+            revised_lines = []
+            for kind, ln in items:
+                if kind != "LEAD":
+                    revised_lines.append(ln); continue
+                revised, _ = ol._revise_lead(ln, rag_exclude_corpus, 0.55, ol_tmpl)
+                revised_lines.append("- [REVISED] " + revised.strip()
+                                     if revised != ln else ln)
+            chunk_out = "\n".join(revised_lines)
+        outs.append(tag + chunk_out)
     return "\n".join(outs)
 
 
@@ -128,6 +142,7 @@ if __name__ == "__main__":
     root = sys.argv[1] if len(sys.argv) > 1 else "."
     use_hybrid = "--hybrid-rag" in sys.argv
     use_rag = "--rag" in sys.argv
+    use_oracle = "--oracle-loop" in sys.argv
     if use_hybrid:
         prompt = "prompts/sol_find_hybrid_rag.md"
         corpus = os.path.basename(root.rstrip("/"))
@@ -147,4 +162,4 @@ if __name__ == "__main__":
         print(f"  (rag index excludes corpus: {rag_exclude})")
     print()
     print(analyze(root, prompt=prompt, rag_exclude_corpus=rag_exclude,
-                  hybrid_rag=use_hybrid))
+                  hybrid_rag=use_hybrid, oracle_loop=use_oracle))
