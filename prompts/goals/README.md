@@ -35,6 +35,7 @@ Goal state is restored on `--resume`.
 | `RAG_LEADS.goal.md` | Inject retrieved past .ANSWERS findings as few-shot to attack the sol_intent recall gap | 1 hour | ~$5 |
 | `HYBRID_RAG.goal.md` | Combine RAG + spec_retrieval injection to close the M-02-style gap (shape exists in docs/tla/ but not .ANSWERS) | 1-2 hours | ~$5 |
 | `ORACLE_LOOP.goal.md` | Oracle-grounded self-correction: each shape-matched lead gets revised by LLM to ground in spec mechanics. v0 — no TLC execution. | 2 hours | ~$3-8 |
+| `LEAD_VOCAB.goal.md` | ORACLE_LOOP Path A: rewrite sol_find to demand mechanism-grounded leads (variables + file:line + transformation) so oracle-loop has more leads to fire on | 1-2 hours | ~$5 |
 | `MARGINAL_RECALL.goal.md` | T15 — per-verifier marginal recall across 5 corpora; ADR-006 step 5 prerequisite | 1-2 hours | $0 |
 | `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
 
