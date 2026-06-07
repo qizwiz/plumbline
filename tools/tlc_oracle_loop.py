@@ -21,6 +21,7 @@ import spec_retrieval
 import cfg_generator
 import invariant_agent as agent
 import prompt_improve as pi
+import weak_confirm
 
 TLA_DIR = os.path.join(HERE, "docs", "tla")
 TLA_JAR = os.path.join(TLA_DIR, "tla2tools.jar")
@@ -98,9 +99,15 @@ def process_lead(lead, exclude_corpus, threshold=0.55):
         return lead, "no-match", ""
     violated, trace, err = _run_tlc(spec_name, cfg)
     if violated:
-        return ("- [CONFIRMED via TLC on " + spec_name + "] " + lead.strip()
+        # Weak-confirm post-filter: require lead to share ≥2 anchor synonyms
+        # with the spec name. Otherwise the TLC firing is likely just the
+        # spec's BuggyAction firing irrespective of the lead's mechanism.
+        strength = weak_confirm.classify(lead, spec_name)
+        tag = "CONFIRMED" if strength == "STRONG" else "WEAK-CONFIRM"
+        status = "confirmed" if strength == "STRONG" else "weak-confirm"
+        return ("- [" + tag + " via TLC on " + spec_name + "] " + lead.strip()
                 + "\n  TLC counterexample: " + trace.replace("\n", " | ")[:600]), \
-                "confirmed", trace
+                status, trace
     if err in ("timeout", "tlc-error"):
         return ("- [NEEDS-LARGER-BOUND on " + spec_name + "] " + lead.strip()
                 + " (TLC " + err + ")"), "needs-larger-bound", ""
@@ -121,8 +128,9 @@ def main():
     src = sys.argv[1]; exclude = sys.argv[2]
     text = sys.stdin.read() if src == "-" else open(src).read()
     items = _split_leads(text)
-    stats = {"confirmed": 0, "revised": 0, "needs-larger-bound": 0,
-             "not-a-bug": 0, "no-match": 0, "error": 0, "other": 0}
+    stats = {"confirmed": 0, "weak-confirm": 0, "revised": 0,
+             "needs-larger-bound": 0, "not-a-bug": 0, "no-match": 0,
+             "error": 0, "other": 0}
     out_lines = []
     for kind, ln in items:
         if kind != "LEAD":
