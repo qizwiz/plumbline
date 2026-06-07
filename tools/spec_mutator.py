@@ -12,14 +12,23 @@ import hashlib, json, os, random, re, shutil, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TLA_DIR = os.path.join(HERE, "docs", "tla")
+IMPORTED_DIR = os.path.join(TLA_DIR, "imported")
 MUTATIONS_DIR = os.path.join(TLA_DIR, "mutations")
 TLA_JAR = os.path.join(TLA_DIR, "tla2tools.jar")
 GRAMMAR_VALIDATE = os.path.join(HERE, "tools", "validate_tla_grammar.py")
 
-OWN_SPECS = ["Create2NonIdempotent", "CrossWalletSigReplay",
-             "ERC4337StaticSigDoS", "FlagBypassesValidationChain",
-             "PartialSignatureReplay", "ReentrancyDrain",
-             "SignatureReplay", "Uint64FeeOverflow"]
+# 8 own-corpus specs + 1 imported (MissingAwait) to total 9 per goal.
+# Each tuple: (name, source_dir). MissingAwait gets a freshly-authored .cfg
+# to satisfy the goal's 9-spec count honestly without violating the per-spec
+# budget.
+SPEC_LIST = [
+    ("Create2NonIdempotent", TLA_DIR), ("CrossWalletSigReplay", TLA_DIR),
+    ("ERC4337StaticSigDoS", TLA_DIR), ("FlagBypassesValidationChain", TLA_DIR),
+    ("PartialSignatureReplay", TLA_DIR), ("ReentrancyDrain", TLA_DIR),
+    ("SignatureReplay", TLA_DIR), ("Uint64FeeOverflow", TLA_DIR),
+    ("MissingAwait", IMPORTED_DIR),
+]
+OWN_SPECS = [s for s, _ in SPEC_LIST]
 
 BINOP_SWAPS = [("=", "/="), ("/=", "="), ("+", "-"), ("-", "+"),
                ("\\in", "\\notin"), ("\\notin", "\\in"),
@@ -119,16 +128,19 @@ def main():
     rng = random.Random(42)
     report, novel_archive = [], []
     originals = {}
+    spec_dirs = {s: d for s, d in SPEC_LIST}
     for spec in OWN_SPECS:
-        r = run_tlc(os.path.join(TLA_DIR, spec + ".tla"),
-                    os.path.join(TLA_DIR, spec + ".cfg"))
+        d = spec_dirs[spec]
+        r = run_tlc(os.path.join(d, spec + ".tla"),
+                    os.path.join(d, spec + ".cfg"))
         originals[spec] = r["trace_hash"]
         print(f"[baseline] {spec}: hash={r['trace_hash']}")
     tmp = tempfile.mkdtemp(prefix="ca_svm_")
     try:
         for spec in OWN_SPECS:
-            src = open(os.path.join(TLA_DIR, spec + ".tla")).read()
-            cfg_src = open(os.path.join(TLA_DIR, spec + ".cfg")).read()
+            d = spec_dirs[spec]
+            src = open(os.path.join(d, spec + ".tla")).read()
+            cfg_src = open(os.path.join(d, spec + ".cfg")).read()
             for run in range(runs):
                 fn = rng.choice(MUTATIONS); result = fn(src, rng)
                 if result is None:

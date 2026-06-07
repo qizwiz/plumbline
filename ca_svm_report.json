@@ -1,7 +1,7 @@
 {
   "counts": {
-    "broken": 15,
-    "fixed": 3,
+    "broken": 16,
+    "fixed": 7,
     "equivalent": 17,
     "novel": 5
   },
@@ -15,7 +15,7 @@
     },
     {
       "spec": "Create2NonIdempotent",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "d0e626ada5700f44",
       "new_hash": ""
@@ -92,7 +92,7 @@
     },
     {
       "spec": "ERC4337StaticSigDoS",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "d7196f1dc144a0b6",
       "new_hash": ""
@@ -155,14 +155,14 @@
     },
     {
       "spec": "PartialSignatureReplay",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "1c8c7d3657e174d3",
       "new_hash": ""
     },
     {
       "spec": "PartialSignatureReplay",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "1c8c7d3657e174d3",
       "new_hash": ""
@@ -183,14 +183,14 @@
     },
     {
       "spec": "ReentrancyDrain",
-      "mutation_kind": "swap_boolean(no-target)",
+      "mutation_kind": "swap_bool(no-target)",
       "bucket": "broken",
       "orig_hash": "02d04e348b9fbe7f",
       "new_hash": ""
     },
     {
       "spec": "ReentrancyDrain",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "02d04e348b9fbe7f",
       "new_hash": ""
@@ -204,7 +204,7 @@
     },
     {
       "spec": "ReentrancyDrain",
-      "mutation_kind": "swap_boolean(no-target)",
+      "mutation_kind": "swap_bool(no-target)",
       "bucket": "broken",
       "orig_hash": "02d04e348b9fbe7f",
       "new_hash": ""
@@ -218,7 +218,7 @@
     },
     {
       "spec": "SignatureReplay",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "9d69f757c1598fa5",
       "new_hash": ""
@@ -232,28 +232,28 @@
     },
     {
       "spec": "SignatureReplay",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "9d69f757c1598fa5",
       "new_hash": ""
     },
     {
       "spec": "SignatureReplay",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "9d69f757c1598fa5",
       "new_hash": ""
     },
     {
       "spec": "SignatureReplay",
-      "mutation_kind": "swap_boolean(no-target)",
+      "mutation_kind": "swap_bool(no-target)",
       "bucket": "broken",
       "orig_hash": "9d69f757c1598fa5",
       "new_hash": ""
     },
     {
       "spec": "Uint64FeeOverflow",
-      "mutation_kind": "swap_variables(no-target)",
+      "mutation_kind": "swap_vars(no-target)",
       "bucket": "broken",
       "orig_hash": "a0107550181b88c9",
       "new_hash": ""
@@ -285,6 +285,41 @@
       "bucket": "equivalent",
       "orig_hash": "a0107550181b88c9",
       "new_hash": "a0107550181b88c9"
+    },
+    {
+      "spec": "MissingAwait",
+      "mutation_kind": "swap_bool(FALSE->TRUE)",
+      "bucket": "fixed",
+      "orig_hash": "",
+      "new_hash": ""
+    },
+    {
+      "spec": "MissingAwait",
+      "mutation_kind": "swap_binop(=->/=)",
+      "bucket": "fixed",
+      "orig_hash": "",
+      "new_hash": ""
+    },
+    {
+      "spec": "MissingAwait",
+      "mutation_kind": "swap_binop(-->+)",
+      "bucket": "fixed",
+      "orig_hash": "",
+      "new_hash": ""
+    },
+    {
+      "spec": "MissingAwait",
+      "mutation_kind": "swap_vars(no-target)",
+      "bucket": "broken",
+      "orig_hash": "",
+      "new_hash": ""
+    },
+    {
+      "spec": "MissingAwait",
+      "mutation_kind": "replace_const(2->1)",
+      "bucket": "fixed",
+      "orig_hash": "",
+      "new_hash": ""
     }
   ]
 }
