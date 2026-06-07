@@ -34,6 +34,7 @@ Goal state is restored on `--resume`.
 | `CA_SVM.goal.md` | Smallest viable kernel for grammar-driven evolution (mutator + 4-bucket measurement) | 30 min | $0 |
 | `RAG_LEADS.goal.md` | Inject retrieved past .ANSWERS findings as few-shot to attack the sol_intent recall gap | 1 hour | ~$5 |
 | `HYBRID_RAG.goal.md` | Combine RAG + spec_retrieval injection to close the M-02-style gap (shape exists in docs/tla/ but not .ANSWERS) | 1-2 hours | ~$5 |
+| `ORACLE_LOOP.goal.md` | Oracle-grounded self-correction: each shape-matched lead gets revised by LLM to ground in spec mechanics. v0 — no TLC execution. | 2 hours | ~$3-8 |
 | `MARGINAL_RECALL.goal.md` | T15 — per-verifier marginal recall across 5 corpora; ADR-006 step 5 prerequisite | 1-2 hours | $0 |
 | `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
 
