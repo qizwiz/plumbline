@@ -5,3 +5,4 @@
 {"ts": "2026-06-07T21:31:26.703224", "goal": "CORPUS_GROWTH for S-3", "verdict": "DISPUTED", "cost_usd": 1.6312, "remaining_after": 46.89}
 {"ts": "2026-06-07T21:56:35.736802", "goal": "CORPUS_GROWTH for S-4", "verdict": "DISPUTED", "cost_usd": 0.7775, "remaining_after": 46.11}
 {"ts": "2026-06-07T22:22:38.364832", "goal": "CFG_DECODE extension (4 specs)", "verdict": "NULL-HONEST", "cost_usd": 0.0032, "remaining_after": 46.11}
+{"ts": "2026-06-07T22:49:26.960560", "goal": "T7 HuggingFace push", "verdict": "NULL-HONEST", "cost_usd": 0.0028, "remaining_after": 46.11}

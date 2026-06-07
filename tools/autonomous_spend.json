@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 3.8915017499999998,
+  "cumulative_usd": 3.89428275,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -52,8 +52,16 @@
       "cost_usd": 0.0032,
       "exec_cost_usd": 0.0,
       "refute_cost_usd": 0.0032
+    },
+    {
+      "ts": "2026-06-07T22:49:26.960560",
+      "goal": "T7 HuggingFace push",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 0.0028,
+      "exec_cost_usd": 0.0,
+      "refute_cost_usd": 0.0028
     }
   ],
-  "last_cycle_ts": "2026-06-07T22:22:38.364832",
+  "last_cycle_ts": "2026-06-07T22:49:26.960560",
   "version": 1
 }
