@@ -32,6 +32,7 @@ Goal state is restored on `--resume`.
 | `HYBRID_ROUTER.goal.md` | Close the tlc-routing gap by composing spec_retrieval as a pre-check before the ML router | 30-60 min | $0 |
 | `CORPUS_GROWTH.goal.md` | Add ONE new TLA+ FailureMode shape (pair with `SHAPES_BACKLOG.md`) | 1-3 hours | $0 |
 | `CA_SVM.goal.md` | Smallest viable kernel for grammar-driven evolution (mutator + 4-bucket measurement) | 30 min | $0 |
+| `RAG_LEADS.goal.md` | Inject retrieved past .ANSWERS findings as few-shot to attack the sol_intent recall gap | 1 hour | ~$5 |
 | `MARGINAL_RECALL.goal.md` | T15 — per-verifier marginal recall across 5 corpora; ADR-006 step 5 prerequisite | 1-2 hours | $0 |
 | `CALIBRATION.goal.md` | JH has 1-3 hours for cold-audit; or grading a finished contest | 1-3 hours | $0-2 |
 
