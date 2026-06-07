@@ -18,7 +18,7 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 | 4 | CFG_DECODE extension (4 specs) | $5 | done | author schemas for remaining specs |
 | 5 | T7 HuggingFace push | $0 | done | push reps + index + classifier to HF |
 | 6 | T19 retrieval recall gap | $0 | done | MissingAwait + missing-await query alignment |
-| 7 | ROUTER_TRAIN refresh | $0 | pending | retrain with new ensemble reps |
+| 7 | ROUTER_TRAIN refresh | $0 | done | retrain with new ensemble reps |
 | 8 | SLITHER baseline on remaining 3 corpora via cloud loop | $0 | pending | leverage the slither.yml workflow |
 
 ## Operating rules

@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 3.89721675,
+  "cumulative_usd": 3.9002167500000002,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -68,8 +68,16 @@
       "cost_usd": 0.0029,
       "exec_cost_usd": 0.0,
       "refute_cost_usd": 0.0029
+    },
+    {
+      "ts": "2026-06-07T23:50:36.242428",
+      "goal": "ROUTER_TRAIN refresh",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 0.003,
+      "exec_cost_usd": 0.0,
+      "refute_cost_usd": 0.003
     }
   ],
-  "last_cycle_ts": "2026-06-07T23:23:07.318875",
+  "last_cycle_ts": "2026-06-07T23:50:36.242428",
   "version": 1
 }

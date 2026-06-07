@@ -7,3 +7,4 @@
 {"ts": "2026-06-07T22:22:38.364832", "goal": "CFG_DECODE extension (4 specs)", "verdict": "NULL-HONEST", "cost_usd": 0.0032, "remaining_after": 46.11}
 {"ts": "2026-06-07T22:49:26.960560", "goal": "T7 HuggingFace push", "verdict": "NULL-HONEST", "cost_usd": 0.0028, "remaining_after": 46.11}
 {"ts": "2026-06-07T23:23:07.318875", "goal": "T19 retrieval recall gap", "verdict": "NULL-HONEST", "cost_usd": 0.0029, "remaining_after": 46.1}
+{"ts": "2026-06-07T23:50:36.242428", "goal": "ROUTER_TRAIN refresh", "verdict": "NULL-HONEST", "cost_usd": 0.003, "remaining_after": 46.1}
