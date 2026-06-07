@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 1.4795767499999999,
+  "cumulative_usd": 3.11080575,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -28,8 +28,16 @@
       "cost_usd": 1.0241,
       "exec_cost_usd": 1.014,
       "refute_cost_usd": 0.01
+    },
+    {
+      "ts": "2026-06-07T21:31:26.703224",
+      "goal": "CORPUS_GROWTH for S-3",
+      "verdict": "DISPUTED",
+      "cost_usd": 1.6312,
+      "exec_cost_usd": 1.6212,
+      "refute_cost_usd": 0.01
     }
   ],
-  "last_cycle_ts": "2026-06-07T20:56:17.990474",
+  "last_cycle_ts": "2026-06-07T21:31:26.703224",
   "version": 1
 }
