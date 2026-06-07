@@ -45,8 +45,15 @@ jobs:
 
       - name: Run autonomous cycle
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # llm.py.resolve_key() accepts any of these; loop.yml pattern.
+          PACT_LLM_API_KEY: ${{ secrets.PACT_LLM_API_KEY }}
+          PACT_LLM_BASE_URL: ${{ secrets.PACT_LLM_BASE_URL }}
+          PACT_LLM_MODEL: ${{ secrets.PACT_LLM_MODEL }}
         run: |
+          if [ -z "${PACT_LLM_API_KEY}" ]; then
+            echo "PACT_LLM_API_KEY not set; cannot run autonomous cycle."
+            exit 0
+          fi
           python3 tools/autonomous_loop.py
 
       - name: Show post-cycle state
