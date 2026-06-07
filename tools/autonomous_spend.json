@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 0.30552375,
+  "cumulative_usd": 0.45552375,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -14,8 +14,14 @@
       "goal": "CORPUS_GROWTH for S-3",
       "verdict": "NULL-HONEST",
       "cost_usd": 0.15
+    },
+    {
+      "ts": "2026-06-07T20:05:15.877453",
+      "goal": "CORPUS_GROWTH for S-4",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 0.15
     }
   ],
-  "last_cycle_ts": "2026-06-07T19:04:34.114994",
+  "last_cycle_ts": "2026-06-07T20:05:15.877453",
   "version": 1
 }
