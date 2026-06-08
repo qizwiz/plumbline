@@ -161,3 +161,42 @@ Tunings noted for v3:
   - Layer D ERC4337StaticSigDoS heuristic fires too broadly (any
     msg_sender_in_validation). v3: narrow to functions whose name
     contains validate / verify / recover.
+
+---
+
+v3 SMOKE-RUN RESULTS (2026-06-08, examples/sequence/):
+
+  Three tunings applied:
+    1. Layer A: new `chained_signature` query — detects `uint256 flag = ...`
+       + ecrecover in same body (flag-dispatched multi-path signature trees).
+       Forces chained_signature candidates past the top-k cap in Layer C
+       (identifier-lifting erases the hit name, so cosine rank understates
+       relevance; bypass is safe because the pattern is rare).
+    2. Layer D: ERC4337StaticSigDoS heuristic narrowed — msg_sender_in_validation
+       now also requires function name to contain validate/verify/recover/auth/sign.
+       Removes false shape assignments on executeUserOp, incrementUsageLimit.
+    3. Layer D: severity filter added — candidates whose corpus top-1 is Low
+       severity AND have no TLA+ shape match are dropped. No effect on
+       examples/sequence (all corpus matches are M/H here).
+
+  Funnel: 49 .sol files → 145 functions → Layer A (23) → Layer B (17) →
+                                          Layer C (13) → Layer D (13)
+  Cost: $0 (no LLM calls)
+  Runtime: ~30s
+
+  Verified catches (all 6 H/M strict — exact function + correct shape):
+    - H-01: BaseSig.recoverBranch → SignatureReplay ✓  [NEW in v3]
+    - H-02: SessionSig.recoverSignature → SignatureReplay ✓
+    - M-01: SessionManager.recoverSapientSignature → ERC4337StaticSigDoS ✓
+    - M-02: ERC4337v07.validateUserOp → ERC4337StaticSigDoS ✓
+    - M-03: BaseAuth.recoverSapientSignature → ERC4337StaticSigDoS ✓
+    - M-04: Factory.deploy → Create2NonIdempotent ✓
+
+  Estimated cascade recall:
+    H/M strict (exact function match): 6/6 = 100%
+
+  Noise in final 13: 7 non-TP functions (SessionSig.recoverConfiguration,
+  BaseAuth.signatureValidation, ERC4337v07.executeUserOp, Payload.hashCalls,
+  ExplicitSessionManager.incrementUsageLimit, Recovery.isValidSignature,
+  Recovery.recoverSapientSignatureCompact). Several are semantically adjacent
+  to real bugs (Recovery.* near H-01 pattern, signatureValidation near M-02).

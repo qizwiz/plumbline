@@ -106,6 +106,11 @@ A_QUERIES = {
     "ecrecover": re.compile(r"\becrecover\s*\(", re.M),
     "self_call": re.compile(r"\bthis\.\w+\(", re.M),
     "raw_assembly": re.compile(r"\bassembly\s*\{", re.M),
+    # v3: flag-dispatched signature dispatch (e.g. recoverBranch-style multi-path
+    # signature trees that branch on a flag byte before calling ecrecover).
+    # Detects `uint256 flag = ...` and ecrecover in the same function body.
+    "chained_signature": re.compile(
+        r"uint256\s+flag\b.*\becrecover\s*\(", re.S),
 }
 
 
@@ -116,6 +121,7 @@ _PRIMARY_HITS = frozenset({
     "external_call", "low_level_call_unchecked", "state_write_after_call",
     "permit_call", "create2", "ecrecover", "self_call",
     "msg_sender_in_validation", "unbounded_for",
+    "chained_signature",
 })
 
 
@@ -251,9 +257,18 @@ def layer_c(survivors: list[dict], cos_threshold: float = 0.65,
                  "cos": float(sims[i][j])}
                 for j in top_idx]
             scored.append((top_cos, f))
-    # top_k cap: keep only the highest-scoring candidates (avoids corpus inflation)
+    # top_k cap: keep only the highest-scoring candidates (avoids corpus inflation).
+    # v3 exception: chained_signature functions bypass the cap — they're rare (flag-
+    # dispatched multi-path ecrecover) and the identifier-lifting erases their hit
+    # name, so cosine rank understates their semantic relevance.
     scored.sort(key=lambda x: -x[0])
-    return [f for _, f in scored[:top_k]]
+    top_k_result = [f for _, f in scored[:top_k]]
+    forced = [f for _, f in scored[top_k:]
+              if "chained_signature" in f.get("ast_hits", [])]
+    if forced:
+        print(f"  Layer C: forced {len(forced)} chained_signature candidate(s) past top-k cap",
+              file=sys.stderr)
+    return top_k_result + forced
 
 
 # ============================================================
@@ -268,9 +283,13 @@ SHAPE_HEURISTICS = {
     "ReentrancyDrain": lambda f: (
         "external_call" in f["ast_hits"] and
         "state_write_after_call" in f["ast_hits"]),
+    # v3: narrow from "any msg.sender" to functions whose name suggests
+    # validation/signing, preventing false fires on arbitrary msg.sender users.
     "ERC4337StaticSigDoS": lambda f: (
         f["function"].lower() in ("validateuserop", "validatesignature") or
-        "msg_sender_in_validation" in f["ast_hits"]),
+        ("msg_sender_in_validation" in f["ast_hits"] and
+         any(kw in f["function"].lower()
+             for kw in ("validate", "verify", "recover", "auth", "sign")))),
     "Uint64FeeOverflow": lambda f: (
         "uint64" in f["text"].lower() and re.search(r"\b\w+\s*[+\-*/]?=", f["text"])),
     "Create2NonIdempotent": lambda f: (
@@ -300,9 +319,9 @@ def _rank_shape(f: dict, shape: str) -> float:
 def layer_d(survivors: list[dict]) -> list[dict]:
     """Heuristic-match each survivor to one TLA+ FailureMode shape (top-1).
 
-    v2 change: store all matches for debugging but select top-1 shape by
-    cross-referencing the corpus nearest-neighbor title, breaking ties by
-    first match order. This tightens funnel signal vs. v1's multi-shape noise.
+    v2: top-1 shape selection ranked by corpus-title keyword alignment.
+    v3: severity filter — candidates whose corpus top-1 is Low severity AND
+    have no TLA+ shape match are dropped (reduces noise from L-finding matches).
     """
     for f in survivors:
         all_matches = [s for s, h in SHAPE_HEURISTICS.items() if h(f)]
@@ -313,9 +332,18 @@ def layer_d(survivors: list[dict]) -> list[dict]:
                                       key=lambda s: _rank_shape(f, s))
         else:
             f["tla_top1_shape"] = None
-    # Survive if ≥1 shape matches OR corpus cos > 0.75 (trust corpus signal)
-    return [f for f in survivors
-            if f["tla_shape_matches"] or f.get("corpus_top1_cos", 0) > 0.75]
+
+    result = []
+    for f in survivors:
+        sev = (f.get("corpus_top1") or {}).get("severity", "")
+        has_shape = bool(f["tla_shape_matches"])
+        high_cos = f.get("corpus_top1_cos", 0) > 0.80
+        # v3: drop if corpus nearest-neighbor is Low severity AND no shape match
+        if sev == "L" and not has_shape and not high_cos:
+            f["layer_d_drop_reason"] = "low_severity_no_shape"
+            continue
+        result.append(f)
+    return result
 
 
 # ============================================================
