@@ -1,0 +1,453 @@
+{
+  "leads_parsed": 205,
+  "ground_truth_total": 37,
+  "h_total": 11,
+  "m_total": 26,
+  "mechanical_recall_total": 0.6756756756756757,
+  "mechanical_recall_h": 0.8181818181818182,
+  "thematic_recall_total": 1.0,
+  "thematic_recall_h": 1.0,
+  "per_finding": [
+    {
+      "id": "H-1",
+      "severity": "High",
+      "title": "Cross-contract reentrancy allows YIELD_TOKEN theft for the GenericERC4626 WithdrawalReq",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARITHMETIC] AbstractYieldStrategy::_mintSharesGivenAssets \u2014 sharesMinted = (yieldTokensMinted * effectiveSupply()) / (initialYieldTokenBalance - feesAccrued() + VIRTUAL_YIELD_TOKENS) \u2014 if initialYieldTokenBalance < feesAccrued(), subtraction underflows in unchecked context",
+        "[TOKEN ACCOUNTING] AbstractWithdrawRequestManager::initiateWithdraw \u2014 ERC20(YIELD_TOKEN).safeTransferFrom(msg.sender, address(this), yieldTokenAmount) \u2014 if YIELD_TOKEN is rebasing, yieldTokenAmount on contract could change before _initiateWithdrawImpl, requestId tied to wrong amount"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.866294264793396,
+      "thematic_best_lead": "[REENTRANCY] AbstractRewardManager::_claimVaultRewards \u2014 _executeClaim() is virtual and calls external rewardPool before updating lastClaimTimestamp \u2014 Reentrancy could allow double-claim if _executeCl"
+    },
+    {
+      "id": "H-2",
+      "severity": "High",
+      "title": "Attacker can drain the entire suppliers on",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7182789444923401,
+      "thematic_best_lead": "[ECONOMIC / INCENTIVE LOGIC] TimelockUpgradeableProxy::UPGRADE_DELAY \u2014 7 days gives attacker time to extract value before malicious upgrade is stopped \u2014 governance has no emergency cancel, must wait 7"
+    },
+    {
+      "id": "H-3",
+      "severity": "High",
+      "title": "DineroWithdrawRequestManager vulnerable to token overwithdrawal via batch ID overlap",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARRAY / INDEX / INPUT VALIDATION] DineroWithdrawRequestManager::_initiateWithdrawImpl \u2014 nonce is s_batchNonce++ but no check if nonce is already at max \u2014 if nonce == type(uint16).max, increment wraps to zero, requestId collision",
+        "[ARRAY / INDEX / INPUT VALIDATION] DineroWithdrawRequestManager::_decodeBatchIds \u2014 requestId is encoded with bit shifts but no validation on decode \u2014 if requestId is malformed, initialBatchId or finalBatchId could be garbage"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7905167937278748,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] AbstractSingleSidedLP::_executeDepositTrades \u2014 assetRemaining underflow check relies on revert, no explicit check \u2014 Could silently succeed with corrupted state if underflow happens "
+    },
+    {
+      "id": "H-4",
+      "severity": "High",
+      "title": "When users borrow directly from Morpho",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ACCESS CONTROL & INIT] MorphoLendingRouter::initializeMarket \u2014 can only be called once per vault, no checks on irm/lltv sanity \u2014 malicious or incorrect parameters could brick the market permanently",
+        "[ORACLE / PRICE FEED] MorphoLendingRouter::healthFactor \u2014 calls MORPHO.accrueInterest and IYieldStrategy(vault).price(borrower) in same tx \u2014 if price() has side effects or depends on accrued state, ordering matters and could be exploited"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7873344421386719,
+      "thematic_best_lead": "[EXTERNAL CALLS & REENTRANCY] MorphoLendingRouter::onMorphoLiquidate \u2014 transfers tokens then approves MORPHO \u2014 if liquidator is malicious contract, could reenter during safeTransferFrom and exploit ap"
+    },
+    {
+      "id": "H-5",
+      "severity": "High",
+      "title": "migrateRewardPool Fails Due to Incompatible Storage Design in CurveConvexLib",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARITHMETIC] CurveConvexLib::_exitPool \u2014 exitBalances[0] = TokenUtils.tokenBalance(TOKEN_1) - exitBalances[0] could underflow \u2014 If tokens were somehow transferred in before the call, subtraction underflows",
+        "[TOKEN ACCOUNTING] CurveConvexLib::joinPoolAndStake \u2014 WETH.withdraw called without checking success \u2014 Failed unwrap could leave contract in inconsistent state"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8018676042556763,
+      "thematic_best_lead": "[EXTERNAL CALLS] AbstractStakingStrategy::_mintYieldTokens \u2014 withdrawRequestManager.stakeTokens assumes success \u2014 Could fail silently leaving assets unstaked"
+    },
+    {
+      "id": "H-6",
+      "severity": "High",
+      "title": "DoS might happen to DineroWithdrawReq",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARRAY / INDEX / INPUT VALIDATION] DineroWithdrawRequestManager::_initiateWithdrawImpl \u2014 nonce is s_batchNonce++ but no check if nonce is already at max \u2014 if nonce == type(uint16).max, increment wraps to zero, requestId collision",
+        "[ARRAY / INDEX / INPUT VALIDATION] DineroWithdrawRequestManager::_decodeBatchIds \u2014 requestId is encoded with bit shifts but no validation on decode \u2014 if requestId is malformed, initialBatchId or finalBatchId could be garbage"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7702105641365051,
+      "thematic_best_lead": "[ARITHMETIC] IYieldStrategy::convertToAssets \u2014 no rounding direction specified \u2014 asymmetric rounding could systematically favor users over protocol or vice versa"
+    },
+    {
+      "id": "H-7",
+      "severity": "High",
+      "title": "RewardManagerMixin.claimAccountRewar",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ACCESS CONTROL] RewardManagerMixin::claimAccountRewards \u2014 fallback() does not restrict which RewardManager functions can be called \u2014 Could allow unauthorized calls to privileged functions through delegatecall",
+        "[TOKEN ACCOUNTING] RewardManagerMixin::_burnShares \u2014 wasEscrowed determined before burn but shares may not actually be in valid escrow state \u2014 Could apply wrong reward logic if escrow state is invalid"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7999553084373474,
+      "thematic_best_lead": "[EXTERNAL CALLS] PendlePTLib::swapExactTokenForPt \u2014 PENDLE_ROUTER.swapExactTokenForPt returns values not validated \u2014 Could return zero or unexpected amounts"
+    },
+    {
+      "id": "H-8",
+      "severity": "High",
+      "title": "Incorrect assumption that one (1) Pendle",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE / PRICE FEED] PendlePTOracle::_getPTRate \u2014 uses twapDuration but no check if TWAP window is manipulable \u2014 attacker could manipulate Pendle pool price within the TWAP window to extract value",
+        "[ORACLE / PRICE FEED] PendlePTOracle constructor \u2014 checks oldestObservationSatisfied at deploy time but not at runtime \u2014 if Pendle oracle state degrades after deployment, getPtToSyRate could fail or return bad data"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7272059917449951,
+      "thematic_best_lead": "[ARITHMETIC] AbstractYieldStrategy::_burnShares \u2014 assetsWithdrawn = finalAssetBalance - initialAssetBalance \u2014 if finalAssetBalance < initialAssetBalance (e.g., fee-on-transfer or slippage), underflow"
+    },
+    {
+      "id": "H-9",
+      "severity": "High",
+      "title": "Hardcoded useEth = true in remove_liq",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[INPUT VALIDATION] CurveConvexLib::checkReentrancyContext \u2014 remove_liquidity called with 0 or 1 amount, not verified pool supports this \u2014 Could revert on some Curve pool types"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8041216731071472,
+      "thematic_best_lead": "[ARITHMETIC] AbstractYieldStrategy::effectiveSupply \u2014 totalSupply() - s_escrowedShares + VIRTUAL_SHARES \u2014 if s_escrowedShares > totalSupply() + VIRTUAL_SHARES due to bug, underflow (though storage var"
+    },
+    {
+      "id": "H-10",
+      "severity": "High",
+      "title": "Malicious user can change the TradeTyp",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7887395620346069,
+      "thematic_best_lead": "[REENTRANCY] AbstractRewardManager::_claimVaultRewards \u2014 _executeClaim() is virtual and calls external rewardPool before updating lastClaimTimestamp \u2014 Reentrancy could allow double-claim if _executeCl"
+    },
+    {
+      "id": "H-11",
+      "severity": "High",
+      "title": "Missing Slippage Protection in Expired PT",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARRAY] AbstractSingleSidedLP::_executeRedemptionTrades \u2014 Iterates exitBalances.length but redemptionTrades may be shorter \u2014 Missing trade params could cause revert or use uninitialized data",
+        "[INPUT VALIDATION] PendlePT::_mintYieldTokens \u2014 PT.isExpired check only reverts, no handling for edge case near expiry \u2014 User could be front-run by expiry"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7279660701751709,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] AbstractYieldStrategy::_executeTrade \u2014 no check if amountBought matches trade.limit \u2014 slippage protection is in Trade struct but not enforced here, could receive less than minOut"
+    },
+    {
+      "id": "M-1",
+      "severity": "Medium",
+      "title": "Hard-Coded Mainnet WETH Address Breaks",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[TOKEN ACCOUNTING] CurveConvexLib::joinPoolAndStake \u2014 WETH.withdraw called without checking success \u2014 Failed unwrap could leave contract in inconsistent state"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6678300499916077,
+      "thematic_best_lead": "[CROSS-CHAIN / BRIDGE] AbstractCustomOracle::_checkSequencer \u2014 SEQUENCER_UPTIME_GRACE_PERIOD hardcoded to 1 hour \u2014 if deployed on different L2 with different sequencer characteristics, grace period co"
+    },
+    {
+      "id": "M-2",
+      "severity": "Medium",
+      "title": "Incorrect tokensClaimed calculation in",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8318738341331482,
+      "thematic_best_lead": "[ARITHMETIC] AbstractYieldStrategy::effectiveSupply \u2014 totalSupply() - s_escrowedShares + VIRTUAL_SHARES \u2014 if s_escrowedShares > totalSupply() + VIRTUAL_SHARES due to bug, underflow (though storage var"
+    },
+    {
+      "id": "M-3",
+      "severity": "Medium",
+      "title": "Single sided strategy cant do trades for",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE] AbstractSingleSidedLP::convertToAssets \u2014 getWithdrawRequestValue used for valuation without staleness check \u2014 Stale withdraw request values could be used for liquidations",
+        "[TOKEN ACCOUNTING] AbstractSingleSidedLP::_executeDepositTrades \u2014 assetRemaining underflow check relies on revert, no explicit check \u2014 Could silently succeed with corrupted state if underflow happens in unchecked context"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7706512212753296,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] AbstractYieldStrategy::_executeTrade \u2014 no check if amountBought matches trade.limit \u2014 slippage protection is in Trade struct but not enforced here, could receive less than minOut"
+    },
+    {
+      "id": "M-4",
+      "severity": "Medium",
+      "title": "Liquidations can be frontrunned to avoid",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7555341124534607,
+      "thematic_best_lead": "[ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::feeRate \u2014 fees accrued but collection timing arbitrary \u2014 owner could delay collectFees to manipulate share price during liquidations"
+    },
+    {
+      "id": "M-5",
+      "severity": "Medium",
+      "title": "Minting yield tokens single sided can be",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.820072591304779,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] AbstractYieldStrategy::_mintSharesGivenAssets \u2014 uint256 yieldTokensMinted = _yieldTokenBalance() - initialYieldTokenBalance \u2014 if yield token has fee-on-transfer or rebasing, actual "
+    },
+    {
+      "id": "M-6",
+      "severity": "Medium",
+      "title": "Withdrawals ongoing for OETH, apxETH,",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7962998747825623,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] CurveConvexLib::joinPoolAndStake \u2014 WETH.withdraw called without checking success \u2014 Failed unwrap could leave contract in inconsistent state"
+    },
+    {
+      "id": "M-7",
+      "severity": "Medium",
+      "title": "Rounding discrepancy between",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7722508311271667,
+      "thematic_best_lead": "[ARITHMETIC] IYieldStrategy::convertToAssets \u2014 no rounding direction specified \u2014 asymmetric rounding could systematically favor users over protocol or vice versa"
+    },
+    {
+      "id": "M-8",
+      "severity": "Medium",
+      "title": "Emission rewards will keep accruing even",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARITHMETIC] AbstractRewardManager::_getAccumulatedRewardViaEmissionRate \u2014 (timeSinceLastAccumulation * DEFAULT_PRECISION * state.emissionRatePerYear) could overflow \u2014 Could cause reward calculation to revert or wrap",
+        "[ECONOMIC] AbstractRewardManager::_accumulateSecondaryRewardViaEmissionRate \u2014 endTime checked but if block.timestamp == endTime, time is set to endTime and last accumulation could be skipped \u2014 Off-by-one could lose final block's rewards"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6629374027252197,
+      "thematic_best_lead": "[ACCESS CONTROL] AbstractRewardManager::updateRewardToken \u2014 No validation that endTime > lastAccumulatedTime when setting emission rate \u2014 Could result in immediate expiry or underflow in accumulation"
+    },
+    {
+      "id": "M-9",
+      "severity": "Medium",
+      "title": "OETH Strategy Broken as Rebasing Not",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6878224611282349,
+      "thematic_best_lead": "[EXTERNAL CALLS] AbstractStakingStrategy::_mintYieldTokens \u2014 withdrawRequestManager.stakeTokens assumes success \u2014 Could fail silently leaving assets unstaked"
+    },
+    {
+      "id": "M-10",
+      "severity": "Medium",
+      "title": "Incorrect asset matching for ETH/WETH",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[TOKEN ACCOUNTING] CurveConvexLib::joinPoolAndStake \u2014 WETH.withdraw called without checking success \u2014 Failed unwrap could leave contract in inconsistent state"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7818147540092468,
+      "thematic_best_lead": "[CROSS-CHAIN / BRIDGE] IYieldStrategy::asset \u2014 no chain-specific decimals handling \u2014 same code on mainnet vs L2 could use wrong decimals if token differs"
+    },
+    {
+      "id": "M-11",
+      "severity": "Medium",
+      "title": "Users unable to claim rewards when Curve",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_lpTokenValue \u2014 spotPrices comparison uses fixed LOWER_LIMIT_MULTIPLIER and UPPER_LIMIT_MULTIPLIER \u2014 during high volatility legitimate price moves could exceed limits and revert all operations",
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_calculateBaseToQuote \u2014 baseToUSD from chainlink but no check on updatedAt or roundId freshness \u2014 stale chainlink price could be used if feed is paused"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7514535188674927,
+      "thematic_best_lead": "[ECONOMIC] AbstractRewardManager::_claimVaultRewards \u2014 forceClaimAfter enforced but no mechanism to force claim if rewardPool is non-responsive \u2014 Rewards could be permanently locked"
+    },
+    {
+      "id": "M-12",
+      "severity": "Medium",
+      "title": "PendlePTOracle._getPTRate isn't correct",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE / PRICE FEED] PendlePTOracle::_getPTRate \u2014 uses twapDuration but no check if TWAP window is manipulable \u2014 attacker could manipulate Pendle pool price within the TWAP window to extract value",
+        "[ORACLE / PRICE FEED] PendlePTOracle constructor \u2014 checks oldestObservationSatisfied at deploy time but not at runtime \u2014 if Pendle oracle state degrades after deployment, getPtToSyRate could fail or return bad data"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8329418897628784,
+      "thematic_best_lead": "[EXTERNAL CALLS] PendlePTLib::swapExactTokenForPt \u2014 PENDLE_ROUTER.swapExactTokenForPt returns values not validated \u2014 Could return zero or unexpected amounts"
+    },
+    {
+      "id": "M-13",
+      "severity": "Medium",
+      "title": "Incompatibility of ERC20::approve function with USDT tokens on Ethereum Mainnet chain",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[TOKEN ACCOUNTING] AbstractYieldStrategy::mintShares \u2014 ERC20(asset).safeTransferFrom(t_CurrentLendingRouter, address(this), assetAmount) \u2014 if asset is fee-on-transfer, assetAmount received is less than assetAmount parameter, shares minted are over-counted",
+        "[TOKEN ACCOUNTING] AbstractYieldStrategy::burnShares \u2014 ERC20(asset).safeTransfer(t_CurrentLendingRouter, assetsWithdrawn) \u2014 if asset is fee-on-transfer, lendingRouter receives less than assetsWithdrawn, downstream accounting breaks"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7939565181732178,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] AbstractYieldStrategy::_transferYieldTokenToOwner \u2014 ERC20(yieldToken).safeTransfer(owner, yieldTokens) \u2014 if yieldToken is non-standard (e.g., USDT on mainnet with no return value), "
+    },
+    {
+      "id": "M-14",
+      "severity": "Medium",
+      "title": "Value of Etherna's Withdrawal Request",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ACCESS CONTROL & INIT] AbstractWithdrawRequestManager::setApprovedVault \u2014 no timelock on vault approval \u2014 upgradeAdmin can immediately whitelist malicious vault to drain funds via stakeTokens",
+        "[ACCESS CONTROL & INIT] AddressRegistry::setWithdrawRequestManager \u2014 single-set restriction may prevent legitimate upgrades \u2014 if manager needs upgrade post-deployment there's no path forward, funds could be stranded"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7638897895812988,
+      "thematic_best_lead": "[ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::price \u2014 price includes withdraw request value \u2014 borrower with large pending withdraw could see artificially high collateral value delaying liquidation"
+    },
+    {
+      "id": "M-15",
+      "severity": "Medium",
+      "title": "Loss of reward tokens during initiating",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7899687886238098,
+      "thematic_best_lead": "[ARITHMETIC] AbstractRewardManager::_getAccumulatedRewardViaEmissionRate \u2014 (timeSinceLastAccumulation * DEFAULT_PRECISION * state.emissionRatePerYear) could overflow \u2014 Could cause reward calculation t"
+    },
+    {
+      "id": "M-16",
+      "severity": "Medium",
+      "title": "Users will be unfairly liquidated if collateral value drops after initiating withdraw request",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARITHMETIC] AbstractRewardManager::_claimRewardToken \u2014 (accountSharesBefore * rewardsPerVaultShare) / DEFAULT_PRECISION could truncate small rewards to zero \u2014 Users with small balances may never receive rewards"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8002917766571045,
+      "thematic_best_lead": "[ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::price \u2014 price includes withdraw request value \u2014 borrower with large pending withdraw could see artificially high collateral value delaying liquidation"
+    },
+    {
+      "id": "M-17",
+      "severity": "Medium",
+      "title": "User unable to migrate under certain edge",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ARITHMETIC] AbstractRewardManager::_claimRewardToken \u2014 (accountSharesBefore * rewardsPerVaultShare) / DEFAULT_PRECISION could truncate small rewards to zero \u2014 Users with small balances may never receive rewards",
+        "[TOKEN ACCOUNTING] AbstractStakingStrategy::_redeemShares \u2014 If asset != withdrawToken trade fails, escrowed funds are lost \u2014 User's shares burned but assets not received"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7011358737945557,
+      "thematic_best_lead": "[INPUT VALIDATION] PendlePT::_mintYieldTokens \u2014 PT.isExpired check only reverts, no handling for edge case near expiry \u2014 User could be front-run by expiry"
+    },
+    {
+      "id": "M-18",
+      "severity": "Medium",
+      "title": "Reducing liquidity in the hardcoded Curve",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_lpTokenValue \u2014 spotPrices comparison uses fixed LOWER_LIMIT_MULTIPLIER and UPPER_LIMIT_MULTIPLIER \u2014 during high volatility legitimate price moves could exceed limits and revert all operations",
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_calculateBaseToQuote \u2014 baseToUSD from chainlink but no check on updatedAt or roundId freshness \u2014 stale chainlink price could be used if feed is paused"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7827475070953369,
+      "thematic_best_lead": "[ARITHMETIC] TypeConvert::toUint128 \u2014 Downcasting from uint256 to uint128 without checking upper bits \u2014 Could silently truncate large values in reward accounting"
+    },
+    {
+      "id": "M-19",
+      "severity": "Medium",
+      "title": "Unable to deposit to Convex in Arbitrum",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ACCESS CONTROL] CurveConvex2Token constructor \u2014 LP_LIB is deployed inline without initialization guard \u2014 Could be front-run or initialized by attacker if deployed separately",
+        "[ARITHMETIC] CurveConvexLib::_exitPool \u2014 exitBalances[0] = TokenUtils.tokenBalance(TOKEN_1) - exitBalances[0] could underflow \u2014 If tokens were somehow transferred in before the call, subtraction underflows"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6998918652534485,
+      "thematic_best_lead": "[ARITHMETIC] IYieldStrategy::convertToShares \u2014 no rounding direction specified \u2014 if rounds down when minting shares, protocol loses assets; if rounds up when burning, users lose assets"
+    },
+    {
+      "id": "M-20",
+      "severity": "Medium",
+      "title": "Lack of minimum debt threshold enables",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6972826719284058,
+      "thematic_best_lead": "[ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::redeemNative \u2014 allows anyone to redeem without collateral check \u2014 user could redeem entire balance while having debt on lending market, causing inso"
+    },
+    {
+      "id": "M-21",
+      "severity": "Medium",
+      "title": "Funds stuck if one of the withdrawal requests cannot be finalized",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7480967044830322,
+      "thematic_best_lead": "[TOKEN ACCOUNTING] IYieldStrategy::burnShares \u2014 assetsWithdrawn returned but no verification \u2014 if withdrawal partially fails, user credited more assets than actually sent"
+    },
+    {
+      "id": "M-22",
+      "severity": "Medium",
+      "title": "Setup with asset = WETH and a Curve",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_lpTokenValue \u2014 spotPrices comparison uses fixed LOWER_LIMIT_MULTIPLIER and UPPER_LIMIT_MULTIPLIER \u2014 during high volatility legitimate price moves could exceed limits and revert all operations",
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_calculateBaseToQuote \u2014 baseToUSD from chainlink but no check on updatedAt or roundId freshness \u2014 stale chainlink price could be used if feed is paused"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6832254528999329,
+      "thematic_best_lead": "[CROSS-CHAIN / BRIDGE] IYieldStrategy::asset \u2014 no chain-specific decimals handling \u2014 same code on mainnet vs L2 could use wrong decimals if token differs"
+    },
+    {
+      "id": "M-23",
+      "severity": "Medium",
+      "title": "Unable to support Curve Pool with Native ETH",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_lpTokenValue \u2014 spotPrices comparison uses fixed LOWER_LIMIT_MULTIPLIER and UPPER_LIMIT_MULTIPLIER \u2014 during high volatility legitimate price moves could exceed limits and revert all operations",
+        "[ORACLE / PRICE FEED] Curve2TokenOracle::_calculateBaseToQuote \u2014 baseToUSD from chainlink but no check on updatedAt or roundId freshness \u2014 stale chainlink price could be used if feed is paused"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7552425861358643,
+      "thematic_best_lead": "[CROSS-CHAIN / BRIDGE] IWithdrawRequestManager::YIELD_TOKEN \u2014 no decimals scaling mentioned \u2014 bridged yield tokens with different decimals cause wrong share calculations"
+    },
+    {
+      "id": "M-24",
+      "severity": "Medium",
+      "title": "Convex cannot be configured for the",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ACCESS CONTROL] CurveConvex2Token constructor \u2014 LP_LIB is deployed inline without initialization guard \u2014 Could be front-run or initialized by attacker if deployed separately",
+        "[ARITHMETIC] CurveConvexLib::_exitPool \u2014 exitBalances[0] = TokenUtils.tokenBalance(TOKEN_1) - exitBalances[0] could underflow \u2014 If tokens were somehow transferred in before the call, subtraction underflows"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6510623097419739,
+      "thematic_best_lead": "[ARITHMETIC] IYieldStrategy::convertToAssets \u2014 no rounding direction specified \u2014 asymmetric rounding could systematically favor users over protocol or vice versa"
+    },
+    {
+      "id": "M-25",
+      "severity": "Medium",
+      "title": "Revert in getWithdrawRequestValue()",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7639376521110535,
+      "thematic_best_lead": "[INPUT VALIDATION] PendlePT::_mintYieldTokens \u2014 PT.isExpired check only reverts, no handling for edge case near expiry \u2014 User could be front-run by expiry"
+    },
+    {
+      "id": "M-26",
+      "severity": "Medium",
+      "title": "initializeMarket can be frontran, preventing markets from being configured in MorphoLe",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[ACCESS CONTROL & INIT] MorphoLendingRouter::initializeMarket \u2014 can only be called once per vault, no checks on irm/lltv sanity \u2014 malicious or incorrect parameters could brick the market permanently",
+        "[ORACLE / PRICE FEED] MorphoLendingRouter::healthFactor \u2014 calls MORPHO.accrueInterest and IYieldStrategy(vault).price(borrower) in same tx \u2014 if price() has side effects or depends on accrued state, ordering matters and could be exploited"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8399132490158081,
+      "thematic_best_lead": "[ACCESS CONTROL & INIT] MorphoLendingRouter::initializeMarket \u2014 can only be called once per vault, no checks on irm/lltv sanity \u2014 malicious or incorrect parameters could brick the market permanently"
+    }
+  ]
+}

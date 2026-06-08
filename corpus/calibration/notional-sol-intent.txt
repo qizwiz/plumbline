@@ -1,0 +1,390 @@
+sol_intent: RECALL+HYBRID-RAG pass for corpus/calibration/notional-source/notional-v4
+  (rag index excludes corpus: notional-v4)
+
+
+===== CHUNK 1/3 =====
+## Findings
+
+### 1. ACCESS CONTROL & INIT
+
+- [ACCESS CONTROL & INIT] AbstractYieldStrategy::_initialize — name and symbol can be set arbitrarily on initialization — malicious deployer could mint shares with misleading token names before proper governance is established
+
+- [ACCESS CONTROL & INIT] AbstractWithdrawRequestManager::setApprovedVault — no timelock on vault approval — upgradeAdmin can immediately whitelist malicious vault to drain funds via stakeTokens
+
+- [ACCESS CONTROL & INIT] AddressRegistry::setWithdrawRequestManager — single-set restriction may prevent legitimate upgrades — if manager needs upgrade post-deployment there's no path forward, funds could be stranded
+
+- [ACCESS CONTROL & INIT] MorphoLendingRouter::initializeMarket — can only be called once per vault, no checks on irm/lltv sanity — malicious or incorrect parameters could brick the market permanently
+
+- [ACCESS CONTROL & INIT] AddressRegistry::transferUpgradeAdmin — two-step transfer but no expiry on pendingUpgradeAdmin — if pending admin never accepts, admin role cannot be transferred to another address
+
+- [ACCESS CONTROL & INIT] TimelockUpgradeableProxy::initiateUpgrade — can be front-run to set upgradeValidAt before intended upgrade — attacker observes pending upgrade tx and submits their own with higher gas
+
+- [ACCESS CONTROL & INIT] AbstractYieldStrategy::collectFees — anyone can call but transfers to ADDRESS_REGISTRY.feeReceiver() — if feeReceiver is compromised or malicious, fees drain immediately on collection
+
+- [ACCESS CONTROL & INIT] TimelockUpgradeableProxy::whitelistSelectors — pauseAdmin can whitelist arbitrary selectors — could whitelist destructive functions that should remain paused
+
+- [ACCESS CONTROL & INIT] AbstractLendingRouter::setApproval — no revocation event if approval set to false — off-chain systems may not detect revocation, continue to trust stale approval
+
+- [ACCESS CONTROL & INIT] AbstractYieldStrategy constructor — feeRate is immutable and set once — if feeRate is misconfigured (e.g., set to 100% or negative due to unchecked cast), vault is permanently broken
+
+### 2. ORACLE / PRICE FEED
+
+- [ORACLE / PRICE FEED] AbstractYieldStrategy::price — transient t_CurrentAccount can be set externally without authentication in price(address) — attacker could manipulate valuation by setting currentAccount to arbitrary address with different collateral
+
+- [ORACLE / PRICE FEED] AbstractYieldStrategy::convertYieldTokenToAsset — relies on TRADING_MODULE.getOraclePrice which may return stale or manipulated price — no staleness check, no deviation limit, could return incorrect conversion during market stress
+
+- [ORACLE / PRICE FEED] AbstractCustomOracle::_checkSequencer — SEQUENCER_UPTIME_GRACE_PERIOD is 1 hour — if sequencer just came back up after downtime, prices may still be stale within the grace period, transactions could execute at bad prices
+
+- [ORACLE / PRICE FEED] PendlePTOracle::_getPTRate — uses twapDuration but no check if TWAP window is manipulable — attacker could manipulate Pendle pool price within the TWAP window to extract value
+
+- [ORACLE / PRICE FEED] Curve2TokenOracle::_lpTokenValue — spotPrices comparison uses fixed LOWER_LIMIT_MULTIPLIER and UPPER_LIMIT_MULTIPLIER — during high volatility legitimate price moves could exceed limits and revert all operations
+
+- [ORACLE / PRICE FEED] AbstractLPOracle::_getOraclePairPrice — TRADING_MODULE.getOraclePrice returns (int256, /* */) and second return value is ignored — if second value indicates staleness or error, it's silently dropped
+
+- [ORACLE / PRICE FEED] MorphoLendingRouter::healthFactor — calls MORPHO.accrueInterest and IYieldStrategy(vault).price(borrower) in same tx — if price() has side effects or depends on accrued state, ordering matters and could be exploited
+
+- [ORACLE / PRICE FEED] PendlePTOracle constructor — checks oldestObservationSatisfied at deploy time but not at runtime — if Pendle oracle state degrades after deployment, getPtToSyRate could fail or return bad data
+
+- [ORACLE / PRICE FEED] Curve2TokenOracle::_calculateBaseToQuote — baseToUSD from chainlink but no check on updatedAt or roundId freshness — stale chainlink price could be used if feed is paused
+
+- [ORACLE / PRICE FEED] AbstractYieldStrategy::feesAccrued — uses block.timestamp - s_lastFeeAccrualTime but if s_lastFeeAccrualTime is in future due to reorg, subtraction underflows — unchecked block prevents revert, returns massive fee
+
+### 3. ARITHMETIC
+
+- [ARITHMETIC] AbstractYieldStrategy::convertSharesToYieldToken — division rounds down, could return zero for small shares — user loses dust on every conversion
+
+- [ARITHMETIC] AbstractYieldStrategy::convertYieldTokenToShares — division rounds down — vault takes rounding advantage, cumulative loss for users
+
+- [ARITHMETIC] AbstractYieldStrategy::convertToShares — nested divisions with exponentiation, precision loss on each step — compounded rounding error, users receive fewer shares than mathematically correct
+
+- [ARITHMETIC] AbstractYieldStrategy::price — multiplies by 10 ** (36 - 24) hardcoded — if decimals assumptions change (e.g., non-18 decimal tokens), overflow or incorrect scaling
+
+- [ARITHMETIC] AbstractYieldStrategy::_calculateAdditionalFeesInYieldToken — Taylor series approximation only uses first three terms — for large x (high feeRate * timeSinceLastFeeAccrual), approximation diverges, fees under-calculated
+
+- [ARITHMETIC] AbstractYieldStrategy::_calculateAdditionalFeesInYieldToken — x = (feeRate * timeSinceLastFeeAccrual) / YEAR but no bounds check on feeRate or timeSinceLastFeeAccrual — if either is huge, x overflows or Taylor series breaks
+
+- [ARITHMETIC] AbstractYieldStrategy::_mintSharesGivenAssets — sharesMinted = (yieldTokensMinted * effectiveSupply()) / (initialYieldTokenBalance - feesAccrued() + VIRTUAL_YIELD_TOKENS) — if initialYieldTokenBalance < feesAccrued(), subtraction underflows in unchecked context
+
+- [ARITHMETIC] AbstractYieldStrategy::_burnShares — assetsWithdrawn = finalAssetBalance - initialAssetBalance — if finalAssetBalance < initialAssetBalance (e.g., fee-on-transfer or slippage), underflow
+
+- [ARITHMETIC] AbstractWithdrawRequestManager::_finalizeWithdraw — tokensWithdrawn = uint256(s.totalWithdraw) * uint256(w.yieldTokenAmount) / uint256(s.totalYieldTokenAmount) — if totalYieldTokenAmount is zero (shouldn't happen but no explicit check), division by zero
+
+- [ARITHMETIC] Curve2TokenOracle::_lpTokenValue — spotPrices[SECONDARY_INDEX] = ICurvePool(LP_TOKEN).get_dy(...) * primaryPrecision * DEFAULT_PRECISION / (dyAmount * secondaryPrecision) — multiple multiplications before division, intermediate overflow possible for large dyAmount or precision
+
+- [ARITHMETIC] PendlePTOracle::_calculateBaseToQuote — answer = (ptRate * baseToUSD) / baseToUSDDecimals — if ptRate and baseToUSD both large, multiplication overflows before division
+
+- [ARITHMETIC] AbstractYieldStrategy::convertToAssets — returns (yieldTokens * convertYieldTokenToAsset() * (10 ** _assetDecimals)) / (10 ** (_yieldTokenDecimals + DEFAULT_DECIMALS)) — if _yieldTokenDecimals + DEFAULT_DECIMALS > 77, exponentiation overflows (10^78 > uint256 max)
+
+- [ARITHMETIC] AbstractYieldStrategy::effectiveSupply — totalSupply() - s_escrowedShares + VIRTUAL_SHARES — if s_escrowedShares > totalSupply() + VIRTUAL_SHARES due to bug, underflow (though storage vars make this unlikely, logic error could set invalid state)
+
+- [ARITHMETIC] AbstractLendingRouter::_redeemShares — unchecked { profitsWithdrawn = assetsWithdrawn - assetToRepay; } — if assetsWithdrawn < assetToRepay, underflow but wrapped in unchecked, silent corruption
+
+- [ARITHMETIC] AbstractWithdrawRequestManager::tokenizeWithdrawRequest — yieldTokenAmount = s_withdraw.yieldTokenAmount * sharesAmount / s_withdraw.sharesAmount — if sharesAmount > s_withdraw.sharesAmount, result could round up and exceed s_withdraw.yieldTokenAmount on repeated calls
+
+### 4. TOKEN ACCOUNTING
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::mintShares — ERC20(asset).safeTransferFrom(t_CurrentLendingRouter, address(this), assetAmount) — if asset is fee-on-transfer, assetAmount received is less than assetAmount parameter, shares minted are over-counted
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::burnShares — ERC20(asset).safeTransfer(t_CurrentLendingRouter, assetsWithdrawn) — if asset is fee-on-transfer, lendingRouter receives less than assetsWithdrawn, downstream accounting breaks
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::_mintSharesGivenAssets — uint256 yieldTokensMinted = _yieldTokenBalance() - initialYieldTokenBalance — if yield token has fee-on-transfer or rebasing, actual minted amount differs from balance delta
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::_burnShares — uint256 assetsWithdrawn = finalAssetBalance - initialAssetBalance — if asset is rebasing (e.g., stETH), balance can change between calls even without transfer
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::_transferYieldTokenToOwner — ERC20(yieldToken).safeTransfer(owner, yieldTokens) — if yieldToken is non-standard (e.g., USDT on mainnet with no return value), safeTransfer could revert
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::_executeTrade — no check if amountBought matches trade.limit — slippage protection is in Trade struct but not enforced here, could receive less than minOut
+
+- [TOKEN ACCOUNTING] AbstractLendingRouter::enterPosition — ERC20(asset).safeTransferFrom(msg.sender, address(this), depositAssetAmount) — if msg.sender has insufficient balance or approval, tx reverts but no event to signal partial entry
+
+- [TOKEN ACCOUNTING] AbstractWithdrawRequestManager::stakeTokens — ERC20(depositToken).safeTransferFrom(msg.sender, address(this), amount) — if depositToken is fee-on-transfer, amount received is less, subsequent staking under-collateralized
+
+- [TOKEN ACCOUNTING] AbstractWithdrawRequestManager::initiateWithdraw — ERC20(YIELD_TOKEN).safeTransferFrom(msg.sender, address(this), yieldTokenAmount) — if YIELD_TOKEN is rebasing, yieldTokenAmount on contract could change before _initiateWithdrawImpl, requestId tied to wrong amount
+
+- [TOKEN ACCOUNTING] EthenaCooldownHolder::_finalizeCooldown — USDe.transfer(manager, tokensClaimed) — if USDe implements transfer fee in future upgrade, manager receives less than tokensClaimed, accounting mismatch
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::redeemNative — no check if balanceOf(msg.sender) >= sharesToRedeem before _burnShares — if sharesHeld < sharesToRedeem, _burn will revert but after potential side effects in _burnShares
+
+- [TOKEN ACCOUNTING] MorphoLendingRouter::_enterOrMigrate — ERC20(asset).approve(vault, assetAmount) — if previous approval exists and new approval is lower, some vaults could fail on transfer
+
+- [TOKEN ACCOUNTING] AbstractYieldStrategy::_yieldTokenBalance — returns ERC20(yieldToken).balanceOf(address(this)) — if yieldToken is non-standard (e.g., rebasing or proxy with broken balanceOf), return value unreliable
+
+### 5. ARRAY / INDEX / INPUT VALIDATION
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractYieldStrategy constructor — _yieldTokenDecimals passed as parameter but no validation against actual token decimals — if mismatch, all conversions broken
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractYieldStrategy::_mintSharesGivenAssets — no check if assets == 0 early exit but later divisions assume non-zero — division by zero possible if initialYieldTokenBalance is VIRTUAL_YIELD_TOKENS and feesAccrued is zero
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractYieldStrategy::initiateWithdraw — no check if data length exceeds reasonable bounds — malicious data could cause OOG or unexpected behavior in _initiateWithdrawImpl
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractLendingRouter::liquidate — no check if sharesToLiquidate > balanceOfCollateral — will fail in _liquidate but after preLiquidation has run, wasting gas and potential side effects
+
+- [ARRAY / INDEX / INPUT VALIDATION] MorphoLendingRouter::_allocate — loop over allocationData with no length cap — attacker could pass huge array, OOG DoS
+
+- [ARRAY / INDEX / INPUT VALIDATION] Curve2TokenOracle constructor — PRIMARY_INDEX is uint8 but no check if < 2 — if PRIMARY_INDEX >= 2, SECONDARY_INDEX = 1 - PRIMARY_INDEX underflows (wraps to 255)
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractLPOracle::_calculateLPTokenValue — loops over tokens.length but no check if tokens.length == decimals.length == balances.length == spotPrices.length — array length mismatch causes OOB or wrong calculations
+
+- [ARRAY / INDEX / INPUT VALIDATION] DineroWithdrawRequestManager::_initiateWithdrawImpl — nonce is s_batchNonce++ but no check if nonce is already at max — if nonce == type(uint16).max, increment wraps to zero, requestId collision
+
+- [ARRAY / INDEX / INPUT VALIDATION] DineroWithdrawRequestManager::_decodeBatchIds — requestId is encoded with bit shifts but no validation on decode — if requestId is malformed, initialBatchId or finalBatchId could be garbage
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractWithdrawRequestManager::tokenizeWithdrawRequest — no check if sharesAmount == 0 early exit — division by zero in yieldTokenAmount calculation if s_withdraw.sharesAmount is somehow zero
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractYieldStrategy::_update — checks t_AllowTransfer_Amount < value but no check if t_AllowTransfer_Amount is zero — if amount is zero, any transfer is allowed regardless of to address
+
+- [ARRAY / INDEX / INPUT VALIDATION] TimelockUpgradeableProxy::whitelistSelectors — no check if selectors array is empty or has duplicates — could whitelist same selector twice, wasting gas, or pass empty array as no-op
+
+- [ARRAY / INDEX / INPUT VALIDATION] AbstractCustomOracle::_checkSequencer — assumes sequencerUptimeOracle is non-zero but no validation if it returns invalid data — if oracle is compromised, check always passes
+
+### 6. EXTERNAL CALLS & REENTRANCY
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractYieldStrategy::mintShares — calls _mintSharesGivenAssets then _transfer, state changes interleaved — reentrancy via ERC20 hooks could read intermediate state
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractYieldStrategy::burnShares — calls _burnShares which calls _redeemShares, then safeTransfer — if redeemData triggers callback, reentrancy before shares burned
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractYieldStrategy::preLiquidation — sets t_AllowTransfer then calls _preLiquidation — if _preLiquidation is overridden with external call, attacker could reenter and exploit t_AllowTransfer being set
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractYieldStrategy::_executeTrade — delegatecall to TRADING_MODULE implementation — if implementation is malicious or upgradeable, could execute arbitrary code in vault context
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractLendingRouter::enterPosition — calls _flashBorrowAndEnter which triggers callback — if flash loan callback reenters, could create multiple positions or bypass checks
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractLendingRouter::exitPosition — calls _redeemShares which may trigger external call via redeemData — reentrancy could bypass clearPosition if balanceOfCollateral check is stale
+
+- [EXTERNAL CALLS & REENTRANCY] MorphoLendingRouter::onMorphoFlashLoan — unauthenticated beyond msg.sender == MORPHO check — if MORPHO is compromised or upgraded to malicious, callback could be invoked with arbitrary data
+
+- [EXTERNAL CALLS & REENTRANCY] MorphoLendingRouter::onMorphoRepay — unauthenticated, only checks msg.sender == MORPHO — attacker could front-run Morpho deployment or exploit if MORPHO address is reused
+
+- [EXTERNAL CALLS & REENTRANCY] MorphoLendingRouter::onMorphoLiquidate — transfers tokens then approves MORPHO — if liquidator is malicious contract, could reenter during safeTransferFrom and exploit approval
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractWithdrawRequestManager::finalizeAndRedeemWithdrawRequest — calls _finalizeWithdraw then safeTransfer — if WITHDRAW_TOKEN has transfer hook, reentrancy could claim same request twice
+
+- [EXTERNAL CALLS & REENTRANCY] EthenaCooldownHolder::_finalizeCooldown — calls sUSDe.unstake then USDe.transfer — if USDe or sUSDe has callback, reentrancy could drain holder before transfer completes
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractYieldStrategy::collectFees — calls _accrueFees then _transferYieldTokenToOwner — if yieldToken has transfer hook, feeReceiver could reenter and collect again
+
+- [EXTERNAL CALLS & REENTRANCY] TimelockUpgradeableProxy::executeUpgrade — calls ERC1967Utils.upgradeToAndCall with arbitrary data — if data encodes malicious initializer, could brick proxy or drain funds
+
+- [EXTERNAL CALLS & REENTRANCY] AbstractYieldStrategy::clearCurrentAccount — called by lending router but no reentrancy guard — if called in unexpected context, could clear account mid-transaction
+
+### 7. CROSS-CHAIN / BRIDGE
+
+- [CROSS-CHAIN / BRIDGE] AbstractCustomOracle::_checkSequencer — SEQUENCER_UPTIME_GRACE_PERIOD hardcoded to 1 hour — if deployed on different L2 with different sequencer characteristics, grace period could be too short or too long
+
+- [CROSS-CHAIN / BRIDGE] AbstractYieldStrategy::convertYieldTokenToAsset — no check if TRADING_MODULE is on same chain — if TRADING_MODULE is cross-chain oracle, call could fail or return stale data
+
+- [CROSS-CHAIN / BRIDGE] MorphoLendingRouter::marketParams — uses immutable s_morphoParams but no validation if MORPHO is on same chain — if MORPHO is on different chain, all calls fail
+
+- [CROSS-CHAIN / BRIDGE] AbstractWithdrawRequestManager constructor — WITHDRAW_TOKEN, YIELD_TOKEN, STAKING_TOKEN are immutable but no chain ID check — if tokens are bridged versions, address collision across chains
+
+- [CROSS-CHAIN / BRIDGE] AddressRegistry::setWithdrawRequestManager — no check if withdrawRequestManager is on same chain — if manager is on different chain, calls to YIELD_TOKEN will fail
+
+- [CROSS-CHAIN / BRIDGE] PendlePTOracle::_getPTRate — calls PENDLE_ORACLE which may be on different chain — if PENDLE_ORACLE is cross-chain, call could fail or return stale data during bridge downtime
+
+- [CROSS-CHAIN / BRIDGE] Curve2TokenOracle::_rewriteAltETH — converts ALT_ETH_ADDRESS to ETH_ADDRESS — if deployed on chain where ALT_ETH_ADDRESS has different meaning, rewrite logic breaks
+
+- [CROSS-CHAIN / BRIDGE] AbstractLendingRouter::migratePosition — assumes migrateFrom is on same chain — if migrateFrom is cross-chain router, call will fail but no error handling
+
+- [CROSS-CHAIN / BRIDGE] TimelockUpgradeableProxy::UPGRADE_DELAY — 7 days hardcoded — on fast-moving L2s or rollups with instant finality, 7 days may be excessive or insufficient depending on governance model
+
+### 8. ECONOMIC / INCENTIVE LOGIC
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::feeRate — immutable and set at deploy — if market conditions change (e.g., yield drops), feeRate could become economically unviable, no way to adjust
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::_calculateAdditionalFeesInYieldToken — fees accrue continuously but only materialized on _accrueFees — if no one calls accrue for long time, sudden large fee withdrawal could cause insolvency
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::feesAccrued — includes virtual shares (VIRTUAL_SHARES, VIRTUAL_YIELD_TOKENS) to prevent inflation attack — if initial mint is very small, attacker could still manipulate by donating yield tokens directly
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::redeemNative — allows anyone to redeem without collateral check — user could redeem entire balance while having debt on lending market, causing insolvency
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractLendingRouter::COOLDOWN_PERIOD — fixed cooldown prevents rapid entry/exit — but attacker could enter position, wait cooldown, then frontrun liquidation by exiting just before
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractLendingRouter::liquidate — liquidator receives shares in native balance — if liquidation is underwater, liquidator has no incentive to liquidate, bad debt accumulates
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractLendingRouter::forceWithdraw — allows anyone to force withdraw on negative health factor — griefing: attacker could force withdraw on legitimate user about to repay debt
+
+- [ECONOMIC / INCENTIVE LOGIC] MorphoLendingRouter::healthFactor — borrowed can exceed maxBorrow but no liquidation penalty — underwater positions have no cost, no incentive to maintain health
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractWithdrawRequestManager::tokenizeWithdrawRequest — tokenized request can be split infinitely — attacker could fragment request into dust, DOS finalization by making totalYieldTokenAmount arithmetic complex
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::convertSharesToYieldToken — rounds down — repeated small redeems could drain vault via rounding losses (dust attack)
+
+- [ECONOMIC / INCENTIVE LOGIC] PendlePTOracle::twapDuration — hardcoded at deploy — if market becomes more volatile, TWAP window too short, price manipulable; if market becomes less volatile, TWAP window too long, price lags
+
+- [ECONOMIC / INCENTIVE LOGIC] Curve2TokenOracle::dyAmount — customizable swap amount for spot price check — if dyAmount too small, price check meaningless; if too large, get_dy may fail or return inaccurate price
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractLPOracle::LOWER_LIMIT_MULTIPLIER and UPPER_LIMIT_MULTIPLIER — fixed deviation limits — in crisis (e.g., depeg), legitimate price moves could exceed limits, locking all vault operations
+
+- [ECONOMIC / INCENTIVE LOGIC] AbstractYieldStrategy::_mintSharesGivenAssets — first depositor advantage: if totalSupply is zero, minted shares proportional to assets but rounding could favor first depositor
+
+- [ECONOMIC / INCENTIVE LOGIC] TimelockUpgradeableProxy::UPGRADE_DELAY — 7 days gives attacker time to extract value before malicious upgrade is stopped — governance has no emergency cancel, must wait 7 days even if exploit detected
+
+===== CHUNK 2/3 =====
+## Findings
+
+### 1. ACCESS CONTROL & INIT
+
+- [ACCESS CONTROL] AbstractRewardManager::migrateRewardPool — No check that newRewardPool.rewardPool is non-zero — Could set invalid rewardPool address leading to failures in subsequent reward claims
+- [ACCESS CONTROL] AbstractRewardManager::updateRewardToken — No validation that endTime > lastAccumulatedTime when setting emission rate — Could result in immediate expiry or underflow in accumulation
+- [ACCESS CONTROL] AbstractRewardManager::updateRewardToken — Can append unlimited new tokens without bounds check — Could cause DOS via unbounded array growth in reward state storage
+- [ACCESS CONTROL] RewardManagerMixin::claimAccountRewards — fallback() does not restrict which RewardManager functions can be called — Could allow unauthorized calls to privileged functions through delegatecall
+- [ACCESS CONTROL] CurveConvex2Token constructor — LP_LIB is deployed inline without initialization guard — Could be front-run or initialized by attacker if deployed separately
+
+### 2. ORACLE / PRICE FEED
+
+- [ORACLE] AbstractSingleSidedLP::convertToAssets — getWithdrawRequestValue used for valuation without staleness check — Stale withdraw request values could be used for liquidations
+- [ORACLE] PendlePT_sUSDe::_executeInstantRedemption — Multi-hop trade (sUSDe→sDAI→DAI→asset) without cumulative slippage guard — Individual leg slippages could compound beyond user's minPurchaseAmount expectation
+
+### 3. ARITHMETIC
+
+- [ARITHMETIC] AbstractRewardManager::_accumulateSecondaryRewardViaClaim — tokensClaimed * DEFAULT_PRECISION / effectiveSupplyBefore could overflow when tokensClaimed is large — Could revert reward accumulation or wrap to small value
+- [ARITHMETIC] AbstractRewardManager::_getAccumulatedRewardViaEmissionRate — (timeSinceLastAccumulation * DEFAULT_PRECISION * state.emissionRatePerYear) could overflow — Could cause reward calculation to revert or wrap
+- [ARITHMETIC] AbstractRewardManager::_claimRewardToken — (accountSharesBefore * rewardsPerVaultShare) / DEFAULT_PRECISION could truncate small rewards to zero — Users with small balances may never receive rewards
+- [ARITHMETIC] AbstractRewardManager::_accumulateSecondaryRewardViaClaim — Division by effectiveSupplyBefore when effectiveSupplyBefore is zero not checked — Could revert or wrap if vault has zero supply
+- [ARITHMETIC] PendlePTLib::swapExactTokenForPt — No overflow check on netTokenIn in TokenInput — Could wrap if amount exceeds type limits
+- [ARITHMETIC] CurveConvexLib::_exitPool — exitBalances[0] = TokenUtils.tokenBalance(TOKEN_1) - exitBalances[0] could underflow — If tokens were somehow transferred in before the call, subtraction underflows
+- [ARITHMETIC] TypeConvert::toUint128 — Downcasting from uint256 to uint128 without checking upper bits — Could silently truncate large values in reward accounting
+
+### 4. TOKEN ACCOUNTING
+
+- [TOKEN ACCOUNTING] AbstractRewardManager::_claimRewardToken — Transfer return value checked via TokenUtils.checkReturnCode but errors are silently ignored — Failed transfers don't revert, user loses rewards without notification beyond event
+- [TOKEN ACCOUNTING] AbstractStakingStrategy::_redeemShares — If asset != withdrawToken trade fails, escrowed funds are lost — User's shares burned but assets not received
+- [TOKEN ACCOUNTING] PendlePT::_initiateWithdraw — _redeemPT returns tokenOutSy but no validation that amount > 0 — Zero-amount withdraw request could be initiated
+- [TOKEN ACCOUNTING] CurveConvexLib::joinPoolAndStake — WETH.withdraw called without checking success — Failed unwrap could leave contract in inconsistent state
+- [TOKEN ACCOUNTING] CurveConvexLib::_unstakeLpTokens — IConvexRewardPool.withdrawAndUnwrap success not checked thoroughly — Failed unstake could leave tokens locked
+- [TOKEN ACCOUNTING] RewardManagerMixin::_burnShares — wasEscrowed determined before burn but shares may not actually be in valid escrow state — Could apply wrong reward logic if escrow state is invalid
+- [TOKEN ACCOUNTING] AbstractSingleSidedLP::_executeDepositTrades — assetRemaining underflow check relies on revert, no explicit check — Could silently succeed with corrupted state if underflow happens in unchecked context
+- [TOKEN ACCOUNTING] AbstractSingleSidedLP::_withdrawPendingRequests — exitBalances returned but no validation that sum equals expected value — Could withdraw less than shares represent
+
+### 5. ARRAY / INDEX / INPUT VALIDATION
+
+- [ARRAY] AbstractRewardManager::_claimRewardToken — rewardDebt mapping not bounds-checked before subtraction — Could underflow if debt tracking is corrupted
+- [ARRAY] AbstractRewardManager::updateRewardToken — Index can equal numRewardStates to append, but no upper bound check — Unbounded array growth could cause DOS
+- [ARRAY] AbstractSingleSidedLP::_executeDepositTrades — amounts[PRIMARY_INDEX()] assigned without checking PRIMARY_INDEX() < amounts.length — Could write out of bounds if PRIMARY_INDEX is invalid
+- [ARRAY] AbstractSingleSidedLP::_executeRedemptionTrades — Iterates exitBalances.length but redemptionTrades may be shorter — Missing trade params could cause revert or use uninitialized data
+- [ARRAY] CurveConvex2Token constructor — _PRIMARY_INDEX set to type(uint8).max if asset not found, later used as array index — Out-of-bounds access in joinPoolAndStake/unstakeAndExitPool
+- [ARRAY] PendlePTLib::swapExactPtForToken — LimitOrderData decoded from empty bytes without length check — Could decode garbage data or revert
+- [INPUT VALIDATION] AbstractStakingStrategy::_initiateWithdraw — yieldTokenAmount not validated against sharesHeld conversion — Mismatch could create invalid withdraw request
+- [INPUT VALIDATION] PendlePT::_mintYieldTokens — PT.isExpired check only reverts, no handling for edge case near expiry — User could be front-run by expiry
+- [INPUT VALIDATION] CurveConvexLib::checkReentrancyContext — remove_liquidity called with 0 or 1 amount, not verified pool supports this — Could revert on some Curve pool types
+
+### 6. EXTERNAL CALLS & REENTRANCY
+
+- [REENTRANCY] AbstractRewardManager::_claimVaultRewards — _executeClaim() is virtual and calls external rewardPool before updating lastClaimTimestamp — Reentrancy could allow double-claim if _executeClaim is malicious
+- [REENTRANCY] AbstractRewardManager::migrateRewardPool — _claimVaultRewards called before _withdrawFromPreviousRewardPool — Reentrancy during claim could corrupt migration state
+- [REENTRANCY] AbstractSingleSidedLP::_preLiquidation — _checkReentrancyContext() called but does not prevent reentrancy, only detects — Liquidation could be reentered if callback allows
+- [REENTRANCY] RewardManagerMixin::_postLiquidation — _delegateCall to REWARD_MANAGER.updateAccountRewards happens twice in sequence — If REWARD_MANAGER is malicious, could reenter and corrupt state
+- [EXTERNAL CALLS] AbstractRewardManager::_claimRewardToken — IEIP20NonStandard.transfer wrapped in try/catch, errors silently swallowed — User may not know transfer failed
+- [EXTERNAL CALLS] AbstractStakingStrategy::_mintYieldTokens — withdrawRequestManager.stakeTokens assumes success — Could fail silently leaving assets unstaked
+- [EXTERNAL CALLS] PendlePTLib::swapExactTokenForPt — PENDLE_ROUTER.swapExactTokenForPt returns values not validated — Could return zero or unexpected amounts
+- [EXTERNAL CALLS] CurveConvexLib::_stakeLpTokens — IConvexBooster.deposit or ICurveGauge.deposit assumes success — Failed stake leaves tokens in vault but not earning rewards
+- [EXTERNAL CALLS] CurveConvexLib::_enterPool — ICurveStableSwapNG.add_liquidity returns lpTokens not checked > 0 — Could mint zero LP tokens but still call _stakeLpTokens
+
+### 7. CROSS-CHAIN / BRIDGE
+
+- None found
+
+### 8. ECONOMIC / INCENTIVE LOGIC
+
+- [ECONOMIC] AbstractRewardManager::updateAccountRewards — If sharesInEscrow is true and accountSharesAfter > 0, rewards array is returned empty but storage not updated — User in escrow with remaining shares loses all reward debt tracking
+- [ECONOMIC] AbstractRewardManager::_claimVaultRewards — forceClaimAfter enforced but no mechanism to force claim if rewardPool is non-responsive — Rewards could be permanently locked
+- [ECONOMIC] AbstractRewardManager::_accumulateSecondaryRewardViaEmissionRate — endTime checked but if block.timestamp == endTime, time is set to endTime and last accumulation could be skipped — Off-by-one could lose final block's rewards
+- [ECONOMIC] RewardManagerMixin::_initiateWithdraw — Rewards claimed at sharesHeld but user may have more shares than they intend to withdraw — Over-claiming rewards before partial withdraw
+- [ECONOMIC] AbstractSingleSidedLP::_checkPoolShare — maxSupplyThreshold uses _totalPoolSupply which may not account for pending withdrawals — Pool share check could be bypassed during withdraw period
+- [ECONOMIC] AbstractStakingStrategy::convertToAssets — getWithdrawRequestValue used for escrowed shares but does not account for pending fees — User may see inflated collateral value during liquidation
+- [ECONOMIC] PendlePT::_initiateWithdraw — Expired PT redeemed directly but value may differ from market rate — User forced to accept redemption rate instead of market rate
+- [ECONOMIC] PendlePT_sUSDe::_executeInstantRedemption — sUSDe→sDAI→DAI unwrap uses sDAI.redeem which could be paused or rate-limited — User instant redemption could fail unexpectedly
+- [ECONOMIC] CurveConvex2Token::_totalPoolSupply — Uses CURVE_POOL_TOKEN.totalSupply without checking for virtual supply inflation — LP share calculation could be manipulated via Curve pool donation
+- [ECONOMIC] AbstractRewardManager::migrateRewardPool — Old pool rewards claimed but new pool not validated to be valid — Could migrate to non-functional pool losing future rewards
+
+### PATTERN-MATCH FINDINGS (from TLA+ shapes)
+
+- [ERC4337StaticSigDoS-like] RewardManagerMixin::fallback — Delegates any call except updateAccountRewards to REWARD_MANAGER without caller validation — External actor could call migrateRewardPool or updateRewardToken if selector is crafted
+- [Create2NonIdempotent-like] CurveConvex2Token constructor — LP_LIB deployed via `new CurveConvexLib(...)` without salt, redeployment could collide — If vault is redeployed at same address, LP_LIB collision could cause storage corruption
+- [PartialSignatureReplay-like] AbstractRewardManager::updateAccountRewards — Reward debt updated per token independently, no nonce — If reward tokens are removed/re-added, debt from old epoch could be replayed
+
+---
+
+**Note**: Inline risk — many findings above chain together (e.g., zero-check → division-by-zero → reward corruption). The code uses try/catch and silent failures extensively, which hides failures rather than reverting, a systemic risk pattern.
+
+===== CHUNK 3/3 =====
+# Audit Findings
+
+## Findings
+
+### 1. ACCESS CONTROL & INIT
+
+- [ACCESS CONTROL & INIT] IWithdrawRequestManager::setApprovedVault — missing access control specification — only owner should be able to approve vaults but interface lacks indication of protection
+- [ACCESS CONTROL & INIT] IWithdrawRequestManager::rescueTokens — emergency exit role mentioned but not defined — if role is not properly initialized or checked, unauthorized rescue could occur
+- [ACCESS CONTROL & INIT] IYieldStrategy::allowTransfer — only lending market should call but no modifier specified — if any caller can invoke, they could bypass transfer restrictions and manipulate collateral positions
+- [ACCESS CONTROL & INIT] IYieldStrategy::preLiquidation — no access control specified — unauthorized pre-liquidation could allow griefing or state manipulation before actual liquidation
+- [ACCESS CONTROL & INIT] IYieldStrategy::postLiquidation — no access control specified — unauthorized post-liquidation could corrupt accounting after liquidation completes
+- [ACCESS CONTROL & INIT] IYieldStrategy::clearCurrentAccount — no access control specified — anyone clearing current account could break CEI patterns or reentrancy guards
+
+### 2. ORACLE / PRICE FEED
+
+- [ORACLE / PRICE FEED] IYieldStrategy::convertYieldTokenToAsset — no staleness check mentioned — stale oracle price could allow liquidations at unfair prices or borrowing beyond safe limits
+- [ORACLE / PRICE FEED] IYieldStrategy::price — takes borrower into account but no sequencer uptime check — on L2s, sequencer downtime could cause stale prices during liquidations
+- [ORACLE / PRICE FEED] IOracle::price — returns uint256 with no bounds checking — oracle returning very high price could overflow in maxBorrow or assetsRepaid calculations as warned in IMorpho comments
+- [ORACLE / PRICE FEED] IYieldStrategy::convertYieldTokenToAsset — no decimals normalization mentioned — if yieldToken and asset have different decimals, conversion could be orders of magnitude wrong
+
+### 3. ARITHMETIC
+
+- [ARITHMETIC] WithdrawRequest::yieldTokenAmount — uint120 storage — if yield token amounts exceed 2^120, overflow will silently wrap causing catastrophic accounting errors
+- [ARITHMETIC] WithdrawRequest::sharesAmount — uint120 storage — if shares amount exceeds 2^120 during high-leverage scenarios, overflow causes loss of user claims
+- [ARITHMETIC] TokenizedWithdrawRequest::totalYieldTokenAmount — uint120 storage — accumulated yield token amounts could overflow uint120 over time with many users
+- [ARITHMETIC] TokenizedWithdrawRequest::totalWithdraw — uint120 storage — total withdraw could exceed uint120 in high-TVL vaults causing wrap-around
+- [ARITHMETIC] IYieldStrategy::convertToShares — no rounding direction specified — if rounds down when minting shares, protocol loses assets; if rounds up when burning, users lose assets
+- [ARITHMETIC] IYieldStrategy::convertToAssets — no rounding direction specified — asymmetric rounding could systematically favor users over protocol or vice versa
+- [ARITHMETIC] IWithdrawRequestManager::finalizeAndRedeemWithdrawRequest — sharesToBurn could exceed sharesAmount — unchecked subtraction could underflow if accounting is inconsistent
+
+### 4. TOKEN ACCOUNTING
+
+- [TOKEN ACCOUNTING] IWithdrawRequestManager::stakeTokens — transfer from vault assumed successful — if depositToken is fee-on-transfer, yieldTokensMinted will exceed actual received amount causing insolvency
+- [TOKEN ACCOUNTING] IWithdrawRequestManager::finalizeAndRedeemWithdrawRequest — tokensWithdrawn returned but no check for actual transfer — if withdraw token transfer fails silently, accounting diverges from balances
+- [TOKEN ACCOUNTING] IYieldStrategy::mintShares — assets transferred but no balanceOf check — if asset is fee-on-transfer, fewer assets received than expected causing share overissuance
+- [TOKEN ACCOUNTING] IYieldStrategy::burnShares — assetsWithdrawn returned but no verification — if withdrawal partially fails, user credited more assets than actually sent
+- [TOKEN ACCOUNTING] IYieldStrategy::asset — no check if asset is standard ERC20 — non-standard tokens omitting return values could cause silent transfer failures
+- [TOKEN ACCOUNTING] IYieldStrategy::totalAssets — includes compounding from yield but no cap — if totalAssets grows above 1e35 as warned, toSharesUp/Down calculations overflow
+
+### 5. ARRAY / INDEX / INPUT VALIDATION
+
+- [ARRAY / INDEX / INPUT VALIDATION] IWithdrawRequestManager::stakeTokens — amount parameter unchecked — zero amount could create withdraw requests with invalid state
+- [ARRAY / INDEX / INPUT VALIDATION] IWithdrawRequestManager::initiateWithdraw — yieldTokenAmount and sharesAmount unchecked — zero values could create invalid requests that later break redemption logic
+- [ARRAY / INDEX / INPUT VALIDATION] IYieldStrategy::convertToShares — assets parameter unchecked — passing max uint256 could overflow in share calculation
+- [ARRAY / INDEX / INPUT VALIDATION] IYieldStrategy::convertToAssets — shares parameter unchecked — passing totalSupply() or more could return inflated asset value
+- [ARRAY / INDEX / INPUT VALIDATION] IWithdrawRequestManager::tokenizeWithdrawRequest — sharesAmount not validated against available — could tokenize more shares than owned causing negative balances
+
+### 6. EXTERNAL CALLS & REENTRANCY
+
+- [EXTERNAL CALLS & REENTRANCY] IWithdrawRequestManager::stakeTokens — transfers from vault before state update — if vault is malicious contract, reentrancy could mint excess yield tokens
+- [EXTERNAL CALLS & REENTRANCY] IWithdrawRequestManager::finalizeAndRedeemWithdrawRequest — calls during vault exit before shares burned — reentrancy could double-withdraw by re-entering with same shares
+- [EXTERNAL CALLS & REENTRANCY] IYieldStrategy::mintShares — external deposit before share mint — callback in depositData could reenter and manipulate share price
+- [EXTERNAL CALLS & REENTRANCY] IYieldStrategy::burnShares — external redeem before share burn — callback in redeemData could reenter and drain assets by burning shares multiple times
+- [EXTERNAL CALLS & REENTRANCY] IYieldStrategy::redeemNative — transfers native ETH before accounting — malicious receiver fallback could reenter and double-redeem
+- [EXTERNAL CALLS & REENTRANCY] IYieldStrategy::allowTransfer — state change allowing transfer before actual transfer — reentrancy during transfer could exceed allowance
+- [EXTERNAL CALLS & REENTRANCY] IWithdrawRequestManager::rescueTokens — external token transfer with no CEI — malicious token could reenter rescue function
+- [EXTERNAL CALLS & REENTRANCY] IYieldStrategy::clearCurrentAccount — state clearing with no reentrancy guard visible — if called during active operation, could corrupt current account tracking
+
+### 7. CROSS-CHAIN / BRIDGE
+
+- [CROSS-CHAIN / BRIDGE] IWithdrawRequestManager::STAKING_TOKEN — no decimals validation across chains — if deployed on L2 with different token decimals, conversions break
+- [CROSS-CHAIN / BRIDGE] IWithdrawRequestManager::YIELD_TOKEN — no decimals scaling mentioned — bridged yield tokens with different decimals cause wrong share calculations
+- [CROSS-CHAIN / BRIDGE] IYieldStrategy::asset — no chain-specific decimals handling — same code on mainnet vs L2 could use wrong decimals if token differs
+- [CROSS-CHAIN / BRIDGE] WithdrawRequest::requestId — uint256 could be truncated on some bridges — if request IDs are cross-chain, truncation causes collision
+
+### 8. ECONOMIC / INCENTIVE LOGIC
+
+- [ECONOMIC / INCENTIVE LOGIC] IWithdrawRequestManager::initiateWithdraw — no minimum shares or yield token amount — dust withdraw requests could grief the protocol with many unfinalizable requests
+- [ECONOMIC / INCENTIVE LOGIC] IWithdrawRequestManager::finalizeRequestManual — no incentive for manual finalization — negligent users' requests sitting idle could accumulate losses but no one has reason to finalize
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::feeRate — fees accrued but collection timing arbitrary — owner could delay collectFees to manipulate share price during liquidations
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::feesAccrued — fees not automatically collected — large uncollected fees inflate totalAssets and manipulate share price upward
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::convertToShares / convertToAssets — no slippage protection mentioned — large share price movements between transaction submission and execution cause losses
+- [ECONOMIC / INCENTIVE LOGIC] IWithdrawRequestManager::tokenizeWithdrawRequest — liquidator receives tokenized claim — if tokenized withdraw value is less than debt, liquidator has no incentive to liquidate
+- [ECONOMIC / INCENTIVE LOGIC] TokenizedWithdrawRequest::finalized — boolean state but no expiry — finalized requests could sit forever if no one redeems, locking value
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::initiateWithdraw — sharesHeld parameter trusted — if lending market passes wrong sharesHeld, user initiates withdraw for more than they own
+- [ECONOMIC / INCENTIVE LOGIC] IWithdrawRequestManager::isPendingWithdrawRequest — blocking condition but no timeout — user could be permanently blocked from exiting if request never finalizes
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::totalAssets — includes fees accrued — donation attack: attacker donates yield tokens to inflate totalAssets, then mints shares at manipulated rate
+- [ECONOMIC / INCENTIVE LOGIC] IWithdrawRequestManager::finalizeAndRedeemWithdrawRequest — withdrawYieldTokenAmount vs sharesToBurn ratio unchecked — if ratio differs from original request, user could redeem excess or deficit
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::preLiquidation / postLiquidation — no validation of shares amounts — if lending market miscalculates, liquidator could seize more collateral than owed
+- [ECONOMIC / INCENTIVE LOGIC] IYieldStrategy::price — price includes withdraw request value — borrower with large pending withdraw could see artificially high collateral value delaying liquidation
