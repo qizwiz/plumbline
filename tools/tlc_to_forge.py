@@ -55,10 +55,20 @@ SHAPE_TEMPLATES = {
             "// State 2: slot=Calling, paid=2*TicketPrice, reentries=2  ← INVARIANT VIOLATED"
         ),
     },
-    # TODO: SignatureReplay, ERC4337StaticSigDoS, Uint64FeeOverflow,
-    #       Create2NonIdempotent, PartialSignatureReplay,
-    #       CrossWalletSigReplay, FlagBypassesValidationChain,
-    #       ArbitraryFromApprovalTheft.
+    "SignatureReplay": {
+        "template": "SignatureReplay.t.sol.template",
+        "invariant": "NoOverpayment",
+        "default_trace_head": (
+            "// State 0: submissions=0, paid_total=0\n"
+            "//   Action: SubmitBuggy(s)\n"
+            "// State 1: submissions[s]=1, paid_total[s]=AuthAmount\n"
+            "//   Action: SubmitBuggy(s)\n"
+            "// State 2: submissions[s]=2, paid_total[s]=2*AuthAmount  ← INVARIANT VIOLATED"
+        ),
+    },
+    # TODO: ERC4337StaticSigDoS, Uint64FeeOverflow, Create2NonIdempotent,
+    #       PartialSignatureReplay, CrossWalletSigReplay,
+    #       FlagBypassesValidationChain, ArbitraryFromApprovalTheft.
 }
 
 

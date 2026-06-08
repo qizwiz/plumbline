@@ -10,7 +10,7 @@ counterexample, and emits a runnable `.t.sol` file.
 | shape | template | status |
 |---|---|---|
 | ReentrancyDrain | `ReentrancyDrain.t.sol.template` | **v1.1 VERIFIED** — `forge test` PASS on puppy-raffle H-1 (drains 3 ETH via 2 re-entries; matches TLC trace) |
-| SignatureReplay | — | TODO |
+| SignatureReplay | `SignatureReplay.t.sol.template` | **v1 unverified** — template written, follows same scaffolding as ReentrancyDrain; per-target setUp() helpers needed for verification on boss-bridge (OZ version mismatch in that target) |
 | ERC4337StaticSigDoS | — | TODO |
 | Uint64FeeOverflow | — | TODO |
 | Create2NonIdempotent | — | TODO |
