@@ -19,16 +19,23 @@ slither examples/<contest-name> 2>&1 | tee examples/<contest-name>/slither.txt
 python sol_intent.py examples/<contest-name> --recall \
     | tee examples/<contest-name>/leads.txt
 
+# 3.5. Structural cascade (free, $0, pure tree-sitter + embedding)
+#      Compresses ~200 sol_intent leads to ~12 high-probability structural hits.
+#      100% H/M strict recall on Notional Exponent (2026-06-08 calibration).
+python tools/structural_cascade.py examples/<contest-name>/ \
+    --out examples/<contest-name>/cascade.jsonl
+
 # 4. sol_match: score leads vs ANY ground-truth-shaped seeds you have
 python sol_match.py examples/<contest-name>/leads.txt <seeds.txt> 0.65
 
 # 5. sol_verify: discharge what we can mechanically
 python sol_verify.py examples/<contest-name>
 
-# 6. Triage: open `leads.txt`, the slither output, and CONFIRMED set
-#    side-by-side. Promote the union to candidate submissions.
+# 6. Triage: open `cascade.jsonl` (structural hits), `leads.txt` (full set),
+#    slither output, and CONFIRMED set side-by-side.
+#    Cascade output is the PRIMARY triage queue; leads.txt is the fallback.
 
-# 7. For each candidate that's a structural-fit for one of our 5
+# 7. For each candidate that's a structural-fit for one of our 10
 #    TLA+ FailureModes, write the spec; run TLC; submission cites
 #    the counterexample.
 
@@ -144,6 +151,23 @@ cat examples/<contest-name>/leads-*.txt \
 
 Use the union as the candidate set for the next stage.
 
+### 2.4 — Structural cascade (free, ~1 min)
+
+Compresses sol_intent's ~200-lead recall carpet to ~12 high-probability structural candidates. Runs entirely locally (tree-sitter + embedding, $0 LLM). Calibrated at **100% H/M strict recall** on Notional Exponent (2026-06-08).
+
+```bash
+python tools/structural_cascade.py examples/<contest-name>/ \
+    --out examples/<contest-name>/cascade.jsonl
+```
+
+Output: one JSON record per candidate function with fields:
+- `path`, `contract`, `name` — location
+- `shape` — matched TLA+ FailureMode name (e.g. `"SignatureReplay"`)
+- `cos_score` — cosine similarity to nearest corpus finding
+- `text_head` — first 300 chars of function body
+
+**Use `cascade.jsonl` as your primary triage queue.** The sol_intent `leads.txt` is the fallback for anything structural analysis misses (logic bugs with no external-call footprint).
+
 ---
 
 ## Section 3 — TLA+ FailureMode match
@@ -170,13 +194,18 @@ If a TLA+ FailureMode matches structurally (cosine ≥ ~0.55 + manual sanity-che
 
 ### Bug-class → FailureMode lookup table
 
-| Lead description shape | Matches | Lift from |
-|------------------------|---------|-----------|
-| signature accepted multiple times, no nonce | should-be-one-shot-no-guard | `docs/tla/SignatureReplay.tla` |
-| external call before state update, attacker re-enters | should-be-one-shot-guard-misplaced | `docs/tla/ReentrancyDrain.tla` |
-| msg.sender check fails when called via EntryPoint / relayer | caller-bound-auth-misreads-msg-sender | `docs/tla/ERC4337StaticSigDoS.tla` |
-| accumulator declared narrower than its true range | narrow-accumulator-truncation | `docs/tla/Uint64FeeOverflow.tla` |
-| deploy/initialize reverts on second call to same target | idempotency-violation | `docs/tla/Create2NonIdempotent.tla` |
+| Lead description shape | Shape name | Spec |
+|------------------------|------------|------|
+| signature accepted multiple times, no nonce | `SignatureReplay` | `docs/tla/SignatureReplay.tla` |
+| external call before state update, attacker re-enters | `ReentrancyDrain` | `docs/tla/ReentrancyDrain.tla` |
+| msg.sender check fails when called via EntryPoint / relayer | `ERC4337StaticSigDoS` | `docs/tla/ERC4337StaticSigDoS.tla` |
+| accumulator declared narrower than its true range | `Uint64FeeOverflow` | `docs/tla/Uint64FeeOverflow.tla` |
+| deploy/initialize reverts on second call to same target | `Create2NonIdempotent` | `docs/tla/Create2NonIdempotent.tla` |
+| batch per-call sig lacks batch-nonce binding; calls extractable from batch | `PartialSignatureReplay` | `docs/tla/PartialSignatureReplay.tla` |
+| session sig replayable across wallets sharing same signer (no wallet-identity binding) | `CrossWalletSigReplay` | `docs/tla/CrossWalletSigReplay.tla` |
+| boolean flag in signed payload lets attacker skip an entire validation step | `FlagBypassesValidationChain` | `docs/tla/FlagBypassesValidationChain.tla` |
+| function accepts caller-supplied `from` address and drains victim's existing ERC-20 approval | `ArbitraryFromApprovalTheft` | `docs/tla/ArbitraryFromApprovalTheft.tla` |
+| periodic bonus / incentive mechanism drains reserves without compensating the core protocol invariant (e.g. x*y=k) | `IncentiveBonusBreaksInvariant` | `docs/tla/IncentiveBonusBreaksInvariant.tla` |
 
 If the lead matches NONE of these shapes, it's a NEW bug-class. Don't force a fit. Either:
 - write a new TLA+ FailureMode (~30 min) and add to the retrieval corpus, or
@@ -249,12 +278,15 @@ The cloud loop picks this up automatically on next pulse (per T13).
 
 ## Section 6 — Triage when time pressure hits
 
-Contest clock is running, you have N candidates and time for ⌈N/2⌉. Prioritize:
+Contest clock is running, you have N candidates and time for ⌈N/2⌉.
+
+**Start from `cascade.jsonl`** (output of Section 2.4 — ~12 structural candidates). Then scan `leads.txt` for anything structural_cascade might miss (pure-logic bugs with no external-call footprint). Prioritize:
 
 1. **CONFIRMED by sol_verify or halmos** — these are the closest to free submissions
 2. **TLA+ counterexample exists** — high-credibility, clear submission shape
-3. **Slither + sol_intent both flagged same area** — corroborated, lower noise risk
-4. **Sole flag, no corroboration, no mechanical discharge** — last priority; risk of triage waste
+3. **Cascade hit + slither corroboration** — structural + static, lower noise risk
+4. **Cascade hit only** — structural hit without further corroboration; triage quickly
+5. **Sole flag, no corroboration, no mechanical discharge** — last priority; risk of triage waste
 
 For each you DROP, log the reason in `examples/<contest-name>/triage-skipped.md`. This is how next contest's runbook gets smarter.
 
@@ -279,7 +311,7 @@ Common causes (from memory):
 
 If `spec_retrieval.py query` returns cos < 0.45 for everything: the corpus doesn't have a structural neighbor for this contest's bug shape. That's a SIGNAL — not a tool failure. It means this contest has a NEW class. Write a new TLA+ FailureMode for it; do not force the closest existing match.
 
-(T19 tracks the deeper embedder discrimination gap. As of 2026-06-06 the corpus has 13 specs and 5 distinct shapes.)
+(T19 tracks the deeper embedder discrimination gap. As of 2026-06-08 the corpus has 10 TLA+ specs and 10 distinct shapes.)
 
 ### sol_intent costs spike
 
@@ -336,4 +368,4 @@ From the project memory:
 
 ---
 
-*Maintained as part of T14. Last verified 2026-06-06. If a command in this file fails, fix the runbook or the command — don't improvise.*
+*Maintained as part of T14. Last verified 2026-06-08. If a command in this file fails, fix the runbook or the command — don't improvise.*
