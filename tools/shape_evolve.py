@@ -11,6 +11,13 @@ This is the grounded-self-improvement loop for the shape library:
      description and scores coverage on the 146 unmatched findings
   3. Top-ranked mutation = candidate to bank as next shape
 
+Graph-level mutation (action_subdivide):
+  Splits a payment action into pre/reenter/post atomic steps, exposing
+  a reentrancy window.  See docs/architecture/SHAPE_GRAPH_MUTATIONS.md.
+
+  Usage:
+    python tools/shape_evolve.py --action-subdivide   # apply to all 9 specs
+
 The fitness signal is SOUND (no LLM-as-judge):
   - TLC discharge yes/no (deterministic, by spec_mutator)
   - Cosine ≥ 0.7 to unmatched finding (deterministic, by embedding)
@@ -19,12 +26,14 @@ The fitness signal is SOUND (no LLM-as-judge):
     the original)
 
 Usage:
-  python tools/shape_evolve.py [--score-only]     # score existing mutations
-  python tools/shape_evolve.py --runs 20          # generate + score new ones
+  python tools/shape_evolve.py [--score-only]       # score existing mutations
+  python tools/shape_evolve.py --runs 20            # generate + score new ones
+  python tools/shape_evolve.py --action-subdivide   # graph-level mutation
 """
 from __future__ import annotations
-import argparse, json, os, re, subprocess, sys
+import argparse, json, os, re, subprocess, sys, tempfile, shutil
 from pathlib import Path
+from typing import Optional
 
 HERE = Path(__file__).resolve().parent.parent
 TLA_DIR = HERE / "docs" / "tla"
@@ -32,6 +41,580 @@ MUT_DIR = TLA_DIR / "mutations"
 SHERLOCK_COVERAGE = HERE / "corpus" / "calibration" / "sherlock_coverage.jsonl"
 COS_COVER = 0.7      # threshold: shape covers a finding
 COS_ANTI = 0.85      # threshold: too-close-to-existing → penalty
+
+# Variable names that signal "monetary/payment" semantics
+_PAYMENT_NAMES = re.compile(
+    r"paid|balance|transfer|payout|amount|fee|reward|claim|total",
+    re.IGNORECASE,
+)
+
+# TLA2Tools jar (same path as spec_graph and spec_mutator expect)
+TLA_JAR = str(TLA_DIR / "tla2tools.jar")
+
+
+# ---------------------------------------------------------------------------
+# action_subdivide: graph-level mutation operator
+# ---------------------------------------------------------------------------
+
+def _detect_payment_action(sg) -> Optional[dict]:
+    """
+    Find an action suitable for action_subdivide.
+
+    Target pattern: parametric action A(param) that atomically writes to
+    BOTH a 'payment variable' (paid_total, fee, etc.) AND a 'counter
+    variable' (submissions, etc.) via function-update expressions of the
+    form:  var' = [var EXCEPT ![param] = @ + Expr]
+
+    Returns a dict with detection results, or None if not applicable.
+    """
+    g = sg.g
+    variables = sg.variables
+
+    for node, attrs in g.nodes(data=True):
+        if attrs.get("kind") != "action":
+            continue
+        params = attrs.get("params", [])
+        if not params:
+            continue  # need parametric action
+        param = params[0]
+        body = attrs.get("body", "")
+
+        # Find function-increment writes: var' = [var EXCEPT ![param] = @ + Expr]
+        fn_inc: dict[str, str] = {}
+        for var in variables:
+            # Raw regex: /\ var' = [var EXCEPT ![param] = @ + ...rest-of-line]
+            pat = (
+                r"/\\"           # TLA+ conjunction /\
+                r"\s+"
+                + re.escape(var) + r"'\s*=\s*"
+                + r"\[" + re.escape(var) + r"\s+EXCEPT\s+!\["
+                + re.escape(param) + r"\]\s*=\s*@\s*\+\s*([^\n]+)"
+            )
+            m = re.search(pat, body)
+            if m:
+                fn_inc[var] = m.group(0).strip()  # full /\ line
+
+        if len(fn_inc) < 2:
+            continue
+
+        # Classify: payment vs counter
+        payment_var = next(
+            (v for v in fn_inc if _PAYMENT_NAMES.search(v)), None
+        )
+        if payment_var is None:
+            continue
+        counter_candidates = [v for v in fn_inc if v != payment_var]
+        if not counter_candidates:
+            continue
+        counter_var = counter_candidates[0]
+
+        # Extract domain from `param \in Domain` guard in body
+        dm = re.search(
+            rf"\b{re.escape(param)}\s+\\in\s+([A-Za-z_]\w*)", body
+        )
+        if not dm:
+            continue
+        domain = dm.group(1)
+
+        # Extract bound guard: counter_var[param] < MaxSomething
+        bg = re.search(
+            r"(/\\\s*" + re.escape(counter_var) + r"\[" + re.escape(param)
+            + r"\]\s*<\s*\w+)",
+            body,
+        )
+        bound_guard = bg.group(1).strip() if bg else None
+
+        # Other variables that must be UNCHANGED in all three sub-actions
+        other_vars = [v for v in variables if v not in fn_inc]
+
+        return {
+            "action_name": node,
+            "param": param,
+            "domain": domain,
+            "payment_var": payment_var,
+            "payment_line": fn_inc[payment_var],
+            "counter_var": counter_var,
+            "counter_line": fn_inc[counter_var],
+            "bound_guard": bound_guard,
+            "other_vars": other_vars,
+            "scalar": False,
+        }
+
+    # Second pass: non-parametric actions with scalar-increment writes
+    # (e.g. Uint64FeeOverflow.FinishRaffleBuggy)
+    for node, attrs in g.nodes(data=True):
+        if attrs.get("kind") != "action":
+            continue
+        if attrs.get("params"):
+            continue  # parametric already handled above
+        body = attrs.get("body", "")
+
+        # Find scalar-increment writes: var' = var + Expr  (no EXCEPT)
+        scalar_inc: dict[str, str] = {}
+        for var in variables:
+            pat = (
+                r"/\\"
+                r"\s+"
+                + re.escape(var) + r"'\s*=\s*"
+                + re.escape(var) + r"\s*\+\s*([^\n]+)"
+            )
+            m = re.search(pat, body)
+            if m:
+                scalar_inc[var] = m.group(0).strip()
+
+        if len(scalar_inc) < 2:
+            continue
+
+        payment_var = next(
+            (v for v in scalar_inc if _PAYMENT_NAMES.search(v)), None
+        )
+        if payment_var is None:
+            continue
+        counter_candidates = [v for v in scalar_inc if v != payment_var]
+        counter_var = counter_candidates[0]
+
+        # Bound guard: counter_var < MaxSomething
+        bg = re.search(
+            r"(/\\\s*" + re.escape(counter_var) + r"\s*<\s*\w+)",
+            body,
+        )
+        bound_guard = bg.group(1).strip() if bg else None
+
+        # Other variables (may include vars with complex writes not captured above)
+        other_vars = [v for v in variables if v not in scalar_inc]
+
+        return {
+            "action_name": node,
+            "param": None,
+            "domain": None,
+            "payment_var": payment_var,
+            "payment_line": scalar_inc[payment_var],
+            "counter_var": counter_var,
+            "counter_line": scalar_inc[counter_var],
+            "bound_guard": bound_guard,
+            "other_vars": other_vars,
+            "scalar": True,
+        }
+
+    return None
+
+
+def _add_variable_to_block(vars_text: str, new_var: str,
+                            domain: Optional[str]) -> str:
+    """
+    Add *new_var* to a VARIABLES block and update the vars == <<...>> tuple.
+    Inserts the new variable after the last existing variable, adding a
+    comma to the previous last variable.
+    domain=None means scalar state variable.
+    """
+    lines = vars_text.split("\n")
+
+    # Locate vars == line
+    vars_line_idx = next(
+        (i for i, l in enumerate(lines) if re.match(r"\s*vars\s*==", l)), None
+    )
+    if vars_line_idx is None:
+        return vars_text
+
+    # Find last non-blank, non-comment content line before vars_line_idx
+    last_var_idx = None
+    for i in range(vars_line_idx - 1, -1, -1):
+        stripped = lines[i].strip()
+        if stripped and not stripped.startswith(r"\*") and not stripped.startswith("(*"):
+            last_var_idx = i
+            break
+
+    if last_var_idx is not None:
+        # Add comma after the variable identifier on that line (if missing)
+        m = re.match(r"(\s+\w+)(.*)", lines[last_var_idx])
+        if m:
+            ident_end = m.end(1)
+            rest = lines[last_var_idx][ident_end:]
+            if not rest.lstrip().startswith(","):
+                lines[last_var_idx] = (
+                    lines[last_var_idx][:ident_end] + ","
+                    + lines[last_var_idx][ident_end:]
+                )
+        # Insert new variable line
+        if domain:
+            comment = (
+                f'\\* function {domain} -> {{"Fresh","InFlight","Consumed"}}'
+            )
+        else:
+            comment = '\\* scalar lifecycle state: "Ready" | "InFlight" | "Done"'
+        lines.insert(last_var_idx + 1, f"    {new_var}      {comment}")
+
+    # Update vars == <<...>> to include new_var
+    new_lines = []
+    for l in lines:
+        new_lines.append(
+            re.sub(
+                r"(vars\s*==\s*<<)([^>]+)(>>)",
+                lambda mm: f"{mm.group(1)}{mm.group(2)}, {new_var}{mm.group(3)}",
+                l,
+            )
+        )
+    return "\n".join(new_lines)
+
+
+def _unch_clause(vars_: list[str]) -> str:
+    """Return UNCHANGED clause for a list of variable names."""
+    if not vars_:
+        return ""
+    if len(vars_) == 1:
+        return f"/\\ UNCHANGED {vars_[0]}"
+    return f"/\\ UNCHANGED <<{', '.join(vars_)}>>"
+
+
+def action_subdivide_spec(sg) -> tuple[Optional[str], Optional[str]]:
+    """
+    Graph mutation: split a payment action into pre/reenter/post atomic steps.
+
+    Returns (new_tla_text, new_module_name) or (None, None) if the spec
+    has no suitable payment action.
+
+    The three sub-actions expose a reentrancy window:
+      A_pre   — guard Fresh→InFlight + payment write (payment before state update)
+      Reenter — guard InFlight + payment write again (reentrancy bug)
+      A_post  — guard InFlight→Consumed + counter write
+
+    TLC should find a violation of the payment invariant via:
+      A_pre(x) → Reenter(x) → (invariant violated)
+    """
+    sys.path.insert(0, str(HERE / "tools"))
+    from spec_graph import parse_spec  # imported here to avoid circular at module load
+
+    target = _detect_payment_action(sg)
+    if target is None:
+        return None, None
+
+    mn = sg.module_name
+    new_module = mn + "_Subdiv"
+
+    is_scalar = target["scalar"]
+    param = target["param"]
+    domain = target["domain"]
+    payment_var = target["payment_var"]
+    payment_line = target["payment_line"]
+    counter_var = target["counter_var"]
+    counter_line = target["counter_line"]
+    bound_guard = target["bound_guard"]
+    other_vars = target["other_vars"]
+    action_name = target["action_name"]
+    state_var = "inflight_state"
+
+    # Sub-action names
+    pre_name = action_name + "_pre"
+    reenter_name = "Reenter_" + action_name
+    post_name = action_name + "_post"
+
+    # UNCHANGED clauses (include other_vars that the original action didn't touch)
+    unch_pre = _unch_clause([counter_var] + other_vars)
+    unch_reenter = _unch_clause([counter_var, state_var] + other_vars)
+    unch_post = _unch_clause([payment_var] + other_vars)
+
+    # Build the new spec block by block
+    new_parts: list[str] = []
+
+    for idx, blk in enumerate(sg.blocks):
+        text = blk.text
+
+        if blk.kind == "header":
+            text = text.replace(f"MODULE {mn}", f"MODULE {new_module}", 1)
+
+        elif blk.kind == "variables":
+            text = _add_variable_to_block(text, state_var, domain)
+
+        elif blk.kind == "operator" and blk.text.startswith("TypeInvariant"):
+            lines = text.rstrip().split("\n")
+            last_conj = max(
+                (i for i, l in enumerate(lines) if l.strip().startswith("/\\")),
+                default=len(lines) - 1,
+            )
+            if is_scalar:
+                inv_line = (
+                    f'    /\\ {state_var} \\in {{"Ready", "InFlight", "Done"}}'
+                )
+            else:
+                inv_line = (
+                    f'    /\\ {state_var} \\in [{domain} -> '
+                    f'{{"Fresh", "InFlight", "Consumed"}}]'
+                )
+            lines.insert(last_conj + 1, inv_line)
+            text = "\n".join(lines) + "\n"
+
+        elif blk.kind == "operator" and blk.text.startswith("Init"):
+            lines = text.rstrip().split("\n")
+            last_conj = max(
+                (i for i, l in enumerate(lines) if l.strip().startswith("/\\")),
+                default=len(lines) - 1,
+            )
+            if is_scalar:
+                init_line = f'    /\\ {state_var}   = "Ready"'
+            else:
+                init_line = (
+                    f'    /\\ {state_var}   = [{param} \\in {domain} |-> "Fresh"]'
+                )
+            lines.insert(last_conj + 1, init_line)
+            text = "\n".join(lines) + "\n"
+
+        elif blk.kind == "operator" and (
+            blk.text.startswith(f"{action_name}(")
+            or (is_scalar and blk.text.startswith(f"{action_name} =="))
+        ):
+            # Replace with the three sub-actions
+            bound_line = f"    {bound_guard}\n" if bound_guard else ""
+            if is_scalar:
+                # Non-parametric scalar version
+                text = (
+                    f"{pre_name} ==\n"
+                    f"    /\\ {state_var} = \"Ready\"\n"
+                    f"{bound_line}"
+                    f"    /\\ {state_var}' = \"InFlight\"\n"
+                    f"    {payment_line}\n"
+                    f"    {unch_pre}\n"
+                    f"\n"
+                    f"{reenter_name} ==\n"
+                    f"    /\\ {state_var} = \"InFlight\"\n"
+                    f"{bound_line}"
+                    f"    {payment_line}\n"
+                    f"    {unch_reenter}\n"
+                    f"\n"
+                    f"{post_name} ==\n"
+                    f"    /\\ {state_var} = \"InFlight\"\n"
+                    f"    /\\ {state_var}' = \"Done\"\n"
+                    f"    {counter_line}\n"
+                    f"    {unch_post}\n"
+                    f"\n"
+                )
+            else:
+                # Parametric function version
+                text = (
+                    f"{pre_name}({param}) ==\n"
+                    f"    /\\ {param} \\in {domain}\n"
+                    f"    /\\ {state_var}[{param}] = \"Fresh\"\n"
+                    f"{bound_line}"
+                    f"    /\\ {state_var}' = [{state_var} EXCEPT ![{param}] = \"InFlight\"]\n"
+                    f"    {payment_line}\n"
+                    f"    {unch_pre}\n"
+                    f"\n"
+                    f"{reenter_name}({param}) ==\n"
+                    f"    /\\ {param} \\in {domain}\n"
+                    f"    /\\ {state_var}[{param}] = \"InFlight\"\n"
+                    f"{bound_line}"
+                    f"    {payment_line}\n"
+                    f"    {unch_reenter}\n"
+                    f"\n"
+                    f"{post_name}({param}) ==\n"
+                    f"    /\\ {param} \\in {domain}\n"
+                    f"    /\\ {state_var}[{param}] = \"InFlight\"\n"
+                    f"    /\\ {state_var}' = [{state_var} EXCEPT ![{param}] = \"Consumed\"]\n"
+                    f"    {counter_line}\n"
+                    f"    {unch_post}\n"
+                    f"\n"
+                )
+
+        elif blk.kind == "operator" and blk.text.startswith("Next"):
+            if is_scalar:
+                text = (
+                    f"Next ==\n"
+                    f"    \\/ {pre_name}\n"
+                    f"    \\/ {reenter_name}\n"
+                    f"    \\/ {post_name}\n"
+                    f"\n"
+                )
+            else:
+                text = (
+                    f"Next ==\n"
+                    f"    \\E {param} \\in {domain} :\n"
+                    f"        \\/ {pre_name}({param})\n"
+                    f"        \\/ {reenter_name}({param})\n"
+                    f"        \\/ {post_name}({param})\n"
+                    f"\n"
+                )
+
+        elif blk.kind == "operator" and blk.text.startswith("Fairness"):
+            if is_scalar:
+                text = (
+                    f"Fairness ==\n"
+                    f"    WF_vars({pre_name} \\/ {reenter_name} \\/ {post_name})\n"
+                    f"\n"
+                )
+            else:
+                text = (
+                    f"Fairness ==\n"
+                    f"    \\A {param} \\in {domain} :\n"
+                    f"        WF_vars({pre_name}({param}) \\/ {reenter_name}({param})"
+                    f" \\/ {post_name}({param}))\n"
+                    f"\n"
+                )
+
+        new_parts.append(text)
+
+    result = "".join(new_parts)
+    if not result.endswith("\n"):
+        result += "\n"
+    return result, new_module
+
+
+def run_tlc_on_text(tla_text: str, module_name: str,
+                    cfg_text: str, timeout: int = 60) -> dict:
+    """
+    Write tla_text + cfg_text to a temp dir, run TLC, return result dict:
+    {violated: bool, error: str|None, trace_hash: str, output: str}
+    """
+    import hashlib, subprocess
+    tmp = tempfile.mkdtemp(prefix="shape_subdiv_")
+    try:
+        tla_path = os.path.join(tmp, module_name + ".tla")
+        cfg_path = os.path.join(tmp, module_name + ".cfg")
+        jar_link = os.path.join(tmp, "tla2tools.jar")
+        with open(tla_path, "w") as f:
+            f.write(tla_text)
+        with open(cfg_path, "w") as f:
+            f.write(cfg_text)
+        if not os.path.exists(jar_link):
+            os.symlink(TLA_JAR, jar_link)
+
+        cmd = [
+            "java", "-XX:+UseParallelGC",
+            "-cp", jar_link,
+            "tlc2.TLC",
+            "-config", cfg_path,
+            "-deadlock",
+            tla_path,
+        ]
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=timeout
+        )
+        out = proc.stdout + proc.stderr
+        violated = "is violated" in out or "Invariant" in out and "violated" in out
+        error = None
+        if proc.returncode != 0 and not violated:
+            # Check for parse/type errors
+            if "Error:" in out and "violated" not in out:
+                error = "tlc-error"
+        trace_hash = hashlib.md5(out.encode()).hexdigest()[:12]
+        return {
+            "violated": violated,
+            "error": error,
+            "trace_hash": trace_hash,
+            "output": out[:2000],
+        }
+    except subprocess.TimeoutExpired:
+        return {"violated": False, "error": "timeout", "trace_hash": "", "output": ""}
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
+def _make_cfg_for_subdiv(original_cfg_path: Path, module_name: str,
+                          extra_invariants: Optional[list[str]] = None) -> str:
+    """
+    Build a .cfg for the subdivided spec by copying the original cfg's
+    CONSTANTS block and updating SPECIFICATION + INVARIANTS.
+    """
+    orig = original_cfg_path.read_text()
+    # Extract CONSTANTS block
+    const_m = re.search(r"(CONSTANTS\s*\n(?:.*\n)*?)(?=\n\w|\Z)", orig, re.M)
+    constants_block = const_m.group(1).rstrip() if const_m else ""
+
+    # Extract INVARIANTS from original
+    inv_m = re.findall(r"^\s*(\w+)\s*$", re.search(
+        r"INVARIANTS\s*\n((?:\s*\w+\s*\n)*)", orig, re.M
+    ).group(1) if re.search(r"INVARIANTS\s*\n", orig, re.M) else "",
+    re.M)
+    if not inv_m:
+        inv_m = ["TypeInvariant"]
+
+    if extra_invariants:
+        inv_m = list(dict.fromkeys(inv_m + extra_invariants))
+
+    inv_block = "INVARIANTS\n" + "\n".join(f"    {i}" for i in inv_m)
+
+    cfg = f"SPECIFICATION Spec\n\n{constants_block}\n\n{inv_block}\n"
+    return cfg
+
+
+def run_action_subdivide_all(spec_list: list[tuple[str, Path]],
+                              dry_run: bool = False) -> list[dict]:
+    """
+    Apply action_subdivide to each spec in spec_list.
+    TLC-discharge each result, collect novel survivors.
+    """
+    sys.path.insert(0, str(HERE / "tools"))
+    from spec_graph import parse_spec
+
+    MUT_DIR.mkdir(parents=True, exist_ok=True)
+    results = []
+
+    for spec_name, spec_dir in spec_list:
+        tla_path = spec_dir / f"{spec_name}.tla"
+        cfg_path = spec_dir / f"{spec_name}.cfg"
+        if not tla_path.exists():
+            print(f"  SKIP {spec_name}: not found", file=sys.stderr)
+            continue
+
+        sg = parse_spec(tla_path)
+        new_text, new_module = action_subdivide_spec(sg)
+        if new_text is None:
+            print(f"  SKIP {spec_name}: no payment action detected",
+                  file=sys.stderr)
+            results.append({"spec": spec_name, "status": "no_target"})
+            continue
+
+        print(f"  {spec_name} → {new_module}", file=sys.stderr)
+
+        if dry_run:
+            print(new_text[:400], file=sys.stderr)
+            results.append({"spec": spec_name, "status": "dry_run",
+                             "module": new_module})
+            continue
+
+        # Build cfg
+        cfg_text = _make_cfg_for_subdiv(cfg_path, new_module)
+
+        # TLC-discharge
+        print(f"    running TLC...", file=sys.stderr)
+        tlc = run_tlc_on_text(new_text, new_module, cfg_text, timeout=90)
+
+        if tlc["error"]:
+            print(f"    TLC ERROR: {tlc['error']}", file=sys.stderr)
+            print(f"    output: {tlc['output'][:500]}", file=sys.stderr)
+            results.append({"spec": spec_name, "status": f"tlc-{tlc['error']}",
+                             "module": new_module})
+            continue
+
+        if not tlc["violated"]:
+            print(f"    invariant HOLDS — not a reentrancy split",
+                  file=sys.stderr)
+            results.append({"spec": spec_name, "status": "holds",
+                             "module": new_module})
+            continue
+
+        print(f"    VIOLATED — trace_hash={tlc['trace_hash']}",
+              file=sys.stderr)
+
+        # Write to mutations dir
+        out_tla = MUT_DIR / f"{new_module}.tla"
+        out_cfg = MUT_DIR / f"{new_module}.cfg"
+        out_tla.write_text(
+            f"\\* MUTATION: action_subdivide({spec_name})\n"
+            f"\\* parent: {spec_name}\n"
+            f"\\* trace_hash: {tlc['trace_hash']}\n\n"
+            + new_text
+        )
+        out_cfg.write_text(cfg_text)
+        print(f"    → {out_tla.name}", file=sys.stderr)
+
+        results.append({
+            "spec": spec_name,
+            "status": "novel",
+            "module": new_module,
+            "trace_hash": tlc["trace_hash"],
+            "tla_path": str(out_tla),
+        })
+
+    return results
 
 
 def _generate_mutations_inline(runs: int):
@@ -243,7 +826,51 @@ def main():
                          "regenerating.")
     ap.add_argument("--runs", type=int, default=0,
                     help="If >0, run spec_mutator with this many runs first.")
+    ap.add_argument("--action-subdivide", action="store_true",
+                    help="Apply action_subdivide graph mutation to all 9 specs, "
+                         "TLC-discharge results, and report novel survivors.")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="With --action-subdivide: print generated specs without "
+                         "running TLC.")
     args = ap.parse_args()
+
+    if args.action_subdivide:
+        sys.path.insert(0, str(HERE / "tools"))
+        from spec_graph import SPEC_LIST
+        print("action_subdivide: applying to all specs...", file=sys.stderr)
+        subdiv_results = run_action_subdivide_all(SPEC_LIST, dry_run=args.dry_run)
+
+        novel = [r for r in subdiv_results if r.get("status") == "novel"]
+        print(f"\n{'=' * 60}")
+        print(f"action_subdivide results: {len(novel)} novel survivors "
+              f"out of {len(subdiv_results)} specs")
+        for r in subdiv_results:
+            status = r.get("status", "?")
+            print(f"  {r['spec']:<40}  {status}")
+
+        if novel and not args.dry_run:
+            # Score the novel survivors
+            print("\nscoring novel survivors...", file=sys.stderr)
+            try:
+                unmatched = load_unmatched_findings()
+                existing = load_existing_shape_signatures()
+                mut_sigs = {
+                    Path(r["tla_path"]).stem: extract_signature(Path(r["tla_path"]))
+                    for r in novel
+                }
+                ranked = score_mutations(mut_sigs, unmatched, existing)
+                out = HERE / "corpus" / "calibration" / "shape_evolve_ranking.json"
+                out.parent.mkdir(parents=True, exist_ok=True)
+                out.write_text(json.dumps(ranked, indent=2))
+                print(f"\nranking → {out}")
+                for r in ranked:
+                    anti = "  ←ANTI" if r["anti_sim_penalty"] else ""
+                    print(f"  {r['mutation']:<50} cov={r['covered_count']:>3} "
+                          f"fit={r['fitness_score']:>3} "
+                          f"cos={r['closest_existing_cos']:.2f}{anti}")
+            except Exception as e:
+                print(f"scoring failed (missing deps?): {e}", file=sys.stderr)
+        return
 
     if args.runs > 0:
         # Inline mutation generator that bypasses spec_mutator's lark
