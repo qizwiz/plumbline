@@ -1,0 +1,38 @@
+[
+  {
+    "mutation": "IncentiveBonusBreaksInvariant_Inject",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "IncentiveBonusBreaksInvariant",
+    "closest_existing_cos": 0.9440248608589172,
+    "anti_sim_penalty": true,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "ReentrancyDrain_Inject",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "ReentrancyDrain",
+    "closest_existing_cos": 0.9408859014511108,
+    "anti_sim_penalty": true,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "SignatureReplay_Inject",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "SignatureReplay",
+    "closest_existing_cos": 0.9247458577156067,
+    "anti_sim_penalty": true,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "Uint64FeeOverflow_Inject",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "Uint64FeeOverflow",
+    "closest_existing_cos": 0.9624866843223572,
+    "anti_sim_penalty": true,
+    "covered_findings_sample": []
+  }
+]

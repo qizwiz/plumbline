@@ -12,7 +12,7 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 
 | rank | goal | est_cost | status | notes |
 |------|------|----------|--------|-------|
-| 0 | SHAPE_GRAPH_EVOLVE | $0 | in-progress | action_subdivide shipped: 3/9 specs produce novel TLC-discharged survivors (SignatureReplay_Subdiv, ReentrancyDrain_Subdiv, Uint64FeeOverflow_Subdiv); next: state_inject_with_correlation operator |
+| 0 | SHAPE_GRAPH_EVOLVE | $0 | in-progress | action_subdivide shipped (3/9 novel survivors); state_inject_with_correlation shipped: 4/9 TLC-discharged survivors (SignatureReplay_Inject, ReentrancyDrain_Inject, Uint64FeeOverflow_Inject, IncentiveBonusBreaksInvariant_Inject); all 9 mutations anti-sim penalized (cos>0.85 to parent) — next: improve signature embedding to escape parent cluster, or proceed to bank step |
 | 1 | NOTIONAL_RECALL | $15 | done | 67.6% strict mechanical, 75.6% honest combined cold recall on Sherlock-judged Notional. Gap to ceiling = 18pp. See CALIBRATION_NOTIONAL_RECALL.md. |
 | 2 | STRUCTURAL_CASCADE | $0 | done | v3: 6/6 H/M strict (100%), 13 final from 145 fns. 294 SLOC. All 8 criteria met. |
 | 3 | LEAD_CONDITIONED_SPEC | $10 | blocked | architectural fix for v1 noise (ERC4337StaticSigDoS only) |

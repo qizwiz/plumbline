@@ -266,6 +266,330 @@ def _unch_clause(vars_: list[str]) -> str:
     return f"/\\ UNCHANGED <<{', '.join(vars_)}>>"
 
 
+def _add_constant_to_block(const_text: str, new_const: str,
+                            comment: str = "") -> str:
+    """Insert *new_const* into a CONSTANTS block after the last existing entry.
+
+    Adds a trailing comma to the preceding last constant so TLA+/SANY accepts
+    the comma-separated CONSTANTS list.
+    """
+    lines = const_text.rstrip().split("\n")
+    # Find last non-blank non-comment non-CONSTANTS line (the last actual constant)
+    last_idx = None
+    for i in range(len(lines) - 1, -1, -1):
+        stripped = lines[i].strip()
+        if (stripped and not stripped.startswith(r"\*")
+                and not stripped.startswith("CONSTANTS")):
+            last_idx = i
+            break
+    cmt = f"   \\* {comment}" if comment else ""
+    if last_idx is None:
+        return const_text.rstrip() + f"\n    {new_const}{cmt}\n"
+    # Add a trailing comma to the identifier on last_idx (before any comment)
+    ln = lines[last_idx]
+    m = re.match(r"(\s*)(\w+)(.*)", ln)
+    if m:
+        indent, ident, rest = m.group(1), m.group(2), m.group(3)
+        # Only add comma if one isn't already there
+        rest_stripped = rest.lstrip()
+        if not rest_stripped.startswith(","):
+            lines[last_idx] = f"{indent}{ident}," + rest
+    # Insert new constant line after last_idx, BEFORE any continuation comments
+    lines.insert(last_idx + 1, f"    {new_const}{cmt}")
+    return "\n".join(lines) + "\n"
+
+
+def _get_op_name(op_text: str) -> Optional[str]:
+    """Extract the operator name from a block's text (first identifier)."""
+    m = re.match(r"\s*([A-Za-z_]\w*)", op_text)
+    return m.group(1) if m else None
+
+
+def _append_unch_to_action(op_text: str, new_var: str) -> str:
+    """Append '/\\ UNCHANGED new_var' after the last /\\ conjunct in an action."""
+    lines = op_text.rstrip("\n").split("\n")
+    last_conj = max(
+        (i for i, ln in enumerate(lines) if ln.lstrip().startswith("/\\")),
+        default=-1,
+    )
+    if last_conj < 0:
+        return op_text
+    lines.insert(last_conj + 1, f"    /\\ UNCHANGED {new_var}")
+    return "\n".join(lines) + "\n"
+
+
+def state_inject_with_correlation_spec(sg) -> tuple[Optional[str], Optional[str]]:
+    """
+    Graph mutation: inject a global monotonic clock + staleness invariant.
+
+    Models the oracle-staleness / deadline-bypass bug class:
+    - New CONSTANT: FRESHNESS  (max clock value before data is stale)
+    - New var:      global_clock \in Nat
+    - New action:   Tick (advance clock while clock <= FRESHNESS)
+    - UNCHANGED global_clock added to all existing actions (required by TLA+)
+    - New invariant: StaleDataRejected — payment must not occur when
+      global_clock > FRESHNESS (violated because original actions lack
+      the staleness guard)
+
+    TLC counterexample: Init → Tick → Tick → BuggyAction → VIOLATED
+    (clock=2 > FRESHNESS=1, but payment still proceeds)
+
+    Returns (new_tla_text, new_module_name) or (None, None) if no suitable
+    payment action is found.
+    """
+    sys.path.insert(0, str(HERE / "tools"))
+    from spec_graph import parse_spec  # noqa: F401 — side-effect: registers parse_spec
+
+    target = _detect_payment_action(sg)
+    if target is None:
+        return None, None
+
+    mn = sg.module_name
+    new_module = mn + "_Inject"
+
+    is_scalar = target["scalar"]
+    param = target["param"]
+    domain = target["domain"]
+    payment_var = target["payment_var"]
+    all_orig_vars = sg.variables   # original var names; global_clock not yet in list
+    clock_var = "global_clock"
+
+    # UNCHANGED of all original variables (Tick touches only global_clock)
+    tick_unch = _unch_clause(all_orig_vars)
+
+    # Collect all action operator names (need UNCHANGED global_clock added)
+    action_op_names = {
+        node for node, attrs in sg.g.nodes(data=True)
+        if attrs.get("kind") == "action"
+    }
+
+    new_parts: list[str] = []
+    tick_inserted = False
+
+    for blk in sg.blocks:
+        text = blk.text
+
+        if blk.kind == "header":
+            text = text.replace(f"MODULE {mn}", f"MODULE {new_module}", 1)
+
+        elif blk.kind == "constants" and blk.text.lstrip().startswith("CONSTANTS"):
+            text = _add_constant_to_block(
+                text, "FRESHNESS",
+                "max clock steps before data is considered stale"
+            )
+
+        elif blk.kind == "variables":
+            text = _add_variable_to_block(text, clock_var, None)
+            # Fix the generic comment: global_clock is a Nat counter, not lifecycle
+            text = text.replace(
+                f'{clock_var}      \\* scalar lifecycle state: "Ready" | "InFlight" | "Done"',
+                f'{clock_var}      \\* Nat: global monotonic clock (staleness proxy)',
+            )
+
+        elif blk.kind == "operator" and re.match(r"TypeInvariant\s*==", blk.text):
+            lines = text.rstrip().split("\n")
+            last_conj = max(
+                (i for i, l in enumerate(lines) if l.strip().startswith("/\\")),
+                default=len(lines) - 1,
+            )
+            lines.insert(last_conj + 1, f"    /\\ {clock_var} \\in Nat")
+            text = "\n".join(lines) + "\n"
+
+        elif blk.kind == "operator" and re.match(r"Init\s*==", blk.text):
+            lines = text.rstrip().split("\n")
+            last_conj = max(
+                (i for i, l in enumerate(lines) if l.strip().startswith("/\\")),
+                default=len(lines) - 1,
+            )
+            lines.insert(last_conj + 1, f"    /\\ {clock_var} = 0")
+            text = "\n".join(lines) + "\n"
+
+        elif blk.kind == "operator" and re.match(r"Next\s*==", blk.text):
+            # Rewrite Next to add Tick as a top-level disjunct
+            m = re.match(r"(Next\s*==\s*)([\s\S]+)", text.rstrip())
+            if m:
+                original_body = m.group(2).strip()
+                text = (
+                    f"Next ==\n"
+                    f"    \\/ ({original_body})\n"
+                    f"    \\/ Tick\n"
+                    f"\n"
+                )
+            elif not text.rstrip().endswith("\\/ Tick"):
+                text = text.rstrip() + "\n    \\/ Tick\n\n"
+
+        elif blk.kind == "operator":
+            # For action operators: append UNCHANGED global_clock
+            op_name = _get_op_name(blk.text)
+            if op_name in action_op_names and clock_var not in blk.text:
+                text = _append_unch_to_action(text, clock_var)
+
+        new_parts.append(text)
+
+        # Insert Tick definition right after the buggy action block
+        action_name = target["action_name"]
+        if (blk.kind == "operator" and not tick_inserted and
+                (blk.text.startswith(f"{action_name}(")
+                 or (is_scalar and blk.text.startswith(f"{action_name} ==")))):
+            tick_def = (
+                f"Tick ==\n"
+                f"    /\\ {clock_var} <= FRESHNESS\n"
+                f"    /\\ {clock_var}' = {clock_var} + 1\n"
+                f"    {tick_unch}\n"
+                f"\n"
+            )
+            new_parts.append(tick_def)
+            tick_inserted = True
+
+    result = "".join(new_parts)
+
+    # Build staleness invariant and inject before the footer (==== line)
+    if is_scalar:
+        inv_def = (
+            f"StaleDataRejected ==\n"
+            f"    {payment_var} > 0 => {clock_var} <= FRESHNESS\n"
+            f"\n"
+        )
+    else:
+        inv_def = (
+            f"StaleDataRejected ==\n"
+            f"    \\A p \\in {domain} :"
+            f" {payment_var}[p] > 0 => {clock_var} <= FRESHNESS\n"
+            f"\n"
+        )
+
+    footer_m = re.search(r"\n={4,}\s*\n?$", result)
+    if footer_m:
+        result = (result[:footer_m.start()] + "\n" + inv_def
+                  + result[footer_m.start():])
+    else:
+        result += inv_def
+
+    if not result.endswith("\n"):
+        result += "\n"
+
+    return result, new_module
+
+
+def _extract_cfg_constants(cfg_text: str) -> str:
+    """Extract the CONSTANTS block from a .cfg, stopping at the next section."""
+    # Stop at INVARIANTS / PROPERTIES / SPECIFICATION / other section keywords
+    m = re.search(
+        r"CONSTANTS([\s\S]*?)(?=\n(?:INVARIANTS|PROPERTIES|SPECIFICATION|"
+        r"INIT|NEXT|SYMMETRY|CONSTRAINT|SYMMETRY|CHECK)|\Z)",
+        cfg_text,
+    )
+    if m:
+        return "CONSTANTS" + m.group(1).rstrip()
+    return "CONSTANTS"
+
+
+def _make_cfg_for_inject(original_cfg_path: Path, module_name: str,
+                          extra_invariants: Optional[list[str]] = None) -> str:
+    """
+    Build a .cfg for the state_inject spec.
+    Copies original CONSTANTS, adds FRESHNESS = 1.
+    """
+    orig = original_cfg_path.read_text()
+    constants_block = _extract_cfg_constants(orig)
+    constants_block += "\n    FRESHNESS = 1"
+
+    # Extract only the INVARIANTS section (stop at blank line or next SECTION keyword)
+    inv_section_m = re.search(
+        r"INVARIANTS[ \t]*\n((?:[ \t]+\w+[ \t]*\n)*)", orig
+    )
+    if inv_section_m:
+        inv_m = re.findall(r"^\s+(\w+)\s*$", inv_section_m.group(1), re.M)
+    else:
+        inv_m = ["TypeInvariant"]
+
+    base_invs = list(dict.fromkeys(inv_m + ["StaleDataRejected"]))
+    if extra_invariants:
+        base_invs = list(dict.fromkeys(base_invs + extra_invariants))
+
+    inv_block = "INVARIANTS\n" + "\n".join(f"    {i}" for i in base_invs)
+    return f"SPECIFICATION Spec\n\n{constants_block}\n\n{inv_block}\n"
+
+
+def run_state_inject_all(spec_list: list[tuple[str, Path]],
+                          dry_run: bool = False) -> list[dict]:
+    """
+    Apply state_inject_with_correlation to each spec in spec_list.
+    TLC-discharge each result, collect novel survivors.
+    """
+    sys.path.insert(0, str(HERE / "tools"))
+    from spec_graph import parse_spec
+
+    MUT_DIR.mkdir(parents=True, exist_ok=True)
+    results = []
+
+    for spec_name, spec_dir in spec_list:
+        tla_path = spec_dir / f"{spec_name}.tla"
+        cfg_path = spec_dir / f"{spec_name}.cfg"
+        if not tla_path.exists():
+            print(f"  SKIP {spec_name}: not found", file=sys.stderr)
+            continue
+
+        sg = parse_spec(tla_path)
+        new_text, new_module = state_inject_with_correlation_spec(sg)
+        if new_text is None:
+            print(f"  SKIP {spec_name}: no payment action detected",
+                  file=sys.stderr)
+            results.append({"spec": spec_name, "status": "no_target"})
+            continue
+
+        print(f"  {spec_name} → {new_module}", file=sys.stderr)
+
+        if dry_run:
+            print(new_text[:600], file=sys.stderr)
+            results.append({"spec": spec_name, "status": "dry_run",
+                             "module": new_module})
+            continue
+
+        cfg_text = _make_cfg_for_inject(cfg_path, new_module)
+
+        print(f"    running TLC...", file=sys.stderr)
+        tlc = run_tlc_on_text(new_text, new_module, cfg_text, timeout=90)
+
+        if tlc["error"]:
+            print(f"    TLC ERROR: {tlc['error']}", file=sys.stderr)
+            print(f"    output: {tlc['output'][:500]}", file=sys.stderr)
+            results.append({"spec": spec_name, "status": f"tlc-{tlc['error']}",
+                             "module": new_module})
+            continue
+
+        if not tlc["violated"]:
+            print(f"    invariant HOLDS — staleness not reachable",
+                  file=sys.stderr)
+            results.append({"spec": spec_name, "status": "holds",
+                             "module": new_module})
+            continue
+
+        print(f"    VIOLATED — trace_hash={tlc['trace_hash']}",
+              file=sys.stderr)
+
+        out_tla = MUT_DIR / f"{new_module}.tla"
+        out_cfg = MUT_DIR / f"{new_module}.cfg"
+        out_tla.write_text(
+            f"\\* MUTATION: state_inject_with_correlation({spec_name})\n"
+            f"\\* parent: {spec_name}\n"
+            f"\\* trace_hash: {tlc['trace_hash']}\n\n"
+            + new_text
+        )
+        out_cfg.write_text(cfg_text)
+        print(f"    → {out_tla.name}", file=sys.stderr)
+
+        results.append({
+            "spec": spec_name,
+            "status": "novel",
+            "module": new_module,
+            "trace_hash": tlc["trace_hash"],
+            "tla_path": str(out_tla),
+        })
+
+    return results
+
+
 def action_subdivide_spec(sg) -> tuple[Optional[str], Optional[str]]:
     """
     Graph mutation: split a payment action into pre/reenter/post atomic steps.
@@ -749,6 +1073,19 @@ def extract_signature(tla_path: Path) -> str:
             sem_hints = "bug class: oracle price manipulation; TWAP attack; spot-feed assumption"
         elif mut_kind.startswith("add_guard"):
             sem_hints = "bug class: access control bypass; missing modifier; role check absent"
+        elif mut_kind.startswith("state_inject_with_correlation"):
+            sem_hints = (
+                "bug class: oracle staleness; stale data acceptance; "
+                "missing freshness check; deadline bypass; expired data; "
+                "global clock; timestamp; time-based invalidation; "
+                "stale price feed; freshness window; heartbeat timeout"
+            )
+        elif mut_kind.startswith("action_subdivide"):
+            sem_hints = (
+                "bug class: reentrancy; CEI violation; external call before update; "
+                "reentrant withdrawal; check-effects-interactions pattern; "
+                "callback exploitation; cross-function reentrancy"
+            )
         mut = f"mutation: {mut_kind} | {mut_kind} | {mut_kind}\n{sem_hints}"
     sig = f"{mut}\nvars: {varlist}\nheader: {header[:1500]}\ninvariants: {' | '.join(invs[:5])[:1500]}"
     return sig
@@ -829,10 +1166,51 @@ def main():
     ap.add_argument("--action-subdivide", action="store_true",
                     help="Apply action_subdivide graph mutation to all 9 specs, "
                          "TLC-discharge results, and report novel survivors.")
+    ap.add_argument("--state-inject", action="store_true",
+                    help="Apply state_inject_with_correlation to all 9 specs, "
+                         "TLC-discharge results, and report novel survivors.")
     ap.add_argument("--dry-run", action="store_true",
-                    help="With --action-subdivide: print generated specs without "
-                         "running TLC.")
+                    help="With --action-subdivide/--state-inject: print generated "
+                         "specs without running TLC.")
     args = ap.parse_args()
+
+    if args.state_inject:
+        sys.path.insert(0, str(HERE / "tools"))
+        from spec_graph import SPEC_LIST
+        print("state_inject_with_correlation: applying to all specs...",
+              file=sys.stderr)
+        inject_results = run_state_inject_all(SPEC_LIST, dry_run=args.dry_run)
+
+        novel = [r for r in inject_results if r.get("status") == "novel"]
+        print(f"\n{'=' * 60}")
+        print(f"state_inject results: {len(novel)} novel survivors "
+              f"out of {len(inject_results)} specs")
+        for r in inject_results:
+            status = r.get("status", "?")
+            print(f"  {r['spec']:<40}  {status}")
+
+        if novel and not args.dry_run:
+            print("\nscoring novel survivors...", file=sys.stderr)
+            try:
+                unmatched = load_unmatched_findings()
+                existing = load_existing_shape_signatures()
+                mut_sigs = {
+                    Path(r["tla_path"]).stem: extract_signature(Path(r["tla_path"]))
+                    for r in novel
+                }
+                ranked = score_mutations(mut_sigs, unmatched, existing)
+                out = HERE / "corpus" / "calibration" / "shape_evolve_ranking.json"
+                out.parent.mkdir(parents=True, exist_ok=True)
+                out.write_text(json.dumps(ranked, indent=2))
+                print(f"\nranking → {out}")
+                for r in ranked:
+                    anti = "  ←ANTI" if r["anti_sim_penalty"] else ""
+                    print(f"  {r['mutation']:<50} cov={r['covered_count']:>3} "
+                          f"fit={r['fitness_score']:>3} "
+                          f"cos={r['closest_existing_cos']:.2f}{anti}")
+            except Exception as e:
+                print(f"scoring failed (missing deps?): {e}", file=sys.stderr)
+        return
 
     if args.action_subdivide:
         sys.path.insert(0, str(HERE / "tools"))
