@@ -1,106 +1,99 @@
-[
-  {
-    "mutation": "ReentrancyDrain_Inject",
-    "covered_count": 5,
-    "fitness_score": 5,
-    "closest_existing": "ReentrancyDrain",
-    "closest_existing_cos": 0.7539396286010742,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": [
-      "Stuck emissions for nullified epochs",
-      "If any stable depegs, oracle will fail, disabling",
-      "Requested oracle versions, which have expired, mus",
-      "NAV staleness during cooldown",
-      "NAV staleness during cooldown"
-    ]
-  },
-  {
-    "mutation": "SignatureReplay_Inject",
-    "covered_count": 5,
-    "fitness_score": 5,
-    "closest_existing": "Uint64FeeOverflow",
-    "closest_existing_cos": 0.7521623373031616,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": [
-      "Stuck emissions for nullified epochs",
-      "If any stable depegs, oracle will fail, disabling",
-      "Requested oracle versions, which have expired, mus",
-      "NAV staleness during cooldown",
-      "NAV staleness during cooldown"
-    ]
-  },
-  {
-    "mutation": "Uint64FeeOverflow_Inject",
-    "covered_count": 5,
-    "fitness_score": 5,
-    "closest_existing": "Uint64FeeOverflow",
-    "closest_existing_cos": 0.7433401942253113,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": [
-      "Stuck emissions for nullified epochs",
-      "If any stable depegs, oracle will fail, disabling",
-      "Requested oracle versions, which have expired, mus",
-      "NAV staleness during cooldown",
-      "NAV staleness during cooldown"
-    ]
-  },
-  {
-    "mutation": "IncentiveBonusBreaksInvariant_Inject",
-    "covered_count": 4,
-    "fitness_score": 4,
-    "closest_existing": "Uint64FeeOverflow",
-    "closest_existing_cos": 0.7476532459259033,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": [
-      "Stuck emissions for nullified epochs",
-      "Requested oracle versions, which have expired, mus",
-      "NAV staleness during cooldown",
-      "NAV staleness during cooldown"
-    ]
-  },
-  {
-    "mutation": "Create2NonIdempotent_mut_4",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "Create2NonIdempotent",
-    "closest_existing_cos": 0.8235283493995667,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": []
-  },
-  {
-    "mutation": "PartialSignatureReplay_mut_2",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "PartialSignatureReplay",
-    "closest_existing_cos": 0.8269497752189636,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": []
-  },
-  {
-    "mutation": "ReentrancyDrain_Subdiv",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "ReentrancyDrain",
-    "closest_existing_cos": 0.840438723564148,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": []
-  },
-  {
-    "mutation": "SignatureReplay_Subdiv",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "ReentrancyDrain",
-    "closest_existing_cos": 0.804709792137146,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": []
-  },
-  {
-    "mutation": "Uint64FeeOverflow_Subdiv",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "ReentrancyDrain",
-    "closest_existing_cos": 0.8088812828063965,
-    "anti_sim_penalty": false,
-    "covered_findings_sample": []
-  }
-]
+{
+  "library_shapes": 12,
+  "library": [
+    "ArbitraryFromApprovalTheft",
+    "Create2NonIdempotent",
+    "CrossWalletSigReplay",
+    "ERC4337StaticSigDoS",
+    "FlagBypassesValidationChain",
+    "IncentiveBonusBreaksInvariant",
+    "OracleStaleness",
+    "PartialSignatureReplay",
+    "ReentrancyDrain",
+    "SignatureReplay",
+    "SignatureReplay_subdiv",
+    "Uint64FeeOverflow"
+  ],
+  "unmatched_findings": 146,
+  "sherlock_corpus_coverage": 0.937,
+  "run_date": "2026-06-08",
+  "note": "All inject mutations now anti-sim blocked by OracleStaleness (the banked shape from previous cycle). Subdiv mutations cover 0 unmatched findings. Next: --runs 10 to generate novel mutations in uncovered region.",
+  "mutations": [
+    {
+      "mutation": "ReentrancyDrain_Inject",
+      "covered_count": 5,
+      "fitness_score": 0,
+      "closest_existing": "OracleStaleness",
+      "closest_existing_cos": 0.88,
+      "anti_sim_penalty": true,
+      "note": "anti-sim blocked by OracleStaleness"
+    },
+    {
+      "mutation": "SignatureReplay_Inject",
+      "covered_count": 5,
+      "fitness_score": 0,
+      "closest_existing": "OracleStaleness",
+      "closest_existing_cos": 0.88,
+      "anti_sim_penalty": true,
+      "note": "anti-sim blocked by OracleStaleness"
+    },
+    {
+      "mutation": "Uint64FeeOverflow_Inject",
+      "covered_count": 5,
+      "fitness_score": 0,
+      "closest_existing": "OracleStaleness",
+      "closest_existing_cos": 0.87,
+      "anti_sim_penalty": true,
+      "note": "anti-sim blocked by OracleStaleness"
+    },
+    {
+      "mutation": "IncentiveBonusBreaksInvariant_Inject",
+      "covered_count": 4,
+      "fitness_score": 0,
+      "closest_existing": "OracleStaleness",
+      "closest_existing_cos": 0.87,
+      "anti_sim_penalty": true,
+      "note": "anti-sim blocked by OracleStaleness"
+    },
+    {
+      "mutation": "Create2NonIdempotent_mut_4",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "Create2NonIdempotent",
+      "closest_existing_cos": 0.82,
+      "anti_sim_penalty": false
+    },
+    {
+      "mutation": "PartialSignatureReplay_mut_2",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "PartialSignatureReplay",
+      "closest_existing_cos": 0.83,
+      "anti_sim_penalty": false
+    },
+    {
+      "mutation": "ReentrancyDrain_Subdiv",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "ReentrancyDrain",
+      "closest_existing_cos": 0.84,
+      "anti_sim_penalty": false
+    },
+    {
+      "mutation": "SignatureReplay_Subdiv",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "ReentrancyDrain",
+      "closest_existing_cos": 0.8,
+      "anti_sim_penalty": false
+    },
+    {
+      "mutation": "Uint64FeeOverflow_Subdiv",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "ReentrancyDrain",
+      "closest_existing_cos": 0.81,
+      "anti_sim_penalty": false
+    }
+  ]
+}
