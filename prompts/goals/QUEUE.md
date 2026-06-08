@@ -12,6 +12,7 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 
 | rank | goal | est_cost | status | notes |
 |------|------|----------|--------|-------|
+| 0 | SHAPE_GRAPH_EVOLVE | $0 | pending | graph-level mutations on TLA+ AST; operator-level proven insufficient 2026-06-08; goal: discover 10th shape via action_subdivide + state_inject_with_correlation; sound TLC+embedding+coverage fitness gates; see docs/architecture/SHAPE_GRAPH_MUTATIONS.md |
 | 1 | NOTIONAL_RECALL | $15 | done | 67.6% strict mechanical, 75.6% honest combined cold recall on Sherlock-judged Notional. Gap to ceiling = 18pp. See CALIBRATION_NOTIONAL_RECALL.md. |
 | 2 | STRUCTURAL_CASCADE | $0 | done | v3: 6/6 H/M strict (100%), 13 final from 145 fns. 294 SLOC. All 8 criteria met. |
 | 3 | LEAD_CONDITIONED_SPEC | $10 | blocked | architectural fix for v1 noise (ERC4337StaticSigDoS only) |

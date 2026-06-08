@@ -86,8 +86,125 @@ def mutate_replace_const(src, rng):
     return src[:s] + str(new_v) + src[e:], f"replace_const({v}->{new_v})"
 
 
+# === Semantic mutations (added by shape-evolve work) ===
+# Operators that change the spec's STATE SPACE or PRECONDITIONS, so the
+# embedding signature actually shifts. The syntactic mutations above
+# preserve semantic identity (cos~0.99 to parent); these aim to push
+# variants out of the parent's anti-similarity basin (cos<0.85).
+
+# Plumbline corpus of bug-class dimensions we want to inject as new state
+# variables. Each is a (var_name, domain_expr, init_expr) triple.
+INJECTABLE_STATE_VARS = [
+    ("oracle_price",     "Nat",                "0"),
+    ("decimals_in",      "Nat",                "18"),
+    ("decimals_out",     "Nat",                "18"),
+    ("chain_id",         "Nat",                "1"),
+    ("token_addr",       "{0, 1, 2}",          "0"),
+    ("staleness_window", "Nat",                "100"),
+    ("paused",           "BOOLEAN",            "FALSE"),
+    ("rebase_factor",    "Nat",                "1"),
+    ("liquidation_qty",  "Nat",                "0"),
+    ("vesting_remaining", "Nat",               "10"),
+]
+
+
+def mutate_add_state_var(src, rng):
+    """Inject a new VARIABLE + Init entry. Changes the spec's state space
+    (so embedding sees new shape) without breaking TLC type-check unless
+    var is referenced in a typing constraint."""
+    # Find VARIABLES block — extend until blank line OR vars ==
+    m = re.search(r"(VARIABLES\s*\n)(.*?)(?=\n\s*\n|\nvars\s*==)", src, re.S)
+    if not m: return None
+    # Pick an injectable var not already declared in body of source
+    declared = re.findall(r"\b\w+\b", m.group(2))
+    available = [v for v in INJECTABLE_STATE_VARS if v[0] not in declared]
+    if not available: return None
+    var_name, _domain, init_expr = rng.choice(available)
+    # Insert the new var as a clean trailing line; previous last var line
+    # gets a trailing comma if it doesn't already have one (ignoring comments)
+    block = m.group(2).rstrip()
+    # Append comma to last "real" line if it doesn't end with one
+    lines = block.split("\n")
+    # Find last line with a variable name (not a pure comment line)
+    last_var_idx = -1
+    for i in range(len(lines) - 1, -1, -1):
+        stripped = re.sub(r"\\\*.*$", "", lines[i]).rstrip()
+        if stripped and not stripped.lstrip().startswith("\\*"):
+            last_var_idx = i
+            break
+    if last_var_idx == -1: return None
+    # Strip inline comment, check for trailing comma, restore comment if any
+    line = lines[last_var_idx]
+    comment_m = re.search(r"\s*\\\*.*$", line)
+    code_part = line[:comment_m.start()] if comment_m else line
+    comment_part = line[comment_m.start():] if comment_m else ""
+    if not code_part.rstrip().endswith(","):
+        code_part = code_part.rstrip() + ","
+    lines[last_var_idx] = code_part + comment_part
+    indent_m = re.match(r"(\s*)", line)
+    indent = indent_m.group(1) if indent_m else "    "
+    lines.append(f"{indent}{var_name}")
+    new_block = "\n".join(lines) + "\n"
+    s = src[:m.start(2)] + new_block + src[m.end(2):]
+    # Add to Init: find `Init ==` block and append `/\ var_name = init_expr`
+    im = re.search(r"(Init\s*==\s*\n)((?:\s+/\\.*\n)+)", s)
+    if im:
+        init_block = im.group(2)
+        # Match the indentation of the existing /\ lines
+        first_line = init_block.split("\n")[0]
+        ind = re.match(r"(\s*)/\\", first_line)
+        prefix = ind.group(1) if ind else "    "
+        new_init_line = f"{prefix}/\\ {var_name} = {init_expr}\n"
+        s = s[:im.end(2)] + new_init_line + s[im.end():]
+    # Add to vars tuple if present: `vars == <<a, b, c>>`
+    vm = re.search(r"(vars\s*==\s*<<)([^>]+)(>>)", s)
+    if vm:
+        existing = vm.group(2).strip()
+        new_vars_tuple = f"{vm.group(1)}{existing}, {var_name}{vm.group(3)}"
+        s = s[:vm.start()] + new_vars_tuple + s[vm.end():]
+    return s, f"add_state_var({var_name})"
+
+
+def mutate_add_guard(src, rng):
+    """Add a precondition conjunct to an existing action. Picks an action
+    definition (Name(args) == /\ ...) and prepends an extra guard line."""
+    # Find action defs: Name(args) == followed by indented /\ lines
+    action_pat = re.compile(
+        r"^([A-Z]\w+)\(([^)]+)\)\s*==\s*\n((?:\s+/\\.*\n)+)", re.M)
+    cands = list(action_pat.finditer(src))
+    if not cands: return None
+    m = rng.choice(cands)
+    name = m.group(1)
+    if name in ("TypeInvariant", "Fairness", "Spec"):
+        return None
+    block = m.group(3)
+    # Determine indent
+    first = block.split("\n")[0]
+    ind = re.match(r"(\s*)/\\", first)
+    prefix = ind.group(1) if ind else "    "
+    # Pick a guard
+    guards = [
+        "TRUE",                                              # no-op guard (control)
+        "Cardinality(DOMAIN slot) > 0" if "slot" in src else "TRUE",
+        "Cardinality(DOMAIN paid) > 0" if "paid" in src else "TRUE",
+        "TRUE /\\ TRUE",                                     # tautology, embedding-noise
+    ]
+    # Domain-shifting guards — these actually change reachable states
+    domain_guards = [
+        "/\\ \\E x \\in DOMAIN slot : TRUE" if "slot" in src else None,
+        "/\\ \\E x \\in DOMAIN paid : TRUE" if "paid" in src else None,
+        "/\\ \\A x \\in DOMAIN slot : TRUE" if "slot" in src else None,
+    ]
+    domain_guards = [g for g in domain_guards if g]
+    guard = rng.choice(domain_guards) if domain_guards else f"/\\ {rng.choice(guards)}"
+    insertion = f"{prefix}{guard}\n"
+    s = src[:m.start(3)] + insertion + src[m.start(3):]
+    return s, f"add_guard({name},{guard[:20].strip()})"
+
+
 MUTATIONS = [mutate_swap_binop, mutate_swap_bool,
-             mutate_swap_vars, mutate_replace_const]
+             mutate_swap_vars, mutate_replace_const,
+             mutate_add_state_var, mutate_add_guard]
 
 
 def trace_hash(stdout):

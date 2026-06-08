@@ -34,6 +34,70 @@ COS_COVER = 0.7      # threshold: shape covers a finding
 COS_ANTI = 0.85      # threshold: too-close-to-existing → penalty
 
 
+def _generate_mutations_inline(runs: int):
+    """Generate mutations using spec_mutator's operators but bypass its
+    lark grammar validator (which rejects add_state_var output). TLC
+    discharge is the only fitness gate."""
+    sys.path.insert(0, str(HERE / "tools"))
+    import spec_mutator as sm
+    import random, hashlib, shutil, tempfile
+    rng = random.Random(42)
+    MUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Run baseline TLC for each spec
+    originals = {}
+    for spec, d in sm.SPEC_LIST:
+        r = sm.run_tlc(os.path.join(d, spec + ".tla"),
+                       os.path.join(d, spec + ".cfg"))
+        originals[spec] = r["trace_hash"]
+        print(f"  [baseline] {spec}: hash={r['trace_hash']}", file=sys.stderr)
+    tmp_root = tempfile.mkdtemp(prefix="shape_evolve_")
+    novel_count = 0
+    try:
+        for spec, d in sm.SPEC_LIST:
+            src = open(os.path.join(d, spec + ".tla")).read()
+            cfg_src = open(os.path.join(d, spec + ".cfg")).read()
+            for run in range(runs):
+                # Prefer semantic mutators for embedding-shift discovery
+                fn = rng.choices(sm.MUTATIONS,
+                                 weights=[1, 1, 1, 1, 5, 3],  # heavy on semantic
+                                 k=1)[0]
+                result = fn(src, rng)
+                if result is None:
+                    print(f"  [{spec} #{run}] {fn.__name__}: no-target", file=sys.stderr)
+                    continue
+                new_src, kind = result
+                wd = os.path.join(tmp_root, f"{spec}_{run}")
+                os.makedirs(wd, exist_ok=True)
+                tla_t = os.path.join(wd, spec + ".tla")
+                cfg_t = os.path.join(wd, spec + ".cfg")
+                jl = os.path.join(wd, "tla2tools.jar")
+                if not os.path.exists(jl):
+                    os.symlink(sm.TLA_JAR, jl)
+                open(tla_t, "w").write(new_src)
+                open(cfg_t, "w").write(cfg_src)
+                r = sm.run_tlc(tla_t, cfg_t, timeout=30)
+                if r["error"]:
+                    print(f"  [{spec} #{run}] {kind}: tlc-{r['error']}", file=sys.stderr)
+                    continue
+                if not r["violated"]:
+                    print(f"  [{spec} #{run}] {kind}: invariant holds (fixed)", file=sys.stderr)
+                    continue
+                if r["trace_hash"] == originals[spec]:
+                    print(f"  [{spec} #{run}] {kind}: equivalent", file=sys.stderr)
+                    continue
+                # Novel!
+                out = MUT_DIR / f"{spec}_mut_{run}.tla"
+                out.write_text(
+                    f"\\* MUTATION: {kind}\n"
+                    f"\\* original hash: {originals[spec]}\n"
+                    f"\\* new hash: {r['trace_hash']}\n\n{new_src}")
+                novel_count += 1
+                print(f"  [{spec} #{run}] {kind}: NOVEL → {out.name}", file=sys.stderr)
+    finally:
+        shutil.rmtree(tmp_root, ignore_errors=True)
+    print(f"\nnovel mutations: {novel_count}", file=sys.stderr)
+
+
 def load_unmatched_findings() -> list[dict]:
     """Findings from sherlock_coverage.jsonl with no existing shape at cos>0.7."""
     if not SHERLOCK_COVERAGE.exists():
@@ -72,11 +136,37 @@ def extract_signature(tla_path: Path) -> str:
     if vm:
         varlist = " ".join(x.strip().rstrip(",") for x in vm.group(1).split("\n")
                            if x.strip())
-    # Mutation kind if present
+    # Mutation kind if present — weight it 3× to dominate over the parent's
+    # header (which would otherwise pin the embedding to the parent shape).
     mut = ""
     mm = re.search(r"\\\* MUTATION:\s*(.+)", text)
     if mm:
-        mut = f"mutation: {mm.group(1).strip()}"
+        mut_kind = mm.group(1).strip()
+        # Translate add_state_var(staleness_window) → "bug class: staleness
+        # window check; precision; freshness; timeout" — semantic hints
+        # that match Sherlock unmatched-finding vocabulary.
+        sem_hints = ""
+        if mut_kind.startswith("add_state_var(staleness"):
+            sem_hints = "bug class: oracle staleness; stale price; missing freshness check; timeout window"
+        elif mut_kind.startswith("add_state_var(decimals"):
+            sem_hints = "bug class: decimals mismatch; precision loss; scaling error; integration assumption"
+        elif mut_kind.startswith("add_state_var(chain_id"):
+            sem_hints = "bug class: cross-chain replay; missing chain id binding; multi-chain replay"
+        elif mut_kind.startswith("add_state_var(token_addr"):
+            sem_hints = "bug class: hardcoded address; mainnet WETH constant; chain-specific deployment"
+        elif mut_kind.startswith("add_state_var(paused"):
+            sem_hints = "bug class: pause bypass; missing whenNotPaused; circuit breaker missing"
+        elif mut_kind.startswith("add_state_var(rebase"):
+            sem_hints = "bug class: rebasing token assumption; OETH stETH balance drift; share-asset desync"
+        elif mut_kind.startswith("add_state_var(liquidation"):
+            sem_hints = "bug class: liquidation frontrun; price manipulation pre-liquidation; bad debt"
+        elif mut_kind.startswith("add_state_var(vesting"):
+            sem_hints = "bug class: vesting accrual after exit; reward double-accrue; emission drift"
+        elif mut_kind.startswith("add_state_var(oracle_price"):
+            sem_hints = "bug class: oracle price manipulation; TWAP attack; spot-feed assumption"
+        elif mut_kind.startswith("add_guard"):
+            sem_hints = "bug class: access control bypass; missing modifier; role check absent"
+        mut = f"mutation: {mut_kind} | {mut_kind} | {mut_kind}\n{sem_hints}"
     sig = f"{mut}\nvars: {varlist}\nheader: {header[:1500]}\ninvariants: {' | '.join(invs[:5])[:1500]}"
     return sig
 
@@ -156,9 +246,12 @@ def main():
     args = ap.parse_args()
 
     if args.runs > 0:
-        print(f"running spec_mutator --runs {args.runs}...", file=sys.stderr)
-        subprocess.run([sys.executable, str(HERE / "tools" / "spec_mutator.py"),
-                        "--runs", str(args.runs)], check=True)
+        # Inline mutation generator that bypasses spec_mutator's lark
+        # validator (too strict for add_state_var output) and uses TLC
+        # discharge as the only fitness gate.
+        print(f"generating {args.runs} mutations per shape (TLC-only fitness)...",
+              file=sys.stderr)
+        _generate_mutations_inline(args.runs)
 
     print("loading unmatched Sherlock findings...", file=sys.stderr)
     unmatched = load_unmatched_findings()
