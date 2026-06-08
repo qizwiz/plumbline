@@ -13,7 +13,7 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 | rank | goal | est_cost | status | notes |
 |------|------|----------|--------|-------|
 | 1 | NOTIONAL_RECALL | $15 | pending | convert corpus ceiling (93.7%) to detection number on graded Sherlock ground truth |
-| 2 | STRUCTURAL_CASCADE | $0 | pending | tree-sitter+NetworkX+embedding+TLA+halmos composition; close 0.42→0.94 gap |
+| 2 | STRUCTURAL_CASCADE | $0 | in-progress | v1 ships: 2-6 of 6 caught on examples/sequence (33% strict, 83-100% loose). Layer C threshold + scorer needs tuning. |
 | 3 | LEAD_CONDITIONED_SPEC | $10 | blocked | architectural fix for v1 noise (ERC4337StaticSigDoS only) |
 | 4 | CORPUS_GROWTH for S-3 | $0 | disputed | counter-increment-on-revert shape; sequence L-02 |
 | 5 | CORPUS_GROWTH for S-4 | $0 | disputed | cumulative-state-drift shape; sequence L-01 |

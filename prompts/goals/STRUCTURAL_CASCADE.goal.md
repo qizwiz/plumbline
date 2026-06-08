@@ -87,3 +87,42 @@ WHY THIS GOAL EXISTS:
 CALIBRATION_SHERLOCK_SWEEP measured the corpus at 93.7% coverage on real
 Sherlock judgments. Sol_intent cold recall is 0.42. The gap is the
 structural composition layer that doesn't exist yet. This builds it.
+
+---
+
+v1 SMOKE-RUN RESULTS (2026-06-08, examples/sequence/):
+
+  Funnel: 49 .sol files → 145 functions → Layer A (54) → Layer B (37) →
+                                          Layer C (37) → Layer D (37)
+  Cost: $0 (no LLM calls)
+  Runtime: <30s on M-series Mac
+
+  Clean mechanical catches (function name match + correct TLA+ shape):
+    - M-03 BaseAuth.recoverSapientSignature → ERC4337StaticSigDoS shape ✓
+    - M-04 Factory.deploy → Create2NonIdempotent shape ✓
+
+  Lax mechanical catches (title-substring match, may be false-positive):
+    - M-02, H-02 via "call" substring in LibOptim.call (noise)
+
+  Likely-in-survivors-but-scorer-missed (manual inspection):
+    - H-02: SessionSig.recoverSignature OR Recovery.isValidSignature
+            (SignatureReplay shape, cos>0.78)
+    - M-01: SessionSig.recoverSignature OR SessionManager.recoverSapient...
+            (same set as above)
+    - M-02: BaseAuth.signatureValidation (ERC4337StaticSigDoS shape, cos=0.801)
+    - H-01: BaseSig.recoverBranch (SignatureReplay shape, cos=0.762)
+
+  Estimated cascade recall:
+    Strict (verified mechanical): 2/6 = 33%
+    Likely (manual inspection of survivors): 5-6/6 = 83-100%
+
+  The scorer is too crude. A semantic scorer (embedding similarity
+  between cascade survivor signature + ground truth title) would
+  produce a tighter estimate. v2 work.
+
+Tunings noted for v2:
+  - Layer C cos threshold (0.55) too permissive — 37/37 candidates
+    survived. Bump to 0.65, expect 15-25 candidates.
+  - Layer D shape match returns shapes generously — multiple shapes
+    per candidate. Constrain to top-1 shape.
+  - Per-finding scorer needs body-aware matching, not just title.
