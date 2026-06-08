@@ -4,13 +4,18 @@ For when JH wakes. **Sherlock contest goes live today.**
 
 ## TL;DR (the punch list)
 
-**Plumbline IS ready to attempt a Sherlock submission today.**
+**Plumbline's RAG corpus covers 93.7% of every H/M finding Sherlock judges have ever graded.**
 
-Three things shipped overnight in service of this:
+Measured: 223 past contests, 705 H + 1619 M = 2324 graded findings. 2178 of them (93.6% of H, 93.8% of M) have a semantic prior at cos>0.7 in plumbline's 1240-finding corpus. This is the **first time** plumbline has been measured against external graded ground truth.
 
-1. **RAG corpus 25× larger** — 49 → **1240 findings** (49 hand-built examples + 1191 ingested from 85 Code4rena public contests). Index `tools/findings_index.pkl` rebuilt.
-2. **Sherlock-shaped output path** — `templates/audit_report_sherlock.j2` + `finding_block_sherlock.j2` + render_report.py routing + pandoc/xelatex PDF conversion. Smoke-tested end-to-end on existing `reps.jsonl` → 129KB PDF.
-3. **Immunefi strategy document** — `docs/research/IMMUNEFI_STRATEGY.md`, 19/25 claims 3-0 verified, 6 explicitly killed in adversarial pass. Schema + Jinja2 template ready. Strategic prize but NOT today's contest.
+Four things shipped overnight:
+
+1. **External calibration** — 93.7% corpus coverage across all of Sherlock's published audit archive. The corpus is real. See `corpus/calibration/sherlock_coverage.jsonl`.
+2. **RAG corpus 25× larger** — 49 → **1240 findings** (49 hand-built examples + 1191 ingested from 85 Code4rena public contests). Index `tools/findings_index.pkl` rebuilt.
+3. **Sherlock-shaped output path** — `templates/audit_report_sherlock.j2` + `finding_block_sherlock.j2` + render_report.py routing + pandoc/xelatex PDF conversion. Smoke-tested end-to-end.
+4. **Immunefi strategy document** — `docs/research/IMMUNEFI_STRATEGY.md`, 19/25 claims 3-0 verified, 6 explicitly killed in adversarial pass. Strategic prize but not today's contest.
+
+**Critical distinction:** 93.7% is **corpus coverage**, not **detection recall**. It means the corpus has a thematic prior at cos>0.7 for ~94% of historical Sherlock findings. It is a **ceiling** on what sol_intent could detect given perfect retrieval-and-grounding. Real recall is unmeasured; the gap between ceiling and recall is where plumbline's remaining work lives.
 
 **First action when you sit down**: read this brief, then `cd ~/src/plumbline && python tools/render_report.py --target sherlock --reps reps.jsonl --slug 2026-06-08-<sponsor> --sponsor "<Sponsor>" --out reports/<slug>.md` to dry-run the pipeline before the contest scope drops.
 
