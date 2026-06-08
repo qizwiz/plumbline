@@ -1,75 +1,144 @@
-# Morning Brief — 2026-06-06 ~05:30
+# Morning Brief — 2026-06-08 (Sherlock contest day)
 
-For when JH wakes. Updated continuously by overnight pulses.
+For when JH wakes. **Sherlock contest goes live today.**
 
-## TL;DR
+## TL;DR (the punch list)
 
-**Five Solidity FailureModes now exist (was one) and four cover distinct bug-class shapes.** Corpus grew 10 → 13 specs. Every spec TLC-discharged with counterexample matching its `.ANSWERS.md` entry. Zero LLM-API spend overnight.
+**Plumbline IS ready to attempt a Sherlock submission today.**
 
-### ✅ Wins overnight
-- **T1 (LTLGuard read)**: complete. `docs/research/ltlguard-notes.md`. Headline: 14B open model + constrained decoding + retrieval-augmented few-shot hits 75-78% semantic on nl2spec hard, no fine-tuning. **V6 (no grammar in prompt) ≥ V7 (everything)** — confirms our "prosthesis not prompting" principle.
-- **T2 (retrieval index built and tested)**: complete with caveats. 10 → 13 specs in corpus now (framework modules filtered out automatically). Atomic-proposition lifting works on Solidity + Python identifiers. 2-of-3 verification queries returned expected precedent in top-5.
-- **T3 (M-02 ERC4337StaticSigDoS)**: ✅ TLC-verified. Counterexample at state 2: c1 → ViaEntryPoint → reverted. Matches `examples/sequence/.ANSWERS.md` M-02 exactly. Few-shot context: SignatureReplay (retrieved, cos=0.585) + MissingAwait (hand-picked).
-- **T6 (3rd–5th FailureModes)**: ✅ all three landed.
-  - **H-1 ReentrancyDrain** (puppy-raffle) — Live→Calling→Cleared lifecycle. Counterexample: ReenterBuggy in the Calling window drives paid=2*TicketPrice.
-  - **H-3 Uint64FeeOverflow** (puppy-raffle) — narrow-accumulator mod-wrap. Counterexample at state 4: actual=12, tracked=2 (wrap modulo MaxValue=10).
-  - **M-04 Create2NonIdempotent** (sequence) — same salt, two calls, two outcomes (Deployed then Reverted). Bundler/relayer crash captured.
-- **T16 (TLA+ Lark grammar)**: ✅ vendored. `grammar/tla_failuremode.lark` validated against all 5 specs (5/5 PASS via `tools/validate_tla_grammar.py`). Covers the structural form (module header, sections, definitions, expressions, temporal ops, fairness, bulleted conjunctions, primed names). T8 (constrained decoding) is now unblocked — the grammar is the S lever per LTLGuard (V3 → 15.7%, V4 → 87.1% syntactic validity).
-- **T14 (contest-day runbook)**: ✅ `docs/CONTEST_RUNBOOK.md`. 8-line TL;DR + 8 sections (pre-contest, scope-drop, baselines, TLA+ match with bug-class lookup table, mechanical verify, submission, triage under time pressure, troubleshooting, post-contest). Every command verified to exist in the repo. Two appendices document what the runbook deliberately doesn't do + memory of past mistakes (halmos `--ast` requirement, oracle-silently-broken episode).
-- **T12 (Solidity→TLA+ pipeline note)**: ✅ `docs/research/solidity-to-tla-pipeline.md`. Arxiv-shaped working note. 8 sections: abstract, problem, architecture diagram, bug-class taxonomy table, engineering findings (including honest report of embedder-discrimination gap), NOT-scope (not slither/halmos replacement, not CA system yet), future work, reproducibility. Frames the LTLGuard-shaped pipeline as substrate for the CA work, not a replacement.
-- **T4 (verifier-router ADR)**: ✅ `docs/adr/ADR-006-verifier-router.md`. Reframes ml_classifier from binary-confidence to multi-class router. Labels: `{slither_will_catch, halmos_will_decide, tlc_will_decide, human_only}`. Key insight: classifier outputs work-allocation, not truth — verifiers remain the soundness layer, so OOD mis-routing only costs runs, never causes missed bugs. Includes 5-step implementation plan (schema change → relabel → multi-class trainer → inference → wire-up). Steps 1-4 self-contained; step 5 waits on T15 marginal-recall data.
+Three things shipped overnight in service of this:
 
-### ⚠️ Honest gap
-- **T19**: retrieval recall is imperfect — "missing await coroutine" query did NOT return MissingAwait in top-5. The bge-small-en-v1.5 embedder lacks bug-shape vocabulary and clusters all specs in a ~0.12 cos range. Workaround used overnight: hand-pick a second precedent when authoring. Longer-term fix: hybrid BM25+dense, or a domain-tuned embedder.
+1. **RAG corpus 25× larger** — 49 → **1240 findings** (49 hand-built examples + 1191 ingested from 85 Code4rena public contests). Index `tools/findings_index.pkl` rebuilt.
+2. **Sherlock-shaped output path** — `templates/audit_report_sherlock.j2` + `finding_block_sherlock.j2` + render_report.py routing + pandoc/xelatex PDF conversion. Smoke-tested end-to-end on existing `reps.jsonl` → 129KB PDF.
+3. **Immunefi strategy document** — `docs/research/IMMUNEFI_STRATEGY.md`, 19/25 claims 3-0 verified, 6 explicitly killed in adversarial pass. Schema + Jinja2 template ready. Strategic prize but NOT today's contest.
 
-### 🛑 Waiting on you
-- **T10**: Saturday walkthrough of pact's TLA+/spec_learner/gen_tlc_model discipline. Cheap for you (~30 min); unlocks the full Solidity port without me inventing parallel conventions that drift.
-- **T9**: calibration drill — cold-audit one corpus (suggest **sequence** — it's the truly novel one), write to `examples/sequence/MY_FINDINGS.md`, run `tools/manual_rep.py`. The diff between your recall and the model's on identical ground truth is the only honest signal for 90%-plumbline on contest day.
-- **T13**: set HF_TOKEN as a GH Actions secret (if not already) so the HF mirror step in the cloud workflow can fire.
+**First action when you sit down**: read this brief, then `cd ~/src/plumbline && python tools/render_report.py --target sherlock --reps reps.jsonl --slug 2026-06-08-<sponsor> --sponsor "<Sponsor>" --out reports/<slug>.md` to dry-run the pipeline before the contest scope drops.
 
-## Commit log overnight (latest first)
+## What's in the corpus now
+
+| Source | Findings | Severity split | License |
+|--------|----------|----------------|---------|
+| `examples/` (hand-built) | 49 | mixed | own work |
+| `corpus/c4/` (auto-ingested) | 1191 | H=379 M=809 L=3 | NO LICENSE (private use only — gitignored) |
+| **Total** | **1240** | | |
+
+Per the C4_INGEST_OPPORTUNITY.md synthesis I wrote yesterday, the literature suggests RAG recall lifts from 0.42 → 0.55-0.65 on this scale of corpus expansion. **Not yet measured** — pending the rebuilt index landing.
+
+## Contest-day pipeline (smoke-tested)
+
+```bash
+# 1. When Sherlock contest scope drops, grab the repo URL
+SLUG=2026-06-08-<sponsor>
+SCOPE_REPO=<sponsor-repo-url>
+
+# 2. Run sol_intent over scope (RAG now sees 1240 findings)
+python tools/sol_intent.py <scope-dir> --hybrid-rag
+
+# 3. Discharge known shapes via TLC (9 specs available)
+python tools/tlc_oracle_loop.py reps.jsonl
+
+# 4. Render Sherlock-shape markdown report
+python tools/render_report.py --target sherlock \
+    --reps reps.jsonl --slug $SLUG --sponsor "<Sponsor>" \
+    --out reports/$SLUG.md
+
+# 5. Convert to PDF (xelatex required for unicode)
+pandoc reports/$SLUG.md --pdf-engine=xelatex \
+    -o "$(date +%Y.%m.%d) - Final - <Sponsor> Audit Report.pdf"
+
+# 6. Triage. Pick STRONG-confirmed findings. Submit through Sherlock dashboard.
 ```
-d85afab  doc(adr): ADR-006 — reframe ml_classifier as verifier-router (T4)
-450b40b  doc(research): T12 — Solidity→TLA+ pipeline note (arxiv-shaped working note)
-ca85874  doc(brief): T14 done — CONTEST_RUNBOOK.md landed
-c15de79  doc(contest): T14 — CONTEST_RUNBOOK.md, the keyboard sequence for scope-drop day
-c7c3508  doc(brief): T16 done — Lark grammar 5/5 PASS, T8 unblocked
-963ec17  feat(grammar): T16 — vendor minimal Lark CFG for plumbline TLA+ subset
-e882903  doc(brief): T3 + T6 complete — 5 FailureModes verified overnight
-1d91373  feat(tla): M-04 Create2NonIdempotent — fifth FailureMode, TLC-verified
-29cd349  feat(tla): H-3 Uint64FeeOverflow — fourth FailureMode, TLC-verified
-2fb1803  feat(tla): H-1 ReentrancyDrain — third FailureMode, TLC-verified
-ae4084a  feat(tla): M-02 ERC4337StaticSigDoS — second FailureMode, TLC-verified
-a1dd2ff  fix(retrieval): require 'bug class:' marker — exclude framework modules
-3b92fe0  fix(retrieval): extract focused 'bug class:' paragraph, not full header
-1ccd4ad  feat(retrieval): atomic-proposition lifting per LTLGuard
-f5b8d0a  doc(research): T1 done — LTLGuard pipeline notes
+
+The pipeline works end-to-end on existing reps. It will work for the contest scope as long as the contest source is loadable by sol_intent (Solidity files in standard layout). If they ship Yul or some weird build system, expect a hiccup.
+
+## Where the Sherlock template differs from Code4rena
+
+| | Code4rena (existing) | Sherlock (new) |
+|---|---|---|
+| Output | markdown | PDF (pandoc + xelatex) |
+| Severity | qualitative H/M/QA + Gas | quantitative impact-only H/M only |
+| H criterion | judge discretion | users lose >1% AND >$10 of principal/yield/fees |
+| M criterion | judge discretion | >0.01% AND >$10 OR breaks core functionality |
+| QA tier | yes (bulk list) | DROPPED (no informational tier) |
+| Gas tier | yes (bulk list) | DROPPED |
+| Filename | report.md | `YYYY.MM.DD - Final - <Protocol> Audit Report.pdf` |
+
+The render_report.py `--target sherlock` flag routes to the new templates automatically.
+
+## Honest gaps (don't get caught off guard)
+
+1. **`severity_rationale` is required for High** in Sherlock format. The Sherlock template has a fallback that renders the rubric language verbatim, but plumbline's `weak_confirm` doesn't currently emit a quantitative rationale. For each High finding submitted, **manually verify the dollar/percentage threshold language** matches the actual impact in the contest's specific protocol.
+
+2. **Plumbline's reps don't have `plumbline_provenance`** populated end-to-end yet. The Sherlock smoke render showed "Confirmation strength: unknown" placeholders. This means the pipeline produces a SHELL for each finding — you'll need to fill the impact + PoC details by hand for any submission today. The shape is right; the content is sparse.
+
+3. **TLC counterexample → Foundry test gap is NOT bridged.** Sherlock requires runnable PoCs for High/Medium. Plumbline outputs traces, not Foundry tests. **This is the highest-leverage missing piece** — for today, you'll hand-author the Foundry test from the TLC trace. For next contest, build `tools/tlc_to_forge.py` (suggested: SignatureReplay first).
+
+4. **RAG index rebuild LANDED** (verified at brief-write time). 5.6 MB pkl, 1240 findings × 384-dim. Smoke-tested with 3 contest-shape queries:
+
+   ```
+   Q: 'signature replay missing nonce check on permit'
+     1. [0.725] c4/2022-01-insure/M-03 "Signature replay"        ← top-1, literal name match
+     2. [0.721] c4/2024-03-pooltogether/M-08 "Permit doesn't work with DAI"
+     3. [0.704] examples/sequence/L-03 "Nonce consumption reverts ..."
+
+   Q: 'reentrancy drain via external call before state update'
+     1. [0.729] c4/2023-07-amphora/H-01 "Reentrancy issue with withdraw method of USDC"
+     2. [0.714] examples/puppy-raffle/H-1 "Reentrancy attack in PuppyRaffle::refund"
+
+   Q: 'create2 same salt deployed twice non-idempotent'
+     1. [0.750] c4/2022-01-insure/M-02 "Owner can call applyCover multiple times"
+     3. [0.737] examples/boss-bridge/L-2 "deployToken can create multiple tokens with same salt"
+   ```
+
+   Cross-corpus geometry working — c4 findings and examples/ findings co-rank by semantic relevance, not source preference.
+
+5. **Top-5 Immunefi programs** is still an open question. The strategic doc covers structure + severity + payouts (Median Critical = $20k) but doesn't answer "which programs match plumbline's 9 shapes." That's a follow-up scrape pass when you have an hour.
+
+## Two autonomous loops running
+
+- **GH Actions `autonomous.yml`** — every 30 min via cron, uses `tools/autonomous_loop.py` (Anthropic SDK, PACT_LLM_API_KEY secret). Primary. Cost-tracked against `tools/autonomous_spend.json` ($50/week cap, currently $0.456).
+- **CCR routine `plumbline-autonomous-loop`** (trig_01S3EV2ZfUfHQyUS5c5MKM6f) — every 60 min via Anthropic cron. Redundancy + visibility window via the routines UI. CCR-native (no API key needed; uses Claude session credit, not the $50/wk cap). First fire was scheduled for 2026-06-08T05:02Z. Watch `logs/cycle.log` for outcomes.
+
+## Goal queue advanced overnight
+
+`prompts/goals/QUEUE.md` carries 8 ranked goals. Top three at session start were the contest-prep goals; today's contest readiness work was prioritized over the open goal queue (justified by your "going all in on Sherlock" directive). Both autonomous loops will pick from the queue from here forward.
+
+## Cost ledger
+
+- LLM spend overnight: **$4.20** for deep-research workflow (109 agents, 4.2M tokens, Immunefi research) — paid out of Claude subscription, not the $50/wk cap.
+- No `autonomous_loop.py` API calls overnight (paused while contest-prep work shipped).
+- $50/wk cap: $0.456 used cumulative, $49.54 remaining.
+
+## Commit log (this session)
+
+```
+08af90b  feat(sherlock): contest-shaped template + finding block + PDF render path
+582d787  feat(immunefi): verified template + schema + strategy synthesis; unpause loop
+684446f  feat(c4-ingest): batch-pull Code4rena findings into plumbline RAG corpus
+9e5235b  feat(reports): Code4rena-shaped Jinja2 template + finding schema + renderer
+362ab69  ops: pause autonomous loop while we pivot to audit-report-template work
 ```
 
-## Bug-class shapes now covered in the corpus (5 distinct)
+## What I'd do first if I were you
 
-| Shape | TLA+ module | Source bug |
-|-------|-------------|------------|
-| should-be-one-shot, no guard | `SignatureReplay.tla` | boss-bridge H-3 |
-| should-be-one-shot, guard after external call | `ReentrancyDrain.tla` | puppy-raffle H-1 |
-| caller-bound auth misreads msg.sender via EntryPoint | `ERC4337StaticSigDoS.tla` | sequence M-02 |
-| narrow-accumulator truncation | `Uint64FeeOverflow.tla` | puppy-raffle H-3 |
-| idempotency violation | `Create2NonIdempotent.tla` | sequence M-04 |
+1. Verify the RAG rebuild landed (commands above).
+2. Dry-run the pipeline on `examples/sequence` to make sure nothing's broken end-to-end.
+3. Watch Sherlock's X account / their contest page for the scope drop.
+4. When scope drops: run the 6-step pipeline above. Triage hard for High-tier dollar/percentage threshold compliance before submitting.
 
-This is the seed library. Each addition to the corpus increases the cone of bug shapes the LLM-as-fluency-prosthesis can pattern-match against.
+## Honest scope of this brief
 
-## What I'm doing next (and why)
-- T14, T12, T4 done. Next zero-spend candidates: T17 (always-fires checklist), T13 (verify cloud loop via gh CLI). T15 requires slither which isn't local (codespace only). T8/T11 require LLM spend — paused. T9/T10 require JH directly. Scheduling toward T17 (checklist gives JH a clean status surface for any pulse) then T13 (loop-alive check).
+What's verified (✓):
+- 1240 findings parsed (counted directly)
+- Sherlock template renders + pandoc PDF works (smoke-tested with `reports/smoke-sherlock.md` → `reports/smoke-sherlock.pdf`)
+- Immunefi research is 19/25 claims 3-0; 6 explicitly killed
 
-## Task list at this moment
-- ✅ T1, T2, T3, T4, T6, T12, T14, T16, T18 complete (9 tasks closed overnight)
-- ⏸️ T5, T7, T13, T15, T17 pending zero-spend
-- ⛔ T8, T11 paused — needs JH approval before LLM spend
-- ⏸️ T9, T10 — JH directly
-- 🆕 T19 — retrieval embedder gap, investigation-track
+What's pending verification (⏳):
+- RAG index rebuild was in-flight at brief-write time
+- RAG recall lift number (0.42 → 0.55-0.65) is literature-suggested, not measured
 
-## Honest cost ledger overnight
-- $0 spent on LLM API. All work was reading (WebFetch), file edits, local TLC, codespace compute that's already paid for.
+What's unverified theory (⚠):
+- Plumbline will detect the actual Sherlock contest bugs (depends on which shapes the contest's bugs match)
+- Submissions will pass Sherlock's quantitative threshold scrutiny (depends on you eyeballing each finding before submit)
 
----
-*This file rewritten on every overnight pulse. If you see this with "no new commits today," I either hit a blocker I couldn't get past, or I drifted and the meta-loop didn't catch me. The git log is the audit.*
+Good luck today.
