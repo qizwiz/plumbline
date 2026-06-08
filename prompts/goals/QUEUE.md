@@ -12,7 +12,8 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 
 | rank | goal | est_cost | status | notes |
 |------|------|----------|--------|-------|
-| 0 | SHAPE_GRAPH_EVOLVE | $0 | in-progress | extract_signature fixed (removed parent header from mutation sigs → cos dropped 0.94→0.75); 3 inject mutations pass both gates (cov=5, fit=5, cos<0.85); OracleStaleness banked: TLC-verified StaleDataRejected, SHAPES+A_QUERIES+SHAPE_HEURISTICS+SHAPE_TEMPLATES+README updated; 10th shape in library — next: run --runs 10 to produce shape_evolve_ranking.json with 10-shape library + check calibration |
+| -1 | CONTEST_DAY_HARDENING | $0 | pending | Mechanical adversarial verification + slither integration + admin-trust filter. Today's calibration showed plumbline produces 200+ leads, 0 survive review. Manual reading produced the only finding. Gap is verification, not generation. See prompts/goals/CONTEST_DAY_HARDENING.goal.md |
+| 0 | SHAPE_GRAPH_EVOLVE | $0 | in-progress | extract_signature fixed (removed parent header from mutation sigs → cos dropped 0.94→0.75); 3 inject mutations pass both gates (cov=5, fit=5, cos<0.85); **OracleStaleness BANKED**: TLC-verified StaleDataRejected, SHAPES+A_QUERIES+SHAPE_HEURISTICS+SHAPE_TEMPLATES+README updated; **10th shape in library** — next: run --runs 10 to produce shape_evolve_ranking.json with 10-shape library + check calibration |
 | 1 | NOTIONAL_RECALL | $15 | done | 67.6% strict mechanical, 75.6% honest combined cold recall on Sherlock-judged Notional. Gap to ceiling = 18pp. See CALIBRATION_NOTIONAL_RECALL.md. |
 | 2 | STRUCTURAL_CASCADE | $0 | done | v3: 6/6 H/M strict (100%), 13 final from 145 fns. 294 SLOC. All 8 criteria met. |
 | 3 | LEAD_CONDITIONED_SPEC | $10 | blocked | architectural fix for v1 noise (ERC4337StaticSigDoS only) |
