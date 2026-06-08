@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Audit finding schema",
+  "description": "Canonical per-finding object that plumbline produces and the Jinja2 templates consume. Code4rena is the default target; per-platform notes in templates/PLATFORM_NOTES.md describe mappings to Sherlock/Immunefi/Cantina/Spearbit/TOB.",
+  "type": "object",
+  "required": ["id", "severity", "title", "impact", "poc", "mitigation"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[HML]-[0-9]{2}$",
+      "description": "Code4rena format: <SEV>-<NN> zero-padded. H-01, M-03, etc. SEV ∈ {H, M, L} per docs.code4rena.com. Sherlock uses different IDs; convert at render time."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["High", "Medium", "QA", "Gas"],
+      "description": "Code4rena severity bucket. Sherlock translates: HIGH = users lose >1% AND >$10 principal; MEDIUM = >0.01% AND >$10 OR core-functionality break; both impact-only, no likelihood."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 200,
+      "description": "Title-case, action-oriented. Plumbline default: invariant_name + spec_name + ' on ' + contract_name. E.g.: 'NoOverpayment violated in SignatureReplay-shaped withdraw flow on L1BossBridge'."
+    },
+    "source_issue_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to original finding submission. For Code4rena: github.com/code-423n4/<slug>-findings/issues/<n>. For solo audits, can be the plumbline rep_id link or a Notion/Linear URL."
+    },
+    "attribution": {
+      "type": "object",
+      "required": ["primary"],
+      "properties": {
+        "primary": {
+          "type": "string",
+          "description": "Primary submitter (warden handle for C4)."
+        },
+        "duplicates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["warden", "url"],
+            "properties": {
+              "warden": {"type": "string"},
+              "url": {"type": "string", "format": "uri"}
+            }
+          },
+          "description": "Optional list of duplicate submitters. Empty for solo work."
+        }
+      }
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional. Code4rena: appears before Impact when included. Treat as `## Description` slot; plumbline default: matched FailureMode shape's bug-class description."
+    },
+    "impact": {
+      "type": "string",
+      "minLength": 20,
+      "description": "REQUIRED. What concretely happens — funds lost, system bricked, user impersonated. Plumbline default: derived from sol_intent lead text + TLC counterexample's first violation state. For Sherlock, must concretely quantify (>1% of principal etc) to fit High; otherwise downgrade to Medium per their impact-only rubric."
+    },
+    "poc": {
+      "type": "string",
+      "minLength": 20,
+      "description": "REQUIRED. For C4 H/M: must be runnable (Foundry test or diff against project test suite). Plumbline default: TLC counterexample state-trace formatted as Foundry test stub. For Sherlock: same expectation."
+    },
+    "poc_diff_path": {
+      "type": "string",
+      "description": "Optional path to runnable PoC diff (e.g. test/exploits/H-01.t.sol). If present, rendered as an additional 'See the runnable PoC diff' line."
+    },
+    "mitigation": {
+      "type": "string",
+      "minLength": 20,
+      "description": "REQUIRED. Specific code change recommended. Plumbline default: derived from the matched FailureMode spec's 'correct' action (the non-buggy branch in our TLA+ spec). E.g.: 'add a per-signature consumed flag set before transfer; check before accept.'"
+    },
+    "tools_used": {
+      "type": "string",
+      "description": "Optional. Plumbline default: 'TLC model checker on plumbline\\'s <SpecName> FailureMode + manual review' for shape-discharged findings; 'Anthropic Claude Sonnet via plumbline\\'s sol_intent + RAG over .ANSWERS history' for lead-driven findings."
+    },
+    "severity_rationale": {
+      "type": "string",
+      "description": "Optional. Why this severity bucket. Required by Code4rena if severity is contestable; required by Sherlock for any High."
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["label", "url"],
+        "properties": {
+          "label": {"type": "string"},
+          "url": {"type": "string", "format": "uri"}
+        }
+      },
+      "description": "Optional external citations. Plumbline auto-fills with relevant past .ANSWERS findings via RAG retrieval."
+    },
+    "code_citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "line_start"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path within the contest scope, e.g., src/L1BossBridge.sol"
+          },
+          "line_start": {"type": "integer", "minimum": 1},
+          "line_end": {"type": "integer", "minimum": 1},
+          "permalink": {
+            "type": "string",
+            "format": "uri",
+            "description": "github.com/code-423n4/<slug>/blob/<commit>/<path>#L<start>-L<end> or equivalent permalink format for other platforms"
+          }
+        }
+      },
+      "description": "Code citations. Code4rena format: ContractName.sol#Lstart-Lend rendered as markdown link to the in-scope code-423n4 repo at the audit's pinned commit."
+    },
+    "plumbline_provenance": {
+      "type": "object",
+      "description": "OPTIONAL plumbline-specific block. NOT rendered into the final audit report — used internally for auditing the auditor.",
+      "properties": {
+        "rep_id": {"type": "string"},
+        "matched_spec": {"type": "string"},
+        "tlc_invariant": {"type": "string"},
+        "tlc_trace_hash": {"type": "string"},
+        "router_verdict": {
+          "type": "string",
+          "enum": ["tlc_will_decide", "halmos_will_decide", "slither_will_catch", "human_only"]
+        },
+        "weak_confirm_strength": {
+          "type": "string",
+          "enum": ["STRONG", "WEAK"]
+        },
+        "sol_intent_lead_text": {"type": "string"}
+      }
+    }
+  }
+}

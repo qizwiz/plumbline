@@ -1,0 +1,41 @@
+{# finding_block.j2 — per-finding sub-template, Code4rena-shaped.
+
+Required slots (3-0 verified): Impact, Proof of Concept, Recommended Mitigation Steps.
+Optional slots: Description, Tools Used, Severity Rationalization, References.
+#}
+
+## [[{{ f.id }} {{ f.title }}]({{ f.source_issue_url }})]({{ f.source_issue_url }})
+
+*Submitted by [{{ f.attribution.primary }}]({{ f.source_issue_url }}){% if f.attribution.duplicates %}, also found by{% for d in f.attribution.duplicates %} [{{ d.warden }}]({{ d.url }}){% if not loop.last %},{% endif %}{% endfor %}{% endif %}*
+
+{% if f.description %}### Description
+
+{{ f.description }}
+
+{% endif %}### Impact
+
+{{ f.impact }}
+
+### Proof of Concept
+
+{{ f.poc }}
+{% if f.poc_diff_path %}
+See the runnable PoC diff at `{{ f.poc_diff_path }}`.
+{% endif %}
+
+### Recommended Mitigation Steps
+
+{{ f.mitigation }}
+
+{% if f.tools_used %}### Tools Used
+
+{{ f.tools_used }}
+
+{% endif %}{% if f.severity_rationale %}### Severity Rationalization
+
+{{ f.severity_rationale }}
+
+{% endif %}{% if f.references %}### References
+
+{% for r in f.references %}- [{{ r.label }}]({{ r.url }})
+{% endfor %}{% endif %}

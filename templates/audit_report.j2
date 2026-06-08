@@ -1,0 +1,110 @@
+{# audit_report.j2 — Code4rena-shaped superset template.
+
+Filled by tools/render_report.py from a `report` dict.
+
+Targets Code4rena format by default (highest verified coverage).
+Other platforms (Sherlock, Immunefi, Cantina, Spearbit, TOB) get
+platform-specific renderers in templates/PLATFORM_NOTES.md.
+
+Structure verified from primary sources — see
+docs/research/AUDIT_REPORT_TEMPLATE_RESEARCH.md.
+#}
+---
+sponsor: "{{ report.sponsor }}"
+slug: "{{ report.slug }}"
+date: "{{ report.date }}"
+title: "{{ report.title }}"
+findings: "{{ report.findings_url }}"
+contest: {{ report.contest_id }}
+---
+
+# {{ report.title }}
+
+## Overview
+
+### About C4
+
+Code4rena (C4) is an open organization consisting of security researchers,
+auditors, developers, and individuals with domain expertise in smart
+contracts.
+
+A C4 audit is an event in which community participants, referred to as
+Wardens, review, audit, or analyze smart contract logic in exchange for
+a bounty provided by sponsoring projects.
+
+During the audit outlined in this document, C4 conducted an analysis of
+{{ report.sponsor }}'s smart contracts. The audit took place from
+{{ report.start_date }} to {{ report.end_date }}.
+
+### Wardens
+
+{% if report.wardens %}{{ report.wardens|length }} Wardens contributed reports to this audit:
+{% for w in report.wardens %}- [{{ w }}](https://code4rena.com/@{{ w }})
+{% endfor %}{% endif %}
+
+This audit was judged by [{{ report.judge }}](https://code4rena.com/@{{ report.judge }}).
+
+Final report assembled by [{{ report.assembler }}](https://code4rena.com/@{{ report.assembler }}).
+
+## Summary
+
+The C4 analysis yielded an aggregated total of {{ report.high_count }} unique
+vulnerabilities. Of these vulnerabilities, {{ report.high_count }} received a
+risk rating in the category of HIGH severity and {{ report.medium_count }}
+received a risk rating in the category of MEDIUM severity.
+
+Additionally, C4 analysis included {{ report.qa_count }} reports detailing issues
+with a risk rating of LOW severity or non-critical. There were also
+{{ report.gas_count }} reports recommending gas optimizations.
+
+All of the issues presented here are linked back to their original finding.
+
+## Scope
+
+The code under review can be found within the [C4 {{ report.title }} repository](https://github.com/code-423n4/{{ report.slug }}), and is composed of {{ report.sloc_count }} smart contracts written in the Solidity programming language and includes {{ report.sloc }} lines of Solidity code.
+
+## Severity Criteria
+
+C4 assesses the severity of disclosed vulnerabilities based on three primary
+risk categories: high, medium, and low/non-critical.
+
+High-level considerations for vulnerabilities span the following key areas
+when conducting assessments:
+
+- Malicious Input Handling
+- Escalation of privileges
+- Arithmetic
+- Gas use
+
+For more information regarding the severity criteria refer to the
+documentation found in our [judging documentation](https://docs.code4rena.com/awarding/judging-criteria/severity-categorization).
+
+{% if report.findings.high %}# High Risk Findings ({{ report.findings.high|length }})
+{% for f in report.findings.high %}{% include 'finding_block.j2' %}
+{% endfor %}{% endif %}
+{% if report.findings.medium %}# Medium Risk Findings ({{ report.findings.medium|length }})
+{% for f in report.findings.medium %}{% include 'finding_block.j2' %}
+{% endfor %}{% endif %}
+{% if report.findings.qa %}# Low Risk and Non-Critical Issues
+
+For this audit, {{ report.findings.qa|length }} reports were submitted by wardens detailing low risk and non-critical issues.
+
+{% for f in report.findings.qa %}- [{{ f.title }}]({{ f.url }})
+{% endfor %}{% endif %}
+{% if report.findings.gas %}# Gas Optimizations
+
+For this audit, {{ report.findings.gas|length }} reports were submitted by wardens detailing gas optimizations.
+
+{% for f in report.findings.gas %}- [{{ f.title }}]({{ f.url }})
+{% endfor %}{% endif %}
+
+## Disclosures
+
+C4 is an open organization governed by participants in the community.
+
+C4 audits incentivize the discovery of exploits, vulnerabilities, and bugs in
+smart contracts. Security researchers are rewarded at an increasing rate for
+finding higher-risk issues. Audit submissions are judged by a knowledgeable
+security researcher and disclosed to sponsoring developers. C4 does not
+conduct formal verification regarding the provided code but instead provides
+final verification to ensure that all issues have been properly disclosed.
