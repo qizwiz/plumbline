@@ -17,14 +17,16 @@
   "unmatched_findings": 146,
   "sherlock_corpus_coverage": 0.937,
   "run_date": "2026-06-08",
-  "note": "All inject mutations now anti-sim blocked by OracleStaleness (the banked shape from previous cycle). Subdiv mutations cover 0 unmatched findings. Next: --runs 10 to generate novel mutations in uncovered region.",
+  "runs_per_spec": 10,
+  "novel_mutations_this_run": 3,
+  "note": "--runs 10 over 9 specs (90 TLC invocations). 3 novel mutations: Create2NonIdempotent_mut_4 (swap_bool), CrossWalletSigReplay_mut_8 (swap_bool), ReentrancyDrain_mut_7 (replace_const). All inject mutations anti-sim blocked by OracleStaleness (cos 0.87-0.88). Non-inject mutations (subdiv, swap) all cover 0 unmatched findings. Next: try semantic operators targeting the 146-finding gap cluster (oracle/timing/economic bugs not covered by existing 12 shapes).",
   "mutations": [
     {
       "mutation": "ReentrancyDrain_Inject",
       "covered_count": 5,
       "fitness_score": 0,
       "closest_existing": "OracleStaleness",
-      "closest_existing_cos": 0.88,
+      "closest_existing_cos": 0.8770927786827087,
       "anti_sim_penalty": true,
       "note": "anti-sim blocked by OracleStaleness"
     },
@@ -33,7 +35,7 @@
       "covered_count": 5,
       "fitness_score": 0,
       "closest_existing": "OracleStaleness",
-      "closest_existing_cos": 0.88,
+      "closest_existing_cos": 0.8803380131721497,
       "anti_sim_penalty": true,
       "note": "anti-sim blocked by OracleStaleness"
     },
@@ -42,7 +44,7 @@
       "covered_count": 5,
       "fitness_score": 0,
       "closest_existing": "OracleStaleness",
-      "closest_existing_cos": 0.87,
+      "closest_existing_cos": 0.8734680414199829,
       "anti_sim_penalty": true,
       "note": "anti-sim blocked by OracleStaleness"
     },
@@ -51,7 +53,7 @@
       "covered_count": 4,
       "fitness_score": 0,
       "closest_existing": "OracleStaleness",
-      "closest_existing_cos": 0.87,
+      "closest_existing_cos": 0.874305009841919,
       "anti_sim_penalty": true,
       "note": "anti-sim blocked by OracleStaleness"
     },
@@ -60,7 +62,15 @@
       "covered_count": 0,
       "fitness_score": 0,
       "closest_existing": "Create2NonIdempotent",
-      "closest_existing_cos": 0.82,
+      "closest_existing_cos": 0.8235283493995667,
+      "anti_sim_penalty": false
+    },
+    {
+      "mutation": "CrossWalletSigReplay_mut_8",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "CrossWalletSigReplay",
+      "closest_existing_cos": 0.8469948172569275,
       "anti_sim_penalty": false
     },
     {
@@ -68,7 +78,7 @@
       "covered_count": 0,
       "fitness_score": 0,
       "closest_existing": "PartialSignatureReplay",
-      "closest_existing_cos": 0.83,
+      "closest_existing_cos": 0.8269497752189636,
       "anti_sim_penalty": false
     },
     {
@@ -76,7 +86,15 @@
       "covered_count": 0,
       "fitness_score": 0,
       "closest_existing": "ReentrancyDrain",
-      "closest_existing_cos": 0.84,
+      "closest_existing_cos": 0.840438723564148,
+      "anti_sim_penalty": false
+    },
+    {
+      "mutation": "ReentrancyDrain_mut_7",
+      "covered_count": 0,
+      "fitness_score": 0,
+      "closest_existing": "ReentrancyDrain",
+      "closest_existing_cos": 0.8188617825508118,
       "anti_sim_penalty": false
     },
     {
@@ -84,7 +102,7 @@
       "covered_count": 0,
       "fitness_score": 0,
       "closest_existing": "ReentrancyDrain",
-      "closest_existing_cos": 0.8,
+      "closest_existing_cos": 0.804709792137146,
       "anti_sim_penalty": false
     },
     {
@@ -92,7 +110,7 @@
       "covered_count": 0,
       "fitness_score": 0,
       "closest_existing": "ReentrancyDrain",
-      "closest_existing_cos": 0.81,
+      "closest_existing_cos": 0.8088812828063965,
       "anti_sim_penalty": false
     }
   ]

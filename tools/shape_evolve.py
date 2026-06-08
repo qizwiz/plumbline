@@ -1343,12 +1343,14 @@ def main():
         print(f"  covered findings (sample):")
         for f in top["covered_findings_sample"]:
             print(f"    - {f}")
-        out = HERE / "corpus" / "calibration" / "shape_evolve_ranking.json"
-        out.write_text(json.dumps(results, indent=2))
-        print(f"\nfull ranking → {out}")
     else:
         print("\nNo mutation passed anti-similarity penalty AND covered >0 findings.")
         print("Try: --runs 20 to generate more mutations.")
+
+    # Always write the ranking JSON so the run is recorded (even all-zero fitness).
+    out = HERE / "corpus" / "calibration" / "shape_evolve_ranking.json"
+    out.write_text(json.dumps(results, indent=2))
+    print(f"\nfull ranking → {out}")
 
 
 if __name__ == "__main__":
