@@ -1,0 +1,388 @@
+{
+  "leads_parsed": 12,
+  "ground_truth_total": 37,
+  "h_total": 11,
+  "m_total": 26,
+  "mechanical_recall_total": 0.05405405405405406,
+  "mechanical_recall_h": 0.0,
+  "thematic_recall_total": 0.8378378378378378,
+  "thematic_recall_h": 1.0,
+  "per_finding": [
+    {
+      "id": "H-1",
+      "severity": "High",
+      "title": "Cross-contract reentrancy allows YIELD_TOKEN theft for the GenericERC4626 WithdrawalReq",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8092441558837891,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls"
+    },
+    {
+      "id": "H-2",
+      "severity": "High",
+      "title": "Attacker can drain the entire suppliers on",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7059926986694336,
+      "thematic_best_lead": "[REFUTE] AbstractYieldStrategy.redeemNative -- msg.sender redeems own shares with nonReentrant protection"
+    },
+    {
+      "id": "H-3",
+      "severity": "High",
+      "title": "DineroWithdrawRequestManager vulnerable to token overwithdrawal via batch ID overlap",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7906066179275513,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.tokenizeWithdrawRequest -- delegated tokenization over fixed token set with OR accumulation"
+    },
+    {
+      "id": "H-4",
+      "severity": "High",
+      "title": "When users borrow directly from Morpho",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.723149299621582,
+      "thematic_best_lead": "[REFUTE] AbstractYieldStrategy.initiateWithdrawNative -- burns caller's full balance with explicit user consent"
+    },
+    {
+      "id": "H-5",
+      "severity": "High",
+      "title": "migrateRewardPool Fails Due to Incompatible Storage Design in CurveConvexLib",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.764202356338501,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls"
+    },
+    {
+      "id": "H-6",
+      "severity": "High",
+      "title": "DoS might happen to DineroWithdrawReq",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7571649551391602,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls"
+    },
+    {
+      "id": "H-7",
+      "severity": "High",
+      "title": "RewardManagerMixin.claimAccountRewar",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7865452766418457,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss"
+    },
+    {
+      "id": "H-8",
+      "severity": "High",
+      "title": "Incorrect assumption that one (1) Pendle",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6605004072189331,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.stakeTokens -- onlyApprovedVault modifier controls staking flow"
+    },
+    {
+      "id": "H-9",
+      "severity": "High",
+      "title": "Hardcoded useEth = true in remove_liq",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7887145280838013,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss"
+    },
+    {
+      "id": "H-10",
+      "severity": "High",
+      "title": "Malicious user can change the TradeTyp",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8018589019775391,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls"
+    },
+    {
+      "id": "H-11",
+      "severity": "High",
+      "title": "Missing Slippage Protection in Expired PT",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6600192785263062,
+      "thematic_best_lead": "[CONFIRM] AbstractWithdrawRequestManager.finalizeAndRedeemWithdrawRequest -- partial withdrawal arithmetic allows share/yield token desynchronization"
+    },
+    {
+      "id": "M-1",
+      "severity": "Medium",
+      "title": "Hard-Coded Mainnet WETH Address Breaks",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": false,
+      "thematic_best_cos": 0.0,
+      "thematic_best_lead": ""
+    },
+    {
+      "id": "M-2",
+      "severity": "Medium",
+      "title": "Incorrect tokensClaimed calculation in",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7415047883987427,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss"
+    },
+    {
+      "id": "M-3",
+      "severity": "Medium",
+      "title": "Single sided strategy cant do trades for",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7032397389411926,
+      "thematic_best_lead": "[REFUTE] AbstractYieldStrategy.redeemNative -- msg.sender redeems own shares with nonReentrant protection"
+    },
+    {
+      "id": "M-4",
+      "severity": "Medium",
+      "title": "Liquidations can be frontrunned to avoid",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6918348670005798,
+      "thematic_best_lead": "[REFUTE] AbstractLendingRouter.liquidate -- preLiquidation whitelist check prevents unauthorized collateral transfer"
+    },
+    {
+      "id": "M-5",
+      "severity": "Medium",
+      "title": "Minting yield tokens single sided can be",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7944207191467285,
+      "thematic_best_lead": "[CONFIRM] AbstractWithdrawRequestManager.finalizeAndRedeemWithdrawRequest -- partial withdrawal arithmetic allows share/yield token desynchronization"
+    },
+    {
+      "id": "M-6",
+      "severity": "Medium",
+      "title": "Withdrawals ongoing for OETH, apxETH,",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7993274331092834,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.initiateWithdraw -- delegated withdrawal with explicit exit balances from caller"
+    },
+    {
+      "id": "M-7",
+      "severity": "Medium",
+      "title": "Rounding discrepancy between",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": false,
+      "thematic_best_cos": 0.0,
+      "thematic_best_lead": ""
+    },
+    {
+      "id": "M-8",
+      "severity": "Medium",
+      "title": "Emission rewards will keep accruing even",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": false,
+      "thematic_best_cos": 0.0,
+      "thematic_best_lead": ""
+    },
+    {
+      "id": "M-9",
+      "severity": "Medium",
+      "title": "OETH Strategy Broken as Rebasing Not",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6653478145599365,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls"
+    },
+    {
+      "id": "M-10",
+      "severity": "Medium",
+      "title": "Incorrect asset matching for ETH/WETH",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7019680738449097,
+      "thematic_best_lead": "[REFUTE] AbstractLendingRouter.liquidate -- preLiquidation whitelist check prevents unauthorized collateral transfer"
+    },
+    {
+      "id": "M-11",
+      "severity": "Medium",
+      "title": "Users unable to claim rewards when Curve",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": false,
+      "thematic_best_cos": 0.0,
+      "thematic_best_lead": ""
+    },
+    {
+      "id": "M-12",
+      "severity": "Medium",
+      "title": "PendlePTOracle._getPTRate isn't correct",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7828630208969116,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss"
+    },
+    {
+      "id": "M-13",
+      "severity": "Medium",
+      "title": "Incompatibility of ERC20::approve function with USDT tokens on Ethereum Mainnet chain",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7327811121940613,
+      "thematic_best_lead": "[CONFIRM] AbstractWithdrawRequestManager.finalizeAndRedeemWithdrawRequest -- partial withdrawal arithmetic allows share/yield token desynchronization"
+    },
+    {
+      "id": "M-14",
+      "severity": "Medium",
+      "title": "Value of Etherna's Withdrawal Request",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss",
+        "[REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7441240549087524,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.initiateWithdraw -- delegated withdrawal with explicit exit balances from caller"
+    },
+    {
+      "id": "M-15",
+      "severity": "Medium",
+      "title": "Loss of reward tokens during initiating",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7300798892974854,
+      "thematic_best_lead": "[CONFIRM] AbstractWithdrawRequestManager.finalizeAndRedeemWithdrawRequest -- partial withdrawal arithmetic allows share/yield token desynchronization"
+    },
+    {
+      "id": "M-16",
+      "severity": "Medium",
+      "title": "Users will be unfairly liquidated if collateral value drops after initiating withdraw request",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7715631127357483,
+      "thematic_best_lead": "[REFUTE] AbstractLendingRouter.liquidate -- preLiquidation whitelist check prevents unauthorized collateral transfer"
+    },
+    {
+      "id": "M-17",
+      "severity": "Medium",
+      "title": "User unable to migrate under certain edge",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6586512923240662,
+      "thematic_best_lead": "[CONFIRM] AddressRegistry.setPosition -- missing vault validation allows position override via malicious lending router"
+    },
+    {
+      "id": "M-18",
+      "severity": "Medium",
+      "title": "Reducing liquidity in the hardcoded Curve",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.701123058795929,
+      "thematic_best_lead": "[CONFIRM] AbstractWithdrawRequestManager.finalizeAndRedeemWithdrawRequest -- partial withdrawal arithmetic allows share/yield token desynchronization"
+    },
+    {
+      "id": "M-19",
+      "severity": "Medium",
+      "title": "Unable to deposit to Convex in Arbitrum",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6918250918388367,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.stakeTokens -- onlyApprovedVault modifier controls staking flow"
+    },
+    {
+      "id": "M-20",
+      "severity": "Medium",
+      "title": "Lack of minimum debt threshold enables",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": false,
+      "thematic_best_cos": 0.0,
+      "thematic_best_lead": ""
+    },
+    {
+      "id": "M-21",
+      "severity": "Medium",
+      "title": "Funds stuck if one of the withdrawal requests cannot be finalized",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7194735407829285,
+      "thematic_best_lead": "[REFUTE] AbstractLendingRouter.liquidate -- preLiquidation whitelist check prevents unauthorized collateral transfer"
+    },
+    {
+      "id": "M-22",
+      "severity": "Medium",
+      "title": "Setup with asset = WETH and a Curve",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.655603289604187,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.stakeTokens -- onlyApprovedVault modifier controls staking flow"
+    },
+    {
+      "id": "M-23",
+      "severity": "Medium",
+      "title": "Unable to support Curve Pool with Native ETH",
+      "mechanical_caught": true,
+      "mech_hits": [
+        "[REFUTE] AbstractYieldStrategy.initiateWithdrawNative -- burns caller's full balance with explicit user consent",
+        "[REFUTE] AbstractYieldStrategy.redeemNative -- msg.sender redeems own shares with nonReentrant protection"
+      ],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.6987391114234924,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.stakeTokens -- onlyApprovedVault modifier controls staking flow"
+    },
+    {
+      "id": "M-24",
+      "severity": "Medium",
+      "title": "Convex cannot be configured for the",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": false,
+      "thematic_best_cos": 0.0,
+      "thematic_best_lead": ""
+    },
+    {
+      "id": "M-25",
+      "severity": "Medium",
+      "title": "Revert in getWithdrawRequestValue()",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.7613077163696289,
+      "thematic_best_lead": "[REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss"
+    },
+    {
+      "id": "M-26",
+      "severity": "Medium",
+      "title": "initializeMarket can be frontran, preventing markets from being configured in MorphoLe",
+      "mechanical_caught": false,
+      "mech_hits": [],
+      "thematic_caught": true,
+      "thematic_best_cos": 0.8111298680305481,
+      "thematic_best_lead": "[REFUTE] AbstractWithdrawRequestManager.stakeTokens -- onlyApprovedVault modifier controls staking flow"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+## VERDICTS
+
+- [REFUTE] AbstractLendingRouter.liquidate -- preLiquidation whitelist check prevents unauthorized collateral transfer
+  shape: (none)
+  why: Lines 151-152, preLiquidation performs security checks and whitelist validation before any state changes; msg.sender usage is for authorized liquidator identification, not a vulnerability
+
+- [REFUTE] BaseLPLib.getWithdrawRequestValue -- view function with require on hasRequest prevents silent value loss
+  shape: (none)
+  why: Line 331, require(hasRequest) enforces all tokens have valid withdraw requests; unbounded loop over TOKENS() is bounded by deployment configuration, not user input
+
+- [CONFIRM] AddressRegistry.setPosition -- missing vault validation allows position override via malicious lending router
+  shape: msg_sender_in_validation
+  why: Lines 134-135, position.lendingRouter set to msg.sender on first call, but lendingRouters[msg.sender] check alone doesn't prevent malicious router from setting position on legitimate vault before legitimate router
+
+- [REFUTE] AbstractYieldStrategy.preLiquidation -- onlyLendingRouter modifier restricts caller to authorized routers
+  shape: (none)
+  why: Line 233, onlyLendingRouter modifier + Lines 236-240 withdraw request validations ensure controlled execution; t_AllowTransfer pattern is intentional temporary authorization
+
+- [REFUTE] AbstractWithdrawRequestManager.initiateWithdraw -- onlyApprovedVault modifier prevents unauthorized vault calls
+  shape: (none)
+  why: Line 102, onlyApprovedVault modifier + Line 105 existing request check ensure controlled withdraw initiation; msg.sender usage is for vault tracking
+
+- [REFUTE] AbstractYieldStrategy.initiateWithdrawNative -- burns caller's full balance with explicit user consent
+  shape: (none)
+  why: Line 294, msg.sender withdraws their own balanceOf(msg.sender), no cross-account manipulation possible
+
+- [REFUTE] BaseLPLib.initiateWithdraw -- delegated withdrawal with explicit exit balances from caller
+  shape: (none)
+  why: Lines 362-373, loop over caller-specified exitBalances array with approved manager calls; unbounded loop is over TOKENS() which is deployment-fixed
+
+- [REFUTE] AddressRegistry.clearPosition -- onlyLendingRouter restricts deletion to authorized routers
+  shape: (none)
+  why: Line 146, lendingRouters[msg.sender] check ensures only authorized routers can clear positions they created
+
+- [REFUTE] AbstractYieldStrategy.redeemNative -- msg.sender redeems own shares with nonReentrant protection
+  shape: (none)
+  why: Line 271, nonReentrant modifier + Lines 272-273 sharesHeld check ensure caller only redeems their own balance
+
+- [REFUTE] BaseLPLib.tokenizeWithdrawRequest -- delegated tokenization over fixed token set with OR accumulation
+  shape: (none)
+  why: Lines 407-416, loop over TOKENS() (deployment-fixed) with proper result accumulation; manager calls are on approved managers only
+
+- [REFUTE] AbstractWithdrawRequestManager.stakeTokens -- onlyApprovedVault modifier controls staking flow
+  shape: (none)
+  why: Line 86, onlyApprovedVault + Lines 88-92 balance tracking ensure controlled token flow; minted tokens returned to approved vault
+
+- [CONFIRM] AbstractWithdrawRequestManager.finalizeAndRedeemWithdrawRequest -- partial withdrawal arithmetic allows share/yield token desynchronization
+  shape: msg_sender_in_validation
+  why: Lines 135-137, proportional tokensWithdrawn calculation uses withdrawYieldTokenAmount/yieldTokenAmount ratio but subtracts fixed sharesToBurn, allowing mismatch if caller controls both parameters independently
