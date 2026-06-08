@@ -26,7 +26,19 @@ Use `audit_report.j2` + `finding_block.j2` as-is.
 
 **Format difference**: Sherlock deliverables are **PDFs**, published to `github.com/sherlock-protocol/sherlock-reports/audits/` with filename `YYYY.MM.DD - Final - <Protocol Name> Audit Report.pdf`.
 
-**Render path**: generate markdown via `audit_report.j2`, then convert to PDF (e.g., via `pandoc` or `weasyprint`).
+**Render path** (smoke-tested 2026-06-08):
+
+```bash
+python tools/render_report.py --target sherlock \
+    --reps reps.jsonl --slug <slug> --sponsor "<Protocol>" \
+    --out reports/<slug>-sherlock.md
+pandoc reports/<slug>-sherlock.md --pdf-engine=xelatex \
+    -o "$(date +%Y.%m.%d) - Final - <Protocol> Audit Report.pdf"
+```
+
+**xelatex required** — finding bodies typically contain unicode (≤, →, etc.) which breaks default pdflatex. xelatex handles them; some monospace font warnings are non-fatal.
+
+Sherlock target uses `templates/audit_report_sherlock.j2` + `finding_block_sherlock.j2` (distinct from Code4rena's templates).
 
 **Severity rubric is QUANTITATIVE and impact-only** (likelihood explicitly excluded):
 

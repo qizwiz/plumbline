@@ -7,3 +7,4 @@ out/
 cache/
 *.log
 corpus/c4/
+reports/

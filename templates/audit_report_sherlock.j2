@@ -1,0 +1,83 @@
+{# audit_report_sherlock.j2 — Sherlock contest report template.
+
+Per docs/research/AUDIT_REPORT_TEMPLATE_RESEARCH.md (3-0 verified):
+  - Sherlock deliverables are PDFs at github.com/sherlock-protocol/sherlock-reports/audits/
+  - Filename: `YYYY.MM.DD - Final - <Protocol Name> Audit Report.pdf`
+  - Severity is QUANTITATIVE and IMPACT-ONLY (likelihood explicitly excluded):
+      High:   direct loss of funds without extensive external conditions
+              AND (users lose >1% AND >$10 of principal, yield, OR fees)
+      Medium: (>0.01% AND >$10) OR breaks core protocol functionality
+  - No QA tier — informational issues are dropped
+  - severity_rationale is REQUIRED for High; render rubric numbers explicitly
+
+Render path:
+  python tools/render_report.py --target sherlock ... --out report.md
+  pandoc report.md -o "$(date +%Y.%m.%d)\ -\ Final\ -\ <Protocol>\ Audit\ Report.pdf"
+#}
+---
+title: "{{ report.title }}"
+subtitle: "Sherlock audit report"
+author: "{{ report.assembler }}"
+date: "{{ report.date }}"
+geometry: margin=1in
+fontsize: 11pt
+---
+
+# {{ report.title }}
+
+## Audit Overview
+
+**Protocol**: {{ report.sponsor }}
+**Audit Window**: {{ report.start_date }} — {{ report.end_date }}
+**Auditor**: {{ report.assembler }}
+**Date of Report**: {{ report.date }}
+
+## Summary of Findings
+
+| Severity | Count |
+|----------|-------|
+| High     | {{ report.high_count }} |
+| Medium   | {{ report.medium_count }} |
+| **Total**    | **{{ report.high_count + report.medium_count }}** |
+
+This audit found {{ report.high_count }} High-severity issue(s) and {{ report.medium_count }} Medium-severity issue(s) in {{ report.sponsor }}'s smart contracts.
+
+## Scope
+
+The code under review can be found at the {{ report.sponsor }} repository ({{ report.findings_url }}). The audit covered {{ report.sloc_count }} smart contract(s) totaling {{ report.sloc }} lines of Solidity.
+
+## Severity Criteria
+
+Sherlock applies a **quantitative, impact-only** severity rubric (V2 judging guidelines, https://docs.sherlock.xyz/audits/judging/judging). Likelihood is explicitly excluded — severity is decided by impact alone.
+
+### High
+
+- Definitive loss of funds without (extensive) limitations on external conditions
+- AND users lose more than 1% AND more than $10 of their principal, yield, or fees
+
+### Medium
+
+- Users lose more than 0.01% AND more than $10 of their principal, yield, or fees
+- OR breaks core protocol functionality
+
+### Out of scope
+
+- Informational / QA-tier issues (Sherlock does not track an Informational tier in this format)
+- Gas optimizations (not severity-rated)
+
+{% if report.findings.high %}# High Risk Findings ({{ report.findings.high|length }})
+
+{% for f in report.findings.high %}{% include 'finding_block_sherlock.j2' %}
+{% endfor %}{% endif %}
+{% if report.findings.medium %}# Medium Risk Findings ({{ report.findings.medium|length }})
+
+{% for f in report.findings.medium %}{% include 'finding_block_sherlock.j2' %}
+{% endfor %}{% endif %}
+
+## About Sherlock
+
+Sherlock is a smart contract security platform that combines audit competitions with an on-chain coverage product. Audit deliverables are published at https://github.com/sherlock-protocol/sherlock-reports/audits.
+
+## Disclaimer
+
+This audit report is a snapshot of the codebase as of the commit hash specified in scope. Subsequent changes to the codebase are out of scope. No security audit can guarantee the absence of vulnerabilities. Use of this report is governed by Sherlock's standard terms.

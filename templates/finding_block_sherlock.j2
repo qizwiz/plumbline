@@ -1,0 +1,38 @@
+{# finding_block_sherlock.j2 — per-finding sub-template for Sherlock reports.
+
+Per-finding triad: Impact / Proof of Concept / Recommendation
++ REQUIRED severity_rationale for High (with rubric numbers explicit per Sherlock V2 docs).
+#}
+
+## {{ f.id }}: {{ f.title }}
+
+**Severity**: {{ f.severity }}
+
+{% if f.severity == "High" %}**Severity Rationale**: {{ f.severity_rationale or "Direct loss of funds; users lose more than 1% AND more than $10 of principal, yield, or fees." }}
+{% elif f.severity == "Medium" %}**Severity Rationale**: {{ f.severity_rationale or "Users lose more than 0.01% AND more than $10 OR breaks core protocol functionality." }}
+{% endif %}
+{% if f.description %}### Description
+
+{{ f.description }}
+
+{% endif %}### Impact
+
+{{ f.impact }}
+
+### Proof of Concept
+
+{{ f.poc }}
+{% if f.poc_diff_path %}
+Runnable PoC: `{{ f.poc_diff_path }}`
+{% endif %}
+
+### Recommendation
+
+{{ f.mitigation }}
+
+{% if f.tools_used %}**Tools Used**: {{ f.tools_used }}
+{% endif %}{% if f.references %}**References**:
+{% for r in f.references %}- [{{ r.label }}]({{ r.url }})
+{% endfor %}{% endif %}
+
+---

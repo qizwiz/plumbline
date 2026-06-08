@@ -79,22 +79,27 @@ def rep_to_finding(rep: dict, idx: int, severity: str) -> dict:
     }
 
 
-def render_codearena(report_data: dict, out_path: str):
+def render_with_template(report_data: dict, out_path: str, template_name: str):
     try:
         from jinja2 import Environment, FileSystemLoader
     except ImportError:
         sys.stderr.write("install jinja2: pip install jinja2\n"); sys.exit(1)
     env = Environment(loader=FileSystemLoader(TEMPLATES_DIR),
                       trim_blocks=False, lstrip_blocks=False)
-    tmpl = env.get_template("audit_report.j2")
+    tmpl = env.get_template(template_name)
     output = tmpl.render(report=report_data)
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     open(out_path, "w").write(output)
-    print(f"rendered → {out_path}")
+    print(f"rendered → {out_path}  (template={template_name})")
     print(f"  {len(report_data['findings']['high'])} H, "
           f"{len(report_data['findings']['medium'])} M, "
-          f"{len(report_data['findings']['qa'])} QA, "
-          f"{len(report_data['findings']['gas'])} Gas")
+          f"{len(report_data['findings'].get('qa', []))} QA, "
+          f"{len(report_data['findings'].get('gas', []))} Gas")
+
+
+def render_codearena(report_data: dict, out_path: str):
+    """Back-compat shim."""
+    render_with_template(report_data, out_path, "audit_report.j2")
 
 
 def main():
@@ -150,18 +155,25 @@ def main():
     }
 
     if args.target == "code4rena":
-        render_codearena(report_data, args.out)
+        render_with_template(report_data, args.out, "audit_report.j2")
     elif args.target == "sherlock":
-        # Same template, post-render PDF conversion
-        render_codearena(report_data, args.out)
+        # Sherlock has a distinct template (quantitative severity, no QA/Gas)
+        # per docs/research/AUDIT_REPORT_TEMPLATE_RESEARCH.md (3-0 verified)
+        render_with_template(report_data, args.out, "audit_report_sherlock.j2")
+        protocol_name = args.sponsor.replace(" ", "_")
+        pdf_name = (f"{__import__('datetime').date.today().strftime('%Y.%m.%d')}"
+                    f" - Final - {protocol_name} Audit Report.pdf")
         sys.stderr.write(
-            "Sherlock targets PDF — convert via "
-            f"`pandoc {args.out} -o {args.out.replace('.md', '.pdf')}`\n")
+            "Sherlock targets PDF. Convert via:\n"
+            f"  pandoc {args.out} --pdf-engine=xelatex -o '{pdf_name}'\n"
+            "(xelatex required — finding bodies typically contain unicode like ≤ "
+            "that breaks default pdflatex. Canonical Sherlock filename per the "
+            "sherlock-reports repo convention.)\n")
     else:
         sys.stderr.write(
             f"Target {args.target} stub: render falls back to code4rena. "
             "Per-platform diff implementation pending follow-up research.\n")
-        render_codearena(report_data, args.out)
+        render_with_template(report_data, args.out, "audit_report.j2")
 
 
 if __name__ == "__main__":
