@@ -1,28 +1,5 @@
-"""
-structural_cascade — compose tree-sitter, NetworkX, embedding NN, and
-TLA+ shape match into one deterministic pipeline.
-
-Closes the gap between sol_intent's 0.42 cold recall and the 0.94 corpus
-ceiling measured in CALIBRATION_SHERLOCK_SWEEP.md. Each layer narrows
-the search space, so expensive layers (TLA+ / halmos) only see
-candidates that survived cheap filters.
-
-Five layers, ordered cheap-to-expensive:
-
-  Layer A: tree-sitter Solidity queries for known structural shapes
-           (external-call-before-write, permit-without-nonce, etc.)
-  Layer B: NetworkX call graph — reachable from public/external entry
-  Layer C: embedding nearest-neighbor against the 1240-finding corpus
-  Layer D: TLA+ shape heuristic match
-  Layer E: halmos symbolic discharge (skipped if scope doesn't build)
-
-Per prompts/goals/STRUCTURAL_CASCADE.goal.md.
-
-Usage:
-  python tools/structural_cascade.py examples/sequence/ --out cascade.jsonl
-
-Cost: $0 (no LLM calls; all layers deterministic).
-"""
+# structural_cascade: tree-sitter → CFG → embedding NN → TLA+ shape → halmos
+# Usage: python tools/structural_cascade.py examples/sequence/ --out cascade.jsonl
 from __future__ import annotations
 import argparse, glob, json, os, pickle, re, sys
 from pathlib import Path
@@ -53,7 +30,6 @@ def parse_file(path: Path) -> tuple[bytes, tree_sitter.Tree]:
 
 def extract_functions(code: bytes, tree: tree_sitter.Tree,
                       path: Path) -> list[dict]:
-    """Walk AST → list of function records with text, line ranges, modifiers."""
     out = []
     def walk(node, contract_name=None):
         if node.type in ("contract_declaration", "library_declaration",
@@ -126,11 +102,6 @@ _PRIMARY_HITS = frozenset({
 
 
 def layer_a(functions: list[dict]) -> list[dict]:
-    """Apply tree-sitter-extracted regex queries to function bodies.
-    Function survives if it has ≥1 PRIMARY structural hit. ast_hits records
-    all hits (including secondary ones like raw_assembly for context).
-    raw_assembly alone does NOT qualify — it fires on pure memory-read utilities.
-    """
     survivors = []
     for f in functions:
         hits = []
@@ -153,8 +124,6 @@ CALL_PAT = re.compile(r"\b([a-z][a-zA-Z0-9_]*)\s*\(", re.M)
 
 
 def build_call_graph(all_functions: list[dict]) -> nx.DiGraph:
-    """Best-effort call graph from regex over function text. Slither would
-    be more precise but adds build dependency; this is good enough for v1."""
     G = nx.DiGraph()
     by_name = {}
     for f in all_functions:
@@ -172,7 +141,6 @@ def build_call_graph(all_functions: list[dict]) -> nx.DiGraph:
 
 def layer_b(layer_a_survivors: list[dict],
             all_functions: list[dict], G: nx.DiGraph) -> list[dict]:
-    """Keep Layer A survivors reachable from a public/external entry point."""
     # Find public entry points
     entries = set()
     for f in all_functions:
@@ -205,14 +173,6 @@ def layer_b(layer_a_survivors: list[dict],
 
 def layer_c(survivors: list[dict], cos_threshold: float = 0.65,
             top_k: int = 12) -> list[dict]:
-    """For each surviving function, embed (signature + body[:1000]) and find
-    nearest neighbor in tools/findings_index.pkl.
-
-    v2 dual-filter: keep candidates where cos > threshold AND rank ≤ top_k.
-    Pure threshold fails when all scores are clustered above 0.75 (dense
-    retrieval artefact). top_k caps the funnel to a manageable size regardless
-    of corpus score inflation.
-    """
     sys.path.insert(0, str(HERE / "tools"))
     import spec_retrieval as sr
     from fastembed import TextEmbedding
@@ -298,31 +258,22 @@ SHAPE_HEURISTICS = {
 }
 
 
+_SHAPE_KWS = {
+    "SignatureReplay": ["replay", "signature replay", "sig replay"],
+    "ReentrancyDrain": ["reentr", "re-entr"],
+    "ERC4337StaticSigDoS": ["4337", "dos", "static", "validateuserop"],
+    "Uint64FeeOverflow": ["overflow", "uint64", "fee"],
+    "Create2NonIdempotent": ["create2", "deploy", "idempotent"],
+    "MissingAwait": ["await", "async"],
+}
+
+
 def _rank_shape(f: dict, shape: str) -> float:
-    """Score how well a shape fits a candidate — higher is better.
-    Cross-references corpus_top1 title to prefer the shape the corpus
-    nearest neighbor actually demonstrates."""
     title = (f.get("corpus_top1") or {}).get("title", "").lower()
-    # Prefer shape whose keyword appears in corpus title
-    keywords = {
-        "SignatureReplay": ["replay", "signature replay", "sig replay"],
-        "ReentrancyDrain": ["reentr", "re-entr"],
-        "ERC4337StaticSigDoS": ["4337", "dos", "static", "validateuserop"],
-        "Uint64FeeOverflow": ["overflow", "uint64", "fee"],
-        "Create2NonIdempotent": ["create2", "deploy", "idempotent"],
-        "MissingAwait": ["await", "async"],
-    }
-    hits = sum(1 for kw in keywords.get(shape, []) if kw in title)
-    return hits
+    return sum(1 for kw in _SHAPE_KWS.get(shape, []) if kw in title)
 
 
 def layer_d(survivors: list[dict]) -> list[dict]:
-    """Heuristic-match each survivor to one TLA+ FailureMode shape (top-1).
-
-    v2: top-1 shape selection ranked by corpus-title keyword alignment.
-    v3: severity filter — candidates whose corpus top-1 is Low severity AND
-    have no TLA+ shape match are dropped (reduces noise from L-finding matches).
-    """
     for f in survivors:
         all_matches = [s for s, h in SHAPE_HEURISTICS.items() if h(f)]
         f["tla_shape_matches"] = all_matches
@@ -351,8 +302,7 @@ def layer_d(survivors: list[dict]) -> list[dict]:
 # ============================================================
 
 def layer_e(survivors: list[dict], scope_dir: Path) -> list[dict]:
-    """Skip for v1 — halmos requires forge build which often fails on
-    cold contest source. Mark each survivor halmos_status=skip with reason."""
+    # halmos skipped in v1 — forge build reliability on cold scope too low
     for f in survivors:
         f["halmos_status"] = "skip-v1"
     return survivors
