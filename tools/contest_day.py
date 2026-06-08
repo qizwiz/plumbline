@@ -42,6 +42,14 @@ def _admin_filter(leads, scope_dir, no_filter=False):
         return leads, []
 
 
+def _adversarial_verify(leads, scope_dir, scripts_dir=None, no_filter=False):
+    try:
+        from adversarial_verify import verify_leads
+        return verify_leads(leads, scope_dir, scripts_dir=scripts_dir, no_filter=no_filter)
+    except ImportError:
+        return leads, []
+
+
 def env_with_key() -> dict:
     """Source .env into a copy of os.environ."""
     env = os.environ.copy()
@@ -203,6 +211,8 @@ def main():
     ap.add_argument("--out-dir", default="reports")
     ap.add_argument("--skip-baseline", action="store_true",
                     help="Cascade-only mode (faster, lower recall)")
+    ap.add_argument("--scripts-dir", default=None,
+                    help="Deployment scripts directory override (default: auto-detect script/deploy/)")
     ap.add_argument("--no-filter", action="store_true",
                     help="Skip admin-trust filter and adversarial verify; output raw union")
     args = ap.parse_args()
@@ -263,17 +273,46 @@ def main():
         print(f"ADMIN-TRUST FILTER: 0 leads downgraded (all {len(filtered)} survive)\n",
               file=sys.stderr)
 
-    # Write filtered union (leads marked REVIEW:admin-trust are still present for audit)
+    # Adversarial verify — post-process HIGH-confidence CONFIRMs
+    # Detect script dir: explicit override → sibling of scope → None
+    if args.scripts_dir:
+        scripts_dir = Path(args.scripts_dir).resolve()
+    else:
+        scripts_dir = None
+        for candidate in ("script", "deploy", "scripts", "deployment"):
+            d = scope / candidate
+            if d.is_dir():
+                scripts_dir = d
+                break
+    verified, adv_rejected = _adversarial_verify(
+        filtered, scope, scripts_dir=scripts_dir, no_filter=args.no_filter)
+    if adv_rejected:
+        print(f"ADVERSARIAL VERIFY: {len(adv_rejected)} HIGH leads downgraded to "
+              f"REVIEW:adversarial\n", file=sys.stderr)
+        for d in adv_rejected:
+            loc = d.get("location", "?")
+            reasons = d.get("adversarial_reasons", [])
+            claim = (d.get("claim") or d.get("raw", "?"))[:80]
+            print(f"  • {loc}: {claim}", file=sys.stderr)
+            for r in reasons:
+                print(f"      {r}", file=sys.stderr)
+        print("", file=sys.stderr)
+    else:
+        n_high = sum(1 for l in filtered if l.get("confidence") in ("HIGH", "CASCADE"))
+        print(f"ADVERSARIAL VERIFY: all {n_high} HIGH leads survive\n", file=sys.stderr)
+
+    # Write filtered union (REVIEW:* leads present for audit)
     filtered_out = out_dir / f"{args.slug}-filtered-leads.json"
-    filtered_out.write_text(json.dumps(filtered, indent=2))
+    filtered_out.write_text(json.dumps(verified, indent=2))
 
     # Render only surviving (non-REVIEW) leads in the report
-    report_leads = [l for l in filtered if not str(l.get("confidence","")).startswith("REVIEW")]
+    report_leads = [l for l in verified if not str(l.get("confidence","")).startswith("REVIEW")]
 
     # Render
     reps = render_report(args.slug, args.sponsor, args.target, report_leads, report_out)
     elapsed = int(time.time() - t_start)
 
+    n_review = len(rejected) + len(adv_rejected)
     print(f"\n=== DONE in {elapsed}s ===", file=sys.stderr)
     print(f"  cascade-grounded:  {cascade_out.relative_to(HERE)}  ({t_cascade}s)",
           file=sys.stderr)
@@ -281,7 +320,7 @@ def main():
           file=sys.stderr)
     print(f"  union-leads.json:  {union_out.relative_to(HERE)}", file=sys.stderr)
     print(f"  filtered-leads:    {filtered_out.relative_to(HERE)}  "
-          f"({len(report_leads)} actionable + {len(rejected)} admin-trust REVIEW)",
+          f"({len(report_leads)} actionable + {n_review} REVIEW)",
           file=sys.stderr)
     print(f"  report:            {report_out.relative_to(HERE)}", file=sys.stderr)
     if args.target == "sherlock":
