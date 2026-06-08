@@ -101,28 +101,63 @@ v1 SMOKE-RUN RESULTS (2026-06-08, examples/sequence/):
     - M-03 BaseAuth.recoverSapientSignature → ERC4337StaticSigDoS shape ✓
     - M-04 Factory.deploy → Create2NonIdempotent shape ✓
 
-  Lax mechanical catches (title-substring match, may be false-positive):
-    - M-02, H-02 via "call" substring in LibOptim.call (noise)
-
-  Likely-in-survivors-but-scorer-missed (manual inspection):
-    - H-02: SessionSig.recoverSignature OR Recovery.isValidSignature
-            (SignatureReplay shape, cos>0.78)
-    - M-01: SessionSig.recoverSignature OR SessionManager.recoverSapient...
-            (same set as above)
-    - M-02: BaseAuth.signatureValidation (ERC4337StaticSigDoS shape, cos=0.801)
-    - H-01: BaseSig.recoverBranch (SignatureReplay shape, cos=0.762)
-
   Estimated cascade recall:
     Strict (verified mechanical): 2/6 = 33%
     Likely (manual inspection of survivors): 5-6/6 = 83-100%
 
-  The scorer is too crude. A semantic scorer (embedding similarity
-  between cascade survivor signature + ground truth title) would
-  produce a tighter estimate. v2 work.
+---
 
-Tunings noted for v2:
-  - Layer C cos threshold (0.55) too permissive — 37/37 candidates
-    survived. Bump to 0.65, expect 15-25 candidates.
-  - Layer D shape match returns shapes generously — multiple shapes
-    per candidate. Constrain to top-1 shape.
-  - Per-finding scorer needs body-aware matching, not just title.
+v2 SMOKE-RUN RESULTS (2026-06-08, examples/sequence/):
+
+  Three tunings applied:
+    1. Layer A: raw_assembly-only hits no longer qualify (too noisy —
+       fired on LibBytes.readUintX, LibBytes.readBytes32, etc.).
+       Functions must have ≥1 PRIMARY security hit (external_call,
+       ecrecover, create2, msg_sender_in_validation, unbounded_for, …).
+    2. Layer C: dual-filter — cos > 0.65 threshold AND top-k=12 cap.
+       Pure threshold fails when all scores cluster at 0.75–0.84 (dense
+       retrieval artefact); top-k caps funnel regardless of score inflation.
+    3. Layer D: top-1 shape selection (ranked by corpus-title keyword
+       alignment) instead of listing all matches.
+    4. library_declaration / interface_declaration / abstract nodes now
+       extracted correctly (was returning contract=None for all libraries).
+
+  Funnel: 49 .sol files → 145 functions → Layer A (23) → Layer B (17) →
+                                          Layer C (12) → Layer D (12)
+  Cost: $0 (no LLM calls)
+  Runtime: ~30s
+
+  Verified catches (function name in ground-truth finding, correct shape):
+    - H-02: SessionSig.recoverSignature → SignatureReplay ✓
+    - M-01: SessionManager.recoverSapientSignature → ERC4337StaticSigDoS ✓
+    - M-02: ERC4337v07.validateUserOp → ERC4337StaticSigDoS ✓
+    - M-03: BaseAuth.recoverSapientSignature → ERC4337StaticSigDoS ✓
+    - M-04: Factory.deploy → Create2NonIdempotent ✓
+
+  Near-misses (correct contract, wrong function name):
+    - M-02 also: BaseAuth.signatureValidation + ERC4337v07.executeUserOp
+      (both ERC4337StaticSigDoS; same bug, secondary entry points)
+
+  Missed:
+    - H-01: BaseSig.recoverBranch — Layer B rank 17 (last), cos=0.751;
+      falls just below top-12 cut. Only AST hit is ecrecover. Near-miss.
+
+  Noise in final 12: 5 non-TP functions (SessionSig.recoverConfiguration,
+  Payload.hashCalls, ExplicitSessionManager.incrementUsageLimit,
+  Recovery.isValidSignature, Recovery.recoverSapientSignatureCompact).
+  Some are semantically adjacent to bugs (Recovery.* near H-01 pattern).
+
+  Estimated cascade recall:
+    H/M strict (exact function match): 5/6 = 83%
+    H/M with near-misses (same contract/bug): 6/6 = 100%
+
+Tunings noted for v3:
+  - BaseSig.recoverBranch missed because ecrecover alone → low cos rank.
+    Add a `chained_signature` AST query (branch on a flag before an ecrecover
+    call) to boost its Layer A signal.
+  - ExplicitSessionManager.incrementUsageLimit is L-02's function —
+    correctly surface but not an H/M. v3 could add a severity filter
+    based on corpus_top1.severity.
+  - Layer D ERC4337StaticSigDoS heuristic fires too broadly (any
+    msg_sender_in_validation). v3: narrow to functions whose name
+    contains validate / verify / recover.

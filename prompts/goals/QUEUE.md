@@ -13,7 +13,7 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 | rank | goal | est_cost | status | notes |
 |------|------|----------|--------|-------|
 | 1 | NOTIONAL_RECALL | $15 | done | 67.6% strict mechanical, 75.6% honest combined cold recall on Sherlock-judged Notional. Gap to ceiling = 18pp. See CALIBRATION_NOTIONAL_RECALL.md. |
-| 2 | STRUCTURAL_CASCADE | $0 | in-progress | v1 ships: 2-6 of 6 caught on examples/sequence (33% strict, 83-100% loose). Layer C threshold + scorer needs tuning. |
+| 2 | STRUCTURAL_CASCADE | $0 | in-progress | v2: 5/6 H/M strict (83%), 12 final candidates from 145 fns. Fixes: raw_assembly-only filter, top-k cap, library node extraction, top-1 shape. H-01 near-miss (rank 13). |
 | 3 | LEAD_CONDITIONED_SPEC | $10 | blocked | architectural fix for v1 noise (ERC4337StaticSigDoS only) |
 | 4 | CORPUS_GROWTH for S-3 | $0 | disputed | counter-increment-on-revert shape; sequence L-02 |
 | 5 | CORPUS_GROWTH for S-4 | $0 | disputed | cumulative-state-drift shape; sequence L-01 |

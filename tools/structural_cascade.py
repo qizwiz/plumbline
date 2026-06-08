@@ -56,8 +56,9 @@ def extract_functions(code: bytes, tree: tree_sitter.Tree,
     """Walk AST → list of function records with text, line ranges, modifiers."""
     out = []
     def walk(node, contract_name=None):
-        if node.type == "contract_declaration":
-            # Find contract name
+        if node.type in ("contract_declaration", "library_declaration",
+                         "interface_declaration", "abstract_contract_declaration"):
+            # Find contract/library/interface name
             name_node = next((c for c in node.named_children
                               if c.type == "identifier"), None)
             cname = code[name_node.start_byte:name_node.end_byte].decode() \
@@ -108,16 +109,29 @@ A_QUERIES = {
 }
 
 
+# raw_assembly alone appears in pure memory-reading utilities (LibBytes etc.)
+# and is too noisy to qualify for Layer A survival by itself.
+# Functions must have ≥1 PRIMARY hit to survive.
+_PRIMARY_HITS = frozenset({
+    "external_call", "low_level_call_unchecked", "state_write_after_call",
+    "permit_call", "create2", "ecrecover", "self_call",
+    "msg_sender_in_validation", "unbounded_for",
+})
+
+
 def layer_a(functions: list[dict]) -> list[dict]:
     """Apply tree-sitter-extracted regex queries to function bodies.
-    Function survives if it has ≥1 structural hit. ast_hits records which."""
+    Function survives if it has ≥1 PRIMARY structural hit. ast_hits records
+    all hits (including secondary ones like raw_assembly for context).
+    raw_assembly alone does NOT qualify — it fires on pure memory-read utilities.
+    """
     survivors = []
     for f in functions:
         hits = []
         for name, pat in A_QUERIES.items():
             if pat.search(f["text"]):
                 hits.append(name)
-        if hits:
+        if hits and any(h in _PRIMARY_HITS for h in hits):
             f["ast_hits"] = hits
             survivors.append(f)
     return survivors
@@ -183,9 +197,16 @@ def layer_b(layer_a_survivors: list[dict],
 # Layer C: embedding nearest-neighbor in corpus
 # ============================================================
 
-def layer_c(survivors: list[dict], cos_threshold: float = 0.55) -> list[dict]:
+def layer_c(survivors: list[dict], cos_threshold: float = 0.65,
+            top_k: int = 12) -> list[dict]:
     """For each surviving function, embed (signature + body[:1000]) and find
-    nearest neighbor in tools/findings_index.pkl. Keep if cos > threshold."""
+    nearest neighbor in tools/findings_index.pkl.
+
+    v2 dual-filter: keep candidates where cos > threshold AND rank ≤ top_k.
+    Pure threshold fails when all scores are clustered above 0.75 (dense
+    retrieval artefact). top_k caps the funnel to a manageable size regardless
+    of corpus score inflation.
+    """
     sys.path.insert(0, str(HERE / "tools"))
     import spec_retrieval as sr
     from fastembed import TextEmbedding
@@ -209,12 +230,14 @@ def layer_c(survivors: list[dict], cos_threshold: float = 0.55) -> list[dict]:
     q_norms = np.linalg.norm(q_embs, axis=1)
     sims = (q_embs @ embs.T) / (q_norms[:, None] * norms[None, :])
 
-    out = []
+    # Score each survivor by its top-1 cosine; keep if above threshold
+    scored = []
     for i, f in enumerate(survivors):
         top_idx = np.argsort(-sims[i])[:3]
         top_match = findings_corpus[top_idx[0]]
-        if sims[i][top_idx[0]] > cos_threshold:
-            f["corpus_top1_cos"] = float(sims[i][top_idx[0]])
+        top_cos = float(sims[i][top_idx[0]])
+        if top_cos > cos_threshold:
+            f["corpus_top1_cos"] = top_cos
             f["corpus_top1"] = {
                 "id": top_match.get("finding_id"),
                 "title": top_match.get("title")[:80],
@@ -227,8 +250,10 @@ def layer_c(survivors: list[dict], cos_threshold: float = 0.55) -> list[dict]:
                  "title": findings_corpus[j].get("title")[:60],
                  "cos": float(sims[i][j])}
                 for j in top_idx]
-            out.append(f)
-    return out
+            scored.append((top_cos, f))
+    # top_k cap: keep only the highest-scoring candidates (avoids corpus inflation)
+    scored.sort(key=lambda x: -x[0])
+    return [f for _, f in scored[:top_k]]
 
 
 # ============================================================
@@ -254,12 +279,41 @@ SHAPE_HEURISTICS = {
 }
 
 
+def _rank_shape(f: dict, shape: str) -> float:
+    """Score how well a shape fits a candidate — higher is better.
+    Cross-references corpus_top1 title to prefer the shape the corpus
+    nearest neighbor actually demonstrates."""
+    title = (f.get("corpus_top1") or {}).get("title", "").lower()
+    # Prefer shape whose keyword appears in corpus title
+    keywords = {
+        "SignatureReplay": ["replay", "signature replay", "sig replay"],
+        "ReentrancyDrain": ["reentr", "re-entr"],
+        "ERC4337StaticSigDoS": ["4337", "dos", "static", "validateuserop"],
+        "Uint64FeeOverflow": ["overflow", "uint64", "fee"],
+        "Create2NonIdempotent": ["create2", "deploy", "idempotent"],
+        "MissingAwait": ["await", "async"],
+    }
+    hits = sum(1 for kw in keywords.get(shape, []) if kw in title)
+    return hits
+
+
 def layer_d(survivors: list[dict]) -> list[dict]:
-    """Heuristic-match each survivor to one or more TLA+ FailureMode shapes."""
+    """Heuristic-match each survivor to one TLA+ FailureMode shape (top-1).
+
+    v2 change: store all matches for debugging but select top-1 shape by
+    cross-referencing the corpus nearest-neighbor title, breaking ties by
+    first match order. This tightens funnel signal vs. v1's multi-shape noise.
+    """
     for f in survivors:
-        f["tla_shape_matches"] = [
-            s for s, h in SHAPE_HEURISTICS.items() if h(f)]
-    # Survive if ≥1 shape matches OR if Layer C cos was very high (>0.75 = trust corpus)
+        all_matches = [s for s, h in SHAPE_HEURISTICS.items() if h(f)]
+        f["tla_shape_matches"] = all_matches
+        if all_matches:
+            # Pick top-1: highest corpus-title alignment, ties broken by list order
+            f["tla_top1_shape"] = max(all_matches,
+                                      key=lambda s: _rank_shape(f, s))
+        else:
+            f["tla_top1_shape"] = None
+    # Survive if ≥1 shape matches OR corpus cos > 0.75 (trust corpus signal)
     return [f for f in survivors
             if f["tla_shape_matches"] or f.get("corpus_top1_cos", 0) > 0.75]
 
@@ -281,7 +335,7 @@ def layer_e(survivors: list[dict], scope_dir: Path) -> list[dict]:
 # ============================================================
 
 def run_cascade(scope_dir: Path, out_path: Path,
-                cos_threshold: float = 0.55) -> dict:
+                cos_threshold: float = 0.65, top_k: int = 12) -> dict:
     sol_files = sorted(scope_dir.rglob("*.sol"))
     # Skip test/mock/script files for cleaner signal
     sol_files = [p for p in sol_files
@@ -308,8 +362,8 @@ def run_cascade(scope_dir: Path, out_path: Path,
     print(f"  Layer B (CFG reach from public):  {len(b):4d} candidates",
           file=sys.stderr)
 
-    c = layer_c(b, cos_threshold=cos_threshold)
-    print(f"  Layer C (corpus NN cos>{cos_threshold}):  {len(c):4d} candidates",
+    c = layer_c(b, cos_threshold=cos_threshold, top_k=top_k)
+    print(f"  Layer C (corpus NN cos>{cos_threshold} top{top_k}): {len(c):4d} candidates",
           file=sys.stderr)
 
     d = layer_d(c)
@@ -346,12 +400,15 @@ def main():
     ap.add_argument("scope_dir", help="Directory containing .sol files")
     ap.add_argument("--out", default="cascade.jsonl",
                     help="Output jsonl path")
-    ap.add_argument("--cos-threshold", type=float, default=0.55,
-                    help="Layer C cosine threshold (default 0.55)")
+    ap.add_argument("--cos-threshold", type=float, default=0.65,
+                    help="Layer C cosine threshold (default 0.65)")
+    ap.add_argument("--top-k", type=int, default=12,
+                    help="Layer C top-k cap after threshold (default 12)")
     args = ap.parse_args()
     s = run_cascade(Path(args.scope_dir).resolve(),
                     Path(args.out).resolve(),
-                    cos_threshold=args.cos_threshold)
+                    cos_threshold=args.cos_threshold,
+                    top_k=args.top_k)
     print()
     print("CASCADE SUMMARY")
     print(json.dumps(s, indent=2))
