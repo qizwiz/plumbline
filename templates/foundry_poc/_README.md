@@ -9,7 +9,7 @@ counterexample, and emits a runnable `.t.sol` file.
 
 | shape | template | status |
 |---|---|---|
-| ReentrancyDrain | `ReentrancyDrain.t.sol.template` | v1 written, **unverified** — needs `forge test` run |
+| ReentrancyDrain | `ReentrancyDrain.t.sol.template` | **v1.1 VERIFIED** — `forge test` PASS on puppy-raffle H-1 (drains 3 ETH via 2 re-entries; matches TLC trace) |
 | SignatureReplay | — | TODO |
 | ERC4337StaticSigDoS | — | TODO |
 | Uint64FeeOverflow | — | TODO |
@@ -66,11 +66,19 @@ python tools/tlc_to_forge.py \
 forge test --match-test test_ReentrancyDrain_exploit -vvvv
 ```
 
-## Status caveat (commit b7049d9 + this commit)
+## Status (verified 2026-06-08)
 
-This whole subsystem is **v1 unverified** as of commit-time. The Python
-emits Solidity; the Solidity has not yet been compiled + run against a
-real target. The morning's first task is to drop the emitted file into
-the puppy-raffle Foundry project and verify `forge test` reproduces
-the published H-1 exploit. Until then, treat all output as "structurally
-correct, but semantics need ground-truth verification on a known bug."
+- Translator emits valid Solidity ✓
+- ReentrancyDrain template + emitted test ran via `forge test` ✓
+- Exploit reproduced on examples/puppy-raffle (drains 3 ETH via 2 re-entries) ✓
+- Matches TLC counterexample from docs/tla/ReentrancyDrain.tla ✓
+
+The setUp() block of the emitted file STILL needs target-specific
+completion by hand (constructor args, initial state setup, attacker
+registration). The translator emits a SKELETON. v2 of the template
+system may include shape-specific setUp helpers; v1.1 is the verified
+working baseline.
+
+The other 8 shapes follow the same architecture: write a template, fix
+the unicode/pragma issues, verify via forge test on a known target,
+update this README's status row.

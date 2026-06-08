@@ -11,3 +11,6 @@ reports/
 corpus/calibration/notional-source
 corpus/calibration/notional-judging
 corpus/sherlock_pdfs/
+examples/puppy-raffle/lib/
+examples/puppy-raffle/cache/
+examples/puppy-raffle/out/

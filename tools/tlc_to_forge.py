@@ -90,10 +90,12 @@ def substitute(template: str, mapping: dict[str, str]) -> str:
 def translate(shape: str, target_path: str, target_contract: str,
               target_fn: str, target_fn_args: str = "",
               target_fn_call_args: str = "0",
+              pragma: str = "^0.8.20",
               tlc_trace_head: str | None = None) -> str:
     template = load_template(shape)
     spec = SHAPE_TEMPLATES[shape]
     mapping = {
+        "PRAGMA": pragma,
         "TARGET_PATH": target_path,
         "TARGET_CONTRACT": target_contract,
         "TARGET_FN": target_fn,
@@ -125,6 +127,9 @@ def main():
                     help="Function signature args, e.g., 'uint256 playerIndex'")
     ap.add_argument("--target-fn-call-args", default="0",
                     help="Function call-site args, e.g., '0' or 'playerIdx'")
+    ap.add_argument("--pragma", default="^0.8.20",
+                    help="Solidity pragma version for the emitted test "
+                         "(default ^0.8.20; use ^0.7.6 for older targets)")
     ap.add_argument("--trace-head",
                     help="First 6 lines of TLC counterexample (multi-line).")
     ap.add_argument("--out",
@@ -151,6 +156,7 @@ def main():
         target_fn=args.target_fn,
         target_fn_args=args.target_fn_args,
         target_fn_call_args=args.target_fn_call_args,
+        pragma=args.pragma,
         tlc_trace_head=args.trace_head,
     )
 
