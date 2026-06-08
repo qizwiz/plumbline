@@ -1,0 +1,78 @@
+{#
+  Immunefi bug bounty submission — markdown for the dashboard form.
+
+  Per docs/research/IMMUNEFI_STRATEGY.md (3-0 verified):
+    - 7-section structure: Title / Bug Description (Brief+Intro / Details) /
+      Impact / Risk Breakdown / Recommendation / References / Proof of Concept
+    - Each section MUST be filled separately in dashboard form
+    - PoC MUST be runnable Foundry/Hardhat against local fork — never mainnet/public testnet
+
+  Schema: schemas/immunefi_submission.json
+#}
+# {{ submission.title }}
+
+## Bug Description
+
+### Brief / Intro
+
+{{ submission.bug_description.brief_intro }}
+
+### Details
+
+{{ submission.bug_description.details }}
+
+## Impact
+
+{{ submission.impact }}
+
+**In-scope impacts selected** (must match the program's enumerated list):
+
+{% for impact in submission.impacts -%}
+- {{ impact }}
+{% endfor %}
+
+## Risk Breakdown
+
+**Severity**: {{ submission.severity }}
+
+{{ submission.risk_breakdown }}
+
+{% if submission.plumbline_provenance and submission.plumbline_provenance.v23_critical_impact -%}
+This maps to V2.3's Smart Contracts Critical impact: **{{ submission.plumbline_provenance.v23_critical_impact }}**.
+{%- endif %}
+
+## Recommendation
+
+{{ submission.recommendation }}
+
+## References
+
+{% if submission.references -%}
+{% for ref in submission.references -%}
+- {{ ref }}
+{% endfor %}
+{%- else -%}
+- [Immunefi VSCSv2.3](https://immunefi.com/immunefi-vulnerability-severity-classification-system-v2-3/)
+{%- endif %}
+
+## Proof of Concept
+
+**Framework**: {{ submission.proof_of_concept.framework }}
+
+{% if submission.proof_of_concept.fork_block -%}
+**Fork block**: {{ submission.proof_of_concept.fork_block }}
+{%- endif %}
+
+{% if submission.proof_of_concept.run_instructions -%}
+**Run**:
+
+```
+{{ submission.proof_of_concept.run_instructions }}
+```
+{%- endif %}
+
+```{{ 'solidity' if submission.proof_of_concept.framework == 'foundry' else 'javascript' }}
+{{ submission.proof_of_concept.code }}
+```
+
+{# IMPORTANT: do NOT touch mainnet or public testnet. Local fork only — live exploitation = permanent ban (verified 3-0). #}

@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/qizwiz/plumbline/schemas/immunefi_submission.json",
+  "title": "Immunefi bug bounty submission",
+  "description": "One Immunefi submission. Mirrors the dashboard form fields per docs/research/IMMUNEFI_STRATEGY.md (verified 2026-06-08, 19/25 claims 3-0). Note: V2.3 severity is 4-tier (NOT V2.2's 5-tier with 'None'). Out-of-scope impacts cause rejection — impacts MUST be enumerated from the target program's bounty page.",
+  "type": "object",
+  "required": ["program", "asset", "impacts", "severity", "title", "bug_description", "impact", "risk_breakdown", "recommendation", "proof_of_concept"],
+  "properties": {
+    "program": {
+      "type": "string",
+      "description": "Bounty program name (dropdown on dashboard). Must EXACTLY match the program's listed name — the form requires retyping it as redundant confirmation.",
+      "minLength": 1
+    },
+    "asset": {
+      "type": "string",
+      "format": "uri",
+      "description": "Codebase URL selected from the program's Asset dropdown. 'Other' allowed but rejection-likely unless the finding is direct loss of funds."
+    },
+    "impacts": {
+      "type": "array",
+      "description": "One or more impacts from the program's enumerated 'Impacts In Scope'. NO custom impacts permitted. Severity is the HIGHEST selected impact's V2.3 tier.",
+      "items": {"type": "string"},
+      "minItems": 1
+    },
+    "severity": {
+      "type": "string",
+      "description": "V2.3 4-tier severity. Derived from impacts but explicitly stated in Risk Breakdown.",
+      "enum": ["Critical", "High", "Medium", "Low"]
+    },
+    "title": {
+      "type": "string",
+      "description": "Single-line summary of the vulnerability. Plumbline default: '<impact_phrase> via <FailureMode shape> in <contract>'.",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "bug_description": {
+      "type": "object",
+      "description": "The 'Bug Description' field on the dashboard form. Two required subsections per Immunefi template.",
+      "required": ["brief_intro", "details"],
+      "properties": {
+        "brief_intro": {
+          "type": "string",
+          "description": "1-3 sentence executive summary of the bug.",
+          "minLength": 1
+        },
+        "details": {
+          "type": "string",
+          "description": "Full technical analysis: affected code path, faulty assumption, attacker model. Markdown-rendered.",
+          "minLength": 1
+        }
+      }
+    },
+    "impact": {
+      "type": "string",
+      "description": "What happens to users/protocol if exploited. Must map onto the program's in-scope impacts list (referenced in 'impacts' field). Markdown-rendered.",
+      "minLength": 1
+    },
+    "risk_breakdown": {
+      "type": "string",
+      "description": "Severity rationalization. Should reference V2.3 4-tier classification and the smart-contract Critical impacts list (direct theft / NFT theft / permanent freeze / governance manipulation / manipulable RNG / unauthorized mint / unintended NFT alteration / protocol insolvency) where relevant.",
+      "minLength": 1
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Concrete fix description. Pre-fix code → post-fix code form preferred. Markdown-rendered.",
+      "minLength": 1
+    },
+    "references": {
+      "type": "array",
+      "description": "Markdown links + Immunefi-style citations. Past similar findings, EIP references, etc.",
+      "items": {"type": "string"},
+      "default": []
+    },
+    "proof_of_concept": {
+      "type": "object",
+      "description": "MUST be runnable exploit code. NOT prose, NOT screenshots, NOT a unit test, NOT the project's own contracts. Local mainnet fork only — touching mainnet/public testnet triggers permanent ban.",
+      "required": ["framework", "code"],
+      "properties": {
+        "framework": {
+          "type": "string",
+          "description": "PoC framework. Foundry recommended (canonical template repo at github.com/immunefi-team/forge-poc-templates). Hardhat also acceptable.",
+          "enum": ["foundry", "hardhat"]
+        },
+        "code": {
+          "type": "string",
+          "description": "Full source code of the runnable PoC. Forge test file, Hardhat test file, or attack contract. Markdown-rendered with code fence on submission.",
+          "minLength": 1
+        },
+        "run_instructions": {
+          "type": "string",
+          "description": "Exact CLI invocation that reproduces the exploit on a local mainnet fork. e.g. 'forge test --match-test test_exploit --fork-url $RPC --fork-block 19000000 -vvvv'."
+        },
+        "fork_block": {
+          "type": "integer",
+          "description": "Block number for local fork (canonical: use a recent mainnet block where the vulnerable state holds).",
+          "minimum": 0
+        }
+      }
+    },
+    "plumbline_provenance": {
+      "type": "object",
+      "description": "Internal plumbline tracking. NOT submitted to Immunefi.",
+      "properties": {
+        "rep_id": {"type": "string"},
+        "matched_spec": {"type": "string", "description": "Which FailureMode shape matched (e.g. 'SignatureReplay')."},
+        "tlc_trace_head": {"type": "string"},
+        "weak_confirm_strength": {"enum": ["STRONG", "WEAK"]},
+        "v23_critical_impact": {
+          "type": "string",
+          "description": "Which V2.3 smart-contract Critical impact this maps to.",
+          "enum": [
+            "direct theft of user funds",
+            "direct NFT theft",
+            "permanent freezing of funds",
+            "permanent freezing of NFTs",
+            "governance manipulation",
+            "manipulable RNG",
+            "unauthorized NFT minting",
+            "unintended NFT alteration",
+            "protocol insolvency"
+          ]
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "program": "Example DeFi Protocol",
+      "asset": "https://github.com/example-defi/contracts",
+      "impacts": ["Direct theft of user funds"],
+      "severity": "Critical",
+      "title": "SignatureReplay in Vault.withdraw permits funds drain via re-used permit signature",
+      "bug_description": {
+        "brief_intro": "The withdraw() entry point lacks a nonce check on the EIP-2612 permit signature, allowing replay across blocks within the deadline window.",
+        "details": "In Vault.sol line 142..."
+      },
+      "impact": "An attacker who observes a single permit signature can replay it to drain the victim's vault balance indefinitely until deadline.",
+      "risk_breakdown": "V2.3 Critical — direct theft of user funds — enumerated impact for Smart Contracts. No external preconditions required beyond observation of one permit tx on mainnet.",
+      "recommendation": "Add nonce increment to the permit validation path...",
+      "references": ["[EIP-2612 spec](https://eips.ethereum.org/EIPS/eip-2612)"],
+      "proof_of_concept": {
+        "framework": "foundry",
+        "code": "pragma solidity 0.8.20; ...",
+        "run_instructions": "forge test --match-test test_replay --fork-url $RPC --fork-block 19000000",
+        "fork_block": 19000000
+      }
+    }
+  ]
+}

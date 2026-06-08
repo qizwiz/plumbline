@@ -39,17 +39,89 @@ No "QA" tier — informational issues are dropped. Map plumbline's QA-tier findi
 
 Naming: file save as `YYYY.MM.DD - Final - <slug> Audit Report.pdf` matching the canonical naming pattern.
 
-## Immunefi (coverage gap — no verified primary-source claims survived)
+## Immunefi (3-0 verified for structure + V2.3 severity; see docs/research/IMMUNEFI_STRATEGY.md)
 
-**Known generally** (from docs at immunefi.com, NOT verified in this research batch):
+**Format**: ONE submission = ONE finding. Multi-finding report template does NOT apply. Use `templates/immunefi_submission.j2` per-finding (schema: `schemas/immunefi_submission.json`).
 
-- Bug bounty program (not contest); submissions go through the platform's whitehat dashboard, not as a report
-- Each submission is a SINGLE finding, not a multi-finding report
-- Required fields per their public templates: vulnerability classification (using their internal taxonomy), affected functions, exploit walkthrough, recommended fix
-- Severity: their own 5-tier (Critical / High / Medium / Low / None)
-- PoC must be runnable; rewards depend on impact disclosure quality
+**7-section dashboard form (markdown-rendered, each section filled separately)**:
 
-**Recommended action before targeting**: do a follow-up research pass specifically on Immunefi's whitehat docs + recently-disclosed reports. The structural template above won't apply; Immunefi uses a per-submission web form, not a markdown report.
+1. **Title**
+2. **Bug Description** — with required Brief/Intro + Details subsections
+3. **Impact**
+4. **Risk Breakdown**
+5. **Recommendation**
+6. **References**
+7. **Proof of Concept**
+
+Lumping into Bug Description or putting PoC code outside the PoC field will explicitly cause the report to not be escalated (3-0 verified).
+
+**Form mechanics**:
+
+- `program` — dropdown selection + retype confirmation
+- `asset` — codebase URL dropdown from program scope; "Other" is rejection-likely unless direct loss of funds
+- `impacts` — **enumerated from program's "Impacts In Scope" list, NO custom impacts**; severity = highest selected impact's tier
+
+**Severity is V2.3 = 4-tier** (NOT V2.2's 5-tier with "None" — research question premise was wrong):
+
+- Critical
+- High
+- Medium
+- Low
+
+Set by impact-type criteria across three category tables (Blockchain/DLT, Smart Contracts, Websites and Apps). V2.3 spec does NOT define USD thresholds — monetary caps are program-specific.
+
+**For Smart Contracts, Critical impacts (enumerated)**:
+
+1. Direct theft of user funds
+2. Direct NFT theft
+3. Permanent freezing of funds/NFTs
+4. Governance manipulation
+5. Manipulable RNG
+6. Unauthorized NFT minting
+7. Unintended NFT alteration
+8. Protocol insolvency
+
+Plumbline's 9 TLA+ FailureMode shapes map cleanly onto these — see IMMUNEFI_STRATEGY.md §2.
+
+**PoC hard rules** (3-0 verified):
+
+- MUST be runnable Foundry/Hardhat test OR attack contract
+- MUST NOT be prose, screenshots, pseudo-code, or unit tests
+- MUST NOT touch mainnet or public testnet — **live exploitation = permanent ban**
+- Local mainnet fork (Foundry/Hardhat) is canonical
+- Official Foundry templates: github.com/immunefi-team/forge-poc-templates (485★)
+
+**Payout reality** (3-0 verified, but Immunefi-self-reported):
+
+- Median Critical: **$20,000**
+- Mean Critical: $114k (heavy-tailed by Wormhole-class outliers)
+- ~1 in 5 confirmed reports is Critical
+- First COMPLETE report wins — duplicates earn zero; placeholders prohibited
+- "No Fix, No Pay" — projects can legitimately close for 4 reasons including "decides not to fix"
+
+**Refuted operational claims (do NOT plan around)**:
+
+- Contractual SLAs of 48h ack / 14d decision / 14d payout (0-3 refuted)
+- Rate limit of 5 reports per 48h (1-2 refuted)
+- Mandatory `snapshot()` modifier on base PoC contract (0-3 refuted)
+
+**Render path**:
+
+```python
+# tools/render_report.py target=immunefi → renders ONE submission per finding
+# (NOT a multi-finding bundled report)
+python tools/render_report.py --target immunefi --finding-id H-01 \
+    --reps reps.jsonl --out submissions/wormhole-2026-06-08.md
+```
+
+**Open questions** (NOT answered in this research pass):
+
+- Top-5 programs ranked by plumbline shape coverage
+- KYC reality for non-US wallets
+- Empirical timing distribution
+- Honest EV/hour vs contests after all haircuts
+
+See `docs/research/IMMUNEFI_STRATEGY.md` for citations + honest scope.
 
 ## Cantina (coverage gap)
 
