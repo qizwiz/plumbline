@@ -84,8 +84,17 @@
       "cost_usd": 0.0034,
       "exec_cost_usd": 0.0,
       "refute_cost_usd": 0.0034
+    },
+    {
+      "ts": "2026-06-08T12:00:00.000000",
+      "goal": "CONTEST_DAY_HARDENING",
+      "verdict": "in-progress",
+      "cost_usd": 0.0,
+      "exec_cost_usd": 0.0,
+      "refute_cost_usd": 0.0,
+      "notes": "criteria #5 smoke test done (19%→20% precision, 4 admin-trust catches, 0 FP); #6 RUNBOOK updated with cost projection; #7 spend.json updated"
     }
   ],
-  "last_cycle_ts": "2026-06-08T00:38:31.524350",
+  "last_cycle_ts": "2026-06-08T12:00:00.000000",
   "version": 1
 }

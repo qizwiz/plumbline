@@ -6,7 +6,60 @@ Every command in this file has been verified to exist in the repo (T14 verificat
 
 ---
 
-## ⚡ TL;DR — the 8-line play
+## ⚡ TL;DR — 2026-06-08+ UNIFIED PIPELINE (one command)
+
+```bash
+# 1. Clone the target scope into examples/
+git clone <contest-repo-url> examples/<contest-name>
+
+# 2. Run the unified contest_day pipeline:
+#      cascade-grounded + baseline sol_intent + slither (parallel)
+#      → admin-trust filter (Sherlock out-of-scope rule, mechanical)
+#      → adversarial verify (3 checks: access control, admin-set call, atomic init)
+#      → renders Sherlock/C4 markdown report
+#      Typical output: 10-30 actionable candidates from ~200 raw leads
+python tools/contest_day.py examples/<contest-name>/ \
+    --slug "$(date +%Y-%m-%d)-<sponsor>" \
+    --sponsor "<Sponsor Name>" \
+    --target sherlock \
+    --out-dir reports/
+
+# 3. Triage reports/<slug>-filtered-leads.json:
+#    HIGH-confidence cascade verdicts first, then slither HIGH/MED-static, then baseline.
+#    REVIEW:admin-trust and REVIEW:adversarial leads listed in filtered file for manual audit.
+#    Cascade output is the PRIMARY triage queue; filtered-leads.json is the full set.
+
+# 4. For each surviving HIGH candidate matching a TLA+ FailureMode, discharge with TLC.
+#    (See § 3 below.)
+
+# 5. Submit, log a rep, push.
+```
+
+**Cost projection (as of 2026-06-08):**
+
+| Step | Tool | Cost | Time |
+|------|------|------|------|
+| cascade-grounded | sol_intent on ~12 candidates | ~$0.30 | ~2 min |
+| baseline | sol_intent --recall on full scope | ~$1-2 | ~5 min |
+| slither | static analysis | $0 | ~1 min |
+| admin-trust filter | mechanical grep/regex | $0 | <1 s |
+| adversarial verify | mechanical grep/regex | $0 | <1 s |
+| **Total** | | **~$1.30–2.30** | **~8 min** |
+
+Slither and both filters are deterministic and free. The total cost is unchanged from the pre-filter pipeline — filters are pure noise reduction.
+
+**Precision measured (2026-06-08 sequence corpus smoke test):**
+- Old pipeline (84 raw leads): 19.0% precision
+- New pipeline (80 after admin-trust filter): 20.0% precision (+1.0pp)
+- Admin-trust filter caught 4 onlySelf-gated leads; zero true positives filtered
+
+Pass `--no-filter` to bypass both filters and get raw union output.
+
+---
+
+## ⚡ TL;DR — legacy manual steps (exploded view)
+
+The manual steps below are the exploded view for debugging or when contest_day.py fails.
 
 ```bash
 # 1. Clone the target scope into examples/
