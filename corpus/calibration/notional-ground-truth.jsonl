@@ -1,0 +1,37 @@
+{"id": "H-1", "severity": "High", "title": "Cross-contract reentrancy allows YIELD_TOKEN theft for the GenericERC4626 WithdrawalReq"}
+{"id": "H-2", "severity": "High", "title": "Attacker can drain the entire suppliers on"}
+{"id": "H-3", "severity": "High", "title": "DineroWithdrawRequestManager vulnerable to token overwithdrawal via batch ID overlap"}
+{"id": "H-4", "severity": "High", "title": "When users borrow directly from Morpho"}
+{"id": "H-5", "severity": "High", "title": "migrateRewardPool Fails Due to Incompatible Storage Design in CurveConvexLib"}
+{"id": "H-6", "severity": "High", "title": "DoS might happen to DineroWithdrawReq"}
+{"id": "H-7", "severity": "High", "title": "RewardManagerMixin.claimAccountRewar"}
+{"id": "H-8", "severity": "High", "title": "Incorrect assumption that one (1) Pendle"}
+{"id": "H-9", "severity": "High", "title": "Hardcoded useEth = true in remove_liq"}
+{"id": "H-10", "severity": "High", "title": "Malicious user can change the TradeTyp"}
+{"id": "H-11", "severity": "High", "title": "Missing Slippage Protection in Expired PT"}
+{"id": "M-1", "severity": "Medium", "title": "Hard-Coded Mainnet WETH Address Breaks"}
+{"id": "M-2", "severity": "Medium", "title": "Incorrect tokensClaimed calculation in"}
+{"id": "M-3", "severity": "Medium", "title": "Single sided strategy cant do trades for"}
+{"id": "M-4", "severity": "Medium", "title": "Liquidations can be frontrunned to avoid"}
+{"id": "M-5", "severity": "Medium", "title": "Minting yield tokens single sided can be"}
+{"id": "M-6", "severity": "Medium", "title": "Withdrawals ongoing for OETH, apxETH,"}
+{"id": "M-7", "severity": "Medium", "title": "Rounding discrepancy between"}
+{"id": "M-8", "severity": "Medium", "title": "Emission rewards will keep accruing even"}
+{"id": "M-9", "severity": "Medium", "title": "OETH Strategy Broken as Rebasing Not"}
+{"id": "M-10", "severity": "Medium", "title": "Incorrect asset matching for ETH/WETH"}
+{"id": "M-11", "severity": "Medium", "title": "Users unable to claim rewards when Curve"}
+{"id": "M-12", "severity": "Medium", "title": "PendlePTOracle._getPTRate isn't correct"}
+{"id": "M-13", "severity": "Medium", "title": "Incompatibility of ERC20::approve function with USDT tokens on Ethereum Mainnet chain"}
+{"id": "M-14", "severity": "Medium", "title": "Value of Etherna's Withdrawal Request"}
+{"id": "M-15", "severity": "Medium", "title": "Loss of reward tokens during initiating"}
+{"id": "M-16", "severity": "Medium", "title": "Users will be unfairly liquidated if collateral value drops after initiating withdraw request"}
+{"id": "M-17", "severity": "Medium", "title": "User unable to migrate under certain edge"}
+{"id": "M-18", "severity": "Medium", "title": "Reducing liquidity in the hardcoded Curve"}
+{"id": "M-19", "severity": "Medium", "title": "Unable to deposit to Convex in Arbitrum"}
+{"id": "M-20", "severity": "Medium", "title": "Lack of minimum debt threshold enables"}
+{"id": "M-21", "severity": "Medium", "title": "Funds stuck if one of the withdrawal requests cannot be finalized"}
+{"id": "M-22", "severity": "Medium", "title": "Setup with asset = WETH and a Curve"}
+{"id": "M-23", "severity": "Medium", "title": "Unable to support Curve Pool with Native ETH"}
+{"id": "M-24", "severity": "Medium", "title": "Convex cannot be configured for the"}
+{"id": "M-25", "severity": "Medium", "title": "Revert in getWithdrawRequestValue()"}
+{"id": "M-26", "severity": "Medium", "title": "initializeMarket can be frontran, preventing markets from being configured in MorphoLe"}

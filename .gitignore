@@ -8,3 +8,6 @@ cache/
 *.log
 corpus/c4/
 reports/
+corpus/calibration/notional-source
+corpus/calibration/notional-judging
+corpus/sherlock_pdfs/
