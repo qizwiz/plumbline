@@ -27,10 +27,111 @@ Outputs:
 If --target sherlock, also prints pandoc invocation for PDF.
 """
 from __future__ import annotations
-import argparse, json, os, re, subprocess, sys, time
+import argparse, json, os, re, shutil, subprocess, sys, time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
+
+# Known fallback path for slither when not on PATH (e.g. user's local Python install)
+_SLITHER_FALLBACK = "/Users/jonathanhill/Library/Python/3.14/bin/slither"
+
+
+def _find_slither() -> str | None:
+    """Return slither binary path: PATH first, then known fallback."""
+    s = shutil.which("slither")
+    if s:
+        return s
+    if Path(_SLITHER_FALLBACK).exists():
+        return _SLITHER_FALLBACK
+    return None
+
+
+def run_slither(scope_dir: Path, out: Path) -> tuple[int, int]:
+    """
+    Run slither --json on scope_dir. Returns (elapsed_s, n_findings).
+    Writes JSON to `out`. Writes empty dict if slither unavailable or fails.
+    """
+    slither_bin = _find_slither()
+    if slither_bin is None:
+        print("[slither] not found in PATH or fallback — SKIPPED", file=sys.stderr)
+        out.write_text("{}")
+        return 0, 0
+
+    t0 = time.time()
+    print(f"[slither] starting on {scope_dir}", file=sys.stderr)
+    p = subprocess.run(
+        [slither_bin, str(scope_dir), "--json", str(out),
+         "--exclude-informational", "--exclude-optimization"],
+        env=env_with_key(), cwd=str(HERE),
+        capture_output=True, text=True, timeout=300,
+    )
+    elapsed = int(time.time() - t0)
+    # Slither exits 1 even on success when detectors fire; only >1 is a hard fail
+    if p.returncode > 1:
+        print(f"[slither] FAILED rc={p.returncode}\n{p.stderr[:600]}", file=sys.stderr)
+        out.write_text("{}")
+        return elapsed, 0
+
+    n = 0
+    if out.exists():
+        try:
+            data = json.loads(out.read_text())
+            n = len(data.get("results", {}).get("detectors", []))
+        except (json.JSONDecodeError, KeyError):
+            pass
+    print(f"[slither] done in {elapsed}s → {n} detectors fired → {out}",
+          file=sys.stderr)
+    return elapsed, n
+
+
+def parse_slither_output(json_path: Path) -> list[dict]:
+    """Parse slither --json output into lead dicts with confidence tags."""
+    if not json_path.exists():
+        return []
+    try:
+        data = json.loads(json_path.read_text())
+    except (json.JSONDecodeError, OSError):
+        return []
+
+    detectors = data.get("results", {}).get("detectors", [])
+    leads: list[dict] = []
+    for det in detectors:
+        impact = det.get("impact", "").strip()
+        if impact == "High":
+            conf_tag = "HIGH-static"
+        elif impact == "Medium":
+            conf_tag = "MEDIUM-static"
+        else:
+            conf_tag = "LOW-static"
+
+        # Best location: first function element → "Contract.fn", else filename stem
+        location = "?"
+        for el in (det.get("elements") or []):
+            el_type = el.get("type", "")
+            name = el.get("name", "")
+            src = el.get("source_mapping", {})
+            filename = src.get("filename_relative", "")
+            parent = (el.get("type_specific_fields") or {}).get("parent", {})
+            contract_name = parent.get("name", "") or Path(filename).stem
+            if name and contract_name:
+                sep = "." if el_type == "function" else "/"
+                location = f"{contract_name}{sep}{name}"
+                break
+            elif filename:
+                location = Path(filename).stem
+                break
+
+        leads.append({
+            "confidence": conf_tag,
+            "source": "slither",
+            "location": location,
+            "claim": det.get("description", "")[:200].replace("\n", " ").strip(),
+            "shape": det.get("check", ""),
+            "why": f"slither/{det.get('check', '')} impact={impact} "
+                   f"confidence={det.get('confidence', '?')}",
+        })
+    return leads
+
 
 # Lazy import so the filter is optional and doesn't break if called
 # with --no-filter or from old scripts that don't pass scope_dir.
@@ -150,17 +251,42 @@ def parse_baseline_leads(text: str) -> list[dict]:
 
 
 def union_dedupe(cascade_verdicts: list[dict],
-                 baseline_leads: list[dict]) -> list[dict]:
-    """Cascade verdicts ranked first. Baseline leads added if their location
-    isn't already covered by a HIGH-confidence cascade verdict."""
+                 baseline_leads: list[dict],
+                 slither_leads: list[dict] | None = None) -> list[dict]:
+    """
+    Cascade HIGH verdicts ranked first, then slither HIGH-static/MEDIUM-static,
+    then baseline NORMAL leads (deduped against cascade locs), then slither
+    LOW-static last.  Slither findings keyed by (location, shape) to avoid
+    duplicates from re-runs.
+    """
     out = list(cascade_verdicts)
     cascade_locs = {v["location"].lower() for v in cascade_verdicts}
+
+    seen_slither: set[tuple[str, str]] = set()
+
+    # Slither HIGH-static + MEDIUM-static go before baseline
+    for lead in (slither_leads or []):
+        if lead.get("confidence") in ("HIGH-static", "MEDIUM-static"):
+            key = (lead.get("location", "").lower(), lead.get("shape", "").lower())
+            if key not in seen_slither:
+                seen_slither.add(key)
+                out.append(lead)
+
+    # Baseline leads, deduped against cascade locs
     for lead in baseline_leads:
         loc = lead.get("location", "").lower()
         if loc and any(c in loc or loc in c for c in cascade_locs):
-            # likely the same finding; cascade verdict already covered it
             continue
         out.append(lead)
+
+    # Slither LOW-static appended last
+    for lead in (slither_leads or []):
+        if lead.get("confidence") == "LOW-static":
+            key = (lead.get("location", "").lower(), lead.get("shape", "").lower())
+            if key not in seen_slither:
+                seen_slither.add(key)
+                out.append(lead)
+
     return out
 
 
@@ -211,6 +337,8 @@ def main():
     ap.add_argument("--out-dir", default="reports")
     ap.add_argument("--skip-baseline", action="store_true",
                     help="Cascade-only mode (faster, lower recall)")
+    ap.add_argument("--skip-slither", action="store_true",
+                    help="Skip slither static analysis step")
     ap.add_argument("--scripts-dir", default=None,
                     help="Deployment scripts directory override (default: auto-detect script/deploy/)")
     ap.add_argument("--no-filter", action="store_true",
@@ -223,6 +351,7 @@ def main():
 
     cascade_out = out_dir / f"{args.slug}-cascade-verdicts.txt"
     baseline_out = out_dir / f"{args.slug}-baseline-leads.txt"
+    slither_out = out_dir / f"{args.slug}-slither.json"
     union_out = out_dir / f"{args.slug}-union-leads.json"
     report_out = out_dir / f"{args.slug}-report.md"
 
@@ -242,15 +371,30 @@ def main():
         t_baseline = 0
         baseline_out.write_text("(skipped)\n")
 
+    # Slither — deterministic static analysis, free to run
+    if not args.skip_slither:
+        t_slither, n_slither = run_slither(scope, slither_out)
+        slither_leads = parse_slither_output(slither_out)
+    else:
+        t_slither, n_slither = 0, 0
+        slither_leads = []
+        slither_out.write_text("{}")
+
     # Parse + union
     cascade_text = cascade_out.read_text() if cascade_out.exists() else ""
     baseline_text = baseline_out.read_text() if baseline_out.exists() else ""
     cascade_verdicts = parse_cascade_verdicts(cascade_text)
     baseline_leads = parse_baseline_leads(baseline_text)
-    union = union_dedupe(cascade_verdicts, baseline_leads)
+    union = union_dedupe(cascade_verdicts, baseline_leads, slither_leads)
     union_out.write_text(json.dumps(union, indent=2))
 
+    n_slither_high = sum(1 for l in slither_leads if l["confidence"] == "HIGH-static")
+    n_slither_med = sum(1 for l in slither_leads if l["confidence"] == "MEDIUM-static")
+    n_slither_low = sum(1 for l in slither_leads if l["confidence"] == "LOW-static")
     print(f"\nCASCADE: {len(cascade_verdicts)} CONFIRMs (HIGH confidence)",
+          file=sys.stderr)
+    print(f"SLITHER: {len(slither_leads)} findings "
+          f"(H={n_slither_high} M={n_slither_med} L={n_slither_low})",
           file=sys.stderr)
     print(f"BASELINE: {len(baseline_leads)} leads (NORMAL confidence)",
           file=sys.stderr)
@@ -315,6 +459,9 @@ def main():
     n_review = len(rejected) + len(adv_rejected)
     print(f"\n=== DONE in {elapsed}s ===", file=sys.stderr)
     print(f"  cascade-grounded:  {cascade_out.relative_to(HERE)}  ({t_cascade}s)",
+          file=sys.stderr)
+    print(f"  slither:           {slither_out.relative_to(HERE)}  "
+          f"({t_slither}s, {n_slither} detectors)",
           file=sys.stderr)
     print(f"  baseline-leads:    {baseline_out.relative_to(HERE)}  ({t_baseline}s)",
           file=sys.stderr)
