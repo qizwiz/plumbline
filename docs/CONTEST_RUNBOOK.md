@@ -20,10 +20,18 @@ python sol_intent.py examples/<contest-name> --recall \
     | tee examples/<contest-name>/leads.txt
 
 # 3.5. Structural cascade (free, $0, pure tree-sitter + embedding)
-#      Compresses ~200 sol_intent leads to ~12 high-probability structural hits.
-#      100% H/M strict recall on Notional Exponent (2026-06-08 calibration).
+#      Compresses ~200 sol_intent leads to ~12 structural candidates.
+#      100% H/M CANDIDATE recall on Notional (all findings reachable in Layer A).
+#      Does NOT guarantee final recall — use as UNION with step 3 leads.
 python tools/structural_cascade.py examples/<contest-name>/ \
     --out examples/<contest-name>/cascade.jsonl
+
+# 3.6. OPTIONAL: cascade-grounded precision confirmer (~$0.30, high precision)
+#      Runs sol_intent only on cascade's ~12 candidates → CONFIRM/REFUTE verdicts.
+#      High precision; LOW recall on diverse-bug contests (5.4% on Notional).
+#      See docs/CASCADE_GROUNDED.md for UNION architecture.
+python tools/sol_intent_cascade.py examples/<contest-name>/ \
+    | tee examples/<contest-name>/cascade-verdicts.txt
 
 # 4. sol_match: score leads vs ANY ground-truth-shaped seeds you have
 python sol_match.py examples/<contest-name>/leads.txt <seeds.txt> 0.65
