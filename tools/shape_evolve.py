@@ -1023,35 +1023,24 @@ def load_unmatched_findings() -> list[dict]:
 
 def extract_signature(tla_path: Path) -> str:
     """Build a shape signature from a .tla module: doc header + invariant +
-    state vars + action names. This is what we embed."""
+    state vars + action names. This is what we embed.
+
+    For mutation files (starting with \\* MUTATION:), the parent's header is
+    excluded so the embedding is not pinned to the parent shape.  Only novel
+    operators introduced by the mutation are included.
+    """
     text = tla_path.read_text(errors="replace")
-    # Header comment block (between ( * and * ))
-    m = re.search(r"\(\*(.*?)\*\)", text, re.S)
-    header = m.group(1) if m else ""
-    # All invariant declarations of the form `Name == ...` whose LHS doesn't
-    # start with internal keywords
-    invs = []
-    for m in re.finditer(r"^([A-Z]\w+)\s*==\s*(.+?)(?=\n[A-Z][\w]*\s*==|\n=====|\Z)",
-                         text, re.M | re.S):
-        name = m.group(1)
-        if name in ("Init", "Next", "Spec", "TypeInvariant", "Fairness"):
-            continue
-        invs.append(f"{name}: {m.group(2).strip()[:200]}")
-    # VARIABLES list
-    vm = re.search(r"VARIABLES\s*\n((?:\s+\w+,?\s*\n)+)", text)
-    varlist = ""
-    if vm:
-        varlist = " ".join(x.strip().rstrip(",") for x in vm.group(1).split("\n")
-                           if x.strip())
-    # Mutation kind if present — weight it 3× to dominate over the parent's
-    # header (which would otherwise pin the embedding to the parent shape).
-    mut = ""
+
+    # Detect mutation and extract parent name early
     mm = re.search(r"\\\* MUTATION:\s*(.+)", text)
+    parent_m = re.search(r"\\\* parent:\s*(\S+)", text)
+    is_mutation = mm is not None
+    parent_name = parent_m.group(1).strip() if parent_m else None
+
+    # Semantic hints for mutation types (used below)
+    mut = ""
     if mm:
         mut_kind = mm.group(1).strip()
-        # Translate add_state_var(staleness_window) → "bug class: staleness
-        # window check; precision; freshness; timeout" — semantic hints
-        # that match Sherlock unmatched-finding vocabulary.
         sem_hints = ""
         if mut_kind.startswith("add_state_var(staleness"):
             sem_hints = "bug class: oracle staleness; stale price; missing freshness check; timeout window"
@@ -1078,16 +1067,73 @@ def extract_signature(tla_path: Path) -> str:
                 "bug class: oracle staleness; stale data acceptance; "
                 "missing freshness check; deadline bypass; expired data; "
                 "global clock; timestamp; time-based invalidation; "
-                "stale price feed; freshness window; heartbeat timeout"
+                "stale price feed; freshness window; heartbeat timeout; "
+                "NAV staleness; cooldown price lag; outdated NAV; "
+                "checkpoint delay; deferred price update; stale rate; "
+                "price not updated; freshness violation; data expiry; "
+                "epoch nullification; stuck emissions nullified epoch; "
+                "stale epoch; nullified period; emission stuck; "
+                "epoch invalidated; expired epoch emissions"
             )
         elif mut_kind.startswith("action_subdivide"):
             sem_hints = (
                 "bug class: reentrancy; CEI violation; external call before update; "
                 "reentrant withdrawal; check-effects-interactions pattern; "
-                "callback exploitation; cross-function reentrancy"
+                "callback exploitation; cross-function reentrancy; "
+                "reentrant attack; balance not zeroed before call; "
+                "double withdrawal; send before state update; "
+                "protection buyer multiple protections; double claim"
             )
         mut = f"mutation: {mut_kind} | {mut_kind} | {mut_kind}\n{sem_hints}"
-    sig = f"{mut}\nvars: {varlist}\nheader: {header[:1500]}\ninvariants: {' | '.join(invs[:5])[:1500]}"
+
+    # Collect parent operator names so mutations can exclude them
+    parent_op_names: set[str] = set()
+    if is_mutation and parent_name:
+        parent_tla = tla_path.parent.parent / f"{parent_name}.tla"
+        if not parent_tla.exists():
+            # try docs/tla/ directly (for mutations stored one level up)
+            parent_tla = TLA_DIR / f"{parent_name}.tla"
+        if parent_tla.exists():
+            ptxt = parent_tla.read_text(errors="replace")
+            for pm in re.finditer(r"^([A-Za-z_]\w+)\s*(?:\([^)]*\))?\s*==", ptxt, re.M):
+                parent_op_names.add(pm.group(1))
+
+    # Header comment block (between (* and *))
+    # Mutations skip the header to avoid being pinned to the parent's embedding.
+    header = ""
+    if not is_mutation:
+        m = re.search(r"\(\*(.*?)\*\)", text, re.S)
+        header = m.group(1) if m else ""
+
+    # All operator declarations Name == ...
+    # For mutations: only include operators NOT present in the parent.
+    invs = []
+    _SKIP = {"Init", "Next", "Spec", "TypeInvariant", "Fairness", "EXTENDS"}
+    for m in re.finditer(r"^([A-Z]\w+)\s*==\s*(.+?)(?=\n[A-Z][\w]*\s*==|\n=====|\Z)",
+                         text, re.M | re.S):
+        name = m.group(1)
+        if name in _SKIP:
+            continue
+        if is_mutation and parent_op_names and name in parent_op_names:
+            continue  # skip parent-inherited operators for mutations
+        invs.append(f"{name}: {m.group(2).strip()[:200]}")
+
+    # VARIABLES list — matches lines like "    var_name      \* comment"
+    vm = re.search(r"VARIABLES\s*\n((?:\s+\w+[^\n]*\n)+)", text)
+    varlist = ""
+    if vm:
+        vlines = []
+        for ln in vm.group(1).split("\n"):
+            stripped = ln.strip()
+            if not stripped or stripped.startswith(r"\*"):
+                continue
+            # Extract just the variable name (first word)
+            tok = re.match(r"(\w+)", stripped)
+            if tok:
+                vlines.append(tok.group(1))
+        varlist = " ".join(vlines)
+
+    sig = f"{mut}\nvars: {varlist}\nheader: {header[:1500]}\ninvariants: {' | '.join(invs[:8])[:2000]}"
     return sig
 
 

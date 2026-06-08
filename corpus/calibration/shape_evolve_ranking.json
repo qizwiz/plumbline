@@ -1,38 +1,106 @@
 [
   {
-    "mutation": "IncentiveBonusBreaksInvariant_Inject",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "IncentiveBonusBreaksInvariant",
-    "closest_existing_cos": 0.9440248608589172,
-    "anti_sim_penalty": true,
-    "covered_findings_sample": []
-  },
-  {
     "mutation": "ReentrancyDrain_Inject",
-    "covered_count": 0,
-    "fitness_score": 0,
+    "covered_count": 5,
+    "fitness_score": 5,
     "closest_existing": "ReentrancyDrain",
-    "closest_existing_cos": 0.9408859014511108,
-    "anti_sim_penalty": true,
-    "covered_findings_sample": []
+    "closest_existing_cos": 0.7539396286010742,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": [
+      "Stuck emissions for nullified epochs",
+      "If any stable depegs, oracle will fail, disabling",
+      "Requested oracle versions, which have expired, mus",
+      "NAV staleness during cooldown",
+      "NAV staleness during cooldown"
+    ]
   },
   {
     "mutation": "SignatureReplay_Inject",
-    "covered_count": 0,
-    "fitness_score": 0,
-    "closest_existing": "SignatureReplay",
-    "closest_existing_cos": 0.9247458577156067,
-    "anti_sim_penalty": true,
-    "covered_findings_sample": []
+    "covered_count": 5,
+    "fitness_score": 5,
+    "closest_existing": "Uint64FeeOverflow",
+    "closest_existing_cos": 0.7521623373031616,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": [
+      "Stuck emissions for nullified epochs",
+      "If any stable depegs, oracle will fail, disabling",
+      "Requested oracle versions, which have expired, mus",
+      "NAV staleness during cooldown",
+      "NAV staleness during cooldown"
+    ]
   },
   {
     "mutation": "Uint64FeeOverflow_Inject",
+    "covered_count": 5,
+    "fitness_score": 5,
+    "closest_existing": "Uint64FeeOverflow",
+    "closest_existing_cos": 0.7433401942253113,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": [
+      "Stuck emissions for nullified epochs",
+      "If any stable depegs, oracle will fail, disabling",
+      "Requested oracle versions, which have expired, mus",
+      "NAV staleness during cooldown",
+      "NAV staleness during cooldown"
+    ]
+  },
+  {
+    "mutation": "IncentiveBonusBreaksInvariant_Inject",
+    "covered_count": 4,
+    "fitness_score": 4,
+    "closest_existing": "Uint64FeeOverflow",
+    "closest_existing_cos": 0.7476532459259033,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": [
+      "Stuck emissions for nullified epochs",
+      "Requested oracle versions, which have expired, mus",
+      "NAV staleness during cooldown",
+      "NAV staleness during cooldown"
+    ]
+  },
+  {
+    "mutation": "Create2NonIdempotent_mut_4",
     "covered_count": 0,
     "fitness_score": 0,
-    "closest_existing": "Uint64FeeOverflow",
-    "closest_existing_cos": 0.9624866843223572,
-    "anti_sim_penalty": true,
+    "closest_existing": "Create2NonIdempotent",
+    "closest_existing_cos": 0.8235283493995667,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "PartialSignatureReplay_mut_2",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "PartialSignatureReplay",
+    "closest_existing_cos": 0.8269497752189636,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "ReentrancyDrain_Subdiv",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "ReentrancyDrain",
+    "closest_existing_cos": 0.840438723564148,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "SignatureReplay_Subdiv",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "ReentrancyDrain",
+    "closest_existing_cos": 0.804709792137146,
+    "anti_sim_penalty": false,
+    "covered_findings_sample": []
+  },
+  {
+    "mutation": "Uint64FeeOverflow_Subdiv",
+    "covered_count": 0,
+    "fitness_score": 0,
+    "closest_existing": "ReentrancyDrain",
+    "closest_existing_cos": 0.8088812828063965,
+    "anti_sim_penalty": false,
     "covered_findings_sample": []
   }
 ]

@@ -66,6 +66,19 @@ SHAPE_TEMPLATES = {
             "// State 2: submissions[s]=2, paid_total[s]=2*AuthAmount  ← INVARIANT VIOLATED"
         ),
     },
+    "OracleStaleness": {
+        "template": "OracleStaleness.t.sol.template",
+        "invariant": "StaleDataRejected",
+        "default_trace_head": (
+            "// State 0: oracle_age=0, paid=false\n"
+            "//   Action: Tick\n"
+            "// State 1: oracle_age=1  (at freshness boundary)\n"
+            "//   Action: Tick\n"
+            "// State 2: oracle_age=2  (past FRESHNESS=1)\n"
+            "//   Action: PayBuggy(a1)  ← INVARIANT VIOLATED\n"
+            "// paid_at[a1]=2 > FRESHNESS=1"
+        ),
+    },
     # TODO: ERC4337StaticSigDoS, Uint64FeeOverflow, Create2NonIdempotent,
     #       PartialSignatureReplay, CrossWalletSigReplay,
     #       FlagBypassesValidationChain, ArbitraryFromApprovalTheft.

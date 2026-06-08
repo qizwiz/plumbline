@@ -13,7 +13,8 @@ HERE = Path(__file__).resolve().parent.parent
 INDEX_PATH = HERE / "tools" / "findings_index.pkl"
 SHAPES = ["SignatureReplay", "ReentrancyDrain", "ERC4337StaticSigDoS",
           "Uint64FeeOverflow", "Create2NonIdempotent", "PartialSignatureReplay",
-          "CrossWalletSigReplay", "FlagBypassesValidationChain", "MissingAwait"]
+          "CrossWalletSigReplay", "FlagBypassesValidationChain", "MissingAwait",
+          "OracleStaleness"]
 
 # ============================================================
 # Layer A: tree-sitter Solidity structural queries
@@ -87,6 +88,11 @@ A_QUERIES = {
     # Detects `uint256 flag = ...` and ecrecover in the same function body.
     "chained_signature": re.compile(
         r"uint256\s+flag\b.*\becrecover\s*\(", re.S),
+    # OracleStaleness: reads a Chainlink / custom oracle price without a
+    # freshness / staleness check on the updatedAt timestamp.
+    "oracle_price_read": re.compile(
+        r"\b(latestAnswer|latestRoundData|getPrice|getRate|getPriceUSD"
+        r"|consult|observe|slot0|getSqrtTwapX96)\s*\(", re.M),
 }
 
 
@@ -97,7 +103,7 @@ _PRIMARY_HITS = frozenset({
     "external_call", "low_level_call_unchecked", "state_write_after_call",
     "permit_call", "create2", "ecrecover", "self_call",
     "msg_sender_in_validation", "unbounded_for",
-    "chained_signature",
+    "chained_signature", "oracle_price_read",
 })
 
 
@@ -255,6 +261,12 @@ SHAPE_HEURISTICS = {
     "Create2NonIdempotent": lambda f: (
         "create2" in f["ast_hits"]),
     "MissingAwait": lambda f: ("await" in f["text"].lower()),  # JS-shaped
+    # OracleStaleness: reads oracle price but has no updatedAt / block.timestamp
+    # freshness check in the same function body.
+    "OracleStaleness": lambda f: (
+        "oracle_price_read" in f["ast_hits"] and
+        not re.search(r"\bupdatedAt\b|\bblock\.timestamp\b.*<|\blastUpdate\b",
+                      f["text"])),
 }
 
 
@@ -265,6 +277,8 @@ _SHAPE_KWS = {
     "Uint64FeeOverflow": ["overflow", "uint64", "fee"],
     "Create2NonIdempotent": ["create2", "deploy", "idempotent"],
     "MissingAwait": ["await", "async"],
+    "OracleStaleness": ["stale", "staleness", "freshness", "heartbeat",
+                        "updatedat", "latestanswer", "latestrounddata", "nav"],
 }
 
 

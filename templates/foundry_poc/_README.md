@@ -18,6 +18,7 @@ counterexample, and emits a runnable `.t.sol` file.
 | CrossWalletSigReplay | — | TODO |
 | FlagBypassesValidationChain | — | TODO |
 | ArbitraryFromApprovalTheft | — | TODO |
+| OracleStaleness | `OracleStaleness.t.sol.template` | **TODO** — shape banked 2026-06-08 (TLC-verified StaleDataRejected, fitness=5 on Sherlock corpus); template not yet written |
 
 ## Architecture
 
