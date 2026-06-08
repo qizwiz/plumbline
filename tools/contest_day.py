@@ -32,6 +32,15 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent.parent
 
+# Lazy import so the filter is optional and doesn't break if called
+# with --no-filter or from old scripts that don't pass scope_dir.
+def _admin_filter(leads, scope_dir, no_filter=False):
+    try:
+        from admin_trust_filter import filter_leads
+        return filter_leads(leads, scope_dir, no_filter=no_filter)
+    except ImportError:
+        return leads, []
+
 
 def env_with_key() -> dict:
     """Source .env into a copy of os.environ."""
@@ -194,6 +203,8 @@ def main():
     ap.add_argument("--out-dir", default="reports")
     ap.add_argument("--skip-baseline", action="store_true",
                     help="Cascade-only mode (faster, lower recall)")
+    ap.add_argument("--no-filter", action="store_true",
+                    help="Skip admin-trust filter and adversarial verify; output raw union")
     args = ap.parse_args()
 
     scope = Path(args.scope_dir).resolve()
@@ -235,8 +246,32 @@ def main():
           file=sys.stderr)
     print(f"UNION (dedup): {len(union)} total\n", file=sys.stderr)
 
+    # Admin-trust filter
+    filtered, rejected = _admin_filter(union, scope, no_filter=args.no_filter)
+    if rejected:
+        print(f"ADMIN-TRUST FILTER: {len(rejected)} leads downgraded to REVIEW "
+              f"({len(filtered) - len(rejected)} survivors)\n", file=sys.stderr)
+        print("=== REJECTED — admin-trust scope (verify filter isn't too aggressive) ===",
+              file=sys.stderr)
+        for r in rejected:
+            loc = r.get("location", "?")
+            reason = r.get("admin_trust_reason", "?")
+            claim = (r.get("claim") or r.get("raw", "?"))[:80]
+            print(f"  • {loc}: {claim}  [{reason}]", file=sys.stderr)
+        print("", file=sys.stderr)
+    else:
+        print(f"ADMIN-TRUST FILTER: 0 leads downgraded (all {len(filtered)} survive)\n",
+              file=sys.stderr)
+
+    # Write filtered union (leads marked REVIEW:admin-trust are still present for audit)
+    filtered_out = out_dir / f"{args.slug}-filtered-leads.json"
+    filtered_out.write_text(json.dumps(filtered, indent=2))
+
+    # Render only surviving (non-REVIEW) leads in the report
+    report_leads = [l for l in filtered if not str(l.get("confidence","")).startswith("REVIEW")]
+
     # Render
-    reps = render_report(args.slug, args.sponsor, args.target, union, report_out)
+    reps = render_report(args.slug, args.sponsor, args.target, report_leads, report_out)
     elapsed = int(time.time() - t_start)
 
     print(f"\n=== DONE in {elapsed}s ===", file=sys.stderr)
@@ -245,6 +280,9 @@ def main():
     print(f"  baseline-leads:    {baseline_out.relative_to(HERE)}  ({t_baseline}s)",
           file=sys.stderr)
     print(f"  union-leads.json:  {union_out.relative_to(HERE)}", file=sys.stderr)
+    print(f"  filtered-leads:    {filtered_out.relative_to(HERE)}  "
+          f"({len(report_leads)} actionable + {len(rejected)} admin-trust REVIEW)",
+          file=sys.stderr)
     print(f"  report:            {report_out.relative_to(HERE)}", file=sys.stderr)
     if args.target == "sherlock":
         pdf_name = (f"{__import__('datetime').date.today().strftime('%Y.%m.%d')}"
