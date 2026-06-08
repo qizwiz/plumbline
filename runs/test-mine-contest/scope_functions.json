@@ -1,0 +1,944 @@
+[
+  {
+    "contract": "dreAaveAdapter",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 74
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "withdraw",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 109
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "getAvailableBalance",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 136
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "setDreUSDManager",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 175
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "setVault",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 190
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "recoverToken",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 211
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 73
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "addRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 108
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "claimVested",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 147
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "vestedAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 155
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "_claimVested",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 163
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "_computeVestedAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 175
+  },
+  {
+    "contract": "dreUSD",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 63
+  },
+  {
+    "contract": "dreUSD",
+    "function": "setSanctionsList",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 80
+  },
+  {
+    "contract": "dreUSD",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 88
+  },
+  {
+    "contract": "dreUSD",
+    "function": "burn",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 94
+  },
+  {
+    "contract": "dreUSD",
+    "function": "setDreUSDManager",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 103
+  },
+  {
+    "contract": "dreUSD",
+    "function": "freeze",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 111
+  },
+  {
+    "contract": "dreUSD",
+    "function": "unfreeze",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 119
+  },
+  {
+    "contract": "dreUSD",
+    "function": "_validateAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 132
+  },
+  {
+    "contract": "dreUSD",
+    "function": "validateAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 143
+  },
+  {
+    "contract": "dreUSD",
+    "function": "isBlockedAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 148
+  },
+  {
+    "contract": "dreUSD",
+    "function": "_update",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 163
+  },
+  {
+    "contract": "dreUSD",
+    "function": "_credit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 184
+  },
+  {
+    "contract": "dreUSD",
+    "function": "transferOwnership",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 205
+  },
+  {
+    "contract": "dreUSD",
+    "function": "renounceOwnership",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 214
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 194
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateVault",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 237
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateCustodianList",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 246
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "setDailyFiatMintCap",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 261
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "dreRewardsDistributor",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 270
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateExpressPaybackAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 275
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateExpressWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 284
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 314
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateVaultAdapter",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 328
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateAllowedList",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 338
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 352
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mintFrom",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 373
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 406
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mintAndStake",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 423
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mintFromUsd",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 456
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mintRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 465
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "requestWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 479
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "requestExpressWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 506
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "fillWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 534
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "fillExpressWithdrawals",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 595
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "payExpressDebt",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 653
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "getDailyFiatMinted",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 661
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "getExpressAvailable",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 666
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "getExpressFillerDebt",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 671
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "calculateExpressFee",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 676
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "adminWithdraw",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 682
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_checkAndUpdateDailyFiatMint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 698
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_queueExpressWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 719
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_queueWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 752
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_paybackExpressFiller",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 768
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_preMintChecks",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 807
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_validateAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 819
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "authDomainSeparator",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 826
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_authDomainSeparator",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 830
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_authorize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 845
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_executePermit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 883
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_transferAndMint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 916
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_mintDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 948
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_mintFromFiatUsd",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 975
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_convertToDecimals",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 1009
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_computeFiatMintStructHash",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 1033
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "supportsInterface",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 1040
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 68
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "setOracle",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 91
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "setStalenessThreshold",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 157
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "setDeviationThreshold",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 168
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "removeOracle",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 179
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "setSequencerUptimeFeed",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 189
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "setGracePeriod",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 198
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "getUsdValue",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 214
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "getTokenAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 250
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "getPriceDecimals",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 296
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "validatePrice",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 302
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "getLatestPrice",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 326
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_requireValidStalenessThreshold",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 336
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_getLatestPrice",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 346
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_checkSequencerStatus",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 358
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_isSequencerHealthy",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 369
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_checkDeviation",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 407
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_isWithinDeviation",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 427
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 57
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "setRewardsDistributor",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 78
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "setShareOFTAdapter",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 95
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "totalAssets",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 109
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "maxDeposit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 126
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "maxMint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 135
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "maxWithdraw",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 144
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "maxRedeem",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 153
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "claimVestedRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 160
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "excessDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 167
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "withdrawExcessDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 174
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_claimVestedRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 204
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_deposit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 213
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_withdraw",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 222
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_validateAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 239
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_isBlockedAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 250
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_update",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 262
+  },
+  {
+    "contract": "dreVault",
+    "function": "checkUpkeep",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 45
+  },
+  {
+    "contract": "dreVault",
+    "function": "performUpkeep",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 53
+  },
+  {
+    "contract": "dreVault",
+    "function": "recoverToken",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 61
+  },
+  {
+    "contract": "dreVault",
+    "function": "recoverEther",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 73
+  },
+  {
+    "contract": "dreWithdrawalKeeperBot",
+    "function": "checkUpkeep",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalKeeperBot.sol",
+    "start_line": 31
+  },
+  {
+    "contract": "dreWithdrawalKeeperBot",
+    "function": "performUpkeep",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalKeeperBot.sol",
+    "start_line": 40
+  },
+  {
+    "contract": "dreWithdrawalKeeperBot",
+    "function": "_collectFillableTokenIds",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalKeeperBot.sol",
+    "start_line": 46
+  },
+  {
+    "contract": "dreWithdrawalKeeperBot",
+    "function": "_availableLiquidity",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalKeeperBot.sol",
+    "start_line": 108
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 57
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "setDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 83
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "setDreUSDManager",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 94
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 105
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "burn",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 124
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "getPosition",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 144
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "getPositions",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 149
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "getUsdcAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 158
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "positionExists",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 164
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "getOriginalUser",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 169
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "getPendingRange",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 179
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "getTokensByIndexes",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 191
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "_exists",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 204
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "_getPosition",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 208
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "_update",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 219
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "_validateAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 240
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "supportsInterface",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 251
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 180
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 195
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "mintFrom",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 213
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "mintAndStake",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 240
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "requestExpressWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 276
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "fillExpressWithdrawals",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 288
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "requestWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 320
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "fillWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 333
+  },
+  {
+    "contract": "IdreUSDManager",
+    "function": "calculateExpressFee",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreUSDManager.sol",
+    "start_line": 373
+  },
+  {
+    "contract": "IdreVault",
+    "function": "checkUpkeep",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/interfaces/IdreVault.sol",
+    "start_line": 24
+  },
+  {
+    "contract": "ScalingConstants",
+    "function": "scaleBase",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/libraries/ScalingConstants.sol",
+    "start_line": 16
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "setStuckFundsRecipient",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 55
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_depositAndSend",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 72
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_redeemAndSend",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 112
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_sendLocal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 152
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_refund",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 183
+  },
+  {
+    "contract": "dreShareOFT",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFT.sol",
+    "start_line": 54
+  },
+  {
+    "contract": "dreShareOFT",
+    "function": "_validateAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFT.sol",
+    "start_line": 78
+  },
+  {
+    "contract": "dreShareOFT",
+    "function": "_update",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFT.sol",
+    "start_line": 89
+  },
+  {
+    "contract": "dreShareOFT",
+    "function": "_credit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFT.sol",
+    "start_line": 109
+  },
+  {
+    "contract": "dreShareOFTAdapter",
+    "function": "initialize",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFTAdapter.sol",
+    "start_line": 49
+  },
+  {
+    "contract": "dreShareOFTAdapter",
+    "function": "setStuckFundsRecipient",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFTAdapter.sol",
+    "start_line": 62
+  },
+  {
+    "contract": "dreShareOFTAdapter",
+    "function": "_credit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFTAdapter.sol",
+    "start_line": 72
+  },
+  {
+    "contract": "dreShareOFTAdapter",
+    "function": "_tryTransfer",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFTAdapter.sol",
+    "start_line": 86
+  },
+  {
+    "contract": "SanctionsListWhitelistWrapper",
+    "function": "isSanctioned",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/whitelist/SanctionsListWhitelistWrapper.sol",
+    "start_line": 42
+  },
+  {
+    "contract": "SanctionsListWhitelistWrapper",
+    "function": "isWhitelisted",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/whitelist/SanctionsListWhitelistWrapper.sol",
+    "start_line": 47
+  },
+  {
+    "contract": "SanctionsListWhitelistWrapper",
+    "function": "addToWhitelist",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/whitelist/SanctionsListWhitelistWrapper.sol",
+    "start_line": 54
+  },
+  {
+    "contract": "SanctionsListWhitelistWrapper",
+    "function": "removeFromWhitelist",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/whitelist/SanctionsListWhitelistWrapper.sol",
+    "start_line": 62
+  },
+  {
+    "contract": "SanctionsListWhitelistWrapper",
+    "function": "supportsInterface",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/whitelist/SanctionsListWhitelistWrapper.sol",
+    "start_line": 68
+  }
+]

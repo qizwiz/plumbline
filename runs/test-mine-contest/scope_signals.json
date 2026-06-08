@@ -1,0 +1,24 @@
+{
+  "carve_in_signals": [
+    "The roles are trusted to complete their responsible functionality without mistakes, malicious intentions, or other issues.\nBut, if these roles can exceed their permissions and access another role's restricted functions, and cause Medium or High impact, then it can be considered a valid issue.\n___",
+    "Issues related to EIP violations can be considered valid only if they qualify for Medium or High severity definitions.\n___",
+    "### Q: What properties/invariants do you want to hold even if breaking them has a low/unknown impact?\ndreUSDs share price must only increase or stay flat, never decrease. totalAssets() in the dreUSDs vault equals _virtualBalance + dreRewardsDistributor.vestedAmount(). Rewards are always additive. The share price (totalAssets / totalSupply) should only go up over time as rewards vest. Any mechanism that causes the share price to decrease (other than rounding dust) would be a valid finding.\nexpres",
+    "Issues related to invariant violations can be considered valid only if they qualify for Medium or High severity definitions.\n___",
+    "### Q: Please discuss any design choices you made.\nVirtual balance pattern in dreUSDs instead of raw balanceOf. The dreUSDs vault tracks a _virtualBalance variable rather than using dreUSD.balanceOf(address(this)) for totalAssets(). This prevents share price inflation from direct dreUSD transfers (donation attacks). Any dreUSD sent directly to the vault is unclaimable and does not affect share pricing. An admin function withdrawExcessDreUSD() allows recovery of such donations. If a mechanism wer"
+  ],
+  "carve_out_signals": [
+    "### Q: Please discuss any design choices you made.\nVirtual balance pattern in dreUSDs instead of raw balanceOf. The dreUSDs vault tracks a _virtualBalance variable rather than using dreUSD.balanceOf(address(this)) for totalAssets(). This prevents share price inflation from direct dreUSD transfers (donation attacks). Any dreUSD sent directly to the vault is unclaimable and does not affect share pricing. An admin function withdrawExcessDreUSD() allows recovery of such donations. If a mechanism wer",
+    "### Q: Please provide links to previous audits (if any) and all the known issues or acceptable risks.\nhttps://github.com/dre-labs/transparency/blob/main/audits/dreusd/2026-02-spearbit-dreusd.pdf\nhttps://github.com/dre-labs/transparency/blob/main/audits/dreusd/2026-03-quantstamp-dreusd.pdf\n___",
+    "Spearbit (Cantina) - Feb 8\u201314, 2026 on commit 49e08974. Found 35 issues (10 Medium, 22 Low, 3 Gas). All findings were addressed and verified by Spearbit on commit 3c0e338a.\nQuantstamp - Feb 23 \u2013 Mar 2, 2026 on commit e167c45. Found 13 issues (1 Medium, 10 Low, 2 Informational). 11 fixed, 2 acknowledged. Fix review completed on commit 7428378.",
+    "Known issues / acceptable risks (from prior audits):",
+    "Bridge sends can credit blocked recipients on destination (Quantstamp DRE-7, Acknowledged). Cross-chain bridge routing uses a quarantine pattern. Blocked recipients can be credited on the destination chain via _credit() (which bypasses compliance checks), but they are unable to subsequently transfer, stake, or redeem. This is by design \u2014 funds are quarantined rather than stuck in LayerZero's message queue.",
+    "Express filler debt can be reimbursed to incorrect filler (Quantstamp DRE-12, Acknowledged). expressFillerDebt is tracked globally, not per filler. payExpressDebt() repays to the configured expressPaybackAddress, not to the individual filler who advanced USDC. This is acceptable because we intend to have only one express filler provider. If multiple fillers are added in the future, the expressPaybackAddress will be updated to a shared address and funds split manually through governance.",
+    "Ownership can be renounced (Quantstamp S1, Acknowledged). OpenZeppelin's Ownable and AccessControl allow renounceOwnership() and renounceRole(). We acknowledge this risk but prefer not to override battle-tested inheritance trees solely to disable renounce flows. This is managed operationally \u2014 privileged roles are not intended to be renounced.",
+    "Compose flow can get stuck on freeze/sanctions/pause (Spearbit 5.2.3, Acknowledged). Cross-chain compose operations (spoke-to-hub deposit+stake) can revert if the vault is paused or the recipient is frozen/sanctioned between send and execution. The refund path depends on the same compliance checks. This requires operator intervention to unblock. Documented as an operational risk with monitoring.",
+    "Centralization risks (Spearbit 5.2.15). All administrative control rests with multisig wallets. No on-chain governance or token voting. This is intentional at this stage. Mitigated by 48-hour timelock on all admin actions, multi-sig requirements, and geographically distributed key holders."
+  ],
+  "summary": {
+    "n_carve_in_paragraphs": 5,
+    "n_carve_out_paragraphs": 9
+  }
+}

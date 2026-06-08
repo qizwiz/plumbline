@@ -1,0 +1,50 @@
+{
+  "scope_dir": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts",
+  "scope_files": 29,
+  "concrete_functions": 157,
+  "ranked_top1": {
+    "contract": "dreRewardsDistributor",
+    "function": "_claimVested",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 163,
+    "max_cos": 0.8413484692573547,
+    "top": [
+      {
+        "cos": 0.8413484692573547,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.8160852789878845,
+        "severity": "H",
+        "title": "`_vested()` claimable amount calculation error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7831642031669617,
+        "severity": "M",
+        "title": "Honest users could be permanently DOS'd from withdrawing their vested tokens/rewards",
+        "finding_id": "M-20"
+      },
+      {
+        "cos": 0.7780488133430481,
+        "severity": "M",
+        "title": "Users of a vault can steal other user's rewards when one vault's `lastRewardTime` differs from another vault's `lastRewa",
+        "finding_id": "M-22"
+      },
+      {
+        "cos": 0.7772483229637146,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      }
+    ]
+  },
+  "artifacts": [
+    "scope_functions.json",
+    "ranked_hypotheses.json",
+    "corpus_clusters.json",
+    "scope_signals.json"
+  ]
+}

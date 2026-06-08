@@ -1,0 +1,1952 @@
+[
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "_claimVested",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 163,
+    "max_cos": 0.8413484692573547,
+    "top": [
+      {
+        "cos": 0.8413484692573547,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.8160852789878845,
+        "severity": "H",
+        "title": "`_vested()` claimable amount calculation error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7831642031669617,
+        "severity": "M",
+        "title": "Honest users could be permanently DOS'd from withdrawing their vested tokens/rewards",
+        "finding_id": "M-20"
+      },
+      {
+        "cos": 0.7780488133430481,
+        "severity": "M",
+        "title": "Users of a vault can steal other user's rewards when one vault's `lastRewardTime` differs from another vault's `lastRewa",
+        "finding_id": "M-22"
+      },
+      {
+        "cos": 0.7772483229637146,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      }
+    ]
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_redeemAndSend",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 112,
+    "max_cos": 0.8252239227294922,
+    "top": [
+      {
+        "cos": 0.8252239227294922,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7885849475860596,
+        "severity": "H",
+        "title": "Holders array can be manipulated by transferring or burning with amount 0, stealing rewards or bricking certain function",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7719303369522095,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7707443833351135,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7691810727119446,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "setOracle",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 91,
+    "max_cos": 0.8195842504501343,
+    "top": [
+      {
+        "cos": 0.8195842504501343,
+        "severity": "M",
+        "title": "`V3Oracle` susceptible to price manipulation",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7970866560935974,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7766939997673035,
+        "severity": "M",
+        "title": "Chainlink Oracles may return stale prices or may be unusable when aggregator `roundId` is less than 50",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7725008130073547,
+        "severity": "H",
+        "title": "openPosition() use stale feeGrowthInside0LastX128/feeGrowthInside1LastX128",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7690978646278381,
+        "severity": "M",
+        "title": "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`",
+        "finding_id": "M-10"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_claimVestedRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 204,
+    "max_cos": 0.8147556185722351,
+    "top": [
+      {
+        "cos": 0.8147556185722351,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7892334461212158,
+        "severity": "M",
+        "title": "Bug in `claim` allows users who are disqualified to claim their previously earned emissions",
+        "finding_id": "M-29"
+      },
+      {
+        "cos": 0.7874897122383118,
+        "severity": "M",
+        "title": "Claiming rewards while the deduction rate is `!= 0`, allows for repeated withdrawal of redistributed rewards",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7807959318161011,
+        "severity": "M",
+        "title": "Unclaimed rewards handling issue in `AuraVault` contract functions (`AuraVault::deposit`, `AuraVault::mint`, `AuraVault:",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.780559241771698,
+        "severity": "H",
+        "title": "Most users won't be able to claim their share of Uniswap fees",
+        "finding_id": "H-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "claimVested",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 147,
+    "max_cos": 0.8079877495765686,
+    "top": [
+      {
+        "cos": 0.8079877495765686,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7972120046615601,
+        "severity": "M",
+        "title": "`PhiFactory:claim` potentially causing loss of funds if `mintFee` changed beforehand",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7965746521949768,
+        "severity": "M",
+        "title": "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7923070192337036,
+        "severity": "M",
+        "title": "Bug in `claim` allows users who are disqualified to claim their previously earned emissions",
+        "finding_id": "M-29"
+      },
+      {
+        "cos": 0.7815124988555908,
+        "severity": "M",
+        "title": "`PositionAction4626::increaseLever` will always revert",
+        "finding_id": "M-05"
+      }
+    ]
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_refund",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 183,
+    "max_cos": 0.8062403798103333,
+    "top": [
+      {
+        "cos": 0.8062403798103333,
+        "severity": "M",
+        "title": "Refunds sent to incorrect addresses in certain cases",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7837420105934143,
+        "severity": "M",
+        "title": "Incorrect flag results to `_hasFallbackToggled` always set to false on `createMultipleSettlement`.",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7756549715995789,
+        "severity": "H",
+        "title": "When `DecentBridgeExecutor.execute` fails, funds will be sent to a random address",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7682161927223206,
+        "severity": "H",
+        "title": "There is no refund mechanism in `ChakraSettlement.processCrossChainCallback` or `ChakraSettlementHandler.receive_cross_c",
+        "finding_id": "H-11"
+      },
+      {
+        "cos": 0.7671028971672058,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      }
+    ]
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "withdraw",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 109,
+    "max_cos": 0.8037119507789612,
+    "top": [
+      {
+        "cos": 0.8037119507789612,
+        "severity": "M",
+        "title": "Deposits will always revert if the amount being deposited is less than the `bufferToFill` value",
+        "finding_id": "M-09"
+      },
+      {
+        "cos": 0.7990236878395081,
+        "severity": "M",
+        "title": "`stakerewardV2pool.withdraw()` should check the user's boost lock status.",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7915455102920532,
+        "severity": "M",
+        "title": "Balance check on withdrawFees enables griefer to block withdrawals via selfdestruct",
+        "finding_id": "M-2"
+      },
+      {
+        "cos": 0.789539098739624,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7890898585319519,
+        "severity": "M",
+        "title": "`PrizeVault.maxDeposit()` doesn't take into account produced fees",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_mintDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 948,
+    "max_cos": 0.8036221861839294,
+    "top": [
+      {
+        "cos": 0.8036221861839294,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7823007702827454,
+        "severity": "H",
+        "title": "Oracle price can be manipulated",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7790266275405884,
+        "severity": "H",
+        "title": "`EUSD.mint` function wrong assumption of cases when calculated sharesAmount = 0",
+        "finding_id": "H-06"
+      },
+      {
+        "cos": 0.7775516510009766,
+        "severity": "H",
+        "title": "Value of asset token can be incorrect when usage of ETH/USD Chainlink oracle is needed",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7728966474533081,
+        "severity": "M",
+        "title": "On a Linear or Exponential Descending Sale Model, a user that mints on the last `block.timestamp` mints at an unexpected",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "claimVestedRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 160,
+    "max_cos": 0.8031119704246521,
+    "top": [
+      {
+        "cos": 0.8031119704246521,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.8010948300361633,
+        "severity": "H",
+        "title": "`_vested()` claimable amount calculation error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7860221862792969,
+        "severity": "H",
+        "title": "Most users won't be able to claim their share of Uniswap fees",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7777096033096313,
+        "severity": "M",
+        "title": "Bug in `claim` allows users who are disqualified to claim their previously earned emissions",
+        "finding_id": "M-29"
+      },
+      {
+        "cos": 0.772861123085022,
+        "severity": "M",
+        "title": "It is possible to manipulate WETH/LBR pair to claim reward of the users which shouldn't be claimed",
+        "finding_id": "M-13"
+      }
+    ]
+  },
+  {
+    "contract": "dreVault",
+    "function": "recoverToken",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 61,
+    "max_cos": 0.8018885254859924,
+    "top": [
+      {
+        "cos": 0.8018885254859924,
+        "severity": "M",
+        "title": "Bridged tokens would be lost if sender and receiver are contracts that don't implement fallback/receive",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7968041300773621,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7877745628356934,
+        "severity": "M",
+        "title": "If `RootBridgeAgent.lzReceiveNonBlocking` reverts internally, the native token sent by relayer to RootBridgeAgent is lef",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7858017683029175,
+        "severity": "M",
+        "title": "NFTs can be transferred even if StakeAtRisk remains, so the user's win cannot be recorded on the chain due to underflow,",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7784554958343506,
+        "severity": "H",
+        "title": "Holders array can be manipulated by transferring or burning with amount 0, stealing rewards or bricking certain function",
+        "finding_id": "H-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "burn",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 124,
+    "max_cos": 0.8014718294143677,
+    "top": [
+      {
+        "cos": 0.8014718294143677,
+        "severity": "M",
+        "title": "Vulnerability in `burnToMint` function allows double use of NFT",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7858582139015198,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7843754887580872,
+        "severity": "M",
+        "title": "Blacklisted user can burn tokens during WHITELIST_ENABLED state",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7776772975921631,
+        "severity": "M",
+        "title": "The `BURNER` cannot burn tokens from accounts not KYC verified due to the check in `_beforeTokenTransfer`.",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7753728628158569,
+        "severity": "H",
+        "title": "Handler's `receive_cross_chain_callback()` will always set the `tx_status` to `SETTLED` on source chain & burn the token",
+        "finding_id": "H-12"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_executePermit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 883,
+    "max_cos": 0.7996646761894226,
+    "top": [
+      {
+        "cos": 0.7996646761894226,
+        "severity": "M",
+        "title": "Incorrect address is used as `spender` for ERC20 permit signature verification",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7972051501274109,
+        "severity": "H",
+        "title": "`IMarket.execute.selector`, `_checkSender` bypass allows to execute arbitrary operations",
+        "finding_id": "H-08"
+      },
+      {
+        "cos": 0.7968178391456604,
+        "severity": "M",
+        "title": "DOS attack to `SwapAction.transferAndSwap()` when using  an ERC20 permit `transferFrom`",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7901958227157593,
+        "severity": "H",
+        "title": "`V3Utils.execute()` does not have caller validation, leading to stolen NFT positions from users",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7818423509597778,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      }
+    ]
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "_update",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 219,
+    "max_cos": 0.7991965413093567,
+    "top": [
+      {
+        "cos": 0.7991965413093567,
+        "severity": "H",
+        "title": "Order's creator can update `tokenOut` to arbitrary token",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7963727712631226,
+        "severity": "H",
+        "title": "Anyone can update the address of the Router in the DcntEth contract to any address they would like to set.",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.756436824798584,
+        "severity": "M",
+        "title": "Incorrect flag results to `_hasFallbackToggled` always set to false on `createMultipleSettlement`.",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7552875876426697,
+        "severity": "M",
+        "title": "Incorrect `unwrapNativeTokenInWallet` receiver address",
+        "finding_id": "M-20"
+      },
+      {
+        "cos": 0.7535650134086609,
+        "severity": "M",
+        "title": "Incorrect `isApprovedForAll` check in the `NukeFund.nuke()` function",
+        "finding_id": "M-17"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "withdrawExcessDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 174,
+    "max_cos": 0.7990370988845825,
+    "top": [
+      {
+        "cos": 0.7990370988845825,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7933804392814636,
+        "severity": "M",
+        "title": "Incorrect use of `u64` for arg `amount` in `withdrawtolandlord` can cause withdrawal failure",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7876958847045898,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7809333205223083,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7796478867530823,
+        "severity": "M",
+        "title": "`PrizeVault.maxDeposit()` doesn't take into account produced fees",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "dreAaveAdapter",
+    "function": "setVault",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreAaveAdapter.sol",
+    "start_line": 190,
+    "max_cos": 0.7990184426307678,
+    "top": [
+      {
+        "cos": 0.7990184426307678,
+        "severity": "M",
+        "title": "Vaults can become immune from liquidation by setting `vault.recipient` to a blacklisted quote token address",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7860117554664612,
+        "severity": "M",
+        "title": "`PositionAction4626::increaseLever` will always revert",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7828035354614258,
+        "severity": "M",
+        "title": "`PositionAction4626.sol#_onWithdraw` should withdraw from position CDPVault position instead of `address(this)`",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7796603441238403,
+        "severity": "M",
+        "title": "`PositionAction4626.sol#_onWithdraw` should withdraw from `position` CDPVault position instead of `address(this)`",
+        "finding_id": "M-35"
+      },
+      {
+        "cos": 0.7792983651161194,
+        "severity": "H",
+        "title": "`Registry.sol#updateHoldingPosition` remove position logic is incorrect: should use `ownerConnector` instead of `calcula",
+        "finding_id": "H-12"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_withdraw",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 222,
+    "max_cos": 0.7975000739097595,
+    "top": [
+      {
+        "cos": 0.7975000739097595,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7862474322319031,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7855028510093689,
+        "severity": "M",
+        "title": "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7836910486221313,
+        "severity": "M",
+        "title": "Incorrect use of `u64` for arg `amount` in `withdrawtolandlord` can cause withdrawal failure",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7798039317131042,
+        "severity": "M",
+        "title": "Inability to withdraw funds for certain users due to `whenNotPaused` modifier in `RateLimitedMinter`",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreWithdrawalNFT",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreWithdrawalNFT.sol",
+    "start_line": 105,
+    "max_cos": 0.7968500256538391,
+    "top": [
+      {
+        "cos": 0.7968500256538391,
+        "severity": "H",
+        "title": "Attacker can drain all ETH from `AuctionDemo` when `block.timestamp == auctionEndTime`",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7968154549598694,
+        "severity": "H",
+        "title": "Unnecessary `updateExchangeRate` in `deposit` function incorrectly updates `exchangeRate` preventing withdraws and unfai",
+        "finding_id": "H-2"
+      },
+      {
+        "cos": 0.7922587394714355,
+        "severity": "H",
+        "title": "`EUSD.mint` function wrong assumption of cases when calculated sharesAmount = 0",
+        "finding_id": "H-06"
+      },
+      {
+        "cos": 0.7898592948913574,
+        "severity": "M",
+        "title": "On a Linear or Exponential Descending Sale Model, a user that mints on the last `block.timestamp` mints at an unexpected",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7848562598228455,
+        "severity": "M",
+        "title": "`PoolV3#repayCreditAccount()` use incorrect share converting function to calculate profit and loss",
+        "finding_id": "M-26"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_queueWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 752,
+    "max_cos": 0.7963690161705017,
+    "top": [
+      {
+        "cos": 0.7963690161705017,
+        "severity": "M",
+        "title": "VotiumStrategy withdrawal queue fails to consider available unlocked tokens causing different issues in the withdraw pro",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7840962409973145,
+        "severity": "H",
+        "title": "Attacker can drain all ETH from `AuctionDemo` when `block.timestamp == auctionEndTime`",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7827357053756714,
+        "severity": "H",
+        "title": "Incorrect calculation of queued withdrawals can deflate TVL and increase ezETH mint rate",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7687269449234009,
+        "severity": "M",
+        "title": "Inability to withdraw funds for certain users due to `whenNotPaused` modifier in `RateLimitedMinter`",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7660096287727356,
+        "severity": "H",
+        "title": "`OUSGInstantManager` will allow excessive `OUSG` token minting during `USDC` depeg event",
+        "finding_id": "H-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "getUsdValue",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 214,
+    "max_cos": 0.7956949472427368,
+    "top": [
+      {
+        "cos": 0.7956949472427368,
+        "severity": "H",
+        "title": "Oracle price can be manipulated",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.782396674156189,
+        "severity": "H",
+        "title": "Value of asset token can be incorrect when usage of ETH/USD Chainlink oracle is needed",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7803769111633301,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7737568020820618,
+        "severity": "H",
+        "title": "AfEth deposits could use price data from an invalid Chainlink response",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7703939080238342,
+        "severity": "M",
+        "title": "`V3Oracle` susceptible to price manipulation",
+        "finding_id": "M-19"
+      }
+    ]
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "vestedAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 155,
+    "max_cos": 0.7951886653900146,
+    "top": [
+      {
+        "cos": 0.7951886653900146,
+        "severity": "H",
+        "title": "`_vested()` claimable amount calculation error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7720059752464294,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7405430674552917,
+        "severity": "H",
+        "title": "Governance wrongly calculates `_quorumReached()`",
+        "finding_id": "H-08"
+      },
+      {
+        "cos": 0.7352818846702576,
+        "severity": "H",
+        "title": "Overflow in `CollateralTracker` allows minting shares for free",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7256609797477722,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      }
+    ]
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_depositAndSend",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 72,
+    "max_cos": 0.7950252294540405,
+    "top": [
+      {
+        "cos": 0.7950252294540405,
+        "severity": "M",
+        "title": "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7941993474960327,
+        "severity": "M",
+        "title": "`PrizeVault.maxDeposit()` doesn't take into account produced fees",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7937489748001099,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7893783450126648,
+        "severity": "H",
+        "title": "Holders array can be manipulated by transferring or burning with amount 0, stealing rewards or bricking certain function",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.784625768661499,
+        "severity": "M",
+        "title": "Staking ETH incorrectly assumes revert bubbling",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreShareOFT",
+    "function": "_credit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFT.sol",
+    "start_line": 109,
+    "max_cos": 0.7950006127357483,
+    "top": [
+      {
+        "cos": 0.7950006127357483,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7662140130996704,
+        "severity": "M",
+        "title": "Invalid handling of flash loan fees in `PositionAction::onCreditFlashLoan`, forcing it to always revert",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7589341402053833,
+        "severity": "M",
+        "title": "Incorrect address is used as `spender` for ERC20 permit signature verification",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7574921250343323,
+        "severity": "M",
+        "title": "`PositionAction.decreaseLever()` fails to consider the loan fee in Flashlender when calculating `loanAmount`, as a resul",
+        "finding_id": "M-17"
+      },
+      {
+        "cos": 0.7563735246658325,
+        "severity": "M",
+        "title": "`PartyGovernanceNFT#rageQuit()` can lead to token loss for users when dealing with zero-balance ERC20 during a `rageQuit",
+        "finding_id": "M-05"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "totalAssets",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 109,
+    "max_cos": 0.7933746576309204,
+    "top": [
+      {
+        "cos": 0.7933746576309204,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.783449113368988,
+        "severity": "H",
+        "title": "`_vested()` claimable amount calculation error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7737391591072083,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7708462476730347,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7650192379951477,
+        "severity": "M",
+        "title": "`PrizeVault.maxDeposit()` doesn't take into account produced fees",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "fillWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 534,
+    "max_cos": 0.7923893332481384,
+    "top": [
+      {
+        "cos": 0.7923893332481384,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7833875417709351,
+        "severity": "M",
+        "title": "Tokens are pulled from  users without verifying pool status contrary to requirement",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7810971736907959,
+        "severity": "M",
+        "title": "Incorrect calculation of lending shares in `_withdrawOrAllocateSharesLiquidation` can lead to revert and failure to liqu",
+        "finding_id": "M-13"
+      },
+      {
+        "cos": 0.7762119174003601,
+        "severity": "M",
+        "title": "Staking ETH incorrectly assumes revert bubbling",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7741514444351196,
+        "severity": "H",
+        "title": "Attacker can drain all ETH from `AuctionDemo` when `block.timestamp == auctionEndTime`",
+        "finding_id": "H-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateVaultAdapter",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 328,
+    "max_cos": 0.7923688292503357,
+    "top": [
+      {
+        "cos": 0.7923688292503357,
+        "severity": "M",
+        "title": "`PositionAction4626.sol#_onWithdraw` should withdraw from position CDPVault position instead of `address(this)`",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.790549099445343,
+        "severity": "M",
+        "title": "`PositionAction4626.sol#_onWithdraw` should withdraw from `position` CDPVault position instead of `address(this)`",
+        "finding_id": "M-35"
+      },
+      {
+        "cos": 0.7765643000602722,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7712216973304749,
+        "severity": "H",
+        "title": "`decreaseLever` uses incorrect position address when withdrawing",
+        "finding_id": "H-09"
+      },
+      {
+        "cos": 0.7688252329826355,
+        "severity": "M",
+        "title": "Withdrawals and Claims are meant to be pausable, but it is not possible in practice",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "getTokenAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 250,
+    "max_cos": 0.7912261486053467,
+    "top": [
+      {
+        "cos": 0.7912261486053467,
+        "severity": "H",
+        "title": "Oracle price can be manipulated",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7887641191482544,
+        "severity": "H",
+        "title": "AfEth deposits could use price data from an invalid Chainlink response",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7670358419418335,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7615901827812195,
+        "severity": "H",
+        "title": "Anyone making use of the MagicLP's TWAP to determine token prices will be exploitable.",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7598484754562378,
+        "severity": "H",
+        "title": "Value of asset token can be incorrect when usage of ETH/USD Chainlink oracle is needed",
+        "finding_id": "H-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateExpressWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 284,
+    "max_cos": 0.7891573309898376,
+    "top": [
+      {
+        "cos": 0.7891573309898376,
+        "severity": "M",
+        "title": "Incorrect fee handling prevents protocol from updating fees",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7850086092948914,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7738102674484253,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7687997221946716,
+        "severity": "M",
+        "title": "Updating fee factor may create issues for the protocol",
+        "finding_id": "M-18"
+      },
+      {
+        "cos": 0.7660682797431946,
+        "severity": "M",
+        "title": "`PositionAction4626::_onDecreaseLever` wrongly updates `tokenOut` forcing user's funds to be stuck in the position actio",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSD",
+    "function": "_credit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSD.sol",
+    "start_line": 184,
+    "max_cos": 0.7883670330047607,
+    "top": [
+      {
+        "cos": 0.7883670330047607,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7606005668640137,
+        "severity": "M",
+        "title": "Invalid handling of flash loan fees in `PositionAction::onCreditFlashLoan`, forcing it to always revert",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7554112076759338,
+        "severity": "M",
+        "title": "Incorrect calculations in `debtCeiling`",
+        "finding_id": "M-18"
+      },
+      {
+        "cos": 0.7553488612174988,
+        "severity": "M",
+        "title": "Incorrect address is used as `spender` for ERC20 permit signature verification",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7551389932632446,
+        "severity": "M",
+        "title": "`PartyGovernanceNFT#rageQuit()` can lead to token loss for users when dealing with zero-balance ERC20 during a `rageQuit",
+        "finding_id": "M-05"
+      }
+    ]
+  },
+  {
+    "contract": "dreOVaultComposer",
+    "function": "_sendLocal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreOVaultComposer.sol",
+    "start_line": 152,
+    "max_cos": 0.7877138257026672,
+    "top": [
+      {
+        "cos": 0.7877138257026672,
+        "severity": "M",
+        "title": "Refunds sent to incorrect addresses in certain cases",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7676203846931458,
+        "severity": "M",
+        "title": "Incorrect `unwrapNativeTokenInWallet` receiver address",
+        "finding_id": "M-20"
+      },
+      {
+        "cos": 0.7418026924133301,
+        "severity": "M",
+        "title": "DecentEthRouter.sol#_bridgeWithPayload() - Any refunded ETH (native token) will be refunded to the DecentBridgeAdapter, ",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7412972450256348,
+        "severity": "M",
+        "title": "Bridged tokens would be lost if sender and receiver are contracts that don't implement fallback/receive",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7398025989532471,
+        "severity": "H",
+        "title": "When `DecentBridgeExecutor.execute` fails, funds will be sent to a random address",
+        "finding_id": "H-03"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mintAndStake",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 423,
+    "max_cos": 0.7874932289123535,
+    "top": [
+      {
+        "cos": 0.7874932289123535,
+        "severity": "M",
+        "title": "No incentive to liquidate small positions could result in protocol going underwater",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7855129837989807,
+        "severity": "M",
+        "title": "`PrizeVault.maxDeposit()` doesn't take into account produced fees",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.782507598400116,
+        "severity": "M",
+        "title": "No check for Individual mint amount surpassing 10% when the circulation reaches 10\\_000\\_000 in `mint()` of `LybraEUSDVa",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7816571593284607,
+        "severity": "M",
+        "title": "Missing deadline check for AfEth actions",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7795041799545288,
+        "severity": "H",
+        "title": "Attacker can drain all ETH from `AuctionDemo` when `block.timestamp == auctionEndTime`",
+        "finding_id": "H-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "fillExpressWithdrawals",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 595,
+    "max_cos": 0.7869884371757507,
+    "top": [
+      {
+        "cos": 0.7869884371757507,
+        "severity": "M",
+        "title": "Vulnerability in `burnToMint` function allows double use of NFT",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7797770500183105,
+        "severity": "M",
+        "title": "NFTs can be transferred even if StakeAtRisk remains, so the user's win cannot be recorded on the chain due to underflow,",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7796074748039246,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7763818502426147,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7762219905853271,
+        "severity": "M",
+        "title": "The Protocol breaks the Allowance Mechanism of the NFTs",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "dreVault",
+    "function": "recoverEther",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 73,
+    "max_cos": 0.7866412997245789,
+    "top": [
+      {
+        "cos": 0.7866412997245789,
+        "severity": "M",
+        "title": "Bridged tokens would be lost if sender and receiver are contracts that don't implement fallback/receive",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7810535430908203,
+        "severity": "H",
+        "title": "Holders array can be manipulated by transferring or burning with amount 0, stealing rewards or bricking certain function",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7744545340538025,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7733394503593445,
+        "severity": "H",
+        "title": "Exploitation of the receive Function to Steal Funds",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7723299860954285,
+        "severity": "M",
+        "title": "Lender of a PAY order lending can grief renter of the payment",
+        "finding_id": "M-14"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_preMintChecks",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 807,
+    "max_cos": 0.785295307636261,
+    "top": [
+      {
+        "cos": 0.785295307636261,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7786869406700134,
+        "severity": "H",
+        "title": "`TSwapPool::deposit` is missing deadline check causing transactions to complete even after the deadline",
+        "finding_id": "H-1"
+      },
+      {
+        "cos": 0.7678031921386719,
+        "severity": "M",
+        "title": "Options can be exercised preemptively due to timing delays",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7636203765869141,
+        "severity": "M",
+        "title": "There is no slippage check in the `nuke()` function",
+        "finding_id": "M-16"
+      },
+      {
+        "cos": 0.7617924809455872,
+        "severity": "M",
+        "title": "TransactionValidator checks intrinsic costs against wrong value",
+        "finding_id": "M-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "excessDreUSD",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 167,
+    "max_cos": 0.7848253846168518,
+    "top": [
+      {
+        "cos": 0.7848253846168518,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7695249319076538,
+        "severity": "H",
+        "title": "Integer overflow of PuppyRaffle::totalFees loses fees",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.7632116079330444,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7567055225372314,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7522703409194946,
+        "severity": "M",
+        "title": "Unintended under/overflow of the amount already swapped in/out due to unmatching logic",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_checkDeviation",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 407,
+    "max_cos": 0.7846810817718506,
+    "top": [
+      {
+        "cos": 0.7846810817718506,
+        "severity": "H",
+        "title": "Oracle price can be manipulated",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7811527252197266,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7602466940879822,
+        "severity": "M",
+        "title": "`V3Oracle` susceptible to price manipulation",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7590701580047607,
+        "severity": "M",
+        "title": "Incorrect fee handling prevents protocol from updating fees",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7532215714454651,
+        "severity": "M",
+        "title": "PriceOracle has invalid checks on price staleness",
+        "finding_id": "M-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "maxRedeem",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 153,
+    "max_cos": 0.7846658229827881,
+    "top": [
+      {
+        "cos": 0.7846658229827881,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7317804098129272,
+        "severity": "M",
+        "title": "Use of `block.number` leads to incorrect interest calculations",
+        "finding_id": "M-09"
+      },
+      {
+        "cos": 0.7230544686317444,
+        "severity": "H",
+        "title": "Overflow in `CollateralTracker` allows minting shares for free",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7145662903785706,
+        "severity": "M",
+        "title": "`YieldEthStakingLido` lacks a limit on the max stake amount, which may result in the unstake exceeding `MAX_STETH_WITHDR",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7145354747772217,
+        "severity": "H",
+        "title": "`executeWithdraw` may be blocked if any of the users are blacklisted from the `baseToken`",
+        "finding_id": "H-04"
+      }
+    ]
+  },
+  {
+    "contract": "dreShareOFTAdapter",
+    "function": "_credit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/ovault/dreShareOFTAdapter.sol",
+    "start_line": 72,
+    "max_cos": 0.7829661965370178,
+    "top": [
+      {
+        "cos": 0.7829661965370178,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7657959461212158,
+        "severity": "M",
+        "title": "Invalid handling of flash loan fees in `PositionAction::onCreditFlashLoan`, forcing it to always revert",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7594742178916931,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7589963674545288,
+        "severity": "M",
+        "title": "`isolateRedeem()` revert in case Revert-on-zero-value-transfers tokens",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7580955028533936,
+        "severity": "M",
+        "title": "`PositionAction.decreaseLever()` fails to consider the loan fee in Flashlender when calculating `loanAmount`, as a resul",
+        "finding_id": "M-17"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "mint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 352,
+    "max_cos": 0.7828013300895691,
+    "top": [
+      {
+        "cos": 0.7828013300895691,
+        "severity": "M",
+        "title": "No check for Individual mint amount surpassing 10% when the circulation reaches 10\\_000\\_000 in `mint()` of `LybraEUSDVa",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7759183645248413,
+        "severity": "H",
+        "title": "Unnecessary `updateExchangeRate` in `deposit` function incorrectly updates `exchangeRate` preventing withdraws and unfai",
+        "finding_id": "H-2"
+      },
+      {
+        "cos": 0.7725235223770142,
+        "severity": "M",
+        "title": "Constraints of `dailyAllowanceReplenishTime` and `allowanceRemaining` during `mint()` can be bypassed by using alias acc",
+        "finding_id": "M-09"
+      },
+      {
+        "cos": 0.7722829580307007,
+        "severity": "M",
+        "title": "No incentive to liquidate small positions could result in protocol going underwater",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7703908085823059,
+        "severity": "M",
+        "title": "`PositionAction.sol#_deposit` incorrectly checks `auxSwap.assetIn` should be equal to `collateralParams.targetToken`",
+        "finding_id": "M-34"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "validatePrice",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 302,
+    "max_cos": 0.782214879989624,
+    "top": [
+      {
+        "cos": 0.782214879989624,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7689096331596375,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7562426328659058,
+        "severity": "H",
+        "title": "Oracle price can be manipulated",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7553019523620605,
+        "severity": "M",
+        "title": "`V3Oracle` susceptible to price manipulation",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7540867328643799,
+        "severity": "H",
+        "title": "AfEth deposits could use price data from an invalid Chainlink response",
+        "finding_id": "H-03"
+      }
+    ]
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "addRewards",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 108,
+    "max_cos": 0.7816420197486877,
+    "top": [
+      {
+        "cos": 0.7816420197486877,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7689363360404968,
+        "severity": "M",
+        "title": "Users of a vault can steal other user's rewards when one vault's `lastRewardTime` differs from another vault's `lastRewa",
+        "finding_id": "M-22"
+      },
+      {
+        "cos": 0.7680056691169739,
+        "severity": "M",
+        "title": "A user's tokens could be locked for an extended duration beyond their intention and without their control",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7653326988220215,
+        "severity": "M",
+        "title": "The `EUSDMiningIncentives` contract is incorrectly implemented and can allow for more than the intended amount of reward",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7646293044090271,
+        "severity": "M",
+        "title": "When malicious behavior occurs and DSS requests slashing against vault during 2 day period after `SLASHING_WINDOW` of 7 ",
+        "finding_id": "M-03"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_checkAndUpdateDailyFiatMint",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 698,
+    "max_cos": 0.7813236117362976,
+    "top": [
+      {
+        "cos": 0.7813236117362976,
+        "severity": "M",
+        "title": "PriceOracle has invalid checks on price staleness",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7721508741378784,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7713847756385803,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7699038982391357,
+        "severity": "M",
+        "title": "Imprecise token age calculation results in an incorrect nuke factor, causing users to claim the wrong amount",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7692102789878845,
+        "severity": "M",
+        "title": "On a Linear or Exponential Descending Sale Model, a user that mints on the last `block.timestamp` mints at an unexpected",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDs",
+    "function": "_deposit",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDs.sol",
+    "start_line": 213,
+    "max_cos": 0.7810095548629761,
+    "top": [
+      {
+        "cos": 0.7810095548629761,
+        "severity": "H",
+        "title": "Mismatch between yield amount deposited in shares calculation and `getAccountYieldBalance()`",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7708571553230286,
+        "severity": "M",
+        "title": "`PrizeVault.maxDeposit()` doesn't take into account produced fees",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7699885368347168,
+        "severity": "M",
+        "title": "Because of the asset: `Share 1:1 Conversion`, if vault incurs a loss, the last user to withdraw will take the entire los",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7667479515075684,
+        "severity": "H",
+        "title": "Unnecessary `updateExchangeRate` in `deposit` function incorrectly updates `exchangeRate` preventing withdraws and unfai",
+        "finding_id": "H-2"
+      },
+      {
+        "cos": 0.7648802399635315,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDOracle",
+    "function": "_isSequencerHealthy",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDOracle.sol",
+    "start_line": 369,
+    "max_cos": 0.7809149026870728,
+    "top": [
+      {
+        "cos": 0.7809149026870728,
+        "severity": "M",
+        "title": "Inadequate checks to confirm the correct status of the sequence/`sequencerUptimeFeed` in `PriceFeed.getPrice()` contract",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7604241371154785,
+        "severity": "M",
+        "title": "No check if Arbitrum/Optimism L2 sequencer is down in Chainlink feeds `PriceOracle.sol`",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.735080897808075,
+        "severity": "M",
+        "title": "No check for sequencer uptime can lead to dutch auctions failing or executing at bad prices",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7270569205284119,
+        "severity": "M",
+        "title": "Inconsistent sequencer unexpected delay in DelayBuffer may harm users calling `forceInclusion()`",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7150644659996033,
+        "severity": "M",
+        "title": "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`",
+        "finding_id": "M-10"
+      }
+    ]
+  },
+  {
+    "contract": "dreRewardsDistributor",
+    "function": "_computeVestedAmount",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreRewardsDistributor.sol",
+    "start_line": 175,
+    "max_cos": 0.7806915640830994,
+    "top": [
+      {
+        "cos": 0.7806915640830994,
+        "severity": "M",
+        "title": "A user's tokens could be locked for an extended duration beyond their intention and without their control",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7761932611465454,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7761737108230591,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7750204205513,
+        "severity": "H",
+        "title": "`_vested()` claimable amount calculation error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7724661827087402,
+        "severity": "M",
+        "title": "Reward sandwiching in VotiumStrategy",
+        "finding_id": "M-05"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "requestExpressWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 506,
+    "max_cos": 0.7805415391921997,
+    "top": [
+      {
+        "cos": 0.7805415391921997,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7718783617019653,
+        "severity": "H",
+        "title": "`OUSGInstantManager` will allow excessive `OUSG` token minting during `USDC` depeg event",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7676008939743042,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7672365307807922,
+        "severity": "M",
+        "title": "Staking ETH incorrectly assumes revert bubbling",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7658830285072327,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "_mintFromFiatUsd",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 975,
+    "max_cos": 0.779872715473175,
+    "top": [
+      {
+        "cos": 0.779872715473175,
+        "severity": "M",
+        "title": "No check for Individual mint amount surpassing 10% when the circulation reaches 10\\_000\\_000 in `mint()` of `LybraEUSDVa",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7762179970741272,
+        "severity": "M",
+        "title": "Lack of data validation when users are claiming their art allows malicious user to bypass signature/merkle hash to provi",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7710816860198975,
+        "severity": "H",
+        "title": "Wrong minting logic based on total token count across generations",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7694424390792847,
+        "severity": "M",
+        "title": "`PositionAction.sol#_deposit` incorrectly checks `auxSwap.assetIn` should be equal to `collateralParams.targetToken`",
+        "finding_id": "M-34"
+      },
+      {
+        "cos": 0.7691224217414856,
+        "severity": "M",
+        "title": "changeWallets() can be confirmed immediately after proposalWallets() by manipulating activeTimelock beforehand",
+        "finding_id": "M-31"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 314,
+    "max_cos": 0.7788957953453064,
+    "top": [
+      {
+        "cos": 0.7788957953453064,
+        "severity": "M",
+        "title": "The time available for a canceled withdrawal should not impact future unstaking processes",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7744811177253723,
+        "severity": "M",
+        "title": "`stakerewardV2pool.withdraw()` should check the user's boost lock status.",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7703657746315002,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7636747360229492,
+        "severity": "M",
+        "title": "Withdrawals and Claims are meant to be pausable, but it is not possible in practice",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7614679932594299,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "updateExpressPaybackAddress",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 275,
+    "max_cos": 0.7787575721740723,
+    "top": [
+      {
+        "cos": 0.7787575721740723,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.770069420337677,
+        "severity": "M",
+        "title": "`PositionAction4626.sol#_onWithdraw` should withdraw from position CDPVault position instead of `address(this)`",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7678393125534058,
+        "severity": "H",
+        "title": "`decreaseLever` uses incorrect position address when withdrawing",
+        "finding_id": "H-09"
+      },
+      {
+        "cos": 0.7605552077293396,
+        "severity": "M",
+        "title": "`PositionAction4626.sol#_onWithdraw` should withdraw from `position` CDPVault position instead of `address(this)`",
+        "finding_id": "M-35"
+      },
+      {
+        "cos": 0.7534616589546204,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "dreVault",
+    "function": "performUpkeep",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreVault.sol",
+    "start_line": 53,
+    "max_cos": 0.7777709364891052,
+    "top": [
+      {
+        "cos": 0.7777709364891052,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.7719042897224426,
+        "severity": "M",
+        "title": "Staking ETH incorrectly assumes revert bubbling",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7621546387672424,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7602225542068481,
+        "severity": "M",
+        "title": "Potential loss of capital due to fixed fee calculations",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7597152590751648,
+        "severity": "M",
+        "title": "Incorrect fee handling prevents protocol from updating fees",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "dreUSDManager",
+    "function": "requestWithdrawal",
+    "file": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/contracts/dreUSDManager.sol",
+    "start_line": 479,
+    "max_cos": 0.7776613831520081,
+    "top": [
+      {
+        "cos": 0.7776613831520081,
+        "severity": "H",
+        "title": "`OUSGInstantManager` will allow excessive `OUSG` token minting during `USDC` depeg event",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7756152749061584,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7754226326942444,
+        "severity": "M",
+        "title": "When malicious behavior occurs and DSS requests slashing against vault during 2 day period after `SLASHING_WINDOW` of 7 ",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7742236852645874,
+        "severity": "M",
+        "title": "Staking ETH incorrectly assumes revert bubbling",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.77131587266922,
+        "severity": "M",
+        "title": "Exiting a farm on mainnet assumes a peg of `1:1`  when swapping stETH for ETH",
+        "finding_id": "M-01"
+      }
+    ]
+  }
+]

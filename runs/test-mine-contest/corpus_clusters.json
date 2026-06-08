@@ -1,0 +1,649 @@
+[
+  {
+    "cluster_id": 7,
+    "size": 57,
+    "severity_dist": {
+      "H": 13,
+      "M": 44
+    },
+    "representative_titles": [
+      "The return value of `buyAllAmount` is incorrect",
+      "Incorrect calculation of `newCumulativeIndex` in function `calcDecrease`",
+      "`_updateSettlementPostBurn()` may not correctly reduce `s_grossPremiumLast[chunkKey]`"
+    ]
+  },
+  {
+    "cluster_id": 11,
+    "size": 53,
+    "severity_dist": {
+      "H": 20,
+      "M": 33
+    },
+    "representative_titles": [
+      "The `receive_cross_chain_msg` function has potential replay attack risks",
+      "There is no refund mechanism in `ChakraSettlement.processCrossChainCallback` or `ChakraSettlementHandler.receive_cross_c",
+      "Handler's `receive_cross_chain_callback()` will always set the `tx_status` to `SETTLED` on source chain & burn the token"
+    ]
+  },
+  {
+    "cluster_id": 26,
+    "size": 53,
+    "severity_dist": {
+      "M": 31,
+      "H": 22
+    },
+    "representative_titles": [
+      "Malicious liquidity provider can put pool into highly manipulatable state",
+      "User can evade `liquidation` by depositing the minimum of tokens and gain time to not be liquidated",
+      "complete liquidity removal will result in permanent disable of the liquidity addition and prevent minting shares for the"
+    ]
+  },
+  {
+    "cluster_id": 24,
+    "size": 49,
+    "severity_dist": {
+      "H": 11,
+      "M": 38
+    },
+    "representative_titles": [
+      "`PoolAction::_balancerExit` returns wrong token out amount",
+      "`PartyGovernanceNFT#rageQuit()` can lead to token loss for users when dealing with zero-balance ERC20 during a `rageQuit",
+      "`PositionAction4626::_onDecreaseLever` wrongly updates `tokenOut` forcing user's funds to be stuck in the position actio"
+    ]
+  },
+  {
+    "cluster_id": 20,
+    "size": 48,
+    "severity_dist": {
+      "H": 24,
+      "M": 24
+    },
+    "representative_titles": [
+      "`RateLimitedMinter` isn't used by `SimplePSM` resulting in Governance attacks",
+      "An attacker can steal all `RubiconRouter` funds",
+      "There is a vulnerability in the `executeFlashloan` function of the `PeUSDMainnet` contract. Hackers can use this vulnera"
+    ]
+  },
+  {
+    "cluster_id": 12,
+    "size": 40,
+    "severity_dist": {
+      "H": 13,
+      "M": 27
+    },
+    "representative_titles": [
+      "Permanent loss of tokens if swap data gets outdated",
+      "A recalled ERC20 bridge transfer can lock tokens in the bridge",
+      "Bridged tokens would be lost if sender and receiver are contracts that don't implement fallback/receive"
+    ]
+  },
+  {
+    "cluster_id": 38,
+    "size": 40,
+    "severity_dist": {
+      "H": 14,
+      "M": 26
+    },
+    "representative_titles": [
+      "Discrepancy between the `lastRewadTime` and the `lastAllPoolUpdate` can allow for incorrect reward distribution to pools",
+      "A user can lose more value than he specifies in the spread when he enters a `PowerFarm`",
+      "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`"
+    ]
+  },
+  {
+    "cluster_id": 48,
+    "size": 37,
+    "severity_dist": {
+      "M": 29,
+      "H": 8
+    },
+    "representative_titles": [
+      "`PanopticFactory` uses spot price when deploying new pools, resulting in liquidity manipulation when minting",
+      "`ThrusterFactory.setYieldCut` should claim fees for all pools before",
+      "Attacker can amplify a rounding error in MagicLP to break the I invariant and cause malicious pricing"
+    ]
+  },
+  {
+    "cluster_id": 25,
+    "size": 36,
+    "severity_dist": {
+      "M": 26,
+      "H": 10
+    },
+    "representative_titles": [
+      "SettlementSignatureVerifier's `required_validators` is not updated, resulting in a low or high number of signatures bein",
+      "`BalancerFlashLender#receiveFlashLoan` does not validate the `originalCallData`",
+      "`SettlementSignatureVerifier` is missing check for duplicate validator signatures"
+    ]
+  },
+  {
+    "cluster_id": 34,
+    "size": 36,
+    "severity_dist": {
+      "H": 12,
+      "M": 24
+    },
+    "representative_titles": [
+      "`onBalanceChange` causes previously unclaimed rewards to be cleared",
+      "Unclaimed rewards handling issue in `AuraVault` contract functions (`AuraVault::deposit`, `AuraVault::mint`, `AuraVault:",
+      "Reward accounting is incorrect in `BathBuddy` contract"
+    ]
+  },
+  {
+    "cluster_id": 43,
+    "size": 34,
+    "severity_dist": {
+      "H": 12,
+      "M": 22
+    },
+    "representative_titles": [
+      "Removed liquidity can overflow when calling `SemiFungiblePositionManager.mintTokenizedPosition` function",
+      "Incorrect calculation of lending shares in `_withdrawOrAllocateSharesLiquidation` can lead to revert and failure to liqu",
+      "`DailyLendIncreaseLimitLeft` and `dailyDebtIncreaseLimitLeft` are not adjusted accurately"
+    ]
+  },
+  {
+    "cluster_id": 21,
+    "size": 33,
+    "severity_dist": {
+      "H": 14,
+      "M": 19
+    },
+    "representative_titles": [
+      "The `shortOrder` verification bug on the `RedemptionFacet::proposeRedemption()` allows an attacker to leave a small `sho",
+      "`mintToken()`, `mintWithBudget()`, and `forge()` in the `TraitForgeNft` contract will fail due to a wrong modifier used ",
+      "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`"
+    ]
+  },
+  {
+    "cluster_id": 6,
+    "size": 31,
+    "severity_dist": {
+      "H": 13,
+      "M": 18
+    },
+    "representative_titles": [
+      "Liquidation doesn't account for penalty when calculating collateral to give, allowing users to profit by borrowing and s",
+      "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+      "No incentive to liquidate when `CR <= 1` as asset received `<` dyad burned"
+    ]
+  },
+  {
+    "cluster_id": 19,
+    "size": 31,
+    "severity_dist": {
+      "M": 19,
+      "H": 12
+    },
+    "representative_titles": [
+      "Repayments and liquidations can be forced to revert by an attacker that repays minuscule amount of shares",
+      "There is no way to liquidate a position if it breaches `maxDebtPerCollateralToken` value creating bad debt.",
+      "The protocol allows borrowing small positions that can create bad debt"
+    ]
+  },
+  {
+    "cluster_id": 23,
+    "size": 31,
+    "severity_dist": {
+      "M": 24,
+      "H": 7
+    },
+    "representative_titles": [
+      "Some arbitrary proposal calls will fail because `executeProposal()` in `ProposalExecutionEngine` is not payable",
+      "`ETHCrowdfundBase.sol#processContribution` - Impossible to finalize crowdfund because of `minContribution` check",
+      "MarginTradingHook#updateOrder lacks access control"
+    ]
+  },
+  {
+    "cluster_id": 5,
+    "size": 29,
+    "severity_dist": {
+      "H": 10,
+      "M": 19
+    },
+    "representative_titles": [
+      "A snapshot may face a permanent DoS if both a slashing event occurs in the `NativeVault` and the staker's validator is p",
+      "Slashing `NativeVault` will lead to locked ETH for the users",
+      "Users can dodge losses due to StRSR era changes with instant operations"
+    ]
+  },
+  {
+    "cluster_id": 16,
+    "size": 29,
+    "severity_dist": {
+      "H": 11,
+      "M": 18
+    },
+    "representative_titles": [
+      "crvRewardsContract `getReward` can be called directly, breaking vaults `claimRewards` functionallity",
+      "Calling `depositTokensToL2` from the Vault contract to the Vault contract allows infinite minting of unbacked tokens",
+      "Incorrect accounting bug of the `yDUSD` vault leads to total loss of depositors' `DUSD` assets"
+    ]
+  },
+  {
+    "cluster_id": 27,
+    "size": 29,
+    "severity_dist": {
+      "M": 23,
+      "H": 6
+    },
+    "representative_titles": [
+      "Due to missing checks on minimum gas passed through LayerZero, executions can fail on the destination chain",
+      "`PayGasFeeInZetaAndUpdateCctx()` is prone to slippage, causing sender overpays the revert gas and lose returned funds",
+      "`calculateTVL` may run out of gas for modest number of operators and tokens breaking deposits, withdrawals, and trades"
+    ]
+  },
+  {
+    "cluster_id": 8,
+    "size": 28,
+    "severity_dist": {
+      "M": 18,
+      "H": 10
+    },
+    "representative_titles": [
+      "`ERC20TokenEmitter::buyToken` function mints more tokens to users than it should do",
+      "Adversary can block `claimAuction()` due to push-strategy to transfer assets to multiple bidders",
+      "The amount of `xezETH` in circulation will not represent the amount of `ezETH` tokens 1:1"
+    ]
+  },
+  {
+    "cluster_id": 13,
+    "size": 28,
+    "severity_dist": {
+      "H": 10,
+      "M": 18
+    },
+    "representative_titles": [
+      "secRewardsPerShare Insufficient precision",
+      "`BalancerConnector::_getPositionTVL` is calculated incorrectly",
+      "`PositionAction20._onWithdraw` and `PositionPendle20._onWithdraw` also returns token amount in wrong scale"
+    ]
+  },
+  {
+    "cluster_id": 22,
+    "size": 28,
+    "severity_dist": {
+      "M": 21,
+      "H": 7
+    },
+    "representative_titles": [
+      "openPosition() Lack of minimum token0PremiumPortion/token1PremiumPortion limit",
+      "No `minLoanSize` means liquidators will have no incentive to liquidate small positions",
+      "`isolateRedeem()` revert in case Revert-on-zero-value-transfers tokens"
+    ]
+  },
+  {
+    "cluster_id": 35,
+    "size": 28,
+    "severity_dist": {
+      "H": 17,
+      "M": 11
+    },
+    "representative_titles": [
+      "A malicious inbound transaction can prevent subsequent events from being processed by observers",
+      "Observer can halt outbound cctxs and steal funds",
+      "Malicious Market Creators Can Steal Tokens From Unsuspecting Approved Reference Accounts"
+    ]
+  },
+  {
+    "cluster_id": 31,
+    "size": 27,
+    "severity_dist": {
+      "H": 3,
+      "M": 24
+    },
+    "representative_titles": [
+      "PriceFeed is likely to be disabled in times of volatility, causing liquidations and borrows to freeze",
+      "Chainlink Oracles may return stale prices or may be unusable when aggregator `roundId` is less than 50",
+      "`fetchPrice` can return different prices in the same transaction"
+    ]
+  },
+  {
+    "cluster_id": 18,
+    "size": 26,
+    "severity_dist": {
+      "M": 24,
+      "H": 2
+    },
+    "representative_titles": [
+      "Staking ETH incorrectly assumes revert bubbling",
+      "Users can deflate other markets Guild holders rewards by staking less priced token",
+      "The time available for a canceled withdrawal should not impact future unstaking processes"
+    ]
+  },
+  {
+    "cluster_id": 17,
+    "size": 25,
+    "severity_dist": {
+      "M": 18,
+      "H": 7
+    },
+    "representative_titles": [
+      "`executeYieldBorrowERC20()` checking `yieldCap` is wrong",
+      "Incorrect accounting of `_pendingWithdrawal` in `queueClaiming` flow",
+      "`deployWithdrawalQueue()` need to clear `_queueAccounting[lastQueueIndex]`"
+    ]
+  },
+  {
+    "cluster_id": 15,
+    "size": 23,
+    "severity_dist": {
+      "H": 7,
+      "M": 16
+    },
+    "representative_titles": [
+      "Inability to withdraw funds for certain users due to `whenNotPaused` modifier in `RateLimitedMinter`",
+      "ETH withdrawals from EigenLayer always fail due to `OperatorDelegator`'s nonReentrant `receive()`",
+      "`withdraw()` users may can't withdraw `underlyingBorrowToken` properly"
+    ]
+  },
+  {
+    "cluster_id": 28,
+    "size": 21,
+    "severity_dist": {
+      "H": 6,
+      "M": 15
+    },
+    "representative_titles": [
+      "Escrow contract can be drained by creating rentals that bypass execution invariant checks",
+      "paused ERC721/ERC1155 could cause stopRent to revert, potentially causing issues for the lender.",
+      "All orders can be hijacked to lock rental assets forever by tipping a malicious ERC20"
+    ]
+  },
+  {
+    "cluster_id": 3,
+    "size": 20,
+    "severity_dist": {
+      "H": 5,
+      "M": 15
+    },
+    "representative_titles": [
+      "Wrong handling of call data check indices, forcing it sometimes to revert",
+      "Incorrect assumption in PoolMath.sol can cause underflow when zapping is used",
+      "MaxHeap.sol: Already extracted tokenId may be extracted again"
+    ]
+  },
+  {
+    "cluster_id": 30,
+    "size": 20,
+    "severity_dist": {
+      "H": 9,
+      "M": 11
+    },
+    "representative_titles": [
+      "openPosition() use stale feeGrowthInside0LastX128/feeGrowthInside1LastX128",
+      "`refinanceFull`/`addNewTranche` reusing a lender's signature leads to unintended behavior",
+      "The `tradeEnd` in `BackingManager` isn't updating correctly"
+    ]
+  },
+  {
+    "cluster_id": 36,
+    "size": 20,
+    "severity_dist": {
+      "H": 4,
+      "M": 16
+    },
+    "representative_titles": [
+      "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+      "`RubiconMarket` checks slippage incorrectly",
+      "Missing slippage protection in `liquidity_lockbox::withdraw`"
+    ]
+  },
+  {
+    "cluster_id": 45,
+    "size": 20,
+    "severity_dist": {
+      "M": 20
+    },
+    "representative_titles": [
+      "Rewards may be spread out among the wrong time period due to the way the protocol calculates it",
+      "Anyone can prolong the time for the rewards to get distributed",
+      "Inflated `GaugeV3` rewards when period is skipped"
+    ]
+  },
+  {
+    "cluster_id": 29,
+    "size": 16,
+    "severity_dist": {
+      "H": 6,
+      "M": 10
+    },
+    "representative_titles": [
+      "Withdrawals can be frozen by creating null deposits",
+      "Withdrawal from NFTs can be temporarily blocked",
+      "Funds locked due to missing transfer check"
+    ]
+  },
+  {
+    "cluster_id": 42,
+    "size": 16,
+    "severity_dist": {
+      "H": 4,
+      "M": 12
+    },
+    "representative_titles": [
+      "`PartyGovernanceNFT.sol#mint` - User can delegate another users funds to themselves and brick them from changing the del",
+      "`mVeNFT` DOS can't trigger the vote function",
+      "Anyone can pause AuctionHouse in `_createAuction`"
+    ]
+  },
+  {
+    "cluster_id": 32,
+    "size": 15,
+    "severity_dist": {
+      "M": 11,
+      "H": 4
+    },
+    "representative_titles": [
+      "The bot won't be able to unstake or repay risky positions in the yield contract",
+      "Factory::create() is vulnerable to reorg attacks",
+      "Redeeming a Settlement won't work for unsigned messages when the communicating dApps have different addresses on the dif"
+    ]
+  },
+  {
+    "cluster_id": 41,
+    "size": 15,
+    "severity_dist": {
+      "M": 12,
+      "H": 3
+    },
+    "representative_titles": [
+      "Gas used mismatch in failed contract calls can lead to wrong gas deductions",
+      "Gas refunds use block gas instead of transaction gas, leading to incorrect refund amounts",
+      "A liquidated position possibly cannot be closed"
+    ]
+  },
+  {
+    "cluster_id": 4,
+    "size": 14,
+    "severity_dist": {
+      "H": 11,
+      "M": 3
+    },
+    "representative_titles": [
+      "Adversary can steal user's NFT's if they have set Magnetar as `isApprovedForAll == true`",
+      "Attacker can use `MagnetarAction.OFT` action of the Magnet to perform operations as any user including directly stealing",
+      "`tOLP` positions created through `MagnetarAction.Permit` can be stolen"
+    ]
+  },
+  {
+    "cluster_id": 10,
+    "size": 14,
+    "severity_dist": {
+      "M": 13,
+      "H": 1
+    },
+    "representative_titles": [
+      "Gas griefing/attack via creating the proposals",
+      "Malicious borrower can decrease Guild holders reward",
+      "The winner can steal claimer fees, and force him to pay for the gas"
+    ]
+  },
+  {
+    "cluster_id": 47,
+    "size": 14,
+    "severity_dist": {
+      "H": 6,
+      "M": 8
+    },
+    "representative_titles": [
+      "The `bankBalance` function failed to handle errors correctly",
+      "`erc721DecreaseIsolateSupplyOnLiquidate()` missing clear `lockerAddr`",
+      "L2SharedBridge l1LegacyBridge is not set"
+    ]
+  },
+  {
+    "cluster_id": 37,
+    "size": 13,
+    "severity_dist": {
+      "M": 10,
+      "H": 3
+    },
+    "representative_titles": [
+      "`totalBorrowedCredit` can revert, breaking gauges.",
+      "When the `unlockOverride` flag is true, users can \"freely\" vote for gauge weights.",
+      "`GaugeController::remove_gauge` will always revert whenever the gauge it's being called or has any weight attached to it"
+    ]
+  },
+  {
+    "cluster_id": 44,
+    "size": 13,
+    "severity_dist": {
+      "M": 9,
+      "H": 4
+    },
+    "representative_titles": [
+      "Each generation should have 1 \"Golden God\" NFT, but there could be 0",
+      "Wrong minting logic based on total token count across generations",
+      "The maximum number of generations is infinite"
+    ]
+  },
+  {
+    "cluster_id": 2,
+    "size": 12,
+    "severity_dist": {
+      "H": 4,
+      "M": 8
+    },
+    "representative_titles": [
+      "Function `settleWithBuyout()` does not call `LoanManager.loanLiquidation()` during a buyout",
+      "Merging tranches could make `_loanTermination()` accounting incorrect",
+      "Inconsistent accounting of `undeployedAssets` might result in undesired optimal range in the pool"
+    ]
+  },
+  {
+    "cluster_id": 9,
+    "size": 11,
+    "severity_dist": {
+      "H": 4,
+      "M": 7
+    },
+    "representative_titles": [
+      "`dettachFromManagedNFT` might revert and temporarily prevent users from detaching in certain situations",
+      "Owner can call `applyCover` multiple times in `PoolTemplate.sol`",
+      "`BathBuddy` rewards DoS"
+    ]
+  },
+  {
+    "cluster_id": 33,
+    "size": 11,
+    "severity_dist": {
+      "H": 4,
+      "M": 7
+    },
+    "representative_titles": [
+      "Some positions will get liquidated immediately",
+      "The curve of short leverage position is not smooth and may cause users to open positions that are different from expecta",
+      "When opening a position, the collateral of the previous position is used for borrowing, which makes the user more easily"
+    ]
+  },
+  {
+    "cluster_id": 14,
+    "size": 9,
+    "severity_dist": {
+      "H": 5,
+      "M": 4
+    },
+    "representative_titles": [
+      "`IndexTemplate.sol` Wrong implementation allows lp of the index pool to resume a locked `PayingOut` pool and escape the ",
+      "An infinite loop in `MultiFeeDistribution.sol` withdraw",
+      "`PoolTemplate.sol#resume()` Wrong implementation of `resume()` will compensate overmuch redeem amount from index pools"
+    ]
+  },
+  {
+    "cluster_id": 40,
+    "size": 9,
+    "severity_dist": {
+      "H": 9
+    },
+    "representative_titles": [
+      "Numerous errors when calculating the TVL for the MorphoBlue connector",
+      "SiloConnector `_getPositionTVL` miscalculate the TVL position",
+      "Incomplete TVL Calculation in `AerodromeConnector::_getPositionTVL` Function"
+    ]
+  },
+  {
+    "cluster_id": 49,
+    "size": 9,
+    "severity_dist": {
+      "H": 8,
+      "M": 1
+    },
+    "representative_titles": [
+      "Logic flaw in `check_can_edit_short` allows editing short-term rental before finalization enabling theft of users' depos",
+      "Lack of validation in `setlistforsell` allows changing denom while there is active bid, leading to stealing of other use",
+      "Insufficient price validation in `transfer_nft` function enables theft of listed tokens"
+    ]
+  },
+  {
+    "cluster_id": 39,
+    "size": 8,
+    "severity_dist": {
+      "M": 5,
+      "H": 3
+    },
+    "representative_titles": [
+      "Collateral cannot be withdrawn from trove once yang is suspended",
+      "Attacker can lock every trove withdrawals",
+      "Neglect of exceptional redistribution amounts in `withdraw_helper` function"
+    ]
+  },
+  {
+    "cluster_id": 1,
+    "size": 6,
+    "severity_dist": {
+      "M": 6
+    },
+    "representative_titles": [
+      "`AirdropBroker`: When `block.timestamp == lastEpochUpdate + EPOCH_DURATION`, users can exercise options in the new epoch",
+      "`lastRPS` could be set to `0` accidentally",
+      "`getPrice` `salesOption` 2 can round down to the lower barrier, skipping the last time period"
+    ]
+  },
+  {
+    "cluster_id": 0,
+    "size": 4,
+    "severity_dist": {
+      "H": 1,
+      "M": 3
+    },
+    "representative_titles": [
+      "Salt Rewards - Rewards related to Arbitrage profits for pools can be lost",
+      "Caller of Upkeep may skip step 11 to save gas",
+      "Some rewards from POL will not be send to team wallet nor burned"
+    ]
+  },
+  {
+    "cluster_id": 46,
+    "size": 4,
+    "severity_dist": {
+      "H": 3,
+      "M": 1
+    },
+    "representative_titles": [
+      "Player can mint more fighter NFTs during claim of rewards by leveraging reentrancy on the `claimRewards() function`",
+      "Players have complete freedom to customize the fighter NFT when calling `redeemMintPass` and can redeem fighters of type",
+      "Fighters cannot be minted after the initial generation due to uninitialized `numElements` mapping"
+    ]
+  }
+]
