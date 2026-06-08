@@ -1,0 +1,899 @@
+[
+  {
+    "cluster_id": 7,
+    "size": 57,
+    "severity_dist": {
+      "H": 13,
+      "M": 44
+    },
+    "representative_titles": [
+      "The return value of `buyAllAmount` is incorrect",
+      "Incorrect calculation of `newCumulativeIndex` in function `calcDecrease`",
+      "`_updateSettlementPostBurn()` may not correctly reduce `s_grossPremiumLast[chunkKey]`"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Change to: ```diff require( fill_amt <= max_fill_amount, \"fill_amt exceeds max_fill_amount\" ); - fill_amt = calcAmountAfterFee(fill_amt); } ``` **[HickupHH3 (judge) commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/714#issuecomment-1564422059):** > It's not a duplicate, as it's not about incorrect calculation. It's about the return amount being exclusive of fees when it should. ***",
+      "**Mechanism:** `Position.cumulativeIndexLastUpdate` will be updated with incorrect `newCumulativeIndex` and less interest accrued will be charged from users. The position which should be liquidated will not be liquidated due the the wrong `Position.cumulativeIndexLastUpdate`. **Mitigation:** Use the code as below: ```solidity else { // If amount is not enough to repay interest,",
+      "**Mechanism:** Due to the incorrect accounting of `s_grossPremiumLast[chunkKey]`, the calculation in `_getAvailablePremium()` is also incorrect. This results in inaccuracies in the amount of premium received by the seller when closing their position."
+    ]
+  },
+  {
+    "cluster_id": 11,
+    "size": 53,
+    "severity_dist": {
+      "H": 20,
+      "M": 33
+    },
+    "representative_titles": [
+      "The `receive_cross_chain_msg` function has potential replay attack risks",
+      "There is no refund mechanism in `ChakraSettlement.processCrossChainCallback` or `ChakraSettlementHandler.receive_cross_chain_callback` function",
+      "Handler's `receive_cross_chain_callback()` will always set the `tx_status` to `SETTLED` on source chain & burn the tokens (MintBurn Mode) even when the msg fails on destination"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** The `receive_cross_chain_msg` function does not check the execution status of cross-chain messages itself and relies entirely on the checks performed by the settlement contract. If the settlement contract is updated without changes to the validators, this could lead to a risk of previously executed transactions being replayed. **Mitigation:** 1.",
+      "**Mechanism:** Because there is no refund mechanism in the `ChakraSettlement.processCrossChainCallback` or `ChakraSettlementHandler.receive_cross_chain_callback` function, when the cross-chain ERC20 settlement fails, such as due to that the source chain's handler can be removed from the whitelist for the destination chain after the corresponding cross-chain message is initiated on the source chain and",
+      "**Mechanism:** Wrong state update and tokens burning. **Mitigation:** Make sure to check the given status and mark the `tx_status` base on that. **[zvlwwj (Chakra) confirmed](https://github.com/code-423n4/2024-08-chakra-findings/issues/84#event-14357113163)** **[0xsomeone (judge) increased severity to High and commented](https://github.com/code-423n4/2024-08-chakra-findings/issues/84#issuecomment-2435504796):** > The submission details how the callback leg of a `MintBurn` mode bridge will always burn the"
+    ]
+  },
+  {
+    "cluster_id": 26,
+    "size": 53,
+    "severity_dist": {
+      "M": 31,
+      "H": 22
+    },
+    "representative_titles": [
+      "Malicious liquidity provider can put pool into highly manipulatable state",
+      "User can evade `liquidation` by depositing the minimum of tokens and gain time to not be liquidated",
+      "complete liquidity removal will result in permanent disable of the liquidity addition and prevent minting shares for the liquidity providers."
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** The issue allows a user to break the invariant about the `MinPoolLiquidity` and either push the pool into a state where it can easily be manipulated, or prevent other users from withdrawing their shares. **Mitigation:** The issue can be mitigated by also adding a check for the total pool",
+      "**Mitigation:** Consider modifying the [liquidation](https://github.com/code-423n4/2024-01-salty/blob/53516c2cdfdfacb662cdea6417c52f23c94d5b5b/src/stable/CollateralAndLiquidity.sol#L154) function as follows: <details> ```diff function liquidateUser( address wallet ) external nonReentrant { require( wallet != msg.sender, \"Cannot liquidate self\" ); // First, make sure that the user's collateral ratio is below the required level require( canUserBeLiquidated(wallet), \"User cannot be liquidated\" ); uint256 userCollateralAmount =",
+      "**Mechanism:** This vulnerability will lead to prevent any liquidity provider from adding liquidity and prevent them from minting new shares; so this is considered a huge loss of funds for the users and the protocol. 1. No New Liquidity - Users can no longer add liquidity to the pool, hindering"
+    ]
+  },
+  {
+    "cluster_id": 24,
+    "size": 49,
+    "severity_dist": {
+      "H": 11,
+      "M": 38
+    },
+    "representative_titles": [
+      "`PoolAction::_balancerExit` returns wrong token out amount",
+      "`PartyGovernanceNFT#rageQuit()` can lead to token loss for users when dealing with zero-balance ERC20 during a `rageQuit()`",
+      "`PositionAction4626::_onDecreaseLever` wrongly updates `tokenOut` forcing user's funds to be stuck in the position action contract"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Instead of returning the whole recipient's balance, return the difference between his balances before and after the exit. ```diff function _balancerExit(PoolActionParams memory poolActionParams) internal returns (uint256 retAmount) { ( bytes32 poolId, address bpt, uint256 bptAmount, uint256 outIndex, address[] memory assets, uint256[] memory minAmountsOut ) = abi.decode(poolActionParams.args, (bytes32, address, uint256,",
+      "**Mitigation:** To ensure that the `BelowMinWithdrawAmountError` check is performed even when `amount` is equal to `0`, `amount > 0` must be replaced with `amount >= 0` in the `rageQuit()` function. Here's the modified code snippet: ```diff --- a/contracts/party/PartyGovernanceNFT.sol +++ b/contracts/party/PartyGovernanceNFT.sol @@ -418,17 +418,17 @@ contract PartyGovernanceNFT is PartyGovernance, ERC721, IERC2981",
+      "**Mitigation:** Handle the multiple scenarios where the recipient might not be the position actions contract or where the `tokenOut` from Balancer isn't the same as the 4626's underlying token. In the if block, just set the `tokenOut` as the contract's balance which should handle all edge cases. ```diff function _onDecreaseLever("
+    ]
+  },
+  {
+    "cluster_id": 20,
+    "size": 48,
+    "severity_dist": {
+      "H": 24,
+      "M": 24
+    },
+    "representative_titles": [
+      "`RateLimitedMinter` isn't used by `SimplePSM` resulting in Governance attacks",
+      "An attacker can steal all `RubiconRouter` funds",
+      "There is a vulnerability in the `executeFlashloan` function of the `PeUSDMainnet` contract. Hackers can use this vulnerability to burn other people's eUSD token balance without permission"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Use rate limiter across all contracts in the protocol when minting or burning Credit and Guild tokens.",
+      "**Mitigation:** The final transfers in `maxBuyAllAmount` and `maxSellAllAmount` (see [RubiconRouter.sol#L355](https://github.com/code-423n4/2023-04-rubicon/blob/main/contracts/utilities/RubiconRouter.sol#L355) and [RubiconRouter.sol#L374](https://github.com/code-423n4/2023-04-rubicon/blob/main/contracts/utilities/RubiconRouter.sol#L374)) should use `pay_gem` instead of `buy_gem`. **[bghughes (Rubicon) confirmed](https://github.com/code-423n4/2023-04-rubicon-findings/issues/770#issuecomment-1533734785)** **[HickupHH3 (judge) commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/770#issuecomment-1576370154):** > Valid, but the router's OOS. > > I'm on the fence for disqualifying it as it should be awarded separately from the audit, but there",
+      "**Mechanism:** The `executeFlashloan` function of the `PeUSDMainnet` contract is used to provide users with the flash loan function. There is a loophole in the logic and hackers can use this loophole to burn other people's eUSD token balance without permission. **Mitigation:** Optimize the flash loan logic of the `executeFlashloan` function"
+    ]
+  },
+  {
+    "cluster_id": 12,
+    "size": 40,
+    "severity_dist": {
+      "H": 13,
+      "M": 27
+    },
+    "representative_titles": [
+      "Permanent loss of tokens if swap data gets outdated",
+      "A recalled ERC20 bridge transfer can lock tokens in the bridge",
+      "Bridged tokens would be lost if sender and receiver are contracts that don't implement fallback/receive"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Wrap the whole `StargateBridgeAdapter:receiveFromBridge()` call into a try/catch and if it reverts send the transferred tokens back to the user. **[wkantaros (Decent) confirmed](https://github.com/code-423n4/2024-01-decent-findings/issues/665#issuecomment-1919408463)** **[0xsomeone (Judge) decreased severity to Medium and commented](https://github.com/code-423n4/2024-01-decent-findings/issues/665#issuecomment-1921162273):** > The Warden has demonstrated that it is possible for a Stargate-based cross-chain interaction to fail at the",
+      "**Mitigation:** Add new functionality in the vault that allows users to send a new message to the destination chain again with new message data if `onMessageRecalls()` can not mint tokens. We give users the ability to redeem for canonical tokens instead of being stuck. **[dantaik (Taiko) acknowledged and commented](https://github.com/code-423n4/2024-03-taiko-findings/issues/279#issuecomment-2033383461):** >",
+      "**Mechanism:** Funds would be lost, since the sending can't be finalized and recovering would revert as well. While this might be considered a user error when sending a value that's greater than zero (they should've checked that the `to` address implements the receiver), this can't be said about the case"
+    ]
+  },
+  {
+    "cluster_id": 38,
+    "size": 40,
+    "severity_dist": {
+      "H": 14,
+      "M": 26
+    },
+    "representative_titles": [
+      "Discrepancy between the `lastRewadTime` and the `lastAllPoolUpdate` can allow for incorrect reward distribution to pools if `registerRewardDeposit` deposits less assets",
+      "A user can lose more value than he specifies in the spread when he enters a `PowerFarm`",
+      "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** In case `endTime > block.timestamp`, can set the `lastPoolUpdate` to `endTime` or always ensure that the `registerRewardDeposit` function will only be called with amounts such that the above issue doesn't occur.",
+      "**Mitigation:** Consider storing the actual deposit and using it to calculate `ethValueBefore`. [PendlePowerFarmLeverageLogic.sol#L423-L488](https://github.com/code-423n4/2024-02-wise-lending/blob/79186b243d8553e66358c05497e5ccfd9488b5e2/contracts/PowerFarms/PendlePowerFarm/PendlePowerFarmLeverageLogic.sol#L423-L488) ```solidity uint256 reverseAllowedSpread = 2 * PRECISION_FACTOR_E18 - _allowedSpread; + unit256 actualDeposit = _depositAmount; if (block.chainid == ARB_CHAIN_ID) { _depositAmount = _getTokensUniV3( _depositAmount, _getEthInTokens( ENTRY_ASSET, _depositAmount ) * reverseAllowedSpread / PRECISION_FACTOR_E18, WETH_ADDRESS, ENTRY_ASSET ); } ... uint256",
+      "**Mitigation:** [`liquidatableBalanceOf()`](https://github.com/code-423n4/2024-03-pooltogether/blob/480d58b9e8611c13587f28811864aea138a0021a/pt-v5-vault/src/PrizeVault.sol#L649) shouldn't apply `yieldFeePercentage` to compare with `_maxAmountOut` when `_tokenOut == address(this)`. ```solidity function liquidatableBalanceOf(address _tokenOut) public view returns (uint256) { uint256 _totalSupply = totalSupply(); uint256 _maxAmountOut; if (_tokenOut == address(this)) { // Liquidation of vault shares is capped to the TWAB supply limit. _maxAmountOut = _twabSupplyLimit(_totalSupply); } else"
+    ]
+  },
+  {
+    "cluster_id": 48,
+    "size": 37,
+    "severity_dist": {
+      "M": 29,
+      "H": 8
+    },
+    "representative_titles": [
+      "`PanopticFactory` uses spot price when deploying new pools, resulting in liquidity manipulation when minting",
+      "`ThrusterFactory.setYieldCut` should claim fees for all pools before",
+      "Attacker can amplify a rounding error in MagicLP to break the I invariant and cause malicious pricing"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Consider using the TWAP price instead of the spot price.",
+      "**Mechanism:** Yield can be collected with wrong proportion. **Mitigation:** I guess protocol just needs to acknowledge the issue as it will be not possible (not worthy) to implement such mechanism. **[jooleseth (Thruster) acknowledged and commented](https://github.com/code-423n4/2024-02-thruster-findings/issues/12#issuecomment-1963667483):** > We acknowledge that this situation is possible, but the effects and consequences of this",
+      "**Mechanism:** Attacker can initialize a Pool with malicious pricing mechanics that break the assumed invariants of the pool, leading to incorrect pool interactions. **Mitigation:** Use `DecimalMaths.mulCeil()` to protect against the rounding error. **[0xCalibur (Abracadabra) acknowledged, but disagreed with severity and commented](https://github.com/code-423n4/2024-03-abracadabra-money-findings/issues/221#issuecomment-1997566094):** > Based on our previous audit, it was discussed"
+    ]
+  },
+  {
+    "cluster_id": 25,
+    "size": 36,
+    "severity_dist": {
+      "M": 26,
+      "H": 10
+    },
+    "representative_titles": [
+      "SettlementSignatureVerifier's `required_validators` is not updated, resulting in a low or high number of signatures being required",
+      "`BalancerFlashLender#receiveFlashLoan` does not validate the `originalCallData`",
+      "`SettlementSignatureVerifier` is missing check for duplicate validator signatures"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** The `required_validators` in `SettlementSignatureVerifier` is not updated when updating `BaseSettlement`'s. This results in either fewer or more signatures being required when verified. **Mitigation:** Call `SettlementSignatureVerifier.set_required_validators_num` at `BaseSettlement.set_required_validators_num` . ```diff function set_required_validators_num( uint256 _required_validators ) external onlyRole(MANAGER_ROLE) { + signature_verifier.set_required_validators_num(_required_validators); uint256 old = required_validators; required_validators = _required_validators; emit RequiredValidatorsChanged(msg.sender, old,",
+      "**Mechanism:** `receiveFlashLoan` does not validate the `originalCallData`. The attacker can pass any parameters into the `receiveFlashLoan` function and execute any Strategy instruction :`_supplyBorrow` `_repayAndWithdraw` `_payDeb`. **Mitigation:** 1. `BalancerFlashLender#flashLoan` function to record the parameters called via hash. 2. Verify the hash value in the `receiveFlashLoan` function. **[hvasconcelos (BakerFi) confirmed](https://github.com/code-423n4/2024-05-bakerfi-findings/issues/2#event-13082089390)** **[0xleastwood (judge)",
+      "**Mechanism:** `SettlementSignatureVerifier::verifyECDSA` and `settlement::check_chakra_signatures` lack checks for duplicate validators and allow passing the threshold with a single valid signature. **Mitigation:** For Solidity: ```diff + mapping (bytes32 msgHash => mapping(address validator => bool usedSig)) public isSignatureUsed; function verifyECDSA( bytes32 msgHash, bytes calldata signatures ) internal view returns (bool) { require( signatures.length"
+    ]
+  },
+  {
+    "cluster_id": 34,
+    "size": 36,
+    "severity_dist": {
+      "H": 12,
+      "M": 24
+    },
+    "representative_titles": [
+      "`onBalanceChange` causes previously unclaimed rewards to be cleared",
+      "Unclaimed rewards handling issue in `AuraVault` contract functions (`AuraVault::deposit`, `AuraVault::mint`, `AuraVault::withdraw` and `AuraVault::redeem`)",
+      "Reward accounting is incorrect in `BathBuddy` contract"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** `onBalanceChange` should claim the previous rewards, and then resets `userFeeOffset`: ```diff diff --git a/contracts/FeeSplitter.sol b/contracts/FeeSplitter.sol index bb24f02..9751902 100644 --- a/contracts/FeeSplitter.sol +++ b/contracts/FeeSplitter.sol @@ -66,8 +66,8 @@ contract FeeSplitter is Security { if (balance > 0) { uint256 owed = (data.cumulativeFeePerToken - data.userFeeOffset[account]) * balance; data.unclaimedFees[account] += owed / PRECISION;",
+      "**Mechanism:** The primary impact of this issue is that users may receive an incorrect number of shares or assets due to the inaccurate calculation of `totalAssets()`. This can lead to financial discrepancies, where some users may gain an unfair advantage while others may suffer losses. The severity of this issue",
+      "**Mitigation:** There are two recommended paths here. The easy path would be to just add the `stake` and `withdraw` functions to the `BathBuddy` contract similar to how the original `StakingRewards` contract works on Synthetix. However, this may change the original intention of the protocol as rewards won't be earned just"
+    ]
+  },
+  {
+    "cluster_id": 43,
+    "size": 34,
+    "severity_dist": {
+      "H": 12,
+      "M": 22
+    },
+    "representative_titles": [
+      "Removed liquidity can overflow when calling `SemiFungiblePositionManager.mintTokenizedPosition` function",
+      "Incorrect calculation of lending shares in `_withdrawOrAllocateSharesLiquidation` can lead to revert and failure to liquidate",
+      "`DailyLendIncreaseLimitLeft` and `dailyDebtIncreaseLimitLeft` are not adjusted accurately"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** [SemiFungiblePositionManager.sol#L1029-L1034](https://github.com/code-423n4/2024-04-panoptic/blob/855f58414589e93fa62e34890118164e8ac7822f/contracts/SemiFungiblePositionManager.sol#L1029-L1034) can be updated to the following code: ```solidity if (!isBurn) { removedLiquidity += chunkLiquidity; } ```",
+      "**Mechanism:** When a particular receiving token is desired and `_withdrawOrAllocateSharesLiquidation()` is called, the liquidation will always revert if the total pool is not large enough to cover the withdraw amount. This defeats the purpose of `_withdrawOrAllocateSharesLiquidation()`, as stated in the NatSpec: ``` /** * @dev Internal math function for liquidation",
+      "**Mechanism:** Even if the `V3Vault.sol#_withdraw` and `V3Vault.sol#_repay` functions are called, `dailyLendIncreaseLimitLeft` and `dailyDebtIncreaseLimitLeft` do not increase, so the protocol does not work as intended. **Mitigation:** `VeVault.sol#_withdraw` function is modified as follows: ```solidity function _withdraw(address receiver, address owner, uint256 amount, bool isShare) internal returns (uint256 assets, uint256 shares) { (uint256 newDebtExchangeRateX96,"
+    ]
+  },
+  {
+    "cluster_id": 21,
+    "size": 33,
+    "severity_dist": {
+      "H": 14,
+      "M": 19
+    },
+    "representative_titles": [
+      "The `shortOrder` verification bug on the `RedemptionFacet::proposeRedemption()` allows an attacker to leave a small `shortOrder` on the order book, leading to the protocol's bad debt",
+      "`mintToken()`, `mintWithBudget()`, and `forge()` in the `TraitForgeNft` contract will fail due to a wrong modifier used in `EntropyGenerator.initializeAlphaIndices()`",
+      "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** To fix the vulnerability, move out the `shortOrder` verification check and execute it immediately after loading the `shortOrder` from storage. ```diff function proposeRedemption( address asset, MTypes.ProposalInput[] calldata proposalInput, uint88 redemptionAmount, uint88 maxRedemptionFee ) external isNotFrozen(asset) nonReentrant { ... for (uint8 i = 0; i < proposalInput.length; i++) { p.shorter",
+      "**Mechanism:** The `initializeAlphaIndices()` function will not be callable by the `TraitForgeNft` contract as intended. This could lead to failures in the expected functionality of the system, particularly in scenarios where the indices need to be initialized or updated by the `TraitForgeNft` contract while performing minting or forging. That means this",
+      "**Mechanism:** The handler does not prevent tokens from being sent to incorrect chains and handlers. If a message is sent to an incorrect handler, the failure cannot be handled through `receive_cross_chain_callback`. **Mitigation:** ```diff function cross_chain_erc20_settlement( string memory to_chain, uint256 to_handler, uint256 to_token, uint256 to, uint256 amount ) external { require(amount"
+    ]
+  },
+  {
+    "cluster_id": 6,
+    "size": 31,
+    "severity_dist": {
+      "H": 13,
+      "M": 18
+    },
+    "representative_titles": [
+      "Liquidation doesn't account for penalty when calculating collateral to give, allowing users to profit by borrowing and self-liquidating",
+      "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+      "No incentive to liquidate when `CR <= 1` as asset received `<` dyad burned"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Apply the penalty to `repayAmount` when calculating the amount of collateral to give to the caller. In addition, ensure that the protocol applies a high enough penalty such that self-liquidators cannot profit from this attack. <details> ```diff function liquidatePosition(address owner, uint256 repayAmount) external whenNotPaused { // validate params if",
+      "**Mitigation:** Use the converted value to `ETH`: ``` function executeLiquidate(State storage state, LiquidateParams calldata params) external returns (uint256 liquidatorProfitCollateralToken) { DebtPosition storage debtPosition = state.getDebtPosition(params.debtPositionId); LoanStatus loanStatus = state.getLoanStatus(params.debtPositionId); uint256 collateralRatio = state.collateralRatio(debtPosition.borrower); uint256 collateralProtocolPercent = state.isUserUnderwater(debtPosition.borrower) ? state.feeConfig.collateralProtocolPercent : state.feeConfig.overdueCollateralProtocolPercent; uint256 assignedCollateral = state.getDebtPositionAssignedCollateral(debtPosition); uint256 debtInCollateralToken = state.debtTokenAmountToCollateralTokenAmount(debtPosition.futureValue); uint256",
+      "**Mechanism:** If `CR<1`, position will not be liquidated, protocol possibly incurring worse bad debt than this could have been. **Mitigation:** Refactor the liquidation calculation, to allow liquidator to repay the debt and still get a reward out of this."
+    ]
+  },
+  {
+    "cluster_id": 19,
+    "size": 31,
+    "severity_dist": {
+      "M": 19,
+      "H": 12
+    },
+    "representative_titles": [
+      "Repayments and liquidations can be forced to revert by an attacker that repays minuscule amount of shares",
+      "There is no way to liquidate a position if it breaches `maxDebtPerCollateralToken` value creating bad debt.",
+      "The protocol allows borrowing small positions that can create bad debt"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** At the moment, both `repay` and `liquidate` calls will fail if the amount of shares that the transaction attempts to repay exceeds the outstanding debt shares of the position, with `RepayExceedsDebt` and `DebtChanged` errors respectively. This enables an attacker to keep repaying very small amounts, such as 1 share,",
+      "**Mitigation:** If periodic partial repays are turned on, the possible solution would be to enforce the `maxDebtPerCollateral` check in `_partialRepay`, that will enforce users to repay an amount that would make `debtPerCollateralToken` value lesser than `maxDebtPerCollateralToken` value. Something like this would be sufficient enough: ```solidity require(loan.debtPerCollateralToken <= param.maxDebtPerCollateralToken, \"Position is",
+      "**Mitigation:** Implement the **minimum borrowing amount check** to limit the minimum size of borrowing positions. **[vonMangoldt (Wise Lending) commented via duplicate issue #277](https://github.com/code-423n4/2024-02-wise-lending-findings/issues/277#issuecomment-2004003575):** > Can also be circumvented by just paying back after borrowing. Doesn't really add any value, in my opinion. **[Trust (judge) commented](https://github.com/code-423n4/2024-02-wise-lending-findings/issues/255#issuecomment-2020946526):** > The bug class is"
+    ]
+  },
+  {
+    "cluster_id": 23,
+    "size": 31,
+    "severity_dist": {
+      "M": 24,
+      "H": 7
+    },
+    "representative_titles": [
+      "Some arbitrary proposal calls will fail because `executeProposal()` in `ProposalExecutionEngine` is not payable",
+      "`ETHCrowdfundBase.sol#processContribution` - Impossible to finalize crowdfund because of `minContribution` check",
+      "MarginTradingHook#updateOrder lacks access control"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** All proposal calls that are using attached ether will fail and Party wont be able to execute these types of proposals, which can be important. **Mitigation:** Make the `executeProposal()` function payable.",
+      "**Mitigation:** Possible solution is not to allow `minContributions > maxTotalContributions - minTotalContributions`. This mitigation may not be the best long-term solution, so we suggest exploring different mitigation.",
+      "**Mechanism:** Any order in the `MarginTradingHook` contract could be updated by other users. **Mitigation:** Consider adding a check that prevents the possibility of updating arbitrary orders, similar to the `cancelOrder` function: ```solidity _require(order.initPosId == initPosId, Errors.INVALID_INPUT); ``` **[fez-init (INIT) confirmed](https://github.com/code-423n4/2024-01-init-capital-invitational-findings/issues/34#issuecomment-1929239967)** ***"
+    ]
+  },
+  {
+    "cluster_id": 5,
+    "size": 29,
+    "severity_dist": {
+      "H": 10,
+      "M": 19
+    },
+    "representative_titles": [
+      "A snapshot may face a permanent DoS if both a slashing event occurs in the `NativeVault` and the staker's validator is penalized",
+      "Slashing `NativeVault` will lead to locked ETH for the users",
+      "Users can dodge losses due to StRSR era changes with instant operations"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** The staker can still receive rewards even if their validators are empty. **Mitigation:** The `_decreaseBalance()` function should be enhanced to properly handle cases where the burning amount exceeds the existing share amount. For example: ```diff function _decreaseBalance(address _of, uint256 assets) internal { NativeVaultLib.Storage storage self = _state(); - uint256",
+      "**Mitigation:** Due to the complexity and the current limitations in testing the implementation of the slashing mechanism, a precise fix is difficult to pinpoint. In the example provided above, the problem occurs at step 5 where `_decreaseBalance` is called again reducing the `totalAssets` by another `3e18` (the slashed amount). If",
+      "**Mechanism:** Users can avoid the collectivization of rate wrapping losses, and artificially get a share of any RSR left in the StRSR contract. This latter quantity may be considerable, because while unlikely, it's not impossible that the rate wrapping happens when little RSR is seized from an otherwise large RSR"
+    ]
+  },
+  {
+    "cluster_id": 16,
+    "size": 29,
+    "severity_dist": {
+      "H": 11,
+      "M": 18
+    },
+    "representative_titles": [
+      "crvRewardsContract `getReward` can be called directly, breaking vaults `claimRewards` functionallity",
+      "Calling `depositTokensToL2` from the Vault contract to the Vault contract allows infinite minting of unbacked tokens",
+      "Incorrect accounting bug of the `yDUSD` vault leads to total loss of depositors' `DUSD` assets"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Create another functionality inside Vault that similar to `claimRewards`, but used CVX, CRV balance inside the contract, to perform the AMPH claim and claim the rewards. **[0xShaito (Amphora) confirmed and commented](https://github.com/code-423n4/2023-07-amphora-findings/issues/301#issuecomment-1667507614):** > True! We will fix this. > > Impact of the attack would be the loss of the",
+      "`depositTokensToL2` function allows the caller to specify the `from` address, from which tokens are taken. Because the vault grants infinite approval to the bridge already (as can be seen in the contract's constructor), it's possible for an attacker to call the `depositTokensToL2` function and transfer tokens from the vault to",
+      "When the match price is below the oracle price, the `OrdersFacet::_matchIsDiscounted()` will be invoked to account for a discount [by minting the discount (`newDebt`)](https://github.com/code-423n4/2024-07-dittoeth/blob/ca3c5bf8e13d0df6a2c1f8a9c66ad95bbad35bce/contracts/facets/OrdersFacet.sol#L178) (`@1` in the snippet below) to the `yDUSD` vault. Assuming the `yDUSD` vault is empty (i.e., both `totalAssets` and `totalSupply` are 0), for simplicity's sake. This"
+    ]
+  },
+  {
+    "cluster_id": 27,
+    "size": 29,
+    "severity_dist": {
+      "M": 23,
+      "H": 6
+    },
+    "representative_titles": [
+      "Due to missing checks on minimum gas passed through LayerZero, executions can fail on the destination chain",
+      "`PayGasFeeInZetaAndUpdateCctx()` is prone to slippage, causing sender overpays the revert gas and lose returned funds",
+      "`calculateTVL` may run out of gas for modest number of operators and tokens breaking deposits, withdrawals, and trades"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Validate/require that the `_dstGasForCall` parameter is greater than `nativeFee` + `zroFee` or re-engineer the architecture to make the `estimateSendAndCallFee()` function a mandatory step of the process. **[0xsomeone (Judge) increased severity to High and commented](https://github.com/code-423n4/2024-01-decent-findings/issues/525#issuecomment-1923713863):** > This and all duplicate exhibits highlight that the `GAS_FOR_RELAY` is a hard-coded value and",
+      "**Mitigation:** Check and handle slippage case. For example, when `QueryUniswapV2RouterGetZetaAmountsIn()` returns an overinflated value due to slippage, return gas payment flow with a slippage error, and handle slippage error in the corresponding vote inbound/outbound tx flow to allow for pending cctx instead of direct abort. **[lumtis (ZetaChain) confirmed](https://github.com/code-423n4/2023-11-zetachain-findings/issues/507#issuecomment-1877392392)** **[0xean (Judge)",
+      "**Mechanism:** An even small number of operators and supported tokens will render the protocol unusable, up to running out of block gas limit. Currently, with 1 OD and 2 tokens, `calculateTVLs` consumes approximately 450K gas (see the [example transaction](https://app.blocksec.com/explorer/tx/eth/0x5366d8b097cc2d2c27c45d97266b1fa6d76606e735c4a261efa7b43aff87de42) gas profiling section). For reasonable values, such as 12 ODs and"
+    ]
+  },
+  {
+    "cluster_id": 8,
+    "size": 28,
+    "severity_dist": {
+      "M": 18,
+      "H": 10
+    },
+    "representative_titles": [
+      "`ERC20TokenEmitter::buyToken` function mints more tokens to users than it should do",
+      "Adversary can block `claimAuction()` due to push-strategy to transfer assets to multiple bidders",
+      "The amount of `xezETH` in circulation will not represent the amount of `ezETH` tokens 1:1"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** * Protocol mints more governance tokens are minted than it should be. **Mitigation:** There are two ways to resolve this issue. An unfair but much easier one, and the fair but not that easy one **Unfair One:**\\ The protocol team should decide which side (creators or buyers) will suffer",
+      "**Mechanism:** - Prevents other bidders from receiving their bids back. - Prevents the token owner from receiving earnings. - Prevents the bidder winner from receiving the NFT. All Ether from the auction can be lost as there is no alternate way of recovering it. This also breaks one of the",
+      "**Mechanism:** The price of `ezETH` is expected to increase over time. This will create a situation where there will be more `xezETH` in circulation than `ezETH`, rendering some `xezETH` worthless and impossible to redeem for `ezETH`. A situation in which the `ezETH` valuation decreases instead of increasing is also problematic,"
+    ]
+  },
+  {
+    "cluster_id": 13,
+    "size": 28,
+    "severity_dist": {
+      "H": 10,
+      "M": 18
+    },
+    "representative_titles": [
+      "secRewardsPerShare Insufficient precision",
+      "`BalancerConnector::_getPositionTVL` is calculated incorrectly",
+      "`PositionAction20._onWithdraw` and `PositionPendle20._onWithdraw` also returns token amount in wrong scale"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** Due to insufficient precision, `secRewardsPerShare` will basically be 0.",
+      "**Mechanism:** BalancerConnector misuses the weight of pool tokens, leading to decreased TVL of these positions. **Mitigation:** Do not use weights to evaluate the TVL of the position, instead just refactor the `_getPositionTVL`'s return with proper decimal scaling based on the asset used. **[HadiEsna (NOYA) confirmed](https://github.com/code-423n4/2024-04-noya-findings/issues/1033#issuecomment-2167905982)** ***",
+      ""
+    ]
+  },
+  {
+    "cluster_id": 22,
+    "size": 28,
+    "severity_dist": {
+      "M": 21,
+      "H": 7
+    },
+    "representative_titles": [
+      "openPosition() Lack of minimum token0PremiumPortion/token1PremiumPortion limit",
+      "No `minLoanSize` means liquidators will have no incentive to liquidate small positions",
+      "`isolateRedeem()` revert in case Revert-on-zero-value-transfers tokens"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** `out_of_price` tokenId, due to the no-cost loan, might lead to the following issues: 1. Malicious occupation of Liquidity 2. Since both `token0Premium/token1Premium` are 0, the liquidator will not execute `liquidatePosition()`, because there is no profit. 3. Since both `token0Premium/token1Premium` are 0, `LP` cannot get fees, but the borrower might",
+      "**Mechanism:** Can push the entire protocol into an underwater state. Underwater debt would first be covered by Protocol reserves and where they aren't sufficient, lenders will bear the responsibility of the uneconomical clean up of bad debt, so both the protocol and lenders stand to lose out. **Mitigation:** Close the",
+      "**Mechanism:** The borrower will never be able to redeem his loan after his loan goes into auction state. **Mitigation:** ```diff File: IsolateLogic.sol#executeIsolateRedeem() - 346: if (loanData.firstBidder != address(0)) { + 346: if (loanData.firstBidder != address(0) && vars.bidFines[vars.nidx] > 0) { 347: // transfer bid fine from borrower to the first"
+    ]
+  },
+  {
+    "cluster_id": 35,
+    "size": 28,
+    "severity_dist": {
+      "H": 17,
+      "M": 11
+    },
+    "representative_titles": [
+      "A malicious inbound transaction can prevent subsequent events from being processed by observers",
+      "Observer can halt outbound cctxs and steal funds",
+      "Malicious Market Creators Can Steal Tokens From Unsuspecting Approved Reference Accounts"
+    ],
+    "representative_bodies_first50w": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "cluster_id": 31,
+    "size": 27,
+    "severity_dist": {
+      "H": 3,
+      "M": 24
+    },
+    "representative_titles": [
+      "PriceFeed is likely to be disabled in times of volatility, causing liquidations and borrows to freeze",
+      "Chainlink Oracles may return stale prices or may be unusable when aggregator `roundId` is less than 50",
+      "`fetchPrice` can return different prices in the same transaction"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** The common behavior for DeFi price feed aggregators is to fallback to the most trustworthy oracle rather than abort. Typically, Chainlink is selected as the preferred fallback due to the diversity of its sources and reputation of stability. It is recommended to follow this principle and fallback to Chainlink's",
+      "**Mechanism:** 1. For new price feeds, OracleHub won't be able to set a heartbeat until the aggregator `roundId` is greater than 50. So the new price feed would be unusable for that period. 2. For price feeds that already have a heartbeat, they won't be able to recalibrate during the",
+      "**Mechanism:** A difference in the price returned by `fetchPrice` in the same transaction can be exploited to perform an arbitrage in different ways. In the case of an increase of over 50% in the Chainlink price, a user can redeem a CDP with the last good price and then open"
+    ]
+  },
+  {
+    "cluster_id": 18,
+    "size": 26,
+    "severity_dist": {
+      "M": 24,
+      "H": 2
+    },
+    "representative_titles": [
+      "Staking ETH incorrectly assumes revert bubbling",
+      "Users can deflate other markets Guild holders rewards by staking less priced token",
+      "The time available for a canceled withdrawal should not impact future unstaking processes"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Use submit instead, as that will propagate any revert. In [`ZapRouterBase::\\_depositRawEthIntoLido()`](https://github.com/code-423n4/2024-06-badger/blob/9173558ee1ac8a78a7ae0a39b97b50ff0dd9e0f8/ebtc-zap-router/src/ZapRouterBase.sol#L34-L41): ```diff function _depositRawEthIntoLido(uint256 _initialETH) internal returns (uint256) { // check before-after balances for 1-wei corner case uint256 _balBefore = stEth.balanceOf(address(this)); // TODO call submit() with a referral? - payable(address(stEth)).call{value: _initialETH}(\"\"); + stETH.submit{value: _initialETH}(address(0)); uint256 _deposit = stEth.balanceOf(address(this)) -",
+      "**Mitigation:** To prevent manipulation, add a check in the `stake()` function to ensure that the passed term is from the same market as the `SurplusGuildMinter`. ```diff function stake(address term, uint256 amount) external whenNotPaused { + require(LendingTerm(term).getReferences().creditToken == credit, \"SurplusGuildMinter: term from wrong market!\"); // apply pending rewards (uint256 lastGaugeLoss, UserStake",
+      "**Mechanism:** When `stakers` want to `unstake` their `StRSR`, they cannot `withdraw` `RSR` immediately.<br> Instead, each `withdrawal` enters a `queue` and will become available after the `unstaking delay` period.<br> This `queue` operates on a `FIFO` basis, meaning earlier `withdrawals` are processed before later ones.<br> `Stakers` can also cancel their `withdrawals`, and"
+    ]
+  },
+  {
+    "cluster_id": 17,
+    "size": 25,
+    "severity_dist": {
+      "M": 18,
+      "H": 7
+    },
+    "representative_titles": [
+      "`executeYieldBorrowERC20()` checking `yieldCap` is wrong",
+      "Incorrect accounting of `_pendingWithdrawal` in `queueClaiming` flow",
+      "`deployWithdrawalQueue()` need to clear `_queueAccounting[lastQueueIndex]`"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** With an incorrect value for `totalSupply`, the check for `yieldCap` will be inaccurate, leading to a security risk.",
+      "**Mitigation:** Change into `_pendingWithdrawal[secondIdx] + = pendingForQueue;`.",
+      "**Mechanism:** Not clearing `_queueAccounting[lastQueueIndex]` when executing `queueClaimAll()` will use this stale data to distribute `totalReceived`."
+    ]
+  },
+  {
+    "cluster_id": 15,
+    "size": 23,
+    "severity_dist": {
+      "H": 7,
+      "M": 16
+    },
+    "representative_titles": [
+      "Inability to withdraw funds for certain users due to `whenNotPaused` modifier in `RateLimitedMinter`",
+      "ETH withdrawals from EigenLayer always fail due to `OperatorDelegator`'s nonReentrant `receive()`",
+      "`withdraw()` users may can't withdraw `underlyingBorrowToken` properly"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Provide an `emergencyWithdraw` method allowing users to withdraw their funds while foregoing rewards when the protocol is paused. This change should be carefully reviewed and tested to ensure it does not introduce other security risks. **[eswak (Ethereum Credit Guild) confirmed and commented](https://github.com/code-423n4/2023-12-ethereumcreditguild-findings/issues/1249#issuecomment-1898741180):** > Very nice catch, thanks a lot",
+      "**Mechanism:** All withdrawals that include any amount of ETH will be permanently stuck in EigenLayer and won't be redeemable. Only amounts coming from new deposits can be redeemed and the team will have no way to fill the withdrawal queues. To unblock them, the team will necessarily have to upgrade",
+      "**Mechanism:** If the token is already borrowed, just stored in `Size` and not yet taken, but due to a slight price fluctuation, `validateUserIsNotBelowOpeningLimitBorrowCR()` fails but is still far from being liquidated, the user may not be able to take the borrowed token, resulting in the possibility that the user may"
+    ]
+  },
+  {
+    "cluster_id": 28,
+    "size": 21,
+    "severity_dist": {
+      "H": 6,
+      "M": 15
+    },
+    "representative_titles": [
+      "Escrow contract can be drained by creating rentals that bypass execution invariant checks",
+      "paused ERC721/ERC1155 could cause stopRent to revert, potentially causing issues for the lender.",
+      "All orders can be hijacked to lock rental assets forever by tipping a malicious ERC20"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** I would suggest to check that the corresponding offers / considerations are actually included in the `totalExecutions` and **completely fulfilled** with their **corresponding recipients**. Adding some notes for the protocol to understand the attack surface: There are other scenarios possible not exposed on the POC. For example, fulfilling just",
+      "**Mitigation:** Consider decoupling the NFT claim from stopRent and introducing a timestamp tracker when the lender calls stopRent. Utilize that timestamp value when the rent stop is finalized and calculate the ERC20 reward for the renter. **[Alec1017 (reNFT) acknowledged and commented](https://github.com/code-423n4/2024-01-renft-findings/issues/220#issuecomment-1908721888):** > Non-standard ERC implementations were considered out of scope,",
+      "**Mitigation:** Disallow tipping, either by removing this functionality in the Seaport fork or, if this isn't possible, perhaps by adding the size of the consideration items to the `ZoneParameters` and reverting if there are more. This would prevent the addition of malicious ERC20 tokens to the `consideration` array, thereby preventing"
+    ]
+  },
+  {
+    "cluster_id": 3,
+    "size": 20,
+    "severity_dist": {
+      "H": 5,
+      "M": 15
+    },
+    "representative_titles": [
+      "Wrong handling of call data check indices, forcing it sometimes to revert",
+      "Incorrect assumption in PoolMath.sol can cause underflow when zapping is used",
+      "MaxHeap.sol: Already extracted tokenId may be extracted again"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** In `BytesHelper.sol`: ```diff function sliceBytes(bytes memory toSlice, uint256 start, uint256 end) public pure returns (bytes memory) { ... - uint256 length = end - start; + uint256 length = end - start + 1; bytes memory sliced = new bytes(length); ... } ``` In `Timelock.sol`: ```diff function _addCalldataCheck( address",
+      "**Mitigation:** Make sure to check the assertion again: <details> ```diff function _zapSwapAmount( uint256 reserve0, uint256 reserve1, uint256 zapAmount0, uint256 zapAmount1 ) internal pure returns (uint256 swapAmount) { uint256 maximumMSB = _maximumMSB( reserve0, reserve1, zapAmount0, zapAmount1); uint256 shift = 0; // Assumes the largest number has more than 80 bits -",
+      "**Mitigation:** Modify the `MaxHeap.sol#extractMax` function as follows: ```solidity function extractMax() external onlyAdmin returns (uint256, uint256) { require(size > 0, \"Heap is empty\"); uint256 popped = heap[0]; heap[0] = heap[--size]; ++ heap[size] = 0; maxHeapify(0); return (popped, valueMapping[popped]); } ``` Since the value of `heap[size]` is initialized to zero, no errors"
+    ]
+  },
+  {
+    "cluster_id": 30,
+    "size": 20,
+    "severity_dist": {
+      "H": 9,
+      "M": 11
+    },
+    "representative_titles": [
+      "openPosition() use stale feeGrowthInside0LastX128/feeGrowthInside1LastX128",
+      "`refinanceFull`/`addNewTranche` reusing a lender's signature leads to unintended behavior",
+      "The `tradeEnd` in `BackingManager` isn't updating correctly"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** Due to use stale `feeGrowthInside0LastX128/feeGrowthInside1LastX128`, the `borrower` will pay extra fees.",
+      "**Mechanism:** Maliciously using the signature of `refinanceFull()` to execute `addNewTranche()` will result in approximately double the borrowed amount, and the risk of borrowing will increase dramatically.",
+      "**Mechanism:** In the `BackingManager`, we use the `tradeEnd` value for each type of `trade` to prevent next `auction` from occurring within the same block. We can find a comment in the code explaining this in `line 114`. function rebalance(TradeKind kind) external nonReentrant { // DoS prevention: 114: // unless caller"
+    ]
+  },
+  {
+    "cluster_id": 36,
+    "size": 20,
+    "severity_dist": {
+      "H": 4,
+      "M": 16
+    },
+    "representative_titles": [
+      "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+      "`RubiconMarket` checks slippage incorrectly",
+      "Missing slippage protection in `liquidity_lockbox::withdraw`"
+    ],
+    "representative_bodies_first50w": [
+      "**Description:** The `swapExactOutput` function does not include any sort of slippage protection. This function is similar to what is done in `TSwapPool::swapExactInput`, where the function specifies a `minOutputAmount`, the `swapExactOutput` function should specify a `maxInputAmount`. **Impact:** If market conditions change before the transaciton processes, the user could get a much",
+      "**Mitigation:** First calculate amount without fees, then check slippage: ```solidity fill_amt = calcAmountAfterFee(fill_amt); require(fill_amt >= min_fill_amount, \"min_fill_amount isn't filled\"); ``` **[bghughes (Rubicon) confirmed and commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/666#issuecomment-1535429281):** > Thanks - we messed up some of the fee logic in this build and are keyed in on a robust solution. > > For",
+      "**Mitigation:** Let users provide the minimum amount of tokens they are willing to use as function arguments and pass them straight to `decreaseLiquidity` like: ```diff - function withdraw(uint64 amount) external { + function withdraw(uint64 amount, uint64 minA, uint64 minB) external { ... - whirlpool.decreaseLiquidity{accounts: metasDecreaseLiquidity, seeds: [[pdaProgramSeed, pdaBump]]}(amount, 0, 0);"
+    ]
+  },
+  {
+    "cluster_id": 45,
+    "size": 20,
+    "severity_dist": {
+      "M": 20
+    },
+    "representative_titles": [
+      "Rewards may be spread out among the wrong time period due to the way the protocol calculates it",
+      "Anyone can prolong the time for the rewards to get distributed",
+      "Inflated `GaugeV3` rewards when period is skipped"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** ```diff + struct rewardQueue { + uint256 periodFinish; + uint256 rewardPerSecond; + } // below is the struct from src/reward/interfaces/LockedBalance.sol struct Reward { - uint256 periodFinish; - uint256 rewardPerSecond; + rewardQueue[] rewards; + uint256 rewardCounter; uint256 lastUpdateTime; uint256 rewardPerTokenStored; uint256 balance; } ``` We can use a queue-like list",
+      "**Mitigation:** Either add a minimum amount required (chosen by governance) to invoke a distribute call, if the call is not done by the `ProfitManager`, or change how rewards are interpolated.",
+      "**Mechanism:** If period `p` has gauge rewards and period `p+1` has no pool activity, the reward calculation for period `p` will be inflated, allowing users to claim more tokens than they should. **Mitigation:** One initial idea for a fix might be to modify `_advancePeriod()` and `newPeriod()` to only extrapolate the"
+    ]
+  },
+  {
+    "cluster_id": 29,
+    "size": 16,
+    "severity_dist": {
+      "H": 6,
+      "M": 10
+    },
+    "representative_titles": [
+      "Withdrawals can be frozen by creating null deposits",
+      "Withdrawal from NFTs can be temporarily blocked",
+      "Funds locked due to missing transfer check"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Just check for the supplied liquidity to not be $0$ in [**liquidity_lockbox, function \\_getPositionData**](https://github.com/code-423n4/2023-12-autonolas/blob/2a095eb1f8359be349d23af67089795fb0be4ed1/lockbox-solana/solidity/liquidity_lockbox.sol#L94C1-L97C10) ```diff ... + // Check that the liquidity > 0 + if (positionData.liquidity == 0) { + revert(\"Liquidity cannot be 0\"); + } // Check that the liquidity is within uint64 bounds if (positionData.liquidity >",
+      "**Mitigation:** Consider modifying the check [here](<https://github.com/code-423n4/2024-02-althea-liquid-infrastructure/blob/main/liquid-infrastructure/contracts/LiquidInfrastructureERC20.sol#L382>) to: ```diff + if (nextWithdrawal >= ManagedNFTs.length) { nextWithdrawal = 0; emit WithdrawalFinished(); } ```",
+      "**Mitigation:** We recommend to fix both the ERC-20 transfer and ERC-4626 withdrawal. For the first, it is easiest to rely on OpenZeppelin's [SafeERC20 `safeTransfer`](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/8cc7f2dcbf368f2a7ea491389dae41f01c16e352/contracts/token/ERC20/utils/SafeERC20.sol#L32-L38) function: ```diff diff --git a/pt-v5-vault/src/PrizeVault.sol b/pt-v5-vault/src/PrizeVault.sol index fafcff3..de69915 100644 --- a/pt-v5-vault/src/PrizeVault.sol +++ b/pt-v5-vault/src/PrizeVault.sol @@ -936,7 +936,7 @@ contract PrizeVault is TwabERC20, Claimable, IERC4626, ILiquidationSource, Ownab yieldVault.redeem(_yieldVaultShares,"
+    ]
+  },
+  {
+    "cluster_id": 42,
+    "size": 16,
+    "severity_dist": {
+      "H": 4,
+      "M": 12
+    },
+    "representative_titles": [
+      "`PartyGovernanceNFT.sol#mint` - User can delegate another users funds to themselves and brick them from changing the delegation",
+      "`mVeNFT` DOS can't trigger the vote function",
+      "Anyone can pause AuctionHouse in `_createAuction`"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** We recommend removing the `contributeFor` function. **[KingNFT (lookout) commented](https://github.com/code-423n4/2023-10-party-findings/issues/418#issuecomment-1806878946):** > Please reference: > ```solidity > File: contracts\\party\\PartyGovernance.sol > 451: function delegateVotingPower(address delegate) external { > 452: _adjustVotingPower(msg.sender, 0, delegate); > 453: } > ``` **[gzeon (judge) decreased severity to Medium and commented](https://github.com/code-423n4/2023-10-party-findings/issues/418#issuecomment-1817881800):** > The warden described a potential grieving",
+      "The `VoterUpgradeableV2.sol` contract has the function `attachToManagedNFT()`, users use it to delegate their `veFNX` voting power to a `mVeNFT`. One of the things this function does after receiving the new voting power is sub-call to `_poke()` and it will update the last voted timestamp of the `mVeNFT`. ```solidity lastVotedTimestamps[tokenId_] =",
+      "**Mechanism:** Malicious users will be able to often pause the `AuctionHouse` contract - they don't even need for their art piece to win the voting as the attack will be likely possible even on random art pieces. Of course, the owner (DAO) will still be able to unpause the contract,"
+    ]
+  },
+  {
+    "cluster_id": 32,
+    "size": 15,
+    "severity_dist": {
+      "M": 11,
+      "H": 4
+    },
+    "representative_titles": [
+      "The bot won't be able to unstake or repay risky positions in the yield contract",
+      "Factory::create() is vulnerable to reorg attacks",
+      "Redeeming a Settlement won't work for unsigned messages when the communicating dApps have different addresses on the different chains"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** When `botAdmin` attempts to unstake and repay risky positions, wrong account address will be used, causing the transaction to fail. **Mitigation:** Allow specifying `user` address in `unstake` and `repay` functions: ```diff + function _unstake(uint32 poolId, address nft, address user, uint256 tokenId, uint256 unstakeFine) internal virtual { UnstakeLocalVars memory vars;",
+      "**Mechanism:** Now, if users rely on the address derivation in advance or try to deploy the magiclp with the same address, any funds/tokens sent to it could potentially be withdrawn by anyone else. All in all, it could lead to the theft of user funds. **Mitigation:** Try the deployment using",
+      "**Mechanism:** Funds cannot be redeemed and remain stuck in a settlement. **Mitigation:** Include an argument that enables users to specify the refundee when creating settlements without using a Virtual Account."
+    ]
+  },
+  {
+    "cluster_id": 41,
+    "size": 15,
+    "severity_dist": {
+      "M": 12,
+      "H": 3
+    },
+    "representative_titles": [
+      "Gas used mismatch in failed contract calls can lead to wrong gas deductions",
+      "Gas refunds use block gas instead of transaction gas, leading to incorrect refund amounts",
+      "A liquidated position possibly cannot be closed"
+    ],
+    "representative_bodies_first50w": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "cluster_id": 4,
+    "size": 14,
+    "severity_dist": {
+      "H": 11,
+      "M": 3
+    },
+    "representative_titles": [
+      "Adversary can steal user's NFT's if they have set Magnetar as `isApprovedForAll == true`",
+      "Attacker can use `MagnetarAction.OFT` action of the Magnet to perform operations as any user including directly stealing user tokens",
+      "`tOLP` positions created through `MagnetarAction.Permit` can be stolen"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Do not allow users to make a call with `ERC721.approve` selector. **[0xWeiss (Tapioca) confirmed](https://github.com/code-423n4/2024-02-tapioca-findings/issues/44#issuecomment-2125599377)** ***",
+      "**Mechanism:** Combining the two issues mentioned above, we can carry out the following exploitation. 1. Call `Magnetar.burst` function with `_action.id == MagnetarAction.OFT`, which will call `_processOFTOperation` function. The `_target` is the Magnetar contract itself, and the `_actionCalldata` is still an encoded calldata to call the `Magnetar.burst` function with `_action.id ==",
+      "This issue is a combination of three other issues: - `MagnetarAction.TapToken` integration will leave tokens stuck in `Magnetar` contract. - A lot of calls in `MagnetarAction.Permit` enables anyone to steal whitelisted tokens held by `Magnetar`. - Anyone can take any whitelisted tokens approved to `Magnetar`. In short, the first issue"
+    ]
+  },
+  {
+    "cluster_id": 10,
+    "size": 14,
+    "severity_dist": {
+      "M": 13,
+      "H": 1
+    },
+    "representative_titles": [
+      "Gas griefing/attack via creating the proposals",
+      "Malicious borrower can decrease Guild holders reward",
+      "The winner can steal claimer fees, and force him to pay for the gas"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** Assumption in this section is that the victims do not get external help and they have invested most of their liquidity inside Kleidi, and only kept minimal amounts out for gas payments. * Imagine if victims have access to `F` amounts of funds, and 95% of those funds is",
+      "**Mechanism:** A malicious borrower can reduce all Guild holders\u2019 rewards with a big flashloan, upon full repayment. A borrower opens a loan with the minimum borrowable amount in term with no mandatory partial repayment. Waits for the loan to accumulate interest, then transfers the funds to an alternative account -",
+      "**Mitigation:** We can check the prize state before and after the hook; if it changes from unclaimed to claimed, we can revert the transaction. **Claimable.sol:** ```diff function claimPrize( ... ) external onlyClaimer returns (uint256) { address recipient; if (_hooks[_winner].useBeforeClaimPrize) { + bool isClaimedBefore = prizePool.wasClaimed(address(this), _winner, _tier, _prizeIndex); recipient ="
+    ]
+  },
+  {
+    "cluster_id": 47,
+    "size": 14,
+    "severity_dist": {
+      "H": 6,
+      "M": 8
+    },
+    "representative_titles": [
+      "The `bankBalance` function failed to handle errors correctly",
+      "`erc721DecreaseIsolateSupplyOnLiquidate()` missing clear `lockerAddr`",
+      "L2SharedBridge l1LegacyBridge is not set"
+    ],
+    "representative_bodies_first50w": [
+      "",
+      "**Mechanism:** Unable to retrieve NFT.",
+      "**Mechanism:** Until `L1ERC20Bridge` is updated, messages sent by the user will fail."
+    ]
+  },
+  {
+    "cluster_id": 37,
+    "size": 13,
+    "severity_dist": {
+      "M": 10,
+      "H": 3
+    },
+    "representative_titles": [
+      "`totalBorrowedCredit` can revert, breaking gauges.",
+      "When the `unlockOverride` flag is true, users can \"freely\" vote for gauge weights.",
+      "`GaugeController::remove_gauge` will always revert whenever the gauge it's being called or has any weight attached to it"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** The `totalBorrowedCredit` function should never fail. Either cap it to `0` to prevent underflows. Or a better way is to track the total tokens minted by the PSM module with a variable which is incremented every mint and decremented every burn. This removes the dependence on `creditMultiplier` which can",
+      "**Mechanism:** Due to the lack of restrictions on `createLock` and `increaseAmount` when the `unlockOverride` flag is set to true, users can `createLock`/`increaseAmount` on `VotingEscrow`, vote for a gauge inside the `GaugeController` to increase the desired gauge's weight, and then immediately withdraw the locked native token from `VotingEscrow` to boost their",
+      "**Mitigation:** Call `_remove_gauge_weight` prior to erasing the gauge type of the gauge: ```diff function remove_gauge(address _gauge) external onlyGovernance { require(gauge_types_[_gauge] != 0, \"Invalid gauge address\"); - gauge_types_[_gauge] = 0; - _remove_gauge_weight(_gauge); + _remove_gauge_weight(_gauge); + gauge_types_[_gauge] = 0; emit GaugeRemoved(_gauge); } ```"
+    ]
+  },
+  {
+    "cluster_id": 44,
+    "size": 13,
+    "severity_dist": {
+      "M": 9,
+      "H": 4
+    },
+    "representative_titles": [
+      "Each generation should have 1 \"Golden God\" NFT, but there could be 0",
+      "Wrong minting logic based on total token count across generations",
+      "The maximum number of generations is infinite"
+    ],
+    "representative_bodies_first50w": [
+      "**Mechanism:** There is a chance that the \"Golden God\" NFT is completely lost and not mintable for a generation. This goes against the docs and the expectations of the game. **Mitigation:** Implement a check that ensures that the `999999` entropy is not set out of bounds. ```diff function initializeAlphaIndices() public",
+      "**Mechanism:** In the current implementation, `_tokenIds` is used to control the minting process. The check while `(budgetLeft >= mintPrice && _tokenIds < maxTokensPerGen)` ensures that minting will stop when current generation minted tokens reaches `maxTokensPerGen`. Instead of checking the number of tokens minted in the current generation, the function incorrectly",
+      "**Mitigation:** In `TraiForgeNft::\\_incrementGeneration`, add a check in order to do not allow the the mint of the NFT's above the maximum generation. Instead of doing this: ```javascript function _incrementGeneration() private { require( generationMintCounts[currentGeneration] >= maxTokensPerGen, 'Generation limit not yet reached' ); currentGeneration++; generationMintCounts[currentGeneration] = 0; priceIncrement = priceIncrement + priceIncrementByGen;"
+    ]
+  },
+  {
+    "cluster_id": 2,
+    "size": 12,
+    "severity_dist": {
+      "H": 4,
+      "M": 8
+    },
+    "representative_titles": [
+      "Function `settleWithBuyout()` does not call `LoanManager.loanLiquidation()` during a buyout",
+      "Merging tranches could make `_loanTermination()` accounting incorrect",
+      "Inconsistent accounting of `undeployedAssets` might result in undesired optimal range in the pool"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Consider checking and calling `loanLiquidation()` in `settleWithBuyout()` to ensure accurate accounting in the pool. **[0xend (Gondi) confirmed and commented](https://github.com/code-423n4/2024-04-gondi-findings/issues/49#issuecomment-2067756607):** > Changing interest paid to use the end of the loan (this appears in another issue since this delta in time otherwise breaks the `maxSeniorRepayment` concept). **[Gondi mitigated](https://github.com/code-423n4/2024-05-gondi-mitigation?tab=readme-ov-file#mitigation-of-high--medium-severity-issues):** > Added",
+      "**Mitigation:** Limit the ability to call `mergeTranches()` directly to lenders only. **[0xend (Gondi) confirmed](https://github.com/code-423n4/2024-04-gondi-findings/issues/69#event-12543124405)** **[Gondi mitigated](https://github.com/code-423n4/2024-05-gondi-mitigation?tab=readme-ov-file#mitigation-of-high--medium-severity-issues):** > Only tranche lender can call `mergeTranches` so it assumes the responsibility. **Status:** Mitigation confirmed. Full details in reports from [minhquanym](https://github.com/code-423n4/2024-05-gondi-mitigation-findings/issues/50) and [bin2chen](https://github.com/code-423n4/2024-05-gondi-mitigation-findings/issues/2). ***",
+      "**Mitigation:** Account for `getCollectedFees` in (2) and (3), noted above. **[0xend (Gondi) confirmed](https://github.com/code-423n4/2024-04-gondi-findings/issues/44#event-12543633373)** **[Gondi mitigated](https://github.com/code-423n4/2024-05-gondi-mitigation?tab=readme-ov-file#mitigation-of-high--medium-severity-issues):** > Missing collected fees in accounting. **Status:** Mitigation confirmed. Full details in reports from [oakcobalt](https://github.com/code-423n4/2024-05-gondi-mitigation-findings/issues/104) and [minhquanym](https://github.com/code-423n4/2024-05-gondi-mitigation-findings/issues/74). ***"
+    ]
+  },
+  {
+    "cluster_id": 9,
+    "size": 11,
+    "severity_dist": {
+      "H": 4,
+      "M": 7
+    },
+    "representative_titles": [
+      "`dettachFromManagedNFT` might revert and temporarily prevent users from detaching in certain situations",
+      "Owner can call `applyCover` multiple times in `PoolTemplate.sol`",
+      "`BathBuddy` rewards DoS"
+    ],
+    "representative_bodies_first50w": [
+      "",
+      "",
+      ""
+    ]
+  },
+  {
+    "cluster_id": 33,
+    "size": 11,
+    "severity_dist": {
+      "H": 4,
+      "M": 7
+    },
+    "representative_titles": [
+      "Some positions will get liquidated immediately",
+      "The curve of short leverage position is not smooth and may cause users to open positions that are different from expectations",
+      "When opening a position, the collateral of the previous position is used for borrowing, which makes the user more easily liquidated"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Introduce a safety factor to scale the loans, which the user can provide when opening the `position`. **[daoio (Rubicon) confirmed via duplicate issue #827](https://github.com/code-423n4/2023-04-rubicon-findings/issues/827#issuecomment-1547185833)** **[HickupHH3 (judge) increased severity to High and commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/1180#issuecomment-1549781170):** > Selected as best because of the POC, which showcases how the account is subject to liquidation",
+      "**Mitigation:** Consider no longer supporting 1.0x short leverage. **[daoio (Rubicon) confirmed](https://github.com/code-423n4/2023-04-rubicon-findings/issues/396#issuecomment-1535717705)** **[HickupHH3 (judge) commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/396#issuecomment-1549863137):** > Nice find! ***",
+      "**Mitigation:** Consider not using collateral from previous positions for borrowing when opening a position. **[daoio (Rubicon) disagreed with severity and commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/545#issuecomment-1534801924):** > Yeah, the issue is correct. It will increase a possibility of being liquidated, though it was an intended behavior. **[HickupHH3 (judge) commented](https://github.com/code-423n4/2023-04-rubicon-findings/issues/545#issuecomment-1569793812):** > A bit of similarity with"
+    ]
+  },
+  {
+    "cluster_id": 14,
+    "size": 9,
+    "severity_dist": {
+      "H": 5,
+      "M": 4
+    },
+    "representative_titles": [
+      "`IndexTemplate.sol` Wrong implementation allows lp of the index pool to resume a locked `PayingOut` pool and escape the responsibility for the compensation",
+      "An infinite loop in `MultiFeeDistribution.sol` withdraw",
+      "`PoolTemplate.sol#resume()` Wrong implementation of `resume()` will compensate overmuch redeem amount from index pools"
+    ],
+    "representative_bodies_first50w": [
+      "",
+      "**Mitigation:** Rewrite the code the following way: ```solidity if (earnedAmount == 0) { i++; continue; } ```",
+      ""
+    ]
+  },
+  {
+    "cluster_id": 40,
+    "size": 9,
+    "severity_dist": {
+      "H": 9
+    },
+    "representative_titles": [
+      "Numerous errors when calculating the TVL for the MorphoBlue connector",
+      "SiloConnector `_getPositionTVL` miscalculate the TVL position",
+      "Incomplete TVL Calculation in `AerodromeConnector::_getPositionTVL` Function"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Each of the 3 points above must be fixed individually for the TVL calculation to be correct. Each issue can be fixed as follows: 1. For the function `convertCToL` the result should be divided by 10&ast;&ast;(collateralTokenDecimals) and multiplied by 10&ast;&ast;(loanTokenDecimals). 2. The borrow amount should be subtracted rather than",
+      "**Mechanism:** `_getPositionTVL` from SiloConnector calculates wrongly the position's TVL thus affecting the share price at which shares are minted / redeemed from the protocol. **Mitigation:** In the for loop, after you got the share tokens balances with `balanceOf`: * convert all 3 share tokens balances to underlying token (eg. `underlyingTotalDeposits,",
+      "**Mechanism:** The [AerodromeConnector::stake](https://github.com/code-423n4/2024-04-noya/blob/9c79b332eff82011dcfa1e8fd51bad805159d758/contracts/connectors/AerodromeConnector.sol#L100) function allows to stake liquidity tokens to the gauge pool. However, the [AerodromeConnector::\\_getPositionTVL](https://github.com/code-423n4/2024-04-noya/blob/9c79b332eff82011dcfa1e8fd51bad805159d758/contracts/connectors/AerodromeConnector.sol#L125) function, which is responsible for calculating the Total Value Locked (TVL), does not take into account the liquidity tokens deposited in the gauge pool. This oversight will result in an incorrect calculation of the"
+    ]
+  },
+  {
+    "cluster_id": 49,
+    "size": 9,
+    "severity_dist": {
+      "H": 8,
+      "M": 1
+    },
+    "representative_titles": [
+      "Logic flaw in `check_can_edit_short` allows editing short-term rental before finalization enabling theft of users' deposited funds",
+      "Lack of validation in `setlistforsell` allows changing denom while there is active bid, leading to stealing of other users' funds",
+      "Insufficient price validation in `transfer_nft` function enables theft of listed tokens"
+    ],
+    "representative_bodies_first50w": [
+      "The landlord (property owner) invokes `finalizeshorttermrental` on a specific rental to settle the payment. If the rental is canceled after approval or has concluded (reached check-out time), the contract sends the payment to the token owner's address. The bug stems from an oversight in the function that checks whether a",
+      "The bug stems from a lack of validation in the `setlistforsell` function, which allows sellers to change the payment token (denom) even when there are active bids on a token. The `setbidtobuy` function, when used to cancel a bid, refunds the buyer using the current denom specified for the token:",
+      "Users can list their tokens for sale by calling `setlistosell` and specifying a price and payment token (denom). Buyers can then purchase the token by calling `setbidtobuy` and transferring the payment into the contract. The trade is finalized when `transfer_nft` is invoked and the recipient is the buyer. The caller"
+    ]
+  },
+  {
+    "cluster_id": 39,
+    "size": 8,
+    "severity_dist": {
+      "M": 5,
+      "H": 3
+    },
+    "representative_titles": [
+      "Collateral cannot be withdrawn from trove once yang is suspended",
+      "Attacker can lock every trove withdrawals",
+      "Neglect of exceptional redistribution amounts in `withdraw_helper` function"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Replace the accidental `assert_can_enter(..)` check with those that are really necessary at this point: ```diff diff --git a/src/core/sentinel.cairo b/src/core/sentinel.cairo index b18edde..9671ca2 100644 --- a/src/core/sentinel.cairo +++ b/src/core/sentinel.cairo @@ -156,7 +156,8 @@ mod sentinel { // This can be used to simulate the effects of `enter`. fn convert_to_yang(self: @ContractState, yang: ContractAddress,",
+      "During `withdraw`, the `convert_to_yang` function of sentinel is called. This function converts an asset amount to a Yang amount. `convert_to_yang` then calls `assert_can_enter` to ensure that `current_total + enter_amt <= max_amt`. This check is incorrect in the case of a withdrawal, as a subtraction should be made instead of an",
+      "The `withdraw_helper` function in the `shrine` contract handles withdrawal logic for both the `withdraw` and `seize` functions. It is responsible for updating trove balances, total yang balances, and charging interest for the trove via the `charge` function. However, there is an oversight in the current implementation: ```cairo fn withdraw_helper(ref self:"
+    ]
+  },
+  {
+    "cluster_id": 1,
+    "size": 6,
+    "severity_dist": {
+      "M": 6
+    },
+    "representative_titles": [
+      "`AirdropBroker`: When `block.timestamp == lastEpochUpdate + EPOCH_DURATION`, users can exercise options in the new epoch.",
+      "`lastRPS` could be set to `0` accidentally",
+      "`getPrice` `salesOption` 2 can round down to the lower barrier, skipping the last time period"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** It is recommended that exercise is not allowed when `block.timestamp == lastEpochUpdate + EPOCH_DURATION`. ```diff function exerciseOption(uint256 _aoTAPTokenID, ERC20 _paymentToken, uint256 _tapAmount) external whenNotPaused tapExists { // Load data (, AirdropTapOption memory aoTapOption) = aoTAP.attributes(_aoTAPTokenID); - if (aoTapOption.expiry < block.timestamp) revert OptionExpired(); + if (aoTapOption.expiry <= block.timestamp) revert OptionExpired();",
+      "**Mitigation:** `lastRPS` should not be updated when `rewardsPerSecond` is `0`: ```diff function _updateEmissions() internal { if (block.timestamp > endRewardTime()) { _massUpdatePools(); - lastRPS = rewardsPerSecond; + if (rewardsPerSecond != 0) { + lastRPS = rewardsPerSecond; + } rewardsPerSecond = 0; return; } setScheduledRewardsPerSecond(); } ```",
+      "**Mitigation:** A simple yet effective suggestion is to add `=` in the [if](https://github.com/code-423n4/2023-10-nextgen/blob/main/smart-contracts/MinterContract.sol#L553). ```diff - if (...) > tDiff){ + if (...) >= tDiff){ ```"
+    ]
+  },
+  {
+    "cluster_id": 0,
+    "size": 4,
+    "severity_dist": {
+      "H": 1,
+      "M": 3
+    },
+    "representative_titles": [
+      "Salt Rewards - Rewards related to Arbitrage profits for pools can be lost",
+      "Caller of Upkeep may skip step 11 to save gas",
+      "Some rewards from POL will not be send to team wallet nor burned"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Given the interdependencies between step 5 and step 7, a failure in step 5 due to a failed swap implies that step 7 should also not proceed because its calculations are dependent on the success of step 5. Appropriate logic should be added to handle this. **[othernet-global (Salty.IO) disputed",
+      "**Mechanism:** The user benefits from gas saved by not having to run step 11. Step 11 sends SALT from the team vesting wallet to the team; skipping this step this could cause issues for the team by not receiving expected SALT at each upkeep. **Mitigation:** Check that sufficient gas is",
+      "**Mitigation:** Two options: * Save the amount of rewards received when withdrawing some POL, so they can be distributed and burned. * Make the call to claim all the rewards at the beginning of `upkeep`. **[Picodes (Judge) commented](https://github.com/code-423n4/2024-01-salty-findings/issues/333#issuecomment-1956687912):** > This report shows how in some cases some rewards may end"
+    ]
+  },
+  {
+    "cluster_id": 46,
+    "size": 4,
+    "severity_dist": {
+      "H": 3,
+      "M": 1
+    },
+    "representative_titles": [
+      "Player can mint more fighter NFTs during claim of rewards by leveraging reentrancy on the `claimRewards() function`",
+      "Players have complete freedom to customize the fighter NFT when calling `redeemMintPass` and can redeem fighters of types Dendroid and with rare attributes",
+      "Fighters cannot be minted after the initial generation due to uninitialized `numElements` mapping"
+    ],
+    "representative_bodies_first50w": [
+      "**Mitigation:** Use a `nonReentrant` modifier for the `claimRewards` function. **[brandinho (AI Arena) confirmed](https://github.com/code-423n4/2024-02-ai-arena-findings/issues/37#issuecomment-1975461186)** **[AI Arena mitigated](https://github.com/code-423n4/2024-04-ai-arena-mitigation?tab=readme-ov-file#scope):** > https://github.com/ArenaX-Labs/2024-02-ai-arena-mitigation/pull/6 **Status:** Mitigation confirmed. Full details in reports from [niser93](https://github.com/code-423n4/2024-04-ai-arena-mitigation-findings/issues/28), [d3e4](https://github.com/code-423n4/2024-04-ai-arena-mitigation-findings/issues/47), and [fnanni](https://github.com/code-423n4/2024-04-ai-arena-mitigation-findings/issues/27). ***",
+      "**Mechanism:** This issue has two major impacts: * Players with valid mint passes can mint fighters of type Dendroid easily. * Players with valid mint passes can mint easily fighters with low rarity attributes which breaks the pseudo-randomness attributes generation aspect **Mitigation:** The main issue is that the mint pass",
+      "**Mitigation:** Allow the admin to update the `numElements` mapping when a new generation is created. **[raymondfam (lookout) commented](https://github.com/code-423n4/2024-02-ai-arena-findings/issues/45#issuecomment-1960006144):** > Missing `numElements[generation[fighterType]]` setter. **[brandinho (AI Arena) confirmed](https://github.com/code-423n4/2024-02-ai-arena-findings/issues/45#issuecomment-1984292251)** **[AI Arena mitigated](https://github.com/code-423n4/2024-04-ai-arena-mitigation?tab=readme-ov-file#scope):** > https://github.com/ArenaX-Labs/2024-02-ai-arena-mitigation/pull/7 **Status:** Mitigation confirmed. Full details in reports from [niser93](https://github.com/code-423n4/2024-04-ai-arena-mitigation-findings/issues/23), [d3e4](https://github.com/code-423n4/2024-04-ai-arena-mitigation-findings/issues/46), and [fnanni](https://github.com/code-423n4/2024-04-ai-arena-mitigation-findings/issues/26). ***"
+    ]
+  }
+]
