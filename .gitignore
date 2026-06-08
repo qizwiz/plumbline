@@ -6,3 +6,4 @@ states/
 out/
 cache/
 *.log
+corpus/c4/
