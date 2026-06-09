@@ -1,5 +1,6 @@
 {
   "shape": "PausedDistributorPricingAsymmetry",
+  "forge_root": "corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd",
   "tla_spec_path": "docs/tla/PausedDistributorPricingAsymmetry.tla",
   "invariant": "ShareValuePreserved",
   "target": {

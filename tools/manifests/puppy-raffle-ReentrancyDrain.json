@@ -1,5 +1,6 @@
 {
   "shape": "ReentrancyDrain",
+  "forge_root": "examples/puppy-raffle",
   "tla_spec_path": "docs/tla/ReentrancyDrain.tla",
   "invariant": "ClaimedAtMostOnce",
   "target": {
