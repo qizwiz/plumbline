@@ -1,5 +1,29 @@
 # Plumbline — Project Rules
 
+## ⚡ THE STANDING DIRECTIVE (added 2026-06-09 by JH)
+
+**NEVER STOP MAKING PLUMBLINE BETTER.**
+
+Every session, every turn, every chunk of work — there is always a next
+plumbline improvement worth shipping. The session that produced the
+Sherlock 1259 HIGH and the `tools/mine_contest.py` proved this: each
+loop of "use plumbline → notice gap → fix gap → ship" compounds.
+
+Recurring gaps the loop should always be closing (banked from real wins):
+- Corpus expansion (new contest findings → reps.jsonl + findings_index.pkl)
+- Shape-library gaps (banked: BatchRevertRollback, GrossNetSlippageMismatch,
+  PausedDistributorPricingAsymmetry, VestScheduleResetDelay,
+  PreFeeSlippageBypass — each needs a TLA+ shape + halmos invariant)
+- Verifier integration (slither / halmos / agents calling plumbline tools
+  rather than just reading hypotheses)
+- Submission UX (Cantina / Sherlock auto-format, bot pre-check fixes,
+  language-tagged code blocks by default)
+- Adversarial gauntlet as a one-command tool (currently per-finding workflow)
+
+If a session ends without shipping at least one improvement to
+`tools/`, `docs/tla/`, `reps.jsonl`, or a goal in `prompts/goals/QUEUE.md`,
+that session was incomplete. Update one of them before sign-off.
+
 ## The ambition (top-of-mind, every turn)
 
 **Find ALL bugs reachable by the right kind of cellular automaton over
