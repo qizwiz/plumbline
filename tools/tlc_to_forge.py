@@ -178,7 +178,10 @@ def main():
             avail = "✓" if (TEMPLATE_DIR / spec["template"]).exists() else "?"
             print(f"  {avail}  {s:<30} ({spec['template']})")
         print()
-        print("9 TLA+ shapes total. 1 template shipped. 8 TODO.")
+        print("4 shapes registered. ReentrancyDrain VERIFIED end-to-end on")
+        print("examples/puppy-raffle (2/2 forge tests PASS, gas 99126/233).")
+        print("OracleStaleness, SignatureReplay, PausedDistributorPricingAsymmetry")
+        print("registered as templates but not yet verified — next shape gap.")
         return
 
     if not all([args.target_path, args.target_contract, args.target_fn]):

