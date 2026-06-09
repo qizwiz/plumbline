@@ -124,7 +124,7 @@ def main():
             "weak_confirm_strength", "WEAK")
         if strength == "STRONG":
             high.append(rep_to_finding(rep, h_idx, "High")); h_idx += 1
-        elif (rep.get("score") or {}).get("recall") and (rep.get("score") or {}).get("recall", 0) > 0.5:
+        elif strength == "MEDIUM" or (rep.get("score") or {}).get("recall", 0) > 0.5:
             medium.append(rep_to_finding(rep, m_idx, "Medium")); m_idx += 1
         else:
             qa.append({

@@ -298,7 +298,19 @@ def render_report(slug: str, sponsor: str, target: str,
     high_idx = m_idx = 1
     with open(reps_jsonl, "w") as f:
         for lead in union:
-            severity = "High" if lead["confidence"] == "HIGH" else "Medium"
+            conf = lead.get("confidence", "NORMAL")
+            # "HIGH" = cascade CONFIRM → STRONG → H in Sherlock template
+            # "HIGH-static" / "MEDIUM-static" / "NORMAL" → MEDIUM → M
+            # "LOW-static" → WEAK → QA (dropped from Sherlock H/M template)
+            if conf == "HIGH":
+                severity = "High"
+                strength = "STRONG"
+            elif conf == "LOW-static":
+                severity = "Low"
+                strength = "WEAK"
+            else:
+                severity = "Medium"
+                strength = "MEDIUM"
             rep = {
                 "rep_id": f"contest-{slug}-{high_idx if severity=='High' else m_idx}",
                 "ts_ns": int(time.time() * 1e9),
@@ -307,7 +319,7 @@ def render_report(slug: str, sponsor: str, target: str,
                 "proposer": {"author": "plumbline"},
                 "plumbline_provenance": {
                     "matched_spec": lead.get("shape", ""),
-                    "weak_confirm_strength": "STRONG" if severity == "High" else "WEAK",
+                    "weak_confirm_strength": strength,
                     "tlc_trace_head": lead.get("why", ""),
                     "mitigation": "(see why field)",
                 },
