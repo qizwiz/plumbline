@@ -1,0 +1,189 @@
+'forge clean' running (wd: /__w/plumbline/plumbline/examples/boss-bridge)
+'forge config --json' running
+Warning: Found unknown `halmos` config for profile `default` defined in foundry.toml.
+'forge build --build-info --skip ./test/** ./script/** --force' running (wd: /__w/plumbline/plumbline/examples/boss-bridge)
+'forge' returned non-zero exit code 1
+Unable to resolve imports:
+stdout:       "../patched/token/ERC20/extensions/ERC20Wrapper.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20WrapperHarness.sol"
+stdout:       "../patched/utils/Pausable.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/PausableHarness.sol"
+stdout:       "../patched/interfaces/IERC3156FlashBorrower.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC3156FlashBorrowerHarness.sol"
+stdout:       "../patched/utils/structs/EnumerableSet.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/EnumerableSetHarness.sol"
+stdout:       "../patched/utils/structs/EnumerableMap.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/EnumerableMapHarness.sol"
+stdout:       "../patched/governance/TimelockController.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/TimelockControllerHarness.sol"
+stdout:       "../patched/token/ERC20/extensions/ERC20Permit.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20WrapperHarness.sol"
+stdout:       "../patched/utils/structs/DoubleEndedQueue.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/DoubleEndedQueueHarness.sol"
+stdout:       "../patched/token/ERC20/ERC20.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20FlashMintHarness.sol"
+stdout:       "../patched/token/ERC721/ERC721.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC721Harness.sol"
+stdout:       "../patched/proxy/utils/Initializable.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/InitializableHarness.sol"
+stdout:       "../patched/access/AccessControl.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/AccessControlHarness.sol"
+stdout:       "../patched/token/ERC20/extensions/ERC20Permit.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20FlashMintHarness.sol"
+stdout:       "../patched/access/extensions/AccessControlDefaultAdminRules.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/AccessControlDefaultAdminRulesHarness.sol"
+stdout:       "../patched/token/ERC20/extensions/ERC20Permit.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20PermitHarness.sol"
+stdout:       "../patched/interfaces/IERC721Receiver.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC721ReceiverHarness.sol"
+stdout:       "../patched/access/Ownable.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/OwnableHarness.sol"
+stdout:       "../patched/token/ERC20/extensions/ERC20FlashMint.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20FlashMintHarness.sol"
+stdout:       "../patched/access/Ownable2Step.sol" in "/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/Ownable2StepHarness.sol"
+stdout: with remappings:
+stdout:       @openzeppelin/=/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts/
+stdout:       forge-std/=/__w/plumbline/plumbline/examples/boss-bridge/lib/forge-std/src/
+stdout:       ds-test/=/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts/lib/forge-std/lib/ds-test/src/
+stdout:       erc4626-tests/=/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts/lib/erc4626-tests/
+stdout:       openzeppelin-contracts-upgradeable/=/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts-upgradeable/contracts/
+stdout:       openzeppelin-contracts/=/__w/plumbline/plumbline/examples/boss-bridge/lib/openzeppelin-contracts/contracts/
+stdout: Compiling 730 files with Solc 0.8.20
+stdout: Solc 0.8.20 finished in 401.02ms
+Warning: Found unknown `halmos` config for profile `default` defined in foundry.toml.
+stderr: Error: Compiler run failed:
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/extensions/AccessControlDefaultAdminRules.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/extensions/AccessControlDefaultAdminRules.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/AccessControlDefaultAdminRulesHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {AccessControlDefaultAdminRules} from "../patched/access/extensions/AccessControlDefaultAdminRules.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/AccessControl.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/AccessControl.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/AccessControlHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {AccessControl} from "../patched/access/AccessControl.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/structs/DoubleEndedQueue.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/structs/DoubleEndedQueue.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/DoubleEndedQueueHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {DoubleEndedQueue} from "../patched/utils/structs/DoubleEndedQueue.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20FlashMintHarness.sol:5:1:
+stderr:   |
+stderr: 5 | import "../patched/token/ERC20/ERC20.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Permit.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Permit.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20FlashMintHarness.sol:6:1:
+stderr:   |
+stderr: 6 | import "../patched/token/ERC20/extensions/ERC20Permit.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20FlashMint.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20FlashMint.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20FlashMintHarness.sol:7:1:
+stderr:   |
+stderr: 7 | import "../patched/token/ERC20/extensions/ERC20FlashMint.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Permit.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Permit.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20PermitHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {ERC20Permit, ERC20} from "../patched/token/ERC20/extensions/ERC20Permit.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Permit.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Permit.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20WrapperHarness.sol:5:1:
+stderr:   |
+stderr: 5 | import {ERC20Permit} from "../patched/token/ERC20/extensions/ERC20Permit.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Wrapper.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC20/extensions/ERC20Wrapper.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC20WrapperHarness.sol:6:1:
+stderr:   |
+stderr: 6 | import {ERC20Wrapper, IERC20, ERC20} from "../patched/token/ERC20/extensions/ERC20Wrapper.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/interfaces/IERC3156FlashBorrower.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/interfaces/IERC3156FlashBorrower.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC3156FlashBorrowerHarness.sol:3:1:
+stderr:   |
+stderr: 3 | import {IERC3156FlashBorrower} from "../patched/interfaces/IERC3156FlashBorrower.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC721/ERC721.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/token/ERC721/ERC721.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC721Harness.sol:5:1:
+stderr:   |
+stderr: 5 | import {ERC721} from "../patched/token/ERC721/ERC721.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/interfaces/IERC721Receiver.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/interfaces/IERC721Receiver.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/ERC721ReceiverHarness.sol:5:1:
+stderr:   |
+stderr: 5 | import "../patched/interfaces/IERC721Receiver.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/structs/EnumerableMap.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/structs/EnumerableMap.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/EnumerableMapHarness.sol:5:1:
+stderr:   |
+stderr: 5 | import {EnumerableMap} from "../patched/utils/structs/EnumerableMap.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/structs/EnumerableSet.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/structs/EnumerableSet.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/EnumerableSetHarness.sol:5:1:
+stderr:   |
+stderr: 5 | import {EnumerableSet} from "../patched/utils/structs/EnumerableSet.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/proxy/utils/Initializable.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/proxy/utils/Initializable.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/InitializableHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {Initializable} from "../patched/proxy/utils/Initializable.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/Ownable2Step.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/Ownable2Step.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/Ownable2StepHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {Ownable2Step, Ownable} from "../patched/access/Ownable2Step.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/Ownable.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/access/Ownable.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/OwnableHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {Ownable} from "../patched/access/Ownable.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/Pausable.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/utils/Pausable.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/PausableHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {Pausable} from "../patched/utils/Pausable.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+stderr: 
+stderr: Error (6275): Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/governance/TimelockController.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr: ParserError: Source "lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/patched/governance/TimelockController.sol" not found: File not found. Searched the following locations: "/__w/plumbline/plumbline/examples/boss-bridge".
+stderr:  --> lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/harnesses/TimelockControllerHarness.sol:4:1:
+stderr:   |
+stderr: 4 | import {TimelockController} from "../patched/governance/TimelockController.sol";
+stderr:   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Traceback (most recent call last):
+  File "/root/.crytic/bin/slither", line 8, in <module>
+    sys.exit(main())
+  File "/root/.crytic/lib/python3.10/site-packages/slither/__main__.py", line 760, in main
+    main_impl(all_detector_classes=detectors, all_printer_classes=printers)
+  File "/root/.crytic/lib/python3.10/site-packages/slither/__main__.py", line 865, in main_impl
+    ) = process_all(filename, args, detector_classes, printer_classes)
+  File "/root/.crytic/lib/python3.10/site-packages/slither/__main__.py", line 95, in process_all
+    compilations = compile_all(target, **vars(args))
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/crytic_compile.py", line 722, in compile_all
+    compilations.append(CryticCompile(target, **kwargs))
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/crytic_compile.py", line 211, in __init__
+    self._compile(**kwargs)
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/crytic_compile.py", line 633, in _compile
+    self._platform.compile(self, **kwargs)
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/platform/foundry.py", line 102, in compile
+    hardhat_like_parsing(
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/platform/hardhat.py", line 52, in hardhat_like_parsing
+    raise InvalidCompilation(txt)
+crytic_compile.platform.exceptions.InvalidCompilation: Compilation failed. Can you run build command?
+/__w/plumbline/plumbline/examples/boss-bridge/out/build-info is not a directory.

@@ -1,0 +1,42 @@
+'forge clean' running (wd: /__w/plumbline/plumbline/examples/puppy-raffle)
+'forge config --json' running
+Warning: Found unknown `halmos` config for profile `default` defined in foundry.toml.
+'forge build --build-info --skip ./test/** ./script/** --force' running (wd: /__w/plumbline/plumbline/examples/puppy-raffle)
+'forge' returned non-zero exit code 1
+Unable to resolve imports:
+stdout:       "lib/base64/base64.sol" in "/__w/plumbline/plumbline/examples/puppy-raffle/src/PuppyRaffle.sol"
+stdout: with remappings:
+stdout:       @openzeppelin/=/__w/plumbline/plumbline/examples/puppy-raffle/lib/openzeppelin-contracts/
+stdout:       lib/base64/=/__w/plumbline/plumbline/examples/puppy-raffle/lib/base64/
+stdout:       forge-std/=/__w/plumbline/plumbline/examples/puppy-raffle/lib/forge-std/src/
+stdout:       openzeppelin-contracts/=/__w/plumbline/plumbline/examples/puppy-raffle/lib/openzeppelin-contracts/contracts/
+stdout: Compiling 15 files with Solc 0.7.6
+stdout: Solc 0.7.6 finished in 6.32ms
+Warning: Found unknown `halmos` config for profile `default` defined in foundry.toml.
+stderr: [2m2026-06-07T00:26:59.693171Z[0m [31mERROR[0m [2mfoundry_compilers_artifacts_solc::sources[0m[2m:[0m [3merror[0m[2m=[0m"/__w/plumbline/plumbline/examples/puppy-raffle/lib/base64/base64.sol": No such file or directory (os error 2)
+stderr: Error: Compiler run failed:
+stderr: Error (6275): Source "lib/base64/base64.sol" not found: File not found.
+stderr: src/PuppyRaffle.sol:7:1: ParserError: Source "lib/base64/base64.sol" not found: File not found.
+stderr: import {Base64} from "lib/base64/base64.sol";
+stderr: ^-------------------------------------------^
+Traceback (most recent call last):
+  File "/root/.crytic/bin/slither", line 8, in <module>
+    sys.exit(main())
+  File "/root/.crytic/lib/python3.10/site-packages/slither/__main__.py", line 760, in main
+    main_impl(all_detector_classes=detectors, all_printer_classes=printers)
+  File "/root/.crytic/lib/python3.10/site-packages/slither/__main__.py", line 865, in main_impl
+    ) = process_all(filename, args, detector_classes, printer_classes)
+  File "/root/.crytic/lib/python3.10/site-packages/slither/__main__.py", line 95, in process_all
+    compilations = compile_all(target, **vars(args))
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/crytic_compile.py", line 722, in compile_all
+    compilations.append(CryticCompile(target, **kwargs))
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/crytic_compile.py", line 211, in __init__
+    self._compile(**kwargs)
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/crytic_compile.py", line 633, in _compile
+    self._platform.compile(self, **kwargs)
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/platform/foundry.py", line 102, in compile
+    hardhat_like_parsing(
+  File "/root/.crytic/lib/python3.10/site-packages/crytic_compile/platform/hardhat.py", line 52, in hardhat_like_parsing
+    raise InvalidCompilation(txt)
+crytic_compile.platform.exceptions.InvalidCompilation: Compilation failed. Can you run build command?
+/__w/plumbline/plumbline/examples/puppy-raffle/out/build-info is not a directory.
