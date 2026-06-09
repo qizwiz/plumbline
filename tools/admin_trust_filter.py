@@ -59,6 +59,9 @@ _CONSTRUCTOR_SET = re.compile(
 _ADMIN_SETTER = re.compile(
     r'function\s+set\w+\s*\(.*?address.*?\).*?only\w+.*?\{[^}]*\}', re.S | re.I)
 
+# ── view/pure function detection ─────────────────────────────────────────────
+_VIEW_PURE = re.compile(r'\b(view|pure)\b', re.I)
+
 
 # ── Solidity parsing utilities ───────────────────────────────────────────────
 
@@ -123,25 +126,25 @@ def _immutable_addresses(sol_text: str) -> set[str]:
 
 # ── per-function trust check ─────────────────────────────────────────────────
 
-def _check_function(func_text: str, sol_text: str) -> tuple[bool, str]:
-    """Return (is_admin_trust, reason) for a function."""
+def _check_function(func_text: str, sol_text: str) -> tuple[bool, str, str]:
+    """Return (is_filtered, tag, reason). tag is 'admin-trust' or 'view-fn'."""
     header = _function_header(func_text)
     body = _function_body(func_text)
 
     # Check 1: explicit modifier
     mod_match = _ADMIN_TRUST_MODS.search(header)
     if mod_match:
-        return True, f"modifier {mod_match.group(1)}"
+        return True, "admin-trust", f"modifier {mod_match.group(1)}"
 
     # Check 2: inline require/revert guard
     rq = _REQUIRE_SENDER.search(body)
     if rq:
-        return True, f"require(msg.sender == {rq.group(1)})"
+        return True, "admin-trust", f"require(msg.sender == {rq.group(1)})"
     rv = _IF_REVERT_SENDER.search(body)
     if rv:
-        return True, f"if(msg.sender != {rv.group(1)}) revert"
+        return True, "admin-trust", f"if(msg.sender != {rv.group(1)}) revert"
     if _CHECK_OWNER.search(body):
-        return True, "_checkOwner() / _onlyAdmin() guard"
+        return True, "admin-trust", "_checkOwner() / _onlyAdmin() guard"
 
     # Check 3: all external calls target admin-set addresses
     admin_vars = _admin_set_addresses(sol_text)
@@ -149,9 +152,14 @@ def _check_function(func_text: str, sol_text: str) -> tuple[bool, str]:
     if external_calls:
         targets = {c[0] for c in external_calls}
         if targets and targets.issubset(admin_vars):
-            return True, f"calls only admin-set address(es): {', '.join(sorted(targets))}"
+            return True, "admin-trust", f"calls only admin-set address(es): {', '.join(sorted(targets))}"
 
-    return False, ""
+    # Check 4: view/pure function — not state-changing; H/M value-loss bugs
+    # require a state mutation path. View/pure leads are typically Low/Info.
+    if _VIEW_PURE.search(header):
+        return True, "view-fn", "view/pure — not state-changing (typically Low/Info scope)"
+
+    return False, "", ""
 
 
 # ── file discovery ────────────────────────────────────────────────────────────
@@ -232,10 +240,10 @@ def filter_leads(leads: list[dict], scope_dir: Path,
             filtered.append(lead)
             continue
 
-        is_trust, reason = _check_function(func_text, sol_text)
-        if is_trust:
+        is_filtered, tag, reason = _check_function(func_text, sol_text)
+        if is_filtered:
             out = dict(lead)
-            out["confidence"] = "REVIEW:admin-trust"
+            out["confidence"] = f"REVIEW:{tag}"
             out["admin_trust_reason"] = reason
             filtered.append(out)
             rejected.append(out)

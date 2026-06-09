@@ -400,21 +400,25 @@ def main():
           file=sys.stderr)
     print(f"UNION (dedup): {len(union)} total\n", file=sys.stderr)
 
-    # Admin-trust filter
+    # Admin-trust + view-fn filter
     filtered, rejected = _admin_filter(union, scope, no_filter=args.no_filter)
+    n_admin_trust = sum(1 for r in rejected if r.get("confidence") == "REVIEW:admin-trust")
+    n_view_fn = sum(1 for r in rejected if r.get("confidence") == "REVIEW:view-fn")
     if rejected:
-        print(f"ADMIN-TRUST FILTER: {len(rejected)} leads downgraded to REVIEW "
-              f"({len(filtered) - len(rejected)} survivors)\n", file=sys.stderr)
-        print("=== REJECTED — admin-trust scope (verify filter isn't too aggressive) ===",
+        print(f"NOISE FILTER: {len(rejected)} leads downgraded to REVIEW "
+              f"(admin-trust={n_admin_trust}, view-fn={n_view_fn}) "
+              f"→ {len(union) - len(rejected)} survive\n", file=sys.stderr)
+        print("=== REJECTED — noise filter (verify filter isn't too aggressive) ===",
               file=sys.stderr)
         for r in rejected:
             loc = r.get("location", "?")
             reason = r.get("admin_trust_reason", "?")
+            tag = r.get("confidence", "REVIEW:?")
             claim = (r.get("claim") or r.get("raw", "?"))[:80]
-            print(f"  • {loc}: {claim}  [{reason}]", file=sys.stderr)
+            print(f"  • [{tag}] {loc}: {claim}  [{reason}]", file=sys.stderr)
         print("", file=sys.stderr)
     else:
-        print(f"ADMIN-TRUST FILTER: 0 leads downgraded (all {len(filtered)} survive)\n",
+        print(f"NOISE FILTER: 0 leads downgraded (all {len(filtered)} survive)\n",
               file=sys.stderr)
 
     # Adversarial verify — post-process HIGH-confidence CONFIRMs
@@ -456,27 +460,33 @@ def main():
     reps = render_report(args.slug, args.sponsor, args.target, report_leads, report_out)
     elapsed = int(time.time() - t_start)
 
+    def _rel(p: Path) -> str:
+        try:
+            return str(p.relative_to(HERE))
+        except ValueError:
+            return str(p)
+
     n_review = len(rejected) + len(adv_rejected)
     print(f"\n=== DONE in {elapsed}s ===", file=sys.stderr)
-    print(f"  cascade-grounded:  {cascade_out.relative_to(HERE)}  ({t_cascade}s)",
+    print(f"  cascade-grounded:  {_rel(cascade_out)}  ({t_cascade}s)",
           file=sys.stderr)
-    print(f"  slither:           {slither_out.relative_to(HERE)}  "
+    print(f"  slither:           {_rel(slither_out)}  "
           f"({t_slither}s, {n_slither} detectors)",
           file=sys.stderr)
-    print(f"  baseline-leads:    {baseline_out.relative_to(HERE)}  ({t_baseline}s)",
+    print(f"  baseline-leads:    {_rel(baseline_out)}  ({t_baseline}s)",
           file=sys.stderr)
-    print(f"  union-leads.json:  {union_out.relative_to(HERE)}", file=sys.stderr)
-    print(f"  filtered-leads:    {filtered_out.relative_to(HERE)}  "
+    print(f"  union-leads.json:  {_rel(union_out)}", file=sys.stderr)
+    print(f"  filtered-leads:    {_rel(filtered_out)}  "
           f"({len(report_leads)} actionable + {n_review} REVIEW)",
           file=sys.stderr)
-    print(f"  report:            {report_out.relative_to(HERE)}", file=sys.stderr)
+    print(f"  report:            {_rel(report_out)}", file=sys.stderr)
     if args.target == "sherlock":
         pdf_name = (f"{__import__('datetime').date.today().strftime('%Y.%m.%d')}"
                     f" - Final - {args.sponsor} Audit Report.pdf")
-        print(f"\nNEXT: convert to PDF:\n  pandoc {report_out.relative_to(HERE)} "
+        print(f"\nNEXT: convert to PDF:\n  pandoc {_rel(report_out)} "
               f"--pdf-engine=xelatex -o '{pdf_name}'", file=sys.stderr)
     print(f"\nTRIAGE: start with HIGH-confidence cascade verdicts in "
-          f"{union_out.relative_to(HERE)}", file=sys.stderr)
+          f"{_rel(union_out)}", file=sys.stderr)
 
 
 if __name__ == "__main__":
