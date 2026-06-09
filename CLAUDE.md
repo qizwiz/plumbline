@@ -1,28 +1,35 @@
 # Plumbline — Project Rules
 
-## ⚡ THE STANDING DIRECTIVE (added 2026-06-09 by JH)
+## ⚡ THE STANDING DIRECTIVE (REPLACED 2026-06-09 — SUPERSEDES the "never stop building" directive)
 
-**NEVER STOP MAKING PLUMBLINE BETTER.**
+**FINISH BEFORE BUILDING. NO NEW PROJECTS UNTIL 2026-06-27.**
 
-Every session, every turn, every chunk of work — there is always a next
-plumbline improvement worth shipping. The session that produced the
-Sherlock 1259 HIGH and the `tools/mine_contest.py` proved this: each
-loop of "use plumbline → notice gap → fix gap → ship" compounds.
+The previous standing directive was "NEVER STOP MAKING PLUMBLINE BETTER."
+On 2026-06-09 we recognized that directive AS the avoidance pattern: it
+rewards starting new architecture instead of finishing what's already
+started. Three Sherlock submissions filed but never converted to revenue,
+188 dirs in ~/src, $236.44/month in Anthropic API for autonomous loops
+that produced no shipped output, financial collections.
 
-Recurring gaps the loop should always be closing (banked from real wins):
-- Corpus expansion (new contest findings → reps.jsonl + findings_index.pkl)
-- Shape-library gaps (banked: BatchRevertRollback, GrossNetSlippageMismatch,
-  PausedDistributorPricingAsymmetry, VestScheduleResetDelay,
-  PreFeeSlippageBypass — each needs a TLA+ shape + halmos invariant)
-- Verifier integration (slither / halmos / agents calling plumbline tools
-  rather than just reading hypotheses)
-- Submission UX (Cantina / Sherlock auto-format, bot pre-check fixes,
-  language-tagged code blocks by default)
-- Adversarial gauntlet as a one-command tool (currently per-finding workflow)
+The replacement directive, in force until 2026-06-27:
 
-If a session ends without shipping at least one improvement to
-`tools/`, `docs/tla/`, `reps.jsonl`, or a goal in `prompts/goals/QUEUE.md`,
-that session was incomplete. Update one of them before sign-off.
+**Read `CURRICULUM.md` FIRST every session.** The 18-day plan is:
+1. Week 1 (now → 2026-06-15): finish + post an arXiv writeup of plumbline
+2. Week 2 (→ 2026-06-22): complete Cyfrin Updraft
+3. Week 3 (→ 2026-06-27): wait for Sherlock 1259 judging; sit still
+
+**Hard rules enforced by you (Claude) on every session:**
+- No new project directories under `~/src/` until 2026-06-27
+- No refactors of plumbline that aren't required for the arXiv writeup
+- No new TLA+ shapes, new manifests, new tools, new agent loops
+- Autonomous loop stays permanently off
+- No autopay re-enable on Anthropic
+- If JH says "let's just build X real quick" — the answer is **no**.
+  Point him at `CURRICULUM.md` and the current week's task.
+
+If JH is in a fragile state and pushing for new architecture as escape:
+your job is to NOT help him escape. Hold the line. The pattern only breaks
+if one finishable thing actually finishes.
 
 ## Foundry vm.prank footgun (learned 2026-06-09, cost ~30 min)
 
