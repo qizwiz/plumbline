@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# plumbline pre-commit hook
+#
+# Enforces: any tools/manifests/*.json that's STAGED must pass
+# tools/manifest_lint.py static checks. We do NOT run --run here
+# because forge can take minutes; --run is for CI / manifest_lint
+# direct invocation, not the pre-commit fast path.
+#
+# Install once via:
+#   git config core.hooksPath .githooks
+#
+# Bypass (RARE, use a real justification):
+#   git commit --no-verify
+#
+# What gets checked:
+#   - JSON parse OK
+#   - required fields (shape, target, blocks)
+#   - no bare-vm.prank-followed-by-nested-call (the M-1 footgun)
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+# Find staged manifests.
+staged_manifests=$(git diff --cached --name-only --diff-filter=ACMR | grep '^tools/manifests/.*\.json$' || true)
+
+if [ -z "$staged_manifests" ]; then
+  exit 0
+fi
+
+echo "pre-commit: linting $(echo "$staged_manifests" | wc -l | tr -d ' ') manifest(s)..."
+
+fail=0
+for m in $staged_manifests; do
+  out=$(python3 tools/manifest_lint.py --manifest "$m" 2>&1)
+  echo "$out"
+  # Warnings (e.g. vm.prank consumption) count as failures in the hook,
+  # even though manifest_lint exits 0 on warnings. Rationale: a warned
+  # manifest will fail forge at the next CI run, and we'd rather catch
+  # the design defect at commit time.
+  if echo "$out" | grep -qE "ERROR:|WARN:"; then
+    fail=1
+  fi
+done
+
+if [ "$fail" -ne 0 ]; then
+  echo ""
+  echo "pre-commit: manifest_lint flagged ERROR or WARN."
+  echo "  fix the manifest, re-stage, and re-commit"
+  echo "  bypass (rare):  git commit --no-verify"
+  exit 1
+fi
+
+# Also check: do any committed manifests reference TODO placeholders?
+# That's an authoring leak.
+for m in $staged_manifests; do
+  if grep -q "TODO_INVARIANT_NAME\|paste TLC counterexample\|TODO_" "$m"; then
+    echo ""
+    echo "pre-commit: $m contains TODO_ placeholders from manifest_from_poc."
+    echo "  fill them in before committing (see tools/manifests/_README.md)"
+    exit 1
+  fi
+done
+
+echo "pre-commit: manifest_lint OK"
