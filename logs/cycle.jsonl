@@ -1,3 +1,4 @@
 {"ts": "2026-06-08T18:08:54Z", "goal": "CONTEST_DAY_HARDENING", "outcome": "in-progress", "commit": "pending", "note": "admin_trust_filter.py built; wired into contest_day.py; criterion #2 complete"}
 {"ts": "2026-06-08T18:09:13Z", "goal": "CONTEST_DAY_HARDENING", "outcome": "in-progress", "commit": "3ebc268", "note": "admin_trust_filter.py built; wired into contest_day.py; criterion #2 complete"}
 2026-06-08T23:13:48Z goal=SHAPE_GRAPH_EVOLVE outcome=done commit=b57d19b
+{"ts": "2026-06-09T00:19:35Z", "goal": "CONTEST_DAY_HARDENING", "outcome": "in-progress", "commit": "9cadbff", "note": "criterion #8 cascade-layer: DRE source committed, 12→3 survivors, fillWithdrawal+initialize false positives caught; adversarial_verify 2 fixes (func_name==initialize trigger + PROXY_INIT_RE encodeWithSelector)"}
