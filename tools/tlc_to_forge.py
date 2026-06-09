@@ -79,6 +79,19 @@ SHAPE_TEMPLATES = {
             "// paid_at[a1]=2 > FRESHNESS=1"
         ),
     },
+    "PausedDistributorPricingAsymmetry": {
+        "template": "PausedDistributorPricingAsymmetry.t.sol.template",
+        "invariant": "ShareValuePreserved",
+        "default_trace_head": (
+            "// State 1: virtualBalance=100, Alice=50 shares, Bob=50 shares\n"
+            "// State 2: AddRewards → rewardsRemaining=100, vestEnd=7\n"
+            "// State 3: Tick → time=1 (vested ~14)\n"
+            "// State 4: PauseDistributor → pause active\n"
+            "// State 5: Alice withdraws → gets 57 dreUSD, virtualBalance=43\n"
+            "// State 6: Bob withdraws → REVERTS, pauseFundsLost=14  ← INVARIANT VIOLATED\n"
+            "// Bug: paused distributor + unpaused vault creates pricing asymmetry"
+        ),
+    },
     # TODO: ERC4337StaticSigDoS, Uint64FeeOverflow, Create2NonIdempotent,
     #       PartialSignatureReplay, CrossWalletSigReplay,
     #       FlagBypassesValidationChain, ArbitraryFromApprovalTheft.
