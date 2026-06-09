@@ -137,7 +137,7 @@ When opening Claude in any plumbline-related session:
 
 | Date | Day | Worked on | Outcome | Notes |
 |------|-----|-----------|---------|-------|
-| 2026-06-09 | 1 | Stop the bleed: 4 cron loops killed, autopay off, curriculum written | DONE | Anthropic balance −$2.84; routines + GHA workflows disabled; 1 hour clean |
+| 2026-06-09 | 1 | (a) Stop the bleed: 4 cron loops killed, autopay off, curriculum written. (b) arXiv Section 1 motivation, 5 paragraphs (~900 words) via interview mode. (c) Section 7 future-work note capturing the computational-material program. | DONE — exceeded Day 1 target | Bleed: Anthropic balance −$2.84; routines + GHA workflows disabled. Writeup: structural hypothesis → computational material → trust question → tool → division of labor. JH directed shapes; Claude transcribed; JH on mobile in interview mode. Commits: 8167633, 1dc52ee, 0f26be8. |
 
 ---
 
