@@ -85,11 +85,12 @@ def fill_template(manifest: dict) -> str:
         "TLA_SPEC_PATH": manifest.get("tla_spec_path", ""),
         "INVARIANT_NAME": manifest["invariant"],
         "TLC_TRACE_HEAD_COMMENT": emit_tlc_trace_comment(manifest.get("tlc_trace_head", [])),
-        "ATTACKER_CONTRACT_BLOCK": emit_attacker_contract(manifest.get("attacker_contract", {})),
+        "ATTACKER_CONTRACT_BLOCK": emit_attacker_contract(manifest.get("attacker_contract") or {}),
         "STATE_VAR_BLOCK": indent_lines(manifest.get("state_vars", []), spaces=4),
         "SETUP_BLOCK": indent_lines(manifest["setup_block"]),
         "TRACE_REPLAY_BLOCK": indent_lines(manifest["trace_replay_block"]),
         "INVARIANT_ASSERT_BLOCK": indent_lines(manifest["invariant_assert_block"]),
+        "EXTRA_IMPORTS": "\n".join(manifest.get("extra_imports", [])),
     }
     for k, v in substitutions.items():
         template = template.replace("{{" + k + "}}", str(v))

@@ -20,6 +20,7 @@ pragma abicoder v2;
 
 import {Test} from "forge-std/Test.sol";
 import {{{TARGET_CONTRACT}}} from "{{TARGET_PATH}}";
+{{EXTRA_IMPORTS}}
 
 {{ATTACKER_CONTRACT_BLOCK}}
 

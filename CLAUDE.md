@@ -24,6 +24,27 @@ If a session ends without shipping at least one improvement to
 `tools/`, `docs/tla/`, `reps.jsonl`, or a goal in `prompts/goals/QUEUE.md`,
 that session was incomplete. Update one of them before sign-off.
 
+## Foundry vm.prank footgun (learned 2026-06-09, cost ~30 min)
+
+`vm.prank(X)` pranks only the **next external call**. If the next statement
+contains an argument expression that ITSELF makes a call (e.g.
+`victim.redeem(victim.balanceOf(alice), alice, alice)`), then
+`victim.balanceOf(alice)` consumes the prank and `victim.redeem(...)` runs
+from the test contract instead of alice.
+
+Symptom: `ERC20InsufficientAllowance(testContract, 0, amount)` — looks like
+an allowance bug, is actually a prank-consumption bug.
+
+Fix patterns:
+1. Cache the inner call first: `uint256 b = victim.balanceOf(alice); vm.prank(alice); victim.redeem(b, alice, alice);`
+2. Use `vm.startPrank(alice); ... vm.stopPrank();` to prank everything in the block.
+
+Same applies to setup blocks where `vm.prank(alice); asset.approve(...); victim.deposit(...);`
+only pranks the approve — the deposit runs unpranked. Always use
+`vm.startPrank`/`vm.stopPrank` pairs for multi-call user actions.
+
+Universal template manifests now have this in their setUp by convention.
+
 ## The ambition (top-of-mind, every turn)
 
 **Find ALL bugs reachable by the right kind of cellular automaton over

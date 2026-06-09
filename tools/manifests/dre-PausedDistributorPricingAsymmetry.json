@@ -1,0 +1,84 @@
+{
+  "shape": "PausedDistributorPricingAsymmetry",
+  "tla_spec_path": "docs/tla/PausedDistributorPricingAsymmetry.tla",
+  "invariant": "ShareValuePreserved",
+  "target": {
+    "path": "../contracts/dreUSDs.sol",
+    "contract": "dreUSDs",
+    "target_fn": "redeem",
+    "pragma": "0.8.28"
+  },
+  "state_vars": [
+    "dreUSD public asset;",
+    "dreRewardsDistributor public dist;",
+    "address public admin = makeAddr(\"admin\");",
+    "address public upgrader = makeAddr(\"upgrader\");",
+    "address public guardian = makeAddr(\"guardian\");",
+    "address public alice = makeAddr(\"alice\");",
+    "address public bob = makeAddr(\"bob\");"
+  ],
+  "attacker_contract": null,
+  "setup_block": [
+    "EndpointV2Mock endpoint = new EndpointV2Mock();",
+    "dreUSD assetImpl = new dreUSD(address(endpoint));",
+    "asset = dreUSD(address(new ERC1967Proxy(address(assetImpl),",
+    "    abi.encodeWithSelector(dreUSD.initialize.selector, admin, upgrader, guardian))));",
+    "dreUSDs vaultImpl = new dreUSDs();",
+    "victim = dreUSDs(address(new ERC1967Proxy(address(vaultImpl),",
+    "    abi.encodeWithSelector(dreUSDs.initialize.selector, IERC20(address(asset)), admin))));",
+    "dreRewardsDistributor distImpl = new dreRewardsDistributor(address(asset), address(victim));",
+    "dist = dreRewardsDistributor(address(new ERC1967Proxy(address(distImpl),",
+    "    abi.encodeWithSelector(dreRewardsDistributor.initialize.selector, admin, admin, admin))));",
+    "vm.prank(admin); victim.setRewardsDistributor(address(dist));",
+    "bytes32 modRole = dist.MODERATOR_ROLE();",
+    "vm.prank(admin); dist.grantRole(modRole, admin);",
+    "vm.prank(admin); asset.setDreUSDManager(address(this));",
+    "asset.mint(alice, 50 ether); asset.mint(bob, 50 ether);",
+    "vm.startPrank(alice); asset.approve(address(victim), type(uint256).max); victim.deposit(50 ether, alice); vm.stopPrank();",
+    "vm.startPrank(bob);   asset.approve(address(victim), type(uint256).max); victim.deposit(50 ether, bob);   vm.stopPrank();"
+  ],
+  "trace_replay_block": [
+    "// State 1→2: AddRewards (100 dreUSD over 7 days)",
+    "asset.mint(address(dist), 100 ether);",
+    "vm.prank(admin); dist.addRewards();",
+    "// State 2→3: Tick (advance to T+3.5d)",
+    "vm.warp(block.timestamp + 3.5 days);",
+    "// State 3→4: PauseDistributor",
+    "vm.prank(admin); dist.pause();",
+    "assertGt(dist.vestedAmount(), 0);",
+    "assertEq(victim.totalAssets(), 150 ether);",
+    "// State 4→5: UserWithdraw(alice) — succeeds at inflated price",
+    "uint256 aliceShares = victim.balanceOf(alice);",
+    "vm.prank(alice);",
+    "uint256 aliceRecovered = victim.redeem(aliceShares, alice, alice);",
+    "emit log_named_decimal_uint(\"Alice recovered:\", aliceRecovered, 18);",
+    "assertGt(aliceRecovered, 50 ether);",
+    "// State 5→6: UserWithdraw(bob) — REVERTS, pauseFundsLost > 0",
+    "uint256 bobShares = victim.balanceOf(bob);",
+    "vm.prank(bob);",
+    "vm.expectRevert();",
+    "victim.redeem(bobShares, bob, bob);"
+  ],
+  "invariant_assert_block": [
+    "// ShareValuePreserved: pauseFundsLost must equal 0",
+    "// In the bug state, Bob's full redeem reverted -- pauseFundsLost > 0",
+    "// proves the invariant is violated.",
+    "emit log(\"ShareValuePreserved VIOLATED: Bob redeem reverted with non-zero pauseFundsLost\");",
+    "emit log(\"M-1 reproduced via universal template + manifest\");"
+  ],
+  "tlc_trace_head": [
+    "State 1: virtualBalance=100, Alice=50 shares, Bob=50 shares",
+    "State 2: AddRewards → rewardsRemaining=100, vestEnd=7",
+    "State 3: Tick → time=1 (vested ~14)",
+    "State 4: PauseDistributor → pause active",
+    "State 5: Alice withdraws → gets 57 dreUSD, virtualBalance=43",
+    "State 6: Bob withdraws → REVERTS, pauseFundsLost=14"
+  ],
+  "extra_imports": [
+    "import {ERC1967Proxy} from \"@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol\";",
+    "import {IERC20} from \"@openzeppelin/contracts/token/ERC20/IERC20.sol\";",
+    "import {dreUSD} from \"../contracts/dreUSD.sol\";",
+    "import {dreRewardsDistributor} from \"../contracts/dreRewardsDistributor.sol\";",
+    "import {EndpointV2Mock} from \"../contracts/mocks/EndpointV2Mock.sol\";"
+  ]
+}
