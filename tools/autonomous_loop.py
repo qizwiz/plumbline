@@ -107,7 +107,7 @@ def parse_queue() -> list[dict]:
     if not os.path.isfile(QUEUE_PATH):
         return rows
     for ln in open(QUEUE_PATH):
-        m = re.match(r"^\|\s*(\d+)\s*\|\s*([^|]+?)\s*\|\s*\$?([\d.]+)\s*\|\s*([\w-]+)\s*\|\s*([^|]*)\|", ln)
+        m = re.match(r"^\|\s*(-?\d+)\s*\|\s*([^|]+?)\s*\|\s*\$?([\d.]+)\s*\|\s*([\w-]+)\s*\|\s*([^|]*)\|", ln)
         if m:
             rows.append({
                 "rank": int(m.group(1)),
@@ -133,7 +133,7 @@ def update_status(goal_name: str, new_status: str):
     text = open(QUEUE_PATH).read()
     # Match: | rank | goal | $cost | OLD_STATUS | ...
     pat = re.compile(
-        rf"(\|\s*\d+\s*\|\s*{re.escape(goal_name)}\s*\|\s*\$?[\d.]+\s*\|\s*)[\w-]+(\s*\|)")
+        rf"(\|\s*-?\d+\s*\|\s*{re.escape(goal_name)}\s*\|\s*\$?[\d.]+\s*\|\s*)[\w-]+(\s*\|)")
     new_text = pat.sub(rf"\g<1>{new_status}\g<2>", text, count=1)
     open(QUEUE_PATH, "w").write(new_text)
 
@@ -153,6 +153,14 @@ def goal_body(goal_name: str) -> str | None:
     # since CORPUS_GROWTH is the goal template; S-3 selects the shape
     if goal_name.startswith("CORPUS_GROWTH"):
         candidates.append(os.path.join(GOAL_DIR, "CORPUS_GROWTH.goal.md"))
+    # Same pattern: "MANIFEST_SHIP <X>" → MANIFEST_SHIP.goal.md
+    # The X selects which banked PoC to ship; the executor reads its own
+    # QUEUE row to know.
+    if goal_name.startswith("MANIFEST_SHIP"):
+        candidates.append(os.path.join(GOAL_DIR, "MANIFEST_SHIP.goal.md"))
+    # Same pattern: "AUTHOR_TLA_SHAPE <X>" → AUTHOR_TLA_SHAPE.goal.md
+    if goal_name.startswith("AUTHOR_TLA_SHAPE"):
+        candidates.append(os.path.join(GOAL_DIR, "AUTHOR_TLA_SHAPE.goal.md"))
     for c in candidates:
         if os.path.isfile(c):
             text = open(c).read()
