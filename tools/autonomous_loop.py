@@ -249,10 +249,23 @@ def _exec_tool(name: str, args: dict) -> str:
         return "\n".join(sorted(os.listdir(p))[:200])
     if name == "run_bash":
         cmd = args.get("cmd", "")
-        # Refuse dangerous patterns
-        if any(x in cmd for x in ["rm -rf /", "git push --force",
-                                  ":(){:|:&};:", "dd if=", "mkfs"]):
-            return "ERROR: refused dangerous command"
+        # Refuse dangerous patterns.
+        # Destructive-git block added 2026-06-09 after the FirstDepositorInflation
+        # cycle clobbered session work via pull --rebase + reset --hard origin/main.
+        DESTRUCTIVE = [
+            "rm -rf /", ":(){:|:&};:", "dd if=", "mkfs",
+            "git push --force", "git push -f ",
+            "git pull --rebase",       # if push conflicts: STOP, don't auto-recover
+            "git reset --hard origin", # destroys local commits
+            "git reset --hard HEAD~",  # destroys history
+            "git checkout origin/",    # detaches from local branch
+            "git add -A", "git add --all", "git add .",  # blanket adds capture noise
+        ]
+        if any(x in cmd for x in DESTRUCTIVE):
+            return (f"BLOCKED: {cmd!r} is in the destructive-ops list. "
+                    "If git push fails, STOP and report — do NOT try to "
+                    "recover via reset/pull-rebase. Add specific files only "
+                    "(git add <path> <path>), not -A.")
         try:
             p = subprocess.run(["bash", "-c", cmd], cwd=HERE,
                                capture_output=True, text=True, timeout=120)
@@ -437,14 +450,33 @@ def cycle():
             spend["weekly_cap_usd"] - spend["cumulative_usd"], 2),
     })
 
+    # Cycle epilogue: capture ONLY the loop's own bookkeeping files. NEVER
+    # `git add -A` — that captured embedded git repos, stale .pkl files, and
+    # whatever else was uncommitted in the working tree (which clobbered
+    # session work on 2026-06-09). The goal contract is responsible for
+    # `git add <specific files>` + `git commit` + `git push` of the real
+    # artifact. This epilogue is only for spend ledger + log + queue status.
     if not DRY_RUN:
         try:
-            subprocess.run(["git", "add", "-A"], cwd=HERE, check=False)
-            msg = (f"autonomous: true — cycle on goal '{g['goal']}' → "
+            for path in [
+                "tools/autonomous_spend.json",
+                "prompts/goals/QUEUE.md",
+                f"logs/autonomous_{datetime.date.today().isoformat()}.jsonl",
+            ]:
+                subprocess.run(["git", "add", path], cwd=HERE, check=False)
+            msg = (f"autonomous: true — cycle bookkeeping for '{g['goal']}' → "
                    f"verdict={verdict}, cost=${total_cost:.3f}, "
                    f"remaining=${spend['weekly_cap_usd'] - spend['cumulative_usd']:.2f}")
-            subprocess.run(["git", "commit", "-m", msg], cwd=HERE, check=False)
-            subprocess.run(["git", "push", "origin", "main"], cwd=HERE, check=False)
+            # commit will no-op if nothing was staged (e.g. status didn't change)
+            subprocess.run(["git", "commit", "-m", msg, "--allow-empty"],
+                           cwd=HERE, check=False)
+            r = subprocess.run(["git", "push", "origin", "main"],
+                               cwd=HERE, check=False, capture_output=True, text=True)
+            if r.returncode != 0:
+                # DO NOT try to recover. Surface the failure for human review.
+                print(f"[cycle] push failed: {r.stderr.strip()[:300]}")
+                print(f"[cycle] STOPPING. Resolve the divergence by hand. "
+                      f"Do NOT let the next cycle force-reset.")
         except Exception as e:
             print(f"[cycle] commit/push failed: {e}")
 
