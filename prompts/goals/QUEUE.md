@@ -18,7 +18,7 @@ Edits to this file are honest curation. Picker re-reads every cycle.
 | 2 | STRUCTURAL_CASCADE | $0 | done | v3: 6/6 H/M strict (100%), 13 final from 145 fns. 294 SLOC. All 8 criteria met. |
 | 3 | LEAD_CONDITIONED_SPEC | $10 | blocked | architectural fix for v1 noise (ERC4337StaticSigDoS only) |
 | 4 | CORPUS_GROWTH for S-3 | $0 | done | CounterIncrementOnRevert.tla — TLC: BudgetReflectsActualUse VIOLATED in 2 states. Grammar PASS. Retrieval top-1 cos=0.829. Corpus size 20. Cites sequence L-02. |
-| 5 | CORPUS_GROWTH for S-4 | $0 | disputed | cumulative-state-drift shape; sequence L-01 |
+| 5 | CORPUS_GROWTH for S-4 | $0 | done | CumulativeStateDrift.tla — TLC: CumulativeLimitHolds VIOLATED in 3 states. Grammar PASS. Retrieval top-1 cos=0.788. Corpus size 21. Cites sequence L-01. |
 | 6 | CFG_DECODE extension (4 specs) | $5 | done | author schemas for remaining specs |
 | 7 | T7 HuggingFace push | $0 | done | push reps + index + classifier to HF |
 | 8 | T19 retrieval recall gap | $0 | done | MissingAwait + missing-await query alignment |
