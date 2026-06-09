@@ -296,11 +296,28 @@ def main():
         ] + (["scope_signals.json"] if args.readme else []),
     }
     (out / "mine_summary.json").write_text(json.dumps(summary, indent=2))
+
+    # ---- Surface available shape manifests so the user can pick one to emit.
+    manifest_dir = HERE / "tools" / "manifests"
+    manifests = sorted(manifest_dir.glob("*.json")) if manifest_dir.exists() else []
+
     print(f"\nDONE → {out}")
     print(f"  Inspect: ranked_hypotheses.json (top-50 functions by corpus NN)")
     print(f"  Inspect: scope_signals.json (Q&A carve-in/out paragraphs)")
-    print(f"  Next: pick top 5-10 hypotheses, run adversarial verification "
-          f"(see prompts/goals/CONTEST_DAY_HARDENING.goal.md)")
+    print(f"\nNEXT STEPS:")
+    print(f"  1. pick top 5-10 hypotheses, run adversarial verification")
+    print(f"     (see prompts/goals/CONTEST_DAY_HARDENING.goal.md)")
+    if manifests:
+        print(f"  2. for each surviving finding, see if it matches a registered shape:")
+        for m in manifests:
+            shape = m.stem.split("-", 1)[1] if "-" in m.stem else m.stem
+            print(f"       - {shape}  ({m.name})")
+        print(f"     if a shape matches → author <target>-<shape>.json under tools/manifests/")
+        print(f"     emit via:   python3 tools/trace_to_forge.py --manifest <path> --out <test.t.sol>")
+        print(f"     verify via: python3 tools/manifest_lint.py --manifest <path> --run")
+        print(f"     schema doc: tools/manifests/_README.md")
+    else:
+        print(f"  2. (no manifests yet — see tools/manifests/_README.md to author one)")
 
 
 if __name__ == "__main__":
