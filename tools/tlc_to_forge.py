@@ -173,15 +173,23 @@ def main():
     args = ap.parse_args()
 
     if args.shape == "LIST":
-        print("Available PoC templates:")
+        print("Available per-shape PoC templates (legacy, --shape required):")
         for s, spec in sorted(SHAPE_TEMPLATES.items()):
             avail = "✓" if (TEMPLATE_DIR / spec["template"]).exists() else "?"
             print(f"  {avail}  {s:<30} ({spec['template']})")
         print()
-        print("4 shapes registered. ReentrancyDrain VERIFIED end-to-end on")
-        print("examples/puppy-raffle (2/2 forge tests PASS, gas 99126/233).")
-        print("OracleStaleness, SignatureReplay, PausedDistributorPricingAsymmetry")
-        print("registered as templates but not yet verified — next shape gap.")
+        # Also surface the newer universal-template manifest registry.
+        manifest_dir = HERE / "tools" / "manifests"
+        manifests = sorted(manifest_dir.glob("*.json")) if manifest_dir.exists() else []
+        if manifests:
+            print("Universal-template manifests (preferred, tools/trace_to_forge.py):")
+            for m in manifests:
+                print(f"  ✓  {m.stem}")
+            print()
+            print("Run all: python3 tools/manifest_lint.py --run")
+            print("Author new: see tools/manifests/_README.md")
+        else:
+            print("(no manifests yet — see tools/manifests/_README.md)")
         return
 
     if not all([args.target_path, args.target_contract, args.target_fn]):
