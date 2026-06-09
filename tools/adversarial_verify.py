@@ -15,6 +15,11 @@ Runs three mechanical checks on each HIGH/CASCADE-CONFIRM lead:
      or use initialize() in a single transaction?
      → If yes, the race window doesn't exist → CONFIRM is vacuous.
 
+Special case: NORMAL-confidence leads whose function is named "initialize" also
+receive the ATOMIC_INIT check. Initializer front-run is a systematic false
+positive in proxy protocols with atomic deployment scripts; no confidence
+threshold is needed for this purely mechanical check.
+
 If ANY check fires → downgrade confidence to "REVIEW:adversarial" and record
 which check fired + short reason.
 
@@ -210,13 +215,29 @@ def _verify_lead(lead: dict, scope_dir: Path,
                  scripts_dir: Path | None) -> tuple[dict, bool, str]:
     """
     Returns (updated_lead, was_downgraded, reason).
-    Only HIGH-confidence leads are checked; others pass through.
+    HIGH/CASCADE leads: all three mechanical checks applied.
+    NORMAL leads whose function is "initialize": ATOMIC_INIT check only (front-run
+    concerns on initializers are uniformly false when the deployment script is
+    atomic — purely mechanical, no LLM needed, no confidence threshold required).
+    All other NORMAL leads pass through unchanged.
     """
-    if lead.get("confidence") not in ("HIGH", "CASCADE"):
-        return lead, False, ""
+    confidence = lead.get("confidence", "")
+    is_high = confidence in ("HIGH", "CASCADE")
 
     location = lead.get("location", "")
     contract_name, func_name = _parse_location(location) if location else (None, None)
+
+    if not is_high:
+        # For non-HIGH leads, only ATOMIC_INIT on initialize functions
+        if func_name != "initialize":
+            return lead, False, ""
+        fired, reason = _check_atomic_init(lead, scripts_dir, func_name=func_name)
+        if fired:
+            out = dict(lead)
+            out["confidence"] = "REVIEW:adversarial"
+            out["adversarial_reasons"] = [f"[ATOMIC_INIT] {reason}"]
+            return out, True, f"[ATOMIC_INIT] {reason}"
+        return lead, False, ""
 
     func_text = sol_text = None
     if contract_name and func_name:
