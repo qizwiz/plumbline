@@ -55,9 +55,12 @@ _INIT_KEYWORDS = re.compile(
     r'\b(initiali[sz]|front.?run|race\s+condition|proxy\s+init|unprotected\s+init)\b', re.I)
 
 # ERC1967Proxy / TransparentUpgradeableProxy atomic init patterns in scripts
+# Handles: new ERC1967Proxy{salt:...}(impl, initData) and abi.encodeWithSelector/encodeCall
 _PROXY_INIT_RE = re.compile(
-    r'(ERC1967Proxy|TransparentUpgradeableProxy|UUPSUpgradeable|initialize)\s*\('
-    r'[^)]*initData|[^)]*abi\.encodeCall[^)]*initiali[sz]',
+    r'(?:'
+    r'ERC1967Proxy|TransparentUpgradeableProxy|UUPSUpgradeable'
+    r')[^;]*?(?:initData|abi\.encode(?:WithSelector|Call)[^;]*?initiali[sz])'
+    r'|abi\.encode(?:WithSelector|Call)[^;]*?\.initialize\b',
     re.I | re.S,
 )
 _SINGLE_INIT_CALL = re.compile(
@@ -171,14 +174,17 @@ def _check_admin_set_call(func_text: str, sol_text: str) -> tuple[bool, str]:
     return False, ""
 
 
-def _check_atomic_init(lead: dict, scripts_dir: Path | None) -> tuple[bool, str]:
+def _check_atomic_init(lead: dict, scripts_dir: Path | None,
+                       func_name: str | None = None) -> tuple[bool, str]:
     """Check 3: for initializer-concern leads, is deployment script atomic?"""
     claim_text = " ".join([
         lead.get("claim", ""),
         lead.get("why", ""),
         lead.get("raw", ""),
     ])
-    if not _INIT_KEYWORDS.search(claim_text):
+    # Also trigger when the function itself is named "initialize" — cascade leads
+    # don't always mention front-run in the claim text, but the risk is the same.
+    if not _INIT_KEYWORDS.search(claim_text) and func_name != "initialize":
         return False, ""
 
     # No scripts dir → we can't confirm atomic, but can't refute either
@@ -232,7 +238,7 @@ def _verify_lead(lead: dict, scope_dir: Path,
         if fired:
             reasons.append(f"[ADMIN_SET_CALL] {reason}")
 
-    fired, reason = _check_atomic_init(lead, scripts_dir)
+    fired, reason = _check_atomic_init(lead, scripts_dir, func_name=func_name)
     if fired:
         reasons.append(f"[ATOMIC_INIT] {reason}")
 
