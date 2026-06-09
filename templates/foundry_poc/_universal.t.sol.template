@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: MIT
+pragma solidity {{PRAGMA}};
+pragma abicoder v2;
+
+// Universal Foundry test scaffold — emitted by plumbline tools/trace_to_forge.py
+// from a TLA+ counterexample trace + a per-target manifest.
+//
+// Shape:       {{SHAPE_NAME}}
+// Target:      {{TARGET_CONTRACT}} (in {{TARGET_PATH}})
+// TLA+ spec:   {{TLA_SPEC_PATH}}
+// Invariant:   {{INVARIANT_NAME}}
+//
+// TLC counterexample trace head:
+{{TLC_TRACE_HEAD_COMMENT}}
+//
+// What the test asserts: the invariant {{INVARIANT_NAME}} holds on the
+// CEI-correct (fixed) version of {{TARGET_CONTRACT}}.{{TARGET_FN}} and
+// is VIOLATED on the buggy version. The action sequence below replays
+// the TLC trace exactly.
+
+import {Test} from "forge-std/Test.sol";
+import {{{TARGET_CONTRACT}}} from "{{TARGET_PATH}}";
+
+{{ATTACKER_CONTRACT_BLOCK}}
+
+contract {{SHAPE_NAME}}_Universal is Test {
+    {{TARGET_CONTRACT}} public victim;
+{{STATE_VAR_BLOCK}}
+
+    function setUp() public {
+{{SETUP_BLOCK}}
+    }
+
+    /// @notice replays TLC counterexample for invariant {{INVARIANT_NAME}}.
+    ///         on the BUGGY version this asserts the invariant is violated.
+    function test_{{SHAPE_NAME}}_invariantViolated() public {
+{{TRACE_REPLAY_BLOCK}}
+
+        // Invariant check derived from TLA+ INVARIANT {{INVARIANT_NAME}}:
+{{INVARIANT_ASSERT_BLOCK}}
+    }
+
+    /// @notice fixed version of the same trace asserts the invariant HOLDS.
+    ///         Skipped unless the target is patched; commented for reference.
+    // function test_{{SHAPE_NAME}}_invariantHoldsOnFix() public { ... }
+}
