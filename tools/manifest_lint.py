@@ -146,7 +146,8 @@ def run_manifest(path: Path) -> tuple[bool, str]:
     env = os.environ.copy()
     env["PATH"] = f"{Path.home() / '.foundry' / 'bin'}:{env.get('PATH','')}"
     res = subprocess.run(
-        ["forge", "test", "--match-path", str(out.relative_to(forge_root))],
+        ["forge", "test", "--match-path", str(out.relative_to(forge_root)),
+         "--no-match-path", "lib/**"],
         cwd=str(forge_root), capture_output=True, text=True, env=env,
         timeout=180,
     )
