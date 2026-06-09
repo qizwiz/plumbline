@@ -36,7 +36,48 @@ If JH says "let's just build X real quick" — the answer is **no, not until
 
 ---
 
-## Week 1 — Days 1-7 (2026-06-09 → 2026-06-15): arXiv writeup
+## Week 1 — Days 1-7 (2026-06-09 → 2026-06-15): arXiv writeup + baselines
+
+**Goal:** Post to arXiv (cs.SE or cs.CR) by end of day 7 with measured comparison to baselines.
+
+### Day 2 (Tue 2026-06-10) — Baseline comparison: Slither + pact-Halmos vs plumbline
+
+**Why this matters:** The paper's strongest reviewer-facing question is "is plumbline better than existing tools?" Today's measurement of plumbline's absolute numbers (P=0.38, R=0.73, F1=0.49 across N=85 reps) is meaningless without a comparison baseline. Slither is the universal baseline; Halmos is the symbolic-execution baseline. Both run against the same 7 corpora plumbline already scored.
+
+**Scope (effective):** 7 unique projects, all with .ANSWERS.md ground truth — puppy-raffle, t-swap, thunder-loan, boss-bridge, sequence, synthetic-dreusd (x3 variants), DRE Sherlock 1259.
+
+**Concrete steps (estimated 4-6 hours focused work):**
+
+1. **Install Slither** (10 min):
+   ```bash
+   pip install slither-analyzer
+   slither --version
+   ```
+
+2. **Author tools/compare_baselines.py** (1 hour) — reads reps.jsonl, extracts unique contract paths, runs Slither on each contract, parses Slither JSON output into a findings list, scores against .ANSWERS.md using the same sol_match scorer plumbline uses for itself, records per-project P/R. Same pattern as tools/measure_reps.py just shipped today.
+
+3. **Run it:**
+   ```bash
+   python3 tools/compare_baselines.py --tool slither --out runs/2026-06-10-baselines/slither.jsonl
+   python3 tools/measure_reps.py --reps runs/2026-06-10-baselines/slither.jsonl
+   ```
+
+4. **Stretch: same for Halmos** (3-4 hours) — pact already has halmos_check.py. Wire it through the same harness. May hit solc-version friction; document and skip if blocked.
+
+5. **Output for the paper:** a single markdown table for paper Section 4:
+
+   | Tool | N | Precision | Recall | F1 |
+   |---|---|---|---|---|
+   | Slither | 7 | ? | ? | ? |
+   | Halmos | 7 | ? | ? | ? |
+   | Plumbline (sol_intent) | 7 | 0.38 | 0.73 | 0.49 |
+   | Plumbline (manual) | 3 | 0.67 | 0.51 | 0.58 |
+
+6. **Honest reporting:** publish whichever direction the numbers fall. If plumbline loses on some, that goes in Section 5 (Limitations). If it wins on some, that's Section 4 (Contribution).
+
+**Done criterion:** runs/2026-06-10-baselines/slither.jsonl exists; the comparison table is committed to the paper draft as Section 4.X "Comparison to baselines."
+
+### Day 3-6 (Wed-Sun) — Paper sections
 
 **Goal:** Post to arXiv (cs.SE or cs.CR) by end of day 7.
 
