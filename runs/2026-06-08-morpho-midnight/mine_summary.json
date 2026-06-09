@@ -1,0 +1,50 @@
+{
+  "scope_dir": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src",
+  "scope_files": 26,
+  "concrete_functions": 88,
+  "ranked_top1": {
+    "contract": "Midnight",
+    "function": "liquidate",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 581,
+    "max_cos": 0.8396914005279541,
+    "top": [
+      {
+        "cos": 0.8396914005279541,
+        "severity": "H",
+        "title": "The collateral remainder cap is incorrectly calculated during liquidation",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.8384045362472534,
+        "severity": "H",
+        "title": "Liquidation doesn't account for penalty when calculating collateral to give, allowing users to profit by borrowing and s",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.8300319910049438,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.8231577277183533,
+        "severity": "H",
+        "title": "User can evade `liquidation` by depositing the minimum of tokens and gain time to not be liquidated",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.8164140582084656,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      }
+    ]
+  },
+  "artifacts": [
+    "scope_functions.json",
+    "ranked_hypotheses.json",
+    "corpus_clusters.json",
+    "scope_signals.json"
+  ]
+}

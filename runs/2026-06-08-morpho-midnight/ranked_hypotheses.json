@@ -1,0 +1,1952 @@
+[
+  {
+    "contract": "Midnight",
+    "function": "liquidate",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 581,
+    "max_cos": 0.8396914005279541,
+    "top": [
+      {
+        "cos": 0.8396914005279541,
+        "severity": "H",
+        "title": "The collateral remainder cap is incorrectly calculated during liquidation",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.8384045362472534,
+        "severity": "H",
+        "title": "Liquidation doesn't account for penalty when calculating collateral to give, allowing users to profit by borrowing and s",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.8300319910049438,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      },
+      {
+        "cos": 0.8231577277183533,
+        "severity": "H",
+        "title": "User can evade `liquidation` by depositing the minimum of tokens and gain time to not be liquidated",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.8164140582084656,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "multicall",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 211,
+    "max_cos": 0.8235882520675659,
+    "top": [
+      {
+        "cos": 0.8235882520675659,
+        "severity": "M",
+        "title": "Multicall does not work as intended",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7833537459373474,
+        "severity": "H",
+        "title": "CM can `delegatecall` to any address and bypass all restrictions",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7812418341636658,
+        "severity": "M",
+        "title": "Discrepancy in ECRECOVER Precompile when Using `Delegatecall`",
+        "finding_id": "M-17"
+      },
+      {
+        "cos": 0.7480177283287048,
+        "severity": "M",
+        "title": "Wrong handling of call data check indices, forcing it sometimes to revert",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7082831859588623,
+        "severity": "M",
+        "title": "Unvalidated memory access in `readMem` and `writeMem` functions",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "safeApprove",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 358,
+    "max_cos": 0.8091334700584412,
+    "top": [
+      {
+        "cos": 0.8091334700584412,
+        "severity": "M",
+        "title": "Incorrect address is used as `spender` for ERC20 permit signature verification",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7757970690727234,
+        "severity": "M",
+        "title": "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7753427624702454,
+        "severity": "M",
+        "title": "The `shortOrder` verification bug on the `RedemptionFacet::proposeRedemption()` allows an attacker to leave a small `sho",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7743139266967773,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7718151807785034,
+        "severity": "M",
+        "title": "DOS attack to `SwapAction.transferAndSwap()` when using  an ERC20 permit `transferFrom`",
+        "finding_id": "M-14"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "withdraw",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 481,
+    "max_cos": 0.806312620639801,
+    "top": [
+      {
+        "cos": 0.806312620639801,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7870243787765503,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7843393087387085,
+        "severity": "H",
+        "title": "`decreaseLever` uses incorrect position address when withdrawing",
+        "finding_id": "H-09"
+      },
+      {
+        "cos": 0.783581018447876,
+        "severity": "M",
+        "title": "`stakerewardV2pool.withdraw()` should check the user's boost lock status.",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7803049683570862,
+        "severity": "M",
+        "title": "Users are incentivized  to not withdraw immediately after the market is closed",
+        "finding_id": "M-01"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "withdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 549,
+    "max_cos": 0.8031242489814758,
+    "top": [
+      {
+        "cos": 0.8031242489814758,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7888333201408386,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7877982258796692,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7848580479621887,
+        "severity": "M",
+        "title": "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7823996543884277,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "flashLoan",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 737,
+    "max_cos": 0.8008887767791748,
+    "top": [
+      {
+        "cos": 0.8008887767791748,
+        "severity": "M",
+        "title": "The fee for the protocol in the function `RamsesV3Pool::flash()` is not calculated correctly",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7704676985740662,
+        "severity": "H",
+        "title": "`Flashlender.sol#flashLoan()` should use `mintProfit()` to mint fees, as the current implementation may lead to locked u",
+        "finding_id": "H-13"
+      },
+      {
+        "cos": 0.758255660533905,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7511004209518433,
+        "severity": "H",
+        "title": "By calling a flashloan and then `ThunderLoan::deposit` instead of `ThunderLoan::repay` users can steal all funds from th",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.750918447971344,
+        "severity": "M",
+        "title": "Incorrect `unwrapNativeTokenInWallet` receiver address",
+        "finding_id": "M-20"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "claimContinuousFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 312,
+    "max_cos": 0.7987202405929565,
+    "top": [
+      {
+        "cos": 0.7987202405929565,
+        "severity": "M",
+        "title": "`yieldFeeBalance` wouldn't be claimed after calling `transferTokensOut()`",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7928653955459595,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7877253890037537,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7862383127212524,
+        "severity": "H",
+        "title": "Most users won't be able to claim their share of Uniswap fees",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.779328465461731,
+        "severity": "H",
+        "title": "Parameter misordering in fee collection function causes denial of service and fee loss",
+        "finding_id": "H-05"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "collateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 867,
+    "max_cos": 0.795427143573761,
+    "top": [
+      {
+        "cos": 0.795427143573761,
+        "severity": "M",
+        "title": "`Position._borrowLimit` doesn't use exisiting collateral in case if user doesn't have any `_bathToken`",
+        "finding_id": "M-21"
+      },
+      {
+        "cos": 0.762758195400238,
+        "severity": "M",
+        "title": "Invalid handling of flash loan fees in `PositionAction::onCreditFlashLoan`, forcing it to always revert",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7591755390167236,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7567774653434753,
+        "severity": "M",
+        "title": "Incorrect calculations in `debtCeiling`",
+        "finding_id": "M-18"
+      },
+      {
+        "cos": 0.7565872073173523,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "updatePositionView",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 797,
+    "max_cos": 0.7933104038238525,
+    "top": [
+      {
+        "cos": 0.7933104038238525,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7777845859527588,
+        "severity": "M",
+        "title": "`PositionAction4626::_onDecreaseLever` wrongly updates `tokenOut` forcing user's funds to be stuck in the position actio",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7767207622528076,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7759912610054016,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7755898833274841,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "liquidationLocked",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 937,
+    "max_cos": 0.7916629314422607,
+    "top": [
+      {
+        "cos": 0.7916629314422607,
+        "severity": "H",
+        "title": "User can evade `liquidation` by depositing the minimum of tokens and gain time to not be liquidated",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7819497585296631,
+        "severity": "M",
+        "title": "Lack of timelock on `rigidRedemption`, enables to steal yield from other users",
+        "finding_id": "M-15"
+      },
+      {
+        "cos": 0.7755735516548157,
+        "severity": "M",
+        "title": "Users can evade the `yDUSD` vault's withdrawal timelock mechanism",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7717862129211426,
+        "severity": "M",
+        "title": "A user's tokens could be locked for an extended duration beyond their intention and without their control",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7712668776512146,
+        "severity": "M",
+        "title": "Possible DoS When calling `GammaTradeMarket::_removePosition` will cause user position to not be able to get liquidated",
+        "finding_id": "M-05"
+      }
+    ]
+  },
+  {
+    "contract": "HashLib",
+    "function": "offerTreeTypeHash",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 22,
+    "max_cos": 0.7908341884613037,
+    "top": [
+      {
+        "cos": 0.7908341884613037,
+        "severity": "M",
+        "title": "The `RandomizerVRF` and `RandomizerRNG` do not produce hash value.",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7534239888191223,
+        "severity": "M",
+        "title": "`loan.hash()` does not contain `protocolFee`",
+        "finding_id": "M-17"
+      },
+      {
+        "cos": 0.749322772026062,
+        "severity": "M",
+        "title": "`BalancerFlashLender#receiveFlashLoan` does not validate the `originalCallData`",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7487993240356445,
+        "severity": "M",
+        "title": "`PoolAction::_balancerExit` returns wrong token out amount",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.745017409324646,
+        "severity": "H",
+        "title": "`BalancerConnector::_getPositionTVL` is calculated incorrectly",
+        "finding_id": "H-13"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "_updatePosition",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 832,
+    "max_cos": 0.789172887802124,
+    "top": [
+      {
+        "cos": 0.789172887802124,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7891618013381958,
+        "severity": "H",
+        "title": "Invalid handling of holding positions in `DolomiteConnector::transferBetweenAccounts`",
+        "finding_id": "H-23"
+      },
+      {
+        "cos": 0.7867995500564575,
+        "severity": "M",
+        "title": "Incorrect calculation of `newCumulativeIndex` in function `calcDecrease`",
+        "finding_id": "M-16"
+      },
+      {
+        "cos": 0.784378170967102,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7828955054283142,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "TickLib",
+    "function": "tickToPrice",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 44,
+    "max_cos": 0.7890822291374207,
+    "top": [
+      {
+        "cos": 0.7890822291374207,
+        "severity": "M",
+        "title": "Incorrect price for negative ticks due to lack of rounding down",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7530228495597839,
+        "severity": "H",
+        "title": "`get_fee_growth_inside` in `tick.rs` should allow for `underflow`/`overflow` but doesn't",
+        "finding_id": "H-06"
+      },
+      {
+        "cos": 0.7326489686965942,
+        "severity": "M",
+        "title": "`_getUniswapTwapWei()` will show incorrect price for negative ticks cause it doesn't round up for negative ticks",
+        "finding_id": "M-18"
+      },
+      {
+        "cos": 0.7195442318916321,
+        "severity": "M",
+        "title": "When performing `swap` and the swap position does not cover `swap amount`, the base price of `sqrt_price` is set incorre",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7131252288818359,
+        "severity": "M",
+        "title": "Incorrect calculation to check remaining ratio after reward in StableConfig.sol",
+        "finding_id": "M-29"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "pullToken",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 378,
+    "max_cos": 0.7881167531013489,
+    "top": [
+      {
+        "cos": 0.7881167531013489,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7749825716018677,
+        "severity": "M",
+        "title": "Missing slippage protection in `liquidity_lockbox::withdraw`",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7676160335540771,
+        "severity": "M",
+        "title": "DecentEthRouter.sol#_bridgeWithPayload() - Any refunded ETH (native token) will be refunded to the DecentBridgeAdapter, ",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7674762010574341,
+        "severity": "M",
+        "title": "Incorrect address is used as `spender` for ERC20 permit signature verification",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7671442627906799,
+        "severity": "M",
+        "title": "Unchecked return value bug on `TransferHelper::_safeTransferFrom()`",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "TakeAmountsLib",
+    "function": "sellerAssetsToUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/TakeAmountsLib.sol",
+    "start_line": 36,
+    "max_cos": 0.7867427468299866,
+    "top": [
+      {
+        "cos": 0.7867427468299866,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7675951719284058,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.7659976482391357,
+        "severity": "H",
+        "title": "SiloConnector `_getPositionTVL` miscalculate the TVL position",
+        "finding_id": "H-15"
+      },
+      {
+        "cos": 0.7609038949012756,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7574054002761841,
+        "severity": "H",
+        "title": "`IMarket.execute.selector`, `_checkSender` bypass allows to execute arbitrary operations",
+        "finding_id": "H-08"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "take",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 337,
+    "max_cos": 0.7856098413467407,
+    "top": [
+      {
+        "cos": 0.7856098413467407,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7787052392959595,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7782231569290161,
+        "severity": "M",
+        "title": "`PendlePowerFarmToken:: totalLpAssetsToDistribute` may lead to temporary DOS due to price growth check being skipped dur",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.7767804861068726,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7756549119949341,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      }
+    ]
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashOffer",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 118,
+    "max_cos": 0.7841657996177673,
+    "top": [
+      {
+        "cos": 0.7841657996177673,
+        "severity": "M",
+        "title": "The `RandomizerVRF` and `RandomizerRNG` do not produce hash value.",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.743735671043396,
+        "severity": "M",
+        "title": "`loan.hash()` does not contain `protocolFee`",
+        "finding_id": "M-17"
+      },
+      {
+        "cos": 0.7412412166595459,
+        "severity": "M",
+        "title": "`BalancerFlashLender#receiveFlashLoan` does not validate the `originalCallData`",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7394700050354004,
+        "severity": "H",
+        "title": "There is a calculation error in `AuraVault::redeem()`",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.739224374294281,
+        "severity": "H",
+        "title": "Attacker can drain all ETH from `AuctionDemo` when `block.timestamp == auctionEndTime`",
+        "finding_id": "H-02"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "repay",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 502,
+    "max_cos": 0.7841385006904602,
+    "top": [
+      {
+        "cos": 0.7841385006904602,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7783682942390442,
+        "severity": "M",
+        "title": "Wrong repayment amount used in `PositionAction::_repay`, forcing users to unexpectedly lose funds",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7766020894050598,
+        "severity": "H",
+        "title": "The bot won't be able to unstake or repay risky positions in the yield contract",
+        "finding_id": "H-08"
+      },
+      {
+        "cos": 0.7740068435668945,
+        "severity": "H",
+        "title": "Risk of overpayment due to race condition between `repay` and `liquidateWithReplacement` transactions",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7737470269203186,
+        "severity": "M",
+        "title": "There is no way to liquidate a position if it breaches `maxDebtPerCollateralToken` value creating bad debt.",
+        "finding_id": "M-07"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "withdrawable",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 903,
+    "max_cos": 0.7837855815887451,
+    "top": [
+      {
+        "cos": 0.7837855815887451,
+        "severity": "M",
+        "title": "Withdraw amount returned by `getLiquidityAmountsAndPositions` may be incorrect",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7790588736534119,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7667926549911499,
+        "severity": "M",
+        "title": "`stakerewardV2pool.withdraw()` should check the user's boost lock status.",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7657707333564758,
+        "severity": "M",
+        "title": "`withdraw()` users may can't withdraw `underlyingBorrowToken` properly",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7655050754547119,
+        "severity": "M",
+        "title": "Inability to withdraw funds for certain users due to `whenNotPaused` modifier in `RateLimitedMinter`",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "SafeTransferLib",
+    "function": "safeTransfer",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/SafeTransferLib.sol",
+    "start_line": 12,
+    "max_cos": 0.7791081070899963,
+    "top": [
+      {
+        "cos": 0.7791081070899963,
+        "severity": "M",
+        "title": "Unchecked return value bug on `TransferHelper::_safeTransferFrom()`",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7612038254737854,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7531659603118896,
+        "severity": "H",
+        "title": "When `DecentBridgeExecutor.execute` fails, funds will be sent to a random address",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7503615021705627,
+        "severity": "M",
+        "title": "DOS attack to `SwapAction.transferAndSwap()` when using  an ERC20 permit `transferFrom`",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7501330971717834,
+        "severity": "H",
+        "title": "Incorrect `gnosis_safe_disable_module_offset` constant leads to removing the rental safe's `module` without verification",
+        "finding_id": "H-04"
+      }
+    ]
+  },
+  {
+    "contract": "TickLib",
+    "function": "priceToTick",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 56,
+    "max_cos": 0.7764397263526917,
+    "top": [
+      {
+        "cos": 0.7764397263526917,
+        "severity": "M",
+        "title": "Incorrect price for negative ticks due to lack of rounding down",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.74521404504776,
+        "severity": "H",
+        "title": "`get_fee_growth_inside` in `tick.rs` should allow for `underflow`/`overflow` but doesn't",
+        "finding_id": "H-06"
+      },
+      {
+        "cos": 0.7392130494117737,
+        "severity": "M",
+        "title": "When performing `swap` and the swap position does not cover `swap amount`, the base price of `sqrt_price` is set incorre",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7311315536499023,
+        "severity": "M",
+        "title": "`_getUniswapTwapWei()` will show incorrect price for negative ticks cause it doesn't round up for negative ticks",
+        "finding_id": "M-18"
+      },
+      {
+        "cos": 0.7165277004241943,
+        "severity": "M",
+        "title": "Min and maxAnswer never checked for oracle price feed",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "TakeAmountsLib",
+    "function": "buyerAssetsToUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/TakeAmountsLib.sol",
+    "start_line": 17,
+    "max_cos": 0.7761756181716919,
+    "top": [
+      {
+        "cos": 0.7761756181716919,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7607997059822083,
+        "severity": "H",
+        "title": "SiloConnector `_getPositionTVL` miscalculate the TVL position",
+        "finding_id": "H-15"
+      },
+      {
+        "cos": 0.7572959065437317,
+        "severity": "H",
+        "title": "`_getReferencePoolPriceX96()` will show incorrect price for negative tick deltas in current implementation cause it does",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.756334662437439,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7549939155578613,
+        "severity": "M",
+        "title": "On a Linear or Exponential Descending Sale Model, a user that mints on the last `block.timestamp` mints at an unexpected",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "supplyCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 524,
+    "max_cos": 0.7761185169219971,
+    "top": [
+      {
+        "cos": 0.7761185169219971,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7736570239067078,
+        "severity": "M",
+        "title": "Absence of autonomous mechanism for `selling collateral assets in the external market in exchange for USDS` will cause u",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7723944783210754,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7692517042160034,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7661186456680298,
+        "severity": "H",
+        "title": "Invalid handling of holding positions in `DolomiteConnector::transferBetweenAccounts`",
+        "finding_id": "H-23"
+      }
+    ]
+  },
+  {
+    "contract": "SafeTransferLib",
+    "function": "safeTransferFrom",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/SafeTransferLib.sol",
+    "start_line": 24,
+    "max_cos": 0.7756298780441284,
+    "top": [
+      {
+        "cos": 0.7756298780441284,
+        "severity": "M",
+        "title": "Unchecked return value bug on `TransferHelper::_safeTransferFrom()`",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7681594491004944,
+        "severity": "M",
+        "title": "Assets in a Safe can be lost",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7510058879852295,
+        "severity": "M",
+        "title": "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7497758865356445,
+        "severity": "M",
+        "title": "DOS attack to `SwapAction.transferAndSwap()` when using  an ERC20 permit `transferFrom`",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7491906881332397,
+        "severity": "H",
+        "title": "Incorrect `gnosis_safe_disable_module_offset` constant leads to removing the rental safe's `module` without verification",
+        "finding_id": "H-04"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "settlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 963,
+    "max_cos": 0.7748951315879822,
+    "top": [
+      {
+        "cos": 0.7748951315879822,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7443780899047852,
+        "severity": "M",
+        "title": "`AirdropBroker`: When `block.timestamp == lastEpochUpdate + EPOCH_DURATION`, users can exercise options in the new epoch",
+        "finding_id": "M-30"
+      },
+      {
+        "cos": 0.7441189885139465,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7432426810264587,
+        "severity": "M",
+        "title": "Incorrect flag results to `_hasFallbackToggled` always set to false on `createMultipleSettlement`.",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7431091070175171,
+        "severity": "M",
+        "title": "The `receive_cross_chain_msg` function has potential replay attack risks",
+        "finding_id": "M-08"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "setMarketSettlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 258,
+    "max_cos": 0.7744584083557129,
+    "top": [
+      {
+        "cos": 0.7744584083557129,
+        "severity": "M",
+        "title": "Incorrect flag results to `_hasFallbackToggled` always set to false on `createMultipleSettlement`.",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7741847634315491,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7700897455215454,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7668889164924622,
+        "severity": "M",
+        "title": "No related function to set `fee_protocol`",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.7651191353797913,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "updatePosition",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 823,
+    "max_cos": 0.7743547558784485,
+    "top": [
+      {
+        "cos": 0.7743547558784485,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7582567930221558,
+        "severity": "H",
+        "title": "Reallocation depends on the `slot0` price, which can be manipulated",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7577528357505798,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7556008100509644,
+        "severity": "M",
+        "title": "`oracleCircuitBreaker`: Not checking if price information of asset is stale",
+        "finding_id": "M-05"
+      },
+      {
+        "cos": 0.7553539276123047,
+        "severity": "M",
+        "title": "`SurplusGuildMinter.getReward()` is susceptible to DoS due to unbounded loop",
+        "finding_id": "M-25"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "claimSettlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 305,
+    "max_cos": 0.7738498449325562,
+    "top": [
+      {
+        "cos": 0.7738498449325562,
+        "severity": "M",
+        "title": "The fee for the protocol in the function `RamsesV3Pool::flash()` is not calculated correctly",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7733953595161438,
+        "severity": "H",
+        "title": "Most users won't be able to claim their share of Uniswap fees",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7707871794700623,
+        "severity": "M",
+        "title": "Incorrect `unwrapNativeTokenInWallet` receiver address",
+        "finding_id": "M-20"
+      },
+      {
+        "cos": 0.769407331943512,
+        "severity": "H",
+        "title": "`AuraVault::claim` reward calculation does not deduct fees from reward amount, causing DoS or extra rewards lost",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7646312117576599,
+        "severity": "M",
+        "title": "Incorrect fee handling prevents protocol from updating fees",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashNode",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 67,
+    "max_cos": 0.7730933427810669,
+    "top": [
+      {
+        "cos": 0.7730933427810669,
+        "severity": "M",
+        "title": "The `RandomizerVRF` and `RandomizerRNG` do not produce hash value.",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7486246824264526,
+        "severity": "H",
+        "title": "`RIPEMD-160` precompile yields wrong hashes for large set of inputs due to off-by-one error",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7320888638496399,
+        "severity": "M",
+        "title": "Potential Gas Manipulation via Bytecode Compression",
+        "finding_id": "M-22"
+      },
+      {
+        "cos": 0.7173227667808533,
+        "severity": "M",
+        "title": "Unvalidated memory access in `readMem` and `writeMem` functions",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7169235944747925,
+        "severity": "M",
+        "title": "`loan.hash()` does not contain `protocolFee`",
+        "finding_id": "M-17"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "repayAndWithdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 315,
+    "max_cos": 0.7720617055892944,
+    "top": [
+      {
+        "cos": 0.7720617055892944,
+        "severity": "M",
+        "title": "Borrowers can DoS liquidations by repaying as little as 1 share.",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7670118808746338,
+        "severity": "M",
+        "title": "Repayments and liquidations can be forced to revert by an attacker that repays minuscule amount of shares",
+        "finding_id": "M-16"
+      },
+      {
+        "cos": 0.7624873518943787,
+        "severity": "H",
+        "title": "The bot won't be able to unstake or repay risky positions in the yield contract",
+        "finding_id": "H-08"
+      },
+      {
+        "cos": 0.7624752521514893,
+        "severity": "M",
+        "title": "LendingTerm.sol `_partialRepay()` A user cannot partial repay a loan with `0` interest",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7622859477996826,
+        "severity": "M",
+        "title": "`isolateRedeem()` revert in case Revert-on-zero-value-transfers tokens",
+        "finding_id": "M-10"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "supplyCollateralAndSellWithUnitsTarget",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 117,
+    "max_cos": 0.7720026969909668,
+    "top": [
+      {
+        "cos": 0.7720026969909668,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7575898766517639,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7570523619651794,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7535374760627747,
+        "severity": "H",
+        "title": "`PendleConnector` incorrectly sends the redeemed `PT` tokens to the market",
+        "finding_id": "H-07"
+      },
+      {
+        "cos": 0.7532544136047363,
+        "severity": "M",
+        "title": "formPOL lacks slippage and deadline protection",
+        "finding_id": "M-26"
+      }
+    ]
+  },
+  {
+    "contract": "TickLib",
+    "function": "divHalfDownUnchecked",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 17,
+    "max_cos": 0.770476758480072,
+    "top": [
+      {
+        "cos": 0.770476758480072,
+        "severity": "H",
+        "title": "`get_fee_growth_inside` in `tick.rs` should allow for `underflow`/`overflow` but doesn't",
+        "finding_id": "H-06"
+      },
+      {
+        "cos": 0.7560588121414185,
+        "severity": "M",
+        "title": "Unchecked return value bug on `TransferHelper::_safeTransferFrom()`",
+        "finding_id": "M-07"
+      },
+      {
+        "cos": 0.7512273788452148,
+        "severity": "M",
+        "title": "Incorrect price for negative ticks due to lack of rounding down",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7314953207969666,
+        "severity": "H",
+        "title": "Reduction gate in binop operation is unsafe",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7304545044898987,
+        "severity": "M",
+        "title": "Incorrect slippage handling in `swap_internal()`",
+        "finding_id": "M-03"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "forceApproveMax",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 371,
+    "max_cos": 0.7686868906021118,
+    "top": [
+      {
+        "cos": 0.7686868906021118,
+        "severity": "M",
+        "title": "Incorrect address is used as `spender` for ERC20 permit signature verification",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7483960390090942,
+        "severity": "M",
+        "title": "Vulnerabilities in Deposit Limit Enforcement and the Impact on Failed Deposits",
+        "finding_id": "M-11"
+      },
+      {
+        "cos": 0.7462789416313171,
+        "severity": "M",
+        "title": "An attacker can easily bypass the collateral value limit factor checks",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7443795204162598,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7440856099128723,
+        "severity": "M",
+        "title": "Does not check if `to_chain` and `to_handler` is whitelisted in `cross_chain_erc20_settlement`",
+        "finding_id": "M-10"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "supplyCollateralAndSellWithAssetsTarget",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 252,
+    "max_cos": 0.7684125304222107,
+    "top": [
+      {
+        "cos": 0.7684125304222107,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7652776837348938,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.760294497013092,
+        "severity": "H",
+        "title": "`PendleConnector` incorrectly sends the redeemed `PT` tokens to the market",
+        "finding_id": "H-07"
+      },
+      {
+        "cos": 0.7594003677368164,
+        "severity": "M",
+        "title": "`PendlePowerFarmToken:: totalLpAssetsToDistribute` may lead to temporary DOS due to price growth check being skipped dur",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.7587886452674866,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "buyWithAssetsTargetAndWithdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 180,
+    "max_cos": 0.7666305899620056,
+    "top": [
+      {
+        "cos": 0.7666305899620056,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7636812925338745,
+        "severity": "M",
+        "title": "`RubiconMarket: buy()` may not take any fee for tokens with low decimal precision",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.7618942260742188,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7600098848342896,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7584345936775208,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "IdLib",
+    "function": "storeInCode",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/IdLib.sol",
+    "start_line": 35,
+    "max_cos": 0.7660640478134155,
+    "top": [
+      {
+        "cos": 0.7660640478134155,
+        "severity": "H",
+        "title": "When `DecentBridgeExecutor.execute` fails, funds will be sent to a random address",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7545548677444458,
+        "severity": "M",
+        "title": "The `shortOrder` verification bug on the `RedemptionFacet::proposeRedemption()` allows an attacker to leave a small `sho",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7541311979293823,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.750336766242981,
+        "severity": "M",
+        "title": "`transferShortRecord`: Can transfer a newly created `ShortRecord` using a previously minted NFT",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7474554777145386,
+        "severity": "H",
+        "title": "Holders array can be manipulated by transferring or burning with amount 0, stealing rewards or bricking certain function",
+        "finding_id": "H-01"
+      }
+    ]
+  },
+  {
+    "contract": "IdLib",
+    "function": "toId",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/IdLib.sol",
+    "start_line": 25,
+    "max_cos": 0.7647676467895508,
+    "top": [
+      {
+        "cos": 0.7647676467895508,
+        "severity": "H",
+        "title": "AfEth deposits could use price data from an invalid Chainlink response",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7520638704299927,
+        "severity": "M",
+        "title": "`encodedData` argument of `hashStruct` is not calculated perfectly for EIP712 singed messages in `CultureIndex.sol`",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7513511776924133,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7511174082756042,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.7509130239486694,
+        "severity": "M",
+        "title": "The `RandomizerVRF` and `RandomizerRNG` do not produce hash value.",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "toId",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 871,
+    "max_cos": 0.7636051177978516,
+    "top": [
+      {
+        "cos": 0.7636051177978516,
+        "severity": "H",
+        "title": "update_market() market weight incorrect",
+        "finding_id": "H-01"
+      },
+      {
+        "cos": 0.7535665035247803,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7414379119873047,
+        "severity": "H",
+        "title": "AfEth deposits could use price data from an invalid Chainlink response",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7392076253890991,
+        "severity": "M",
+        "title": "`MagicLpAggregator` can be incompatible with potential integrators due to incorrect `latestRoundData` function",
+        "finding_id": "M-11"
+      },
+      {
+        "cos": 0.7376734018325806,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "setDefaultSettlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 277,
+    "max_cos": 0.763458251953125,
+    "top": [
+      {
+        "cos": 0.763458251953125,
+        "severity": "H",
+        "title": "Order's creator can update `tokenOut` to arbitrary token",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7450909614562988,
+        "severity": "M",
+        "title": "The `refundAccount` is erroneously set to `msg.sender` instead of `tx.origin` when `refundAccount` specified as `address",
+        "finding_id": "M-19"
+      },
+      {
+        "cos": 0.7417513132095337,
+        "severity": "H",
+        "title": "Logic flaw in `check_can_edit_short` allows editing short-term rental before finalization enabling theft of users' depos",
+        "finding_id": "H-07"
+      },
+      {
+        "cos": 0.7396274209022522,
+        "severity": "M",
+        "title": "No related function to set `fee_protocol`",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.7373393177986145,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "touchMarket",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 755,
+    "max_cos": 0.7619377374649048,
+    "top": [
+      {
+        "cos": 0.7619377374649048,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7615334391593933,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7548976540565491,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.7362366914749146,
+        "severity": "M",
+        "title": "Improper adjustment of Lending Ledger configuration",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7356323599815369,
+        "severity": "H",
+        "title": "`IMarket.execute.selector`, `_checkSender` bypass allows to execute arbitrary operations",
+        "finding_id": "H-08"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "toMarket",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 877,
+    "max_cos": 0.7617509365081787,
+    "top": [
+      {
+        "cos": 0.7617509365081787,
+        "severity": "H",
+        "title": "`IMarket.execute.selector`, `_checkSender` bypass allows to execute arbitrary operations",
+        "finding_id": "H-08"
+      },
+      {
+        "cos": 0.7454208731651306,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.7426111698150635,
+        "severity": "M",
+        "title": "`_getUniswapTwapWei()` will show incorrect price for negative ticks cause it doesn't round up for negative ticks",
+        "finding_id": "M-18"
+      },
+      {
+        "cos": 0.7367119193077087,
+        "severity": "M",
+        "title": "`MagicLpAggregator` can be incompatible with potential integrators due to incorrect `latestRoundData` function",
+        "finding_id": "M-11"
+      },
+      {
+        "cos": 0.7365460395812988,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "buyWithUnitsTargetAndWithdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 49,
+    "max_cos": 0.7604720592498779,
+    "top": [
+      {
+        "cos": 0.7604720592498779,
+        "severity": "M",
+        "title": "`RubiconMarket: buy()` may not take any fee for tokens with low decimal precision",
+        "finding_id": "M-25"
+      },
+      {
+        "cos": 0.760312020778656,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7585124373435974,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7511447072029114,
+        "severity": "M",
+        "title": "Miscalculation in addLiquidity of Router results in unauthorized spending of tokens",
+        "finding_id": "M-03"
+      },
+      {
+        "cos": 0.7485525012016296,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "setConsumed",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 723,
+    "max_cos": 0.7600734233856201,
+    "top": [
+      {
+        "cos": 0.7600734233856201,
+        "severity": "M",
+        "title": "No related function to set `fee_protocol`",
+        "finding_id": "M-12"
+      },
+      {
+        "cos": 0.7459316849708557,
+        "severity": "M",
+        "title": "Incorrect fee handling prevents protocol from updating fees",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7447355389595032,
+        "severity": "M",
+        "title": "The fee for the protocol in the function `RamsesV3Pool::flash()` is not calculated correctly",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7404632568359375,
+        "severity": "M",
+        "title": "Integration issue in `ousgInstantManager` with `BUIDL` if `minUSTokens` is set by blackrock",
+        "finding_id": "M-01"
+      },
+      {
+        "cos": 0.7401384115219116,
+        "severity": "M",
+        "title": "Incorrect `unwrapNativeTokenInWallet` receiver address",
+        "finding_id": "M-20"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "settlementFeeCbps",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 908,
+    "max_cos": 0.7582976222038269,
+    "top": [
+      {
+        "cos": 0.7582976222038269,
+        "severity": "M",
+        "title": "Incorrect flag results to `_hasFallbackToggled` always set to false on `createMultipleSettlement`.",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.7560362815856934,
+        "severity": "M",
+        "title": "The `receive_cross_chain_msg` function has potential replay attack risks",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7477745413780212,
+        "severity": "M",
+        "title": "`FixedTermLoanHook` looks at `block.timestamp` instead of `expiry`",
+        "finding_id": "M-04"
+      },
+      {
+        "cos": 0.7432098984718323,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7428775429725647,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "lossFactor",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 895,
+    "max_cos": 0.7582110166549683,
+    "top": [
+      {
+        "cos": 0.7582110166549683,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7404974699020386,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7378252744674683,
+        "severity": "H",
+        "title": "`swapOut` functions have invalid slippage check, causing user loss of funds",
+        "finding_id": "H-07"
+      },
+      {
+        "cos": 0.7328817844390869,
+        "severity": "H",
+        "title": "`convert_to_yang_helper()` loss precision",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.725727915763855,
+        "severity": "M",
+        "title": "In `CDPVault::liquidatePositionBadDebt()`, the calculation of `loss` is incorrect",
+        "finding_id": "M-18"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "collateralBitmap",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 863,
+    "max_cos": 0.7573568224906921,
+    "top": [
+      {
+        "cos": 0.7573568224906921,
+        "severity": "M",
+        "title": "`Position._borrowLimit` doesn't use exisiting collateral in case if user doesn't have any `_bathToken`",
+        "finding_id": "M-21"
+      },
+      {
+        "cos": 0.736400842666626,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.736027717590332,
+        "severity": "H",
+        "title": "`decreaseLever` uses incorrect position address when withdrawing",
+        "finding_id": "H-09"
+      },
+      {
+        "cos": 0.7339357137680054,
+        "severity": "H",
+        "title": "Overflow in `CollateralTracker` allows minting shares for free",
+        "finding_id": "H-02"
+      },
+      {
+        "cos": 0.7268168330192566,
+        "severity": "M",
+        "title": "`fillOrder` not properly cancel order when collateral of position is empty",
+        "finding_id": "M-02"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "hasCredit",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 853,
+    "max_cos": 0.7562364935874939,
+    "top": [
+      {
+        "cos": 0.7562364935874939,
+        "severity": "M",
+        "title": "`Position._borrowLimit` doesn't use exisiting collateral in case if user doesn't have any `_bathToken`",
+        "finding_id": "M-21"
+      },
+      {
+        "cos": 0.7412642240524292,
+        "severity": "H",
+        "title": "Wrong use of `nftID` to check if a `PowerFarm` position is an Aave position",
+        "finding_id": "H-05"
+      },
+      {
+        "cos": 0.7407365441322327,
+        "severity": "M",
+        "title": "Neither `sellCreditMarket()` nor `compensate()` checks whether the credit position to be sold is allowed for sale",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.739714503288269,
+        "severity": "M",
+        "title": "LendingTerm.sol `_partialRepay()` A user cannot partial repay a loan with `0` interest",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7297510504722595,
+        "severity": "M",
+        "title": "ProfitManager's `creditMultiplier` calculation does not count undistributed rewards; this can cause value losses to user",
+        "finding_id": "M-24"
+      }
+    ]
+  },
+  {
+    "contract": "EcrecoverRatifier",
+    "function": "isRatified",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/EcrecoverRatifier.sol",
+    "start_line": 33,
+    "max_cos": 0.7551703453063965,
+    "top": [
+      {
+        "cos": 0.7551703453063965,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7419695854187012,
+        "severity": "M",
+        "title": "`BalancerFlashLender#receiveFlashLoan` does not validate the `originalCallData`",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7373494505882263,
+        "severity": "M",
+        "title": "`encodedData` argument of `hashStruct` is not calculated perfectly for EIP712 singed messages in `CultureIndex.sol`",
+        "finding_id": "M-14"
+      },
+      {
+        "cos": 0.7350742220878601,
+        "severity": "M",
+        "title": "`AccessControlHooks` `onQueueWithdrawal()` does not check if market is hooked which could lead to unexpected errors such",
+        "finding_id": "M-08"
+      },
+      {
+        "cos": 0.7308794260025024,
+        "severity": "M",
+        "title": "` validateCallback()` is vulnerable to a birthday attack",
+        "finding_id": "M-05"
+      }
+    ]
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashMarket",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 89,
+    "max_cos": 0.7535202503204346,
+    "top": [
+      {
+        "cos": 0.7535202503204346,
+        "severity": "M",
+        "title": "The `RandomizerVRF` and `RandomizerRNG` do not produce hash value.",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7389275431632996,
+        "severity": "H",
+        "title": "Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens",
+        "finding_id": "H-3"
+      },
+      {
+        "cos": 0.7303377389907837,
+        "severity": "M",
+        "title": "Loss of precission when calculating the accumulated CANTO per share",
+        "finding_id": "M-02"
+      },
+      {
+        "cos": 0.7197906374931335,
+        "severity": "H",
+        "title": "Insufficient price validation in `transfer_nft` function enables theft of listed tokens",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7172471880912781,
+        "severity": "M",
+        "title": "`BalancerFlashLender#receiveFlashLoan` does not validate the `originalCallData`",
+        "finding_id": "M-08"
+      }
+    ]
+  },
+  {
+    "contract": "Midnight",
+    "function": "totalUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 891,
+    "max_cos": 0.7534374594688416,
+    "top": [
+      {
+        "cos": 0.7534374594688416,
+        "severity": "M",
+        "title": "Incorrect `totalsupply` value will be returned due to erroneous return data decode implementation",
+        "finding_id": "M-10"
+      },
+      {
+        "cos": 0.734144389629364,
+        "severity": "M",
+        "title": "`PoolAction::updateLeverJoin` wrongly updates `assetsIn` array, leading to `PositionAction4626::_onIncreaseLever` to alw",
+        "finding_id": "M-06"
+      },
+      {
+        "cos": 0.7282782793045044,
+        "severity": "H",
+        "title": "Governance wrongly calculates `_quorumReached()`",
+        "finding_id": "H-08"
+      },
+      {
+        "cos": 0.710254967212677,
+        "severity": "H",
+        "title": "The collateral remainder cap is incorrectly calculated during liquidation",
+        "finding_id": "H-03"
+      },
+      {
+        "cos": 0.7101939916610718,
+        "severity": "H",
+        "title": "Users won't liquidate positions because the logic used to calculate the liquidator's profit is incorrect",
+        "finding_id": "H-04"
+      }
+    ]
+  }
+]

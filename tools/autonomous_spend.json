@@ -1,7 +1,7 @@
 {
   "week_start": "2026-06-08",
   "weekly_cap_usd": 50.0,
-  "cumulative_usd": 3.90366375,
+  "cumulative_usd": 5.79225375,
   "cycles": [
     {
       "ts": "2026-06-07T14:24:45.822106",
@@ -86,15 +86,14 @@
       "refute_cost_usd": 0.0034
     },
     {
-      "ts": "2026-06-08T12:00:00.000000",
-      "goal": "CONTEST_DAY_HARDENING",
-      "verdict": "in-progress",
-      "cost_usd": 0.0,
-      "exec_cost_usd": 0.0,
-      "refute_cost_usd": 0.0,
-      "notes": "criteria #5 smoke test done (19%→20% precision, 4 admin-trust catches, 0 FP); #6 RUNBOOK updated with cost projection; #7 spend.json updated"
+      "ts": "2026-06-09T07:26:41.720651",
+      "goal": "AUTHOR_TLA_SHAPE FirstDepositorInflation",
+      "verdict": "NULL-HONEST",
+      "cost_usd": 1.8886,
+      "exec_cost_usd": 1.8858,
+      "refute_cost_usd": 0.0028
     }
   ],
-  "last_cycle_ts": "2026-06-08T12:00:00.000000",
+  "last_cycle_ts": "2026-06-09T07:26:41.720651",
   "version": 1
 }

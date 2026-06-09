@@ -1,0 +1,530 @@
+[
+  {
+    "contract": "Midnight",
+    "function": "multicall",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 211
+  },
+  {
+    "contract": "Midnight",
+    "function": "setRoleSetter",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 224
+  },
+  {
+    "contract": "Midnight",
+    "function": "setFeeSetter",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 230
+  },
+  {
+    "contract": "Midnight",
+    "function": "setFeeClaimer",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 236
+  },
+  {
+    "contract": "Midnight",
+    "function": "setTickSpacingSetter",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 242
+  },
+  {
+    "contract": "Midnight",
+    "function": "setMarketTickSpacing",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 249
+  },
+  {
+    "contract": "Midnight",
+    "function": "setMarketSettlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 258
+  },
+  {
+    "contract": "Midnight",
+    "function": "setDefaultSettlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 277
+  },
+  {
+    "contract": "Midnight",
+    "function": "setMarketContinuousFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 287
+  },
+  {
+    "contract": "Midnight",
+    "function": "setDefaultContinuousFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 297
+  },
+  {
+    "contract": "Midnight",
+    "function": "claimSettlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 305
+  },
+  {
+    "contract": "Midnight",
+    "function": "claimContinuousFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 312
+  },
+  {
+    "contract": "Midnight",
+    "function": "take",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 337
+  },
+  {
+    "contract": "Midnight",
+    "function": "withdraw",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 481
+  },
+  {
+    "contract": "Midnight",
+    "function": "repay",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 502
+  },
+  {
+    "contract": "Midnight",
+    "function": "supplyCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 524
+  },
+  {
+    "contract": "Midnight",
+    "function": "withdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 549
+  },
+  {
+    "contract": "Midnight",
+    "function": "liquidate",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 581
+  },
+  {
+    "contract": "Midnight",
+    "function": "setConsumed",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 723
+  },
+  {
+    "contract": "Midnight",
+    "function": "setIsAuthorized",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 731
+  },
+  {
+    "contract": "Midnight",
+    "function": "flashLoan",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 737
+  },
+  {
+    "contract": "Midnight",
+    "function": "touchMarket",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 755
+  },
+  {
+    "contract": "Midnight",
+    "function": "updatePositionView",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 797
+  },
+  {
+    "contract": "Midnight",
+    "function": "updatePosition",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 823
+  },
+  {
+    "contract": "Midnight",
+    "function": "_updatePosition",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 832
+  },
+  {
+    "contract": "Midnight",
+    "function": "hasCredit",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 853
+  },
+  {
+    "contract": "Midnight",
+    "function": "lastLossFactor",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 859
+  },
+  {
+    "contract": "Midnight",
+    "function": "collateralBitmap",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 863
+  },
+  {
+    "contract": "Midnight",
+    "function": "collateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 867
+  },
+  {
+    "contract": "Midnight",
+    "function": "toId",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 871
+  },
+  {
+    "contract": "Midnight",
+    "function": "toMarket",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 877
+  },
+  {
+    "contract": "Midnight",
+    "function": "creditOf",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 883
+  },
+  {
+    "contract": "Midnight",
+    "function": "debtOf",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 887
+  },
+  {
+    "contract": "Midnight",
+    "function": "totalUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 891
+  },
+  {
+    "contract": "Midnight",
+    "function": "lossFactor",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 895
+  },
+  {
+    "contract": "Midnight",
+    "function": "tickSpacing",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 899
+  },
+  {
+    "contract": "Midnight",
+    "function": "withdrawable",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 903
+  },
+  {
+    "contract": "Midnight",
+    "function": "settlementFeeCbps",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 908
+  },
+  {
+    "contract": "Midnight",
+    "function": "continuousFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 921
+  },
+  {
+    "contract": "Midnight",
+    "function": "continuousFeeCredit",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 925
+  },
+  {
+    "contract": "Midnight",
+    "function": "pendingFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 929
+  },
+  {
+    "contract": "Midnight",
+    "function": "lastAccrual",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 933
+  },
+  {
+    "contract": "Midnight",
+    "function": "liquidationLocked",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 937
+  },
+  {
+    "contract": "Midnight",
+    "function": "isHealthy",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 944
+  },
+  {
+    "contract": "Midnight",
+    "function": "settlementFee",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/Midnight.sol",
+    "start_line": 963
+  },
+  {
+    "contract": "IdLib",
+    "function": "toId",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/IdLib.sol",
+    "start_line": 25
+  },
+  {
+    "contract": "IdLib",
+    "function": "storeInCode",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/IdLib.sol",
+    "start_line": 35
+  },
+  {
+    "contract": "SafeTransferLib",
+    "function": "safeTransfer",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/SafeTransferLib.sol",
+    "start_line": 12
+  },
+  {
+    "contract": "SafeTransferLib",
+    "function": "safeTransferFrom",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/SafeTransferLib.sol",
+    "start_line": 24
+  },
+  {
+    "contract": "TickLib",
+    "function": "divHalfDownUnchecked",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 17
+  },
+  {
+    "contract": "TickLib",
+    "function": "wExp",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 23
+  },
+  {
+    "contract": "TickLib",
+    "function": "tickToPrice",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 44
+  },
+  {
+    "contract": "TickLib",
+    "function": "priceToTick",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/TickLib.sol",
+    "start_line": 56
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "atMostOneNonZero",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 9
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "min",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 16
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "zeroFloorSub",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 22
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "mulDivDown",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 29
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "mulDivUp",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 34
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "toUint128",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 38
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "countBits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 44
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "msb",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 54
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "setBit",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 61
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "clearBit",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 67
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "tExchange",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 74
+  },
+  {
+    "contract": "UtilsLib",
+    "function": "tGet",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/libraries/UtilsLib.sol",
+    "start_line": 83
+  },
+  {
+    "contract": "ConsumableUnitsLib",
+    "function": "consumableUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/ConsumableUnitsLib.sol",
+    "start_line": 14
+  },
+  {
+    "contract": "EcrecoverAuthorizer",
+    "function": "setIsAuthorized",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/EcrecoverAuthorizer.sol",
+    "start_line": 24
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "buyWithUnitsTargetAndWithdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 49
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "supplyCollateralAndSellWithUnitsTarget",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 117
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "buyWithAssetsTargetAndWithdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 180
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "supplyCollateralAndSellWithAssetsTarget",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 252
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "repayAndWithdrawCollateral",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 315
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "min",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 351
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "safeApprove",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 358
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "forceApproveMax",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 371
+  },
+  {
+    "contract": "MidnightBundles",
+    "function": "pullToken",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/MidnightBundles.sol",
+    "start_line": 378
+  },
+  {
+    "contract": "TakeAmountsLib",
+    "function": "buyerAssetsToUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/TakeAmountsLib.sol",
+    "start_line": 17
+  },
+  {
+    "contract": "TakeAmountsLib",
+    "function": "sellerAssetsToUnits",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/periphery/TakeAmountsLib.sol",
+    "start_line": 36
+  },
+  {
+    "contract": "EcrecoverRatifier",
+    "function": "cancelRoot",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/EcrecoverRatifier.sol",
+    "start_line": 27
+  },
+  {
+    "contract": "EcrecoverRatifier",
+    "function": "isRatified",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/EcrecoverRatifier.sol",
+    "start_line": 33
+  },
+  {
+    "contract": "SetterRatifier",
+    "function": "setIsRootRatified",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/SetterRatifier.sol",
+    "start_line": 24
+  },
+  {
+    "contract": "SetterRatifier",
+    "function": "isRatified",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/SetterRatifier.sol",
+    "start_line": 30
+  },
+  {
+    "contract": "HashLib",
+    "function": "offerTreeTypeHash",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 22
+  },
+  {
+    "contract": "HashLib",
+    "function": "isLeaf",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 53
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashNode",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 67
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashCollateralParams",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 76
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashMarket",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 89
+  },
+  {
+    "contract": "HashLib",
+    "function": "hashOffer",
+    "file": "corpus/calibration/2026-06-08-cantina-morpho-midnight/midnight/src/ratifiers/libraries/HashLib.sol",
+    "start_line": 118
+  }
+]
