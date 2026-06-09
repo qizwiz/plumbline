@@ -15,28 +15,15 @@ from reps.jsonl, the limitations.]*
 
 ## 1. Motivation
 
-> **Seed paragraph (JH expand from here):**
->
-> Smart-contract auditing has converged on a quality standard for proof
-> of concept: a runnable Foundry test that reproduces the vulnerability
-> against a forked or locally-deployed target. Sherlock, Code4rena, and
-> Immunefi all require it; prose-only submissions are auto-rejected or
-> down-judged. Yet the *path* from "a TLA+ specification of a structural
-> bug class violates its invariant" to "a Foundry test that reproduces
-> the bug on a specific contract" is currently a hand-coded step — every
-> shape and every target needs its own bespoke test scaffold. This paper
-> describes plumbline, a pipeline that closes that gap with a single
-> universal Foundry test template plus per-target JSON manifests. The
-> universal template plus a manifest plus a lint-and-emit tool reduces
-> the TLA+-to-PoC step from ~3 hours of hand-coding per (shape, target)
-> pair to ~10 minutes of JSON authoring with static + dynamic verification.
+The pipeline is the latest test of a longer-running hypothesis: that software engineering's hardest problem is the absence of intrinsic ground truth. Unlike mechanical or civil engineering, where gravity, material strength, and dimensional tolerance enforce a baseline of reality that cannot be argued away, software is words about words. A program that compiles is not a program that works; a test that passes is not a proof of correctness; a specification that reads well is not one that has been checked. We have long held that the only place ground truth lives in software is in its *structure* — the AST, the call graph, the type lattice, the proof tree, the cellular automaton — and that the right system architecture is one that lifts as much engineering work as possible into structural transformations whose correctness can be mechanically discharged.
 
-*[JH next: expand the motivation. Cover:*
-- *Why verifier-discharge as a frame: LLM proposes, verifier disposes*
-- *The "elite human auditor + tooling" gap that plumbline tries to close*
-- *Why the universal template + JSON manifest beats per-shape Jinja templates*
-- *Reference: docs/research/IMMUNEFI_STRATEGY.md*
-*]*
+The hypothesis has a corollary: the right computational substrate is not a token stream but a *graph* — a thing with positions, edges, neighborhoods, and topology. Internally we call this *computational material*: a substrate that computes but also has physics — plasticity, attractor basins, properties that survive under composition. The motivating image is the McDonald-brothers' tennis-court scene from *The Founder*, in which two engineers optimize a kitchen workflow by walking it with chalk on asphalt: machine learning made physical, gradient descent enacted by two humans on a parking lot. The conjecture this paper does not prove but is shaped by is that arbitrary systems can be stitched together from physically-grounded structural components, and the truth of their composition follows mechanically from the truth of their parts. Plumbline is a small instance of this larger program; the program itself is left to a separate position paper (Section 7).
+
+The local question that motivated plumbline was about trust. LLMs are fluent in any technical language they have training data for, including TLA+ and Solidity, but they also lie — confidently, in syntactically-valid form, in ways a non-expert reader cannot easily detect. For a solo auditor whose submissions get judged by adversarial reviewers, an LLM that produces a syntactically-clean-but-semantically-wrong specification is worse than no LLM at all. The architectural question was therefore: *what is the shape of engineering truth that lets one actually depend on a model's output?* The answer, in this domain, is verifier discharge — the LLM proposes a TLA+ shape, but TLC's invariant check either violates the property (a real counterexample) or doesn't (the spec is too weak). The LLM proposes a Foundry test, but forge either reproduces the exploit or doesn't. The model is allowed to be wrong; the verifier is not. Soundness moves out of the language model and into the discharge tool.
+
+Concretely, smart-contract auditing has converged on a quality standard for proof of concept: a runnable Foundry test that reproduces the vulnerability against a forked or locally-deployed target. Sherlock, Code4rena, and Immunefi all require it; prose-only submissions are auto-rejected or down-judged. Yet the *path* from "a TLA+ specification of a structural bug class violates its invariant" to "a Foundry test that reproduces the bug on a specific contract" is currently a hand-coded step — every shape and every target needs its own bespoke test scaffold. This paper describes plumbline, a pipeline that closes that gap with a single universal Foundry test template plus per-target JSON manifests. The universal template plus a manifest plus a lint-and-emit tool reduces the TLA+-to-PoC step from ~3 hours of hand-coding per (shape, target) pair to ~10 minutes of JSON authoring with static + dynamic verification.
+
+The pipeline is built on a specific division of labor: shape-recognition is the human's job, fluency is the LLM's job, soundness is the verifier's job. A human auditor working alone can recognize the structural shape of a vulnerability — "this looks like first-depositor inflation," "this looks like signature replay" — but converting that recognition into a well-formed TLA+ specification or a runnable Foundry test is high-friction symbolic work. An LLM working alone is fluent in TLA+ and Solidity syntax but has no reliable taste for which abstraction matches the actual bug; left to itself it produces specifications that compile but model the wrong thing. The verifier (TLC for the spec, forge for the PoC) is sound but mute — it tells you yes or no, not what to write next. Plumbline pairs them: the human provides the shape, the LLM provides the fluency, the verifier discharges the result. The contribution of this paper is the specific glue that makes this three-way pairing tractable for smart-contract auditing — a universal Foundry template, per-target JSON manifests, and a lint that catches the recurring authoring footguns before they cost real session time.
 
 ---
 
@@ -157,10 +144,31 @@ is slow + lossy.]*
 
 ---
 
-## 7. Conclusion
+## 7. Conclusion and Future Work
 
-*[JH: ~3 sentences. The verifier-discharge frame, the universal-template
+*[JH: ~3 sentences on the verifier-discharge frame, the universal-template
 generalization, what's measurably better since adopting this.]*
+
+### Future Work — the larger program
+
+Plumbline operationalizes one small slice of a longer-running research
+program around *computational material* — the conjecture that arbitrary
+software systems can be stitched together from physically-grounded
+structural components and that the truth of their composition follows
+mechanically from the truth of their parts. The smart-contract-auditing
+instance presented here is the easiest case: the bug classes are
+well-categorized, the verifiers (TLC, forge) are mature, and the
+"physical substrate" is the EVM, which is finite-state enough to fit
+inside a discharge tool. Open questions for the larger program include:
+how to extend verifier-discharged structural pipelines to substrates
+without bounded state (general distributed systems, ML training loops);
+how to compose multiple verifiers whose individual soundness guarantees
+don't trivially compose; whether the "shape-recognition + fluency +
+soundness" three-way pairing is the right factoring or whether the
+fluency role can itself be lifted into structural form. We expect to
+treat these in a separate position paper; the present work is the
+existence proof that the pairing is tractable in at least one
+non-trivial domain.
 
 ---
 
@@ -187,4 +195,4 @@ generalization, what's measurably better since adopting this.]*
 
 | Date | Day | Section worked | Word count | Notes |
 |------|-----|----------------|------------|-------|
-| 2026-06-09 | 1 | Outline + Section 1 seed | ~250 | Scaffolded by Claude; JH to expand |
+| 2026-06-09 | 1 | Outline + Section 1 motivation (5 paragraphs) + Section 7 future-work note | ~900 | Interview mode: JH directed shape, Claude transcribed. Captures structural-hypothesis → computational-material → AI-lying / verifier-discharge → tool description → shape/fluency/soundness division of labor. |
