@@ -36,9 +36,64 @@ If JH says "let's just build X real quick" — the answer is **no, not until
 
 ---
 
-## Week 1 — Days 1-7 (2026-06-09 → 2026-06-15): arXiv writeup + baselines
+## REVISED 2026-06-09 EVENING — sequence change
 
-**Goal:** Post to arXiv (cs.SE or cs.CR) by end of day 7 with measured comparison to baselines.
+After today's cold-test on DRE revealed sol_intent solo produced ZERO violations on the Sherlock #1 codebase, and after studying pact's invariant_agent + plumbline's structural_cascade output, we identified that the seam between "structural narrowing" and "LLM-text proposer" is much smaller to close than initially thought: cascade.jsonl already emits the rich object (corpus_top1, tla_top1_shape, halmos_status) the proposer needs. See `docs/design/structural_proposer.md`.
+
+EV analysis favors building structural_proposer FIRST, then writing the paper with H8 results as the headline rather than as future work. Discipline preserved by hard Day-5 cutoff: if structural_proposer isn't fired-and-measured on DRE by Friday EOD (2026-06-13), revert to paper-first immediately. No "almost there, give me one more day."
+
+## Week 1 — Days 1-5 (2026-06-09 → 2026-06-13): structural_proposer build + H8 test
+
+**Goal:** Working `tools/structural_proposer.py` fired on DRE with a measured recall number by EOD Friday.
+
+### Day 1 (today, 2026-06-09)
+COMPLETE. Bleed stopped, 14 commits, Section 1 + 7 + 3.1 written, cold-test falsified the implicit Sherlock-#1-from-sol_intent claim, structural_proposer design doc landed.
+
+### Day 2 (Tue 2026-06-10) — Pass A corpus annotation
+- Author `tools/annotate_corpus_invariants.py`
+- For each of 1,240 findings in `findings_index.pkl`, LLM-extract a halmos-shaped structural invariant from the title prose
+- Add `structural_invariant` field per finding
+- Validate on 50 sampled findings — manually confirm the extracted invariant is faithful to the bug
+- Re-pickle `findings_index.pkl`
+- Cost: ~$5 OpenRouter; effort: 4-6 hours
+
+### Day 3 (Wed 2026-06-11) — structural_proposer core
+- Author `tools/structural_proposer.py::propose_check(cascade_entry, corpus, shapes_dir)`
+- Compose pact's `_propose_prompt` style with corpus_top1.structural_invariant + tla_top1_shape's INVARIANT as conditioning
+- Integration test on a single cascade.jsonl entry from puppy-raffle
+- Effort: 6-8 hours
+
+### Day 4 (Thu 2026-06-12) — DRE end-to-end
+- Run mine_contest.py + structural_proposer + halmos_check.run_halmos + gauntlet on DRE
+- Score output against Sherlock #1 answer key
+- Effort: 4-6 hours
+
+### Day 5 (Fri 2026-06-13) — HARD CUTOFF + measurement
+- If structural_proposer produced ≥1 lead matching Sherlock #1 mechanism: H8 holds. Paper sequence proceeds (week 2).
+- If structural_proposer produced zero relevant leads: H8 falsified on DRE. PIVOT TO PAPER. Write the falsification result honestly into Section 7. Days 6-12 become paper writing with original "comparable to Slither" framing.
+- If structural_proposer isn't running by EOD: KILL THE BUILD. Revert to paper. No "I just need one more day."
+
+## Week 2 — Days 6-12 (2026-06-14 → 2026-06-20): paper writeup
+
+If H8 holds: paper uses H8 measured result as the headline finding ("structural-proposer beats sol_intent by X recall delta on DRE"). Sections 2-6 written in interview mode.
+
+If H8 falsified: paper uses original baseline-comparable framing. Sections 2-6 written in interview mode.
+
+Either way, **the paper has measured results to anchor every claim.**
+
+## Week 3 — Days 13-18 (2026-06-21 → 2026-06-26): arXiv + SHSU + Secureum
+
+- Day 13: arXiv submission + Zenodo dual-post
+- Day 14-15: SHSU walk-in (CS + Math depts), endorsement outreach to Dr. Islam / Dr. Chapman / Mom warm intro
+- Day 16-17: Cyfrin Updraft if time
+- Day 18: register Secureum RACE; wait for Sherlock judging
+- **Hard rule:** no new project directories. The "build something while waiting" urge is the pattern firing.
+
+---
+
+## Old Week 1 (DEPRECATED — preserved below for reference only)
+
+The original Week 1 plan (arXiv writeup days 1-7) is preserved below. Don't follow it. The revised plan above is the active discipline.
 
 ### Day 2 (Tue 2026-06-10) — Baseline comparison: Slither + pact-Halmos vs plumbline
 

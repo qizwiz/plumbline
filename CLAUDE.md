@@ -13,10 +13,13 @@ that produced no shipped output, financial collections.
 
 The replacement directive, in force until 2026-06-27:
 
-**Read `CURRICULUM.md` FIRST every session.** The 18-day plan is:
-1. Week 1 (now → 2026-06-15): finish + post an arXiv writeup of plumbline
-2. Week 2 (→ 2026-06-22): complete Cyfrin Updraft
-3. Week 3 (→ 2026-06-27): wait for Sherlock 1259 judging; sit still
+**Read `CURRICULUM.md` FIRST every session.** The 18-day plan was REVISED 2026-06-09 evening after cold-test on DRE falsified the implicit "sol_intent finds bugs autonomously" claim:
+
+1. **Week 1 (now → 2026-06-13): BUILD `tools/structural_proposer.py`** — close the seam between cascade.jsonl's structural-narrowing output and pact's halmos discharge. HARD DAY-5 CUTOFF: if not fired-and-measured on DRE by Friday EOD, KILL THE BUILD and revert to paper. See `docs/design/structural_proposer.md`.
+2. **Week 2 (2026-06-14 → 2026-06-20): write the arXiv paper** — anchored by H8 measured result (whether it holds or falsifies)
+3. **Week 3 (2026-06-21 → 2026-06-26): arXiv post + SHSU outreach + Secureum RACE registration; wait for Sherlock 1259 judging**
+
+If JH starts drifting from structural_proposer on Day 4 toward "let me also refactor X" — hold him to the Day-5 cutoff. The cutoff is the safety mechanism for trusting the sequence change.
 
 **Hard rules enforced by you (Claude) on every session:**
 - No new project directories under `~/src/` until 2026-06-27
