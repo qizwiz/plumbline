@@ -49,13 +49,23 @@ EV analysis favors building structural_proposer FIRST, then writing the paper wi
 ### Day 1 (today, 2026-06-09)
 COMPLETE. Bleed stopped, 14 commits, Section 1 + 7 + 3.1 written, cold-test falsified the implicit Sherlock-#1-from-sol_intent claim, structural_proposer design doc landed.
 
-### Day 2 (Tue 2026-06-10) — Pass A corpus annotation
-- Author `tools/annotate_corpus_invariants.py`
-- For each of 1,240 findings in `findings_index.pkl`, LLM-extract a halmos-shaped structural invariant from the title prose
-- Add `structural_invariant` field per finding
-- Validate on 50 sampled findings — manually confirm the extracted invariant is faithful to the bug
-- Re-pickle `findings_index.pkl`
-- Cost: ~$5 OpenRouter; effort: 4-6 hours
+### Day 2 (Tue 2026-06-10) — Pass A prompt iteration + corpus annotation
+
+**PARTIAL FROM DAY 1 EVENING** — Day 1's session shipped: the Pass A driver script (`tools/annotate_corpus_invariants.py`), the research-derived spec (`docs/design/pass_a_spec.json` from a 7-agent Workflow research swarm), and a N=50 sample run with the adversarial REFUTE-default validator. Result: **7/50 CLEAN (14%), 43/50 REFUTED, 0/50 NULL** — extraction prompt produces too many tautological/vacuous invariants. See `runs/2026-06-09-pass-a/validation.md` for the per-finding diagnosis.
+
+**Day 2's actual first task is prompt iteration**, NOT `--full`:
+
+1. **Read the validation markdown** at `runs/2026-06-09-pass-a/validation.md`. Look at the refute reasons. Identify pattern of failures.
+2. **Tighten the extraction prompt** in `docs/design/pass_a_spec.json`:
+   - Add self-validation requirement: extractor must articulate "when the bug fires, this expression evaluates to FALSE because <concrete reason>" for each invariant. If they can't, the invariant is rejected.
+   - Consider reducing the number of invariants requested per finding (currently 2-3; precision drops with quantity)
+   - Add an anti-pattern list (tautological, vacuous, wrong-abstraction-layer) to the prompt
+3. **Re-run sample**: `python3 tools/annotate_corpus_invariants.py --sample 50`. Target: ≥50% CLEAN.
+4. **Iterate**: if still <50%, try again. Cap at 3 prompt-iteration rounds (~$6) before deciding.
+5. **Run `--full`** once CLEAN rate is acceptable. Cost: ~$15 OpenRouter (doubled by the adversarial validator); time: ~30-45 min unattended.
+6. **Inspect the full output**: count CLEAN/REFUTED/NULL across the 1,240 findings. Document for the paper.
+
+**Don't pollute the corpus on a marginal prompt.** Better to have 200 high-quality annotations than 1,240 questionable ones.
 
 ### Day 3 (Wed 2026-06-11) — structural_proposer core
 - Author `tools/structural_proposer.py::propose_check(cascade_entry, corpus, shapes_dir)`
