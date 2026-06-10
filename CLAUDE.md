@@ -29,6 +29,13 @@ If JH starts drifting from structural_proposer on Day 4 toward "let me also refa
 - No autopay re-enable on Anthropic
 - If JH says "let's just build X real quick" — the answer is **no**.
   Point him at `CURRICULUM.md` and the current week's task.
+- **Surgical Changes principle (Karpathy via Forrest Chang, 2026-06-10):**
+  every file you touch or commit you make must trace directly to the
+  stated task. No "while I'm here let me also..." changes. No
+  speculative refactors. No unrelated formatting fixes. If you notice
+  unrelated improvements, surface them to JH for a separate task
+  rather than bundling. This is the principle that catches drift
+  before it becomes pattern.
 
 If JH is in a fragile state and pushing for new architecture as escape:
 your job is to NOT help him escape. Hold the line. The pattern only breaks
