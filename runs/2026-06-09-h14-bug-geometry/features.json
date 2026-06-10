@@ -1,0 +1,6322 @@
+[
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle._baseURI",
+    "short_name": "_baseURI",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle._isActivePlayer",
+    "short_name": "_isActivePlayer",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.changeFeeAddress",
+    "short_name": "changeFeeAddress",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.enterRaffle",
+    "short_name": "enterRaffle",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.getActivePlayerIndex",
+    "short_name": "getActivePlayerIndex",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.refund",
+    "short_name": "refund",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.selectWinner",
+    "short_name": "selectWinner",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.tokenURI",
+    "short_name": "tokenURI",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "puppy-raffle",
+    "node": "PuppyRaffle.withdrawFees",
+    "short_name": "withdrawFees",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "PoolFactory.createPool",
+    "short_name": "createPool",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "PoolFactory.getPool",
+    "short_name": "getPool",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "PoolFactory.getToken",
+    "short_name": "getToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "PoolFactory.getWethToken",
+    "short_name": "getWethToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool._addLiquidityMintAndTransfer",
+    "short_name": "_addLiquidityMintAndTransfer",
+    "is_bug": true,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool._isUnknown",
+    "short_name": "_isUnknown",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool._swap",
+    "short_name": "_swap",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.049999999999999996,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.deposit",
+    "short_name": "deposit",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.013157894736842105,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getInputAmountBasedOnOutput",
+    "short_name": "getInputAmountBasedOnOutput",
+    "is_bug": true,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getMinimumWethDepositAmount",
+    "short_name": "getMinimumWethDepositAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getOutputAmountBasedOnInput",
+    "short_name": "getOutputAmountBasedOnInput",
+    "is_bug": true,
+    "degree": 3,
+    "betweenness": 0.034210526315789476,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getPoolToken",
+    "short_name": "getPoolToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getPoolTokensToDepositBasedOnWeth",
+    "short_name": "getPoolTokensToDepositBasedOnWeth",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getPriceOfOnePoolTokenInWeth",
+    "short_name": "getPriceOfOnePoolTokenInWeth",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getPriceOfOneWethInPoolTokens",
+    "short_name": "getPriceOfOneWethInPoolTokens",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.getWeth",
+    "short_name": "getWeth",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.sellPoolTokens",
+    "short_name": "sellPoolTokens",
+    "is_bug": true,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.swapExactInput",
+    "short_name": "swapExactInput",
+    "is_bug": true,
+    "degree": 2,
+    "betweenness": 0.039473684210526314,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.swapExactOutput",
+    "short_name": "swapExactOutput",
+    "is_bug": true,
+    "degree": 3,
+    "betweenness": 0.034210526315789476,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.totalLiquidityTokenSupply",
+    "short_name": "totalLiquidityTokenSupply",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.007894736842105263,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "t-swap",
+    "node": "TSwapPool.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "AssetToken.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0002032520325203252,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "AssetToken.getExchangeRate",
+    "short_name": "getExchangeRate",
+    "is_bug": true,
+    "degree": 4,
+    "betweenness": 0.01289812829446976,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "AssetToken.getUnderlying",
+    "short_name": "getUnderlying",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "AssetToken.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0002395470383275261,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "AssetToken.transferUnderlyingTo",
+    "short_name": "transferUnderlyingTo",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0109465737514518,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "AssetToken.updateExchangeRate",
+    "short_name": "updateExchangeRate",
+    "is_bug": true,
+    "degree": 4,
+    "betweenness": 0.0033423791655498975,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "IFlashLoanReceiver.executeOperation",
+    "short_name": "executeOperation",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "IPoolFactory.getPool",
+    "short_name": "getPool",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ITSwapPool.getPriceOfOnePoolTokenInWeth",
+    "short_name": "getPriceOfOnePoolTokenInWeth",
+    "is_bug": true,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "IThunderLoan.repay",
+    "short_name": "repay",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "OracleUpgradeable.__Oracle_init",
+    "short_name": "__Oracle_init",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0018292682926829267,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "OracleUpgradeable.__Oracle_init_unchained",
+    "short_name": "__Oracle_init_unchained",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "OracleUpgradeable.getPoolFactoryAddress",
+    "short_name": "getPoolFactoryAddress",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "OracleUpgradeable.getPrice",
+    "short_name": "getPrice",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "OracleUpgradeable.getPriceInWeth",
+    "short_name": "getPriceInWeth",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.026001742160278743,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.deposit",
+    "short_name": "deposit",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.014667761100687928,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.flashloan",
+    "short_name": "flashloan",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.009765590100955955,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.getAssetFromToken",
+    "short_name": "getAssetFromToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.getCalculatedFee",
+    "short_name": "getCalculatedFee",
+    "is_bug": true,
+    "degree": 5,
+    "betweenness": 0.02223030018761726,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.getFee",
+    "short_name": "getFee",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.getFeePrecision",
+    "short_name": "getFeePrecision",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.isAllowedToken",
+    "short_name": "isAllowedToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.isCurrentlyFlashLoaning",
+    "short_name": "isCurrentlyFlashLoaning",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.redeem",
+    "short_name": "redeem",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.005044447422496203,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.repay",
+    "short_name": "repay",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.setAllowedToken",
+    "short_name": "setAllowedToken",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoan.updateFlashLoanFee",
+    "short_name": "updateFlashLoanFee",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.deposit",
+    "short_name": "deposit",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.007965804520682568,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.flashloan",
+    "short_name": "flashloan",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.004680938979719468,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.getAssetFromToken",
+    "short_name": "getAssetFromToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.getCalculatedFee",
+    "short_name": "getCalculatedFee",
+    "is_bug": true,
+    "degree": 3,
+    "betweenness": 0.008676404895917091,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.getFee",
+    "short_name": "getFee",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.isAllowedToken",
+    "short_name": "isAllowedToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.isCurrentlyFlashLoaning",
+    "short_name": "isCurrentlyFlashLoaning",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.redeem",
+    "short_name": "redeem",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.005044447422496203,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.repay",
+    "short_name": "repay",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.setAllowedToken",
+    "short_name": "setAllowedToken",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "thunder-loan",
+    "node": "ThunderLoanUpgraded.updateFlashLoanFee",
+    "short_name": "updateFlashLoanFee",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1BossBridge.depositTokensToL2",
+    "short_name": "depositTokensToL2",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1BossBridge.pause",
+    "short_name": "pause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1BossBridge.sendToL1",
+    "short_name": "sendToL1",
+    "is_bug": true,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1BossBridge.setSigner",
+    "short_name": "setSigner",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1BossBridge.unpause",
+    "short_name": "unpause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1BossBridge.withdrawTokensToL1",
+    "short_name": "withdrawTokensToL1",
+    "is_bug": true,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "L1Vault.approveTo",
+    "short_name": "approveTo",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "TokenFactory.deployToken",
+    "short_name": "deployToken",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "boss-bridge",
+    "node": "TokenFactory.getTokenAddressFromSymbol",
+    "short_name": "getTokenAddressFromSymbol",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Base64.decode",
+    "short_name": "decode",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Base64.encode",
+    "short_name": "encode",
+    "is_bug": false,
+    "degree": 12,
+    "betweenness": 0.06433504576011508,
+    "clustering": 0.015151515151515152,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth._getStaticSignature",
+    "short_name": "_getStaticSignature",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.008250097683870472,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth._setStaticSignature",
+    "short_name": "_setStaticSignature",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.004892367906066537,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.getStaticSignature",
+    "short_name": "getStaticSignature",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.isValidSignature",
+    "short_name": "isValidSignature",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.006485706250547083,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.recoverPartialSignature",
+    "short_name": "recoverPartialSignature",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.001976893254500188,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.recoverSapientSignature",
+    "short_name": "recoverSapientSignature",
+    "is_bug": true,
+    "degree": 2,
+    "betweenness": 0.001593338344480542,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.setStaticSignature",
+    "short_name": "setStaticSignature",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.signatureValidation",
+    "short_name": "signatureValidation",
+    "is_bug": false,
+    "degree": 9,
+    "betweenness": 0.023027023164568106,
+    "clustering": 0.027777777777777776,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseAuth.updateImageHash",
+    "short_name": "updateImageHash",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig._leafForAddressAndWeight",
+    "short_name": "_leafForAddressAndWeight",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig._leafForAnyAddressSubdigest",
+    "short_name": "_leafForAnyAddressSubdigest",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig._leafForHardcodedSubdigest",
+    "short_name": "_leafForHardcodedSubdigest",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig._leafForNested",
+    "short_name": "_leafForNested",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig._leafForSapient",
+    "short_name": "_leafForSapient",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig.recover",
+    "short_name": "recover",
+    "is_bug": false,
+    "degree": 11,
+    "betweenness": 0.0245716988028585,
+    "clustering": 0.12727272727272726,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig.recoverBranch",
+    "short_name": "recoverBranch",
+    "is_bug": false,
+    "degree": 21,
+    "betweenness": 0.07810918665077769,
+    "clustering": 0.02857142857142857,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "BaseSig.recoverChained",
+    "short_name": "recoverChained",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0,
+    "clustering": 1.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Calls._execute",
+    "short_name": "_execute",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.005256875764282043,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Calls.execute",
+    "short_name": "execute",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.006878002113915515,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Calls.selfExecute",
+    "short_name": "selfExecute",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.009238282466600469,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "ERC4337FactoryWrapper.deploy",
+    "short_name": "deploy",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ERC4337v07.executeUserOp",
+    "short_name": "executeUserOp",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ERC4337v07.validateUserOp",
+    "short_name": "validateUserOp",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Estimator._estimate",
+    "short_name": "_estimate",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0028215865252734806,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Estimator._isValidImage",
+    "short_name": "_isValidImage",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Estimator.estimate",
+    "short_name": "estimate",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.012318410647698372,
+    "clustering": 0.1,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ExplicitSessionManager._validateExplicitCall",
+    "short_name": "_validateExplicitCall",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.006169876003535493,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ExplicitSessionManager._validateLimitUsageIncrement",
+    "short_name": "_validateLimitUsageIncrement",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0,
+    "clustering": 1.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ExplicitSessionManager.incrementUsageLimit",
+    "short_name": "incrementUsageLimit",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.004892367906066537,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Factory.deploy",
+    "short_name": "deploy",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Guest._dispatchGuest",
+    "short_name": "_dispatchGuest",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 2.329699002888827e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks._readHook",
+    "short_name": "_readHook",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0107319080550839,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks._writeHook",
+    "short_name": "_writeHook",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.004096626098303482,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.addHook",
+    "short_name": "addHook",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00023879414779610475,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.onERC1155BatchReceived",
+    "short_name": "onERC1155BatchReceived",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.onERC1155Received",
+    "short_name": "onERC1155Received",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.onERC721Received",
+    "short_name": "onERC721Received",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.readHook",
+    "short_name": "readHook",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.removeHook",
+    "short_name": "removeHook",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00023879414779610475,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.tokenReceived",
+    "short_name": "tokenReceived",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Hooks.tokensReceived",
+    "short_name": "tokensReceived",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IAccount.validateUserOp",
+    "short_name": "validateUserOp",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IAuth._isValidImage",
+    "short_name": "_isValidImage",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00031473124148550505,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IAuth._updateImageHash",
+    "short_name": "_updateImageHash",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ICheckpointer.snapshotFor",
+    "short_name": "snapshotFor",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IDelegatedExtension.handleSequenceDelegateCall",
+    "short_name": "handleSequenceDelegateCall",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC1155Receiver.onERC1155BatchReceived",
+    "short_name": "onERC1155BatchReceived",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC1155Receiver.onERC1155Received",
+    "short_name": "onERC1155Received",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC1271.isValidSignature",
+    "short_name": "isValidSignature",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC1271Data.isValidSignature",
+    "short_name": "isValidSignature",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC223Receiver.tokenReceived",
+    "short_name": "tokenReceived",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC721Receiver.onERC721Received",
+    "short_name": "onERC721Received",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IERC777Receiver.tokensReceived",
+    "short_name": "tokensReceived",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IEntryPoint.depositTo",
+    "short_name": "depositTo",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IExplicitSessionManager.incrementUsageLimit",
+    "short_name": "incrementUsageLimit",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "IPartialAuth.recoverPartialSignature",
+    "short_name": "recoverPartialSignature",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ISapient.recoverSapientSignature",
+    "short_name": "recoverSapientSignature",
+    "is_bug": true,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ISapientCompact.recoverSapientSignatureCompact",
+    "short_name": "recoverSapientSignatureCompact",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ISignalsImplicitMode.acceptImplicitRequest",
+    "short_name": "acceptImplicitRequest",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Implementation._getImplementation",
+    "short_name": "_getImplementation",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Implementation._setImplementation",
+    "short_name": "_setImplementation",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Implementation._updateImplementation",
+    "short_name": "_updateImplementation",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0003261578604044358,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Implementation.getImplementation",
+    "short_name": "getImplementation",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Implementation.updateImplementation",
+    "short_name": "updateImplementation",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ImplicitSessionManager._isAddressBlacklisted",
+    "short_name": "_isAddressBlacklisted",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "ImplicitSessionManager._validateImplicitCall",
+    "short_name": "_validateImplicitCall",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.01453732177802628,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibAttestation.fromPacked",
+    "short_name": "fromPacked",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.007219673978584997,
+    "clustering": 0.13333333333333333,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibAttestation.fromPackedAuthData",
+    "short_name": "fromPackedAuthData",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00032190876232530383,
+    "clustering": 0.3333333333333333,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibAttestation.generateImplicitRequestMagic",
+    "short_name": "generateImplicitRequestMagic",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibAttestation.toHash",
+    "short_name": "toHash",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.019196719783803932,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibAttestation.toPackAuthData",
+    "short_name": "toPackAuthData",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibAttestation.toPacked",
+    "short_name": "toPacked",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.004892367906066537,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readAddress",
+    "short_name": "readAddress",
+    "is_bug": false,
+    "degree": 7,
+    "betweenness": 0.008416539135016474,
+    "clustering": 0.047619047619047616,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readBytes32",
+    "short_name": "readBytes32",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readBytes4",
+    "short_name": "readBytes4",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readFirstUint8",
+    "short_name": "readFirstUint8",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 9.689700776081725e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readRSVCompact",
+    "short_name": "readRSVCompact",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.001581277097366735,
+    "clustering": 0.3333333333333333,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUint16",
+    "short_name": "readUint16",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.002050924537128057,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUint160",
+    "short_name": "readUint160",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUint24",
+    "short_name": "readUint24",
+    "is_bug": false,
+    "degree": 8,
+    "betweenness": 0.01612488982387676,
+    "clustering": 0.14285714285714285,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUint256",
+    "short_name": "readUint256",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0009234086719794018,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUint64",
+    "short_name": "readUint64",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0005443270917953944,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUint8",
+    "short_name": "readUint8",
+    "is_bug": false,
+    "degree": 7,
+    "betweenness": 0.011212461293535567,
+    "clustering": 0.14285714285714285,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibBytes.readUintX",
+    "short_name": "readUintX",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.006651555220616021,
+    "clustering": 0.1,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibOptim.call",
+    "short_name": "call",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.006243159354594988,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibOptim.delegatecall",
+    "short_name": "delegatecall",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0006639124746771553,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibOptim.fkeccak256",
+    "short_name": "fkeccak256",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.005628593200974901,
+    "clustering": 0.1,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibOptim.returnData",
+    "short_name": "returnData",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.001960339543399444,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibPermission.readPermission",
+    "short_name": "readPermission",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.001172744225177966,
+    "clustering": 0.1,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibPermission.ruleToPacked",
+    "short_name": "ruleToPacked",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "LibPermission.toPacked",
+    "short_name": "toPacked",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.004892367906066537,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Nonce._consumeNonce",
+    "short_name": "_consumeNonce",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0036385188423797674,
+    "clustering": 0.16666666666666666,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Nonce._writeNonce",
+    "short_name": "_writeNonce",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0019637583546113792,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Nonce.readNonce",
+    "short_name": "readNonce",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.003029831876653591,
+    "clustering": 0.3333333333333333,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "P256.verifySignature",
+    "short_name": "verifySignature",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Passkeys._decodeSignature",
+    "short_name": "_decodeSignature",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0056851721069212866,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Passkeys._rootForPasskey",
+    "short_name": "_rootForPasskey",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0002125373371059822,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Passkeys.recoverSapientSignatureCompact",
+    "short_name": "recoverSapientSignatureCompact",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.007824856449635664,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.domainSeparator",
+    "short_name": "domainSeparator",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.003016694301570122,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.fromConfigUpdate",
+    "short_name": "fromConfigUpdate",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.fromDigest",
+    "short_name": "fromDigest",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.fromMessage",
+    "short_name": "fromMessage",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.fromPackedCalls",
+    "short_name": "fromPackedCalls",
+    "is_bug": false,
+    "degree": 11,
+    "betweenness": 0.025280719725884578,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.hash",
+    "short_name": "hash",
+    "is_bug": false,
+    "degree": 7,
+    "betweenness": 0.017083305057960997,
+    "clustering": 0.09523809523809523,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.hashCall",
+    "short_name": "hashCall",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008928122040490278,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.hashCalls",
+    "short_name": "hashCalls",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0002279776881398352,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.hashFor",
+    "short_name": "hashFor",
+    "is_bug": false,
+    "degree": 7,
+    "betweenness": 0.01751290472606128,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Payload.toEIP712",
+    "short_name": "toEIP712",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.008951994374921952,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "PermissionValidator.getLimitUsage",
+    "short_name": "getLimitUsage",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.009834436057528033,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "PermissionValidator.setLimitUsage",
+    "short_name": "setLimitUsage",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "PermissionValidator.validatePermission",
+    "short_name": "validatePermission",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.015912223494263165,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery._leafForRecoveryLeaf",
+    "short_name": "_leafForRecoveryLeaf",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery._recoverBranch",
+    "short_name": "_recoverBranch",
+    "is_bug": false,
+    "degree": 8,
+    "betweenness": 0.011725391352855876,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery.domainSeparator",
+    "short_name": "domainSeparator",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.004794351954851277,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery.isValidSignature",
+    "short_name": "isValidSignature",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.009358994177316036,
+    "clustering": 0.1,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery.queuePayload",
+    "short_name": "queuePayload",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00501661851955394,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery.recoverSapientSignatureCompact",
+    "short_name": "recoverSapientSignatureCompact",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery.recoveryPayloadHash",
+    "short_name": "recoveryPayloadHash",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0013217159009722612,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Recovery.totalQueuedPayloads",
+    "short_name": "totalQueuedPayloads",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionManager.recoverSapientSignature",
+    "short_name": "recoverSapientSignature",
+    "is_bug": true,
+    "degree": 7,
+    "betweenness": 0.056928390749083395,
+    "clustering": 0.047619047619047616,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig._decodePermissions",
+    "short_name": "_decodePermissions",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 5.771435565956115e-05,
+    "clustering": 0.6666666666666666,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig._hashPayloadHashCallIdx",
+    "short_name": "_hashPayloadHashCallIdx",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0006648011168853391,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig._leafHashForBlacklist",
+    "short_name": "_leafHashForBlacklist",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig._leafHashForIdentitySigner",
+    "short_name": "_leafHashForIdentitySigner",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig._leafHashForPermissions",
+    "short_name": "_leafHashForPermissions",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig.hashPayloadCallIdx",
+    "short_name": "hashPayloadCallIdx",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0002737097649035027,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig.recoverConfiguration",
+    "short_name": "recoverConfiguration",
+    "is_bug": false,
+    "degree": 13,
+    "betweenness": 0.024568469703886264,
+    "clustering": 0.02564102564102564,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "SessionSig.recoverSignature",
+    "short_name": "recoverSignature",
+    "is_bug": false,
+    "degree": 9,
+    "betweenness": 0.043594103063525895,
+    "clustering": 0.05555555555555555,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Simulator.simulate",
+    "short_name": "simulate",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.008594273566191675,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage1Auth._isValidImage",
+    "short_name": "_isValidImage",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage1Auth._updateImageHash",
+    "short_name": "_updateImageHash",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0002795638803466592,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage1Module._isValidImage",
+    "short_name": "_isValidImage",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00031473124148550505,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage2Auth._isValidImage",
+    "short_name": "_isValidImage",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage2Auth._updateImageHash",
+    "short_name": "_updateImageHash",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage2Auth.imageHash",
+    "short_name": "imageHash",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Stage2Module._isValidImage",
+    "short_name": "_isValidImage",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Storage.readBytes32",
+    "short_name": "readBytes32",
+    "is_bug": false,
+    "degree": 9,
+    "betweenness": 0.026881482250969632,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Storage.readBytes32Map",
+    "short_name": "readBytes32Map",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.020568154769912264,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "Storage.writeBytes32",
+    "short_name": "writeBytes32",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00018637592023110615,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "Storage.writeBytes32Map",
+    "short_name": "writeBytes32Map",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0207254698826075,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "sequence",
+    "node": "WebAuthn.encodeAuth",
+    "short_name": "encodeAuth",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "WebAuthn.tryDecodeAuth",
+    "short_name": "tryDecodeAuth",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "WebAuthn.tryDecodeAuthCompact",
+    "short_name": "tryDecodeAuthCompact",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "WebAuthn.tryDecodeAuthCompactCalldata",
+    "short_name": "tryDecodeAuthCompactCalldata",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "WebAuthn.tryEncodeAuthCompact",
+    "short_name": "tryEncodeAuthCompact",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "sequence",
+    "node": "WebAuthn.verify",
+    "short_name": "verify",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.007480875289094468,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.getAToken",
+    "short_name": "getAToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.getAavePool",
+    "short_name": "getAavePool",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.getAvailableBalance",
+    "short_name": "getAvailableBalance",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.getUsdc",
+    "short_name": "getUsdc",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.getVault",
+    "short_name": "getVault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.setAvailableBalance",
+    "short_name": "setAvailableBalance",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3AdapterMock.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3PoolMock.getReserveData",
+    "short_name": "getReserveData",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3PoolMock.setWithdrawAmount",
+    "short_name": "setWithdrawAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3PoolMock.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.00841126764482724,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3PoolMockWithConfigurableAToken.getReserveData",
+    "short_name": "getReserveData",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3PoolMockWithConfigurableAToken.setATokenAddress",
+    "short_name": "setATokenAddress",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AaveV3PoolMockWithConfigurableAToken.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AggregatorV3Interface.decimals",
+    "short_name": "decimals",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AggregatorV3Interface.description",
+    "short_name": "description",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AggregatorV3Interface.getRoundData",
+    "short_name": "getRoundData",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AggregatorV3Interface.latestRoundData",
+    "short_name": "latestRoundData",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "AggregatorV3Interface.version",
+    "short_name": "version",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDBlockedMock.isBlockedAddress",
+    "short_name": "isBlockedAddress",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDBlockedMock.setBlocked",
+    "short_name": "setBlocked",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.approve",
+    "short_name": "approve",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.freeze",
+    "short_name": "freeze",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.grantRole",
+    "short_name": "grantRole",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.isBlockedAddress",
+    "short_name": "isBlockedAddress",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.setSanctionsList",
+    "short_name": "setSanctionsList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.transfer",
+    "short_name": "transfer",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.004829631819710422,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.transferFrom",
+    "short_name": "transferFrom",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.unfreeze",
+    "short_name": "unfreeze",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDMock.validateAddress",
+    "short_name": "validateAddress",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0016252900088088236,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.getLatestPrice",
+    "short_name": "getLatestPrice",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.getPriceDecimals",
+    "short_name": "getPriceDecimals",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.getTokenAmount",
+    "short_name": "getTokenAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.getUsdValue",
+    "short_name": "getUsdValue",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.gracePeriod",
+    "short_name": "gracePeriod",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.removeOracle",
+    "short_name": "removeOracle",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.sequencerUptimeFeed",
+    "short_name": "sequencerUptimeFeed",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setDeviationThreshold",
+    "short_name": "setDeviationThreshold",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setGracePeriod",
+    "short_name": "setGracePeriod",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setOracle",
+    "short_name": "setOracle",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setPriceDecimals",
+    "short_name": "setPriceDecimals",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setSequencerUptimeFeed",
+    "short_name": "setSequencerUptimeFeed",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setStalenessThreshold",
+    "short_name": "setStalenessThreshold",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setTokenAmount",
+    "short_name": "setTokenAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.setUsdValue",
+    "short_name": "setUsdValue",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "DreUSDOracleMock.validatePrice",
+    "short_name": "validatePrice",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.approve",
+    "short_name": "approve",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.asset",
+    "short_name": "asset",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0034691521711236978,
+    "clustering": 0.16666666666666666,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.convertToAssets",
+    "short_name": "convertToAssets",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.convertToShares",
+    "short_name": "convertToShares",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.deposit",
+    "short_name": "deposit",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0012914743618958246,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.maxDeposit",
+    "short_name": "maxDeposit",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.maxMint",
+    "short_name": "maxMint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.maxRedeem",
+    "short_name": "maxRedeem",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.maxWithdraw",
+    "short_name": "maxWithdraw",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00010081609510712205,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.previewDeposit",
+    "short_name": "previewDeposit",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.previewMint",
+    "short_name": "previewMint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.previewRedeem",
+    "short_name": "previewRedeem",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.previewWithdraw",
+    "short_name": "previewWithdraw",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.redeem",
+    "short_name": "redeem",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.setRewardsDistributor",
+    "short_name": "setRewardsDistributor",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.totalAssets",
+    "short_name": "totalAssets",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.001870944703025878,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.transfer",
+    "short_name": "transfer",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.transferFrom",
+    "short_name": "transferFrom",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ERC4626Mock.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "EndpointV2Mock.setDelegate",
+    "short_name": "setDelegate",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Adapter.getAToken",
+    "short_name": "getAToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Adapter.getAavePool",
+    "short_name": "getAavePool",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Adapter.getAvailableBalance",
+    "short_name": "getAvailableBalance",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0008322488130430957,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Adapter.getUsdc",
+    "short_name": "getUsdc",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Adapter.getVault",
+    "short_name": "getVault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Adapter.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00028908691195791346,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Pool.getReserveData",
+    "short_name": "getReserveData",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAaveV3Pool.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAutomationCompatible.checkUpkeep",
+    "short_name": "checkUpkeep",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IAutomationCompatible.performUpkeep",
+    "short_name": "performUpkeep",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.getLatestPrice",
+    "short_name": "getLatestPrice",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.getPriceDecimals",
+    "short_name": "getPriceDecimals",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.getTokenAmount",
+    "short_name": "getTokenAmount",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 2.0140899286319317e-06,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.getUsdValue",
+    "short_name": "getUsdValue",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.gracePeriod",
+    "short_name": "gracePeriod",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.removeOracle",
+    "short_name": "removeOracle",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.sequencerUptimeFeed",
+    "short_name": "sequencerUptimeFeed",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.setDeviationThreshold",
+    "short_name": "setDeviationThreshold",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.setGracePeriod",
+    "short_name": "setGracePeriod",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.setOracle",
+    "short_name": "setOracle",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.setSequencerUptimeFeed",
+    "short_name": "setSequencerUptimeFeed",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.setStalenessThreshold",
+    "short_name": "setStalenessThreshold",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IDreUSDOracle.validatePrice",
+    "short_name": "validatePrice",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ISanctionsList.isSanctioned",
+    "short_name": "isSanctioned",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0008560687832657163,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.dreUSD",
+    "short_name": "dreUSD",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.003563163377424127,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.fillWithdrawal",
+    "short_name": "fillWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.paused",
+    "short_name": "paused",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.0026920283122129243,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.usdc",
+    "short_name": "usdc",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.withdrawalNFT",
+    "short_name": "withdrawalNFT",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.withdrawalVaultAdapter",
+    "short_name": "withdrawalVaultAdapter",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalKeeperManager.withdrawalWaitingTime",
+    "short_name": "withdrawalWaitingTime",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.getOriginalUser",
+    "short_name": "getOriginalUser",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.getPendingRange",
+    "short_name": "getPendingRange",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.getPosition",
+    "short_name": "getPosition",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00033642761975892727,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.getPositions",
+    "short_name": "getPositions",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.getTokensByIndexes",
+    "short_name": "getTokensByIndexes",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.getUsdcAmount",
+    "short_name": "getUsdcAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFT.positionExists",
+    "short_name": "positionExists",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00033642761975892727,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFTQueue.lastBurnedTokenId",
+    "short_name": "lastBurnedTokenId",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IWithdrawalNFTQueue.nextTokenId",
+    "short_name": "nextTokenId",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.MODERATOR_ROLE",
+    "short_name": "MODERATOR_ROLE",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.VEST_PERIOD",
+    "short_name": "VEST_PERIOD",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.addRewards",
+    "short_name": "addRewards",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.cTs",
+    "short_name": "cTs",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.claimVested",
+    "short_name": "claimVested",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.dreUSD",
+    "short_name": "dreUSD",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.eTs",
+    "short_name": "eTs",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.rewards",
+    "short_name": "rewards",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.vault",
+    "short_name": "vault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreRewardsDistributor.vestedAmount",
+    "short_name": "vestedAmount",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.005206034243952345,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.freeze",
+    "short_name": "freeze",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.frozen",
+    "short_name": "frozen",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.isBlockedAddress",
+    "short_name": "isBlockedAddress",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0015221323400603027,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.00022075768344425063,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.sanctionsList",
+    "short_name": "sanctionsList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.setSanctionsList",
+    "short_name": "setSanctionsList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.unfreeze",
+    "short_name": "unfreeze",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSD.validateAddress",
+    "short_name": "validateAddress",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0023728284015156298,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.adminWithdraw",
+    "short_name": "adminWithdraw",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.authDomainSeparator",
+    "short_name": "authDomainSeparator",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.authNonce",
+    "short_name": "authNonce",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.calculateExpressFee",
+    "short_name": "calculateExpressFee",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.dreRewardsDistributor",
+    "short_name": "dreRewardsDistributor",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 4.438072888803878e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.fillExpressWithdrawals",
+    "short_name": "fillExpressWithdrawals",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.fillWithdrawal",
+    "short_name": "fillWithdrawal",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.getDailyFiatMinted",
+    "short_name": "getDailyFiatMinted",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.getExpressAvailable",
+    "short_name": "getExpressAvailable",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.getExpressFillerDebt",
+    "short_name": "getExpressFillerDebt",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.mintAndStake",
+    "short_name": "mintAndStake",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.mintFrom",
+    "short_name": "mintFrom",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.mintFromUsd",
+    "short_name": "mintFromUsd",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.mintRewards",
+    "short_name": "mintRewards",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.payExpressDebt",
+    "short_name": "payExpressDebt",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.requestExpressWithdrawal",
+    "short_name": "requestExpressWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.requestWithdrawal",
+    "short_name": "requestWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.setDailyFiatMintCap",
+    "short_name": "setDailyFiatMintCap",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateAllowedList",
+    "short_name": "updateAllowedList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateCustodianList",
+    "short_name": "updateCustodianList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateExpressPaybackAddress",
+    "short_name": "updateExpressPaybackAddress",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateExpressWithdrawal",
+    "short_name": "updateExpressWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateVault",
+    "short_name": "updateVault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateVaultAdapter",
+    "short_name": "updateVaultAdapter",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDManager.updateWithdrawal",
+    "short_name": "updateWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDs.claimVestedRewards",
+    "short_name": "claimVestedRewards",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDs.excessDreUSD",
+    "short_name": "excessDreUSD",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDs.rewardsDistributor",
+    "short_name": "rewardsDistributor",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreUSDs.withdrawExcessDreUSD",
+    "short_name": "withdrawExcessDreUSD",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreVault.checkUpkeep",
+    "short_name": "checkUpkeep",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreVault.forwardVault",
+    "short_name": "forwardVault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreVault.performUpkeep",
+    "short_name": "performUpkeep",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreVault.recoverEther",
+    "short_name": "recoverEther",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreVault.recoverToken",
+    "short_name": "recoverToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreVault.token",
+    "short_name": "token",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "IdreWithdrawalKeeperBot.manager",
+    "short_name": "manager",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ManagerMock.setToken",
+    "short_name": "setToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockAggregatorV3._timestampForRound",
+    "short_name": "_timestampForRound",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 6.20339698018635e-06,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockAggregatorV3.getRoundData",
+    "short_name": "getRoundData",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockAggregatorV3.latestRoundData",
+    "short_name": "latestRoundData",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockAggregatorV3.setLatestAnswer",
+    "short_name": "setLatestAnswer",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20.approve",
+    "short_name": "approve",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20.transfer",
+    "short_name": "transfer",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20.transferFrom",
+    "short_name": "transferFrom",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20Permit.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20Permit.decimals",
+    "short_name": "decimals",
+    "is_bug": false,
+    "degree": 10,
+    "betweenness": 0.00597379092507299,
+    "clustering": 0.06666666666666667,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockERC20Permit.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockSequencerUptimeFeed.getRoundData",
+    "short_name": "getRoundData",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockSequencerUptimeFeed.latestRoundData",
+    "short_name": "latestRoundData",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00026754364975975134,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "MockSequencerUptimeFeed.setLatestAnswer",
+    "short_name": "setLatestAnswer",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListMock.isSanctioned",
+    "short_name": "isSanctioned",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListMock.removeSanctioned",
+    "short_name": "removeSanctioned",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListMock.setSanctioned",
+    "short_name": "setSanctioned",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListWhitelistWrapper.addToWhitelist",
+    "short_name": "addToWhitelist",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListWhitelistWrapper.isSanctioned",
+    "short_name": "isSanctioned",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListWhitelistWrapper.isWhitelisted",
+    "short_name": "isWhitelisted",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListWhitelistWrapper.removeFromWhitelist",
+    "short_name": "removeFromWhitelist",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "SanctionsListWhitelistWrapper.supportsInterface",
+    "short_name": "supportsInterface",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "ScalingConstants.scaleBase",
+    "short_name": "scaleBase",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.00012249247370399712,
+    "clustering": 0.2,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock._removeToken",
+    "short_name": "_removeToken",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.approve",
+    "short_name": "approve",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.balanceOf",
+    "short_name": "balanceOf",
+    "is_bug": false,
+    "degree": 15,
+    "betweenness": 0.015567302940462447,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getApproved",
+    "short_name": "getApproved",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getOriginalUser",
+    "short_name": "getOriginalUser",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getPendingRange",
+    "short_name": "getPendingRange",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getPosition",
+    "short_name": "getPosition",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getPositions",
+    "short_name": "getPositions",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getTokensByIndexes",
+    "short_name": "getTokensByIndexes",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.getUsdcAmount",
+    "short_name": "getUsdcAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.isApprovedForAll",
+    "short_name": "isApprovedForAll",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.lastBurnedTokenId",
+    "short_name": "lastBurnedTokenId",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.nextTokenId",
+    "short_name": "nextTokenId",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.ownerOf",
+    "short_name": "ownerOf",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0012977285997732907,
+    "clustering": 0.3333333333333333,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.positionExists",
+    "short_name": "positionExists",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.safeTransferFrom",
+    "short_name": "safeTransferFrom",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0026987822583606122,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.setApprovalForAll",
+    "short_name": "setApprovalForAll",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.supportsInterface",
+    "short_name": "supportsInterface",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.tokenByIndex",
+    "short_name": "tokenByIndex",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.tokenOfOwnerByIndex",
+    "short_name": "tokenOfOwnerByIndex",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.totalSupply",
+    "short_name": "totalSupply",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalEnumerableNFTMock.transferFrom",
+    "short_name": "transferFrom",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.001167064312332441,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalKeeperManagerMock.fillWithdrawal",
+    "short_name": "fillWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalKeeperManagerMock.setPaused",
+    "short_name": "setPaused",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalKeeperManagerMock.setVaultAdapter",
+    "short_name": "setVaultAdapter",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.approve",
+    "short_name": "approve",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.balanceOf",
+    "short_name": "balanceOf",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getApproved",
+    "short_name": "getApproved",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getOriginalUser",
+    "short_name": "getOriginalUser",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getPendingRange",
+    "short_name": "getPendingRange",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getPosition",
+    "short_name": "getPosition",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getPositions",
+    "short_name": "getPositions",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getTokensByIndexes",
+    "short_name": "getTokensByIndexes",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.getUsdcAmount",
+    "short_name": "getUsdcAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.isApprovedForAll",
+    "short_name": "isApprovedForAll",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.ownerOf",
+    "short_name": "ownerOf",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.positionExists",
+    "short_name": "positionExists",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.safeTransferFrom",
+    "short_name": "safeTransferFrom",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.setApprovalForAll",
+    "short_name": "setApprovalForAll",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.supportsInterface",
+    "short_name": "supportsInterface",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "WithdrawalNFTMock.transferFrom",
+    "short_name": "transferFrom",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0001216637243478803,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.getAToken",
+    "short_name": "getAToken",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.getAavePool",
+    "short_name": "getAavePool",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.getAvailableBalance",
+    "short_name": "getAvailableBalance",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.getUsdc",
+    "short_name": "getUsdc",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.getVault",
+    "short_name": "getVault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.recoverToken",
+    "short_name": "recoverToken",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.setDreUSDManager",
+    "short_name": "setDreUSDManager",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.setVault",
+    "short_name": "setVault",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 6.20339698018635e-06,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreAaveAdapter.withdraw",
+    "short_name": "withdraw",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0010895959118992877,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreOVaultComposer._depositAndSend",
+    "short_name": "_depositAndSend",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0013230871191690539,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreOVaultComposer._redeemAndSend",
+    "short_name": "_redeemAndSend",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreOVaultComposer._refund",
+    "short_name": "_refund",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreOVaultComposer._sendLocal",
+    "short_name": "_sendLocal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreOVaultComposer.setStuckFundsRecipient",
+    "short_name": "setStuckFundsRecipient",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor._claimVested",
+    "short_name": "_claimVested",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 1.24067939603727e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor._computeVestedAmount",
+    "short_name": "_computeVestedAmount",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 1.24067939603727e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor.addRewards",
+    "short_name": "addRewards",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.004311143809256535,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor.claimVested",
+    "short_name": "claimVested",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor.pause",
+    "short_name": "pause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor.unpause",
+    "short_name": "unpause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributor.vestedAmount",
+    "short_name": "vestedAmount",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.addRewards",
+    "short_name": "addRewards",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.claimVested",
+    "short_name": "claimVested",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.setClaimAmount",
+    "short_name": "setClaimAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.setPaused",
+    "short_name": "setPaused",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.setShouldRevertClaim",
+    "short_name": "setShouldRevertClaim",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.setVestedAmount",
+    "short_name": "setVestedAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreRewardsDistributorMock.vestedAmount",
+    "short_name": "vestedAmount",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFT._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFT._credit",
+    "short_name": "_credit",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0009746799547506041,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFT._update",
+    "short_name": "_update",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0021351287498441304,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFT._validateAddress",
+    "short_name": "_validateAddress",
+    "is_bug": false,
+    "degree": 12,
+    "betweenness": 0.011519645636491087,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFT.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0003929933279156543,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFTAdapter._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFTAdapter._credit",
+    "short_name": "_credit",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00030940180938319914,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFTAdapter._tryTransfer",
+    "short_name": "_tryTransfer",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008076298476209842,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFTAdapter.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreShareOFTAdapter.setStuckFundsRecipient",
+    "short_name": "setStuckFundsRecipient",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD._credit",
+    "short_name": "_credit",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 2.311503874759914e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD._update",
+    "short_name": "_update",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0008230854628002574,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD._validateAddress",
+    "short_name": "_validateAddress",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 5.810515171441215e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.freeze",
+    "short_name": "freeze",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.isBlockedAddress",
+    "short_name": "isBlockedAddress",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 2.6996014901818197e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.renounceOwnership",
+    "short_name": "renounceOwnership",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.setDreUSDManager",
+    "short_name": "setDreUSDManager",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.setSanctionsList",
+    "short_name": "setSanctionsList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.transferOwnership",
+    "short_name": "transferOwnership",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.unfreeze",
+    "short_name": "unfreeze",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSD.validateAddress",
+    "short_name": "validateAddress",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0006710635281275298,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._authDomainSeparator",
+    "short_name": "_authDomainSeparator",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._authorize",
+    "short_name": "_authorize",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0016873239786106872,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._checkAndUpdateDailyFiatMint",
+    "short_name": "_checkAndUpdateDailyFiatMint",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._computeFiatMintStructHash",
+    "short_name": "_computeFiatMintStructHash",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._convertToDecimals",
+    "short_name": "_convertToDecimals",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0005252613519309259,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._executePermit",
+    "short_name": "_executePermit",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00021750785486217004,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._mintDreUSD",
+    "short_name": "_mintDreUSD",
+    "is_bug": false,
+    "degree": 8,
+    "betweenness": 0.004446341860707226,
+    "clustering": 0.03571428571428571,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._mintFromFiatUsd",
+    "short_name": "_mintFromFiatUsd",
+    "is_bug": false,
+    "degree": 10,
+    "betweenness": 0.008821571653120959,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._paybackExpressFiller",
+    "short_name": "_paybackExpressFiller",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._preMintChecks",
+    "short_name": "_preMintChecks",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00021750785486217004,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._queueExpressWithdrawal",
+    "short_name": "_queueExpressWithdrawal",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00013182423850298681,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._queueWithdrawal",
+    "short_name": "_queueWithdrawal",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00013182423850298681,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._transferAndMint",
+    "short_name": "_transferAndMint",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.008392381384281146,
+    "clustering": 0.06666666666666667,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager._validateAddress",
+    "short_name": "_validateAddress",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.adminWithdraw",
+    "short_name": "adminWithdraw",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.authDomainSeparator",
+    "short_name": "authDomainSeparator",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.calculateExpressFee",
+    "short_name": "calculateExpressFee",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.dreRewardsDistributor",
+    "short_name": "dreRewardsDistributor",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0008942461151735685,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.fillExpressWithdrawals",
+    "short_name": "fillExpressWithdrawals",
+    "is_bug": false,
+    "degree": 10,
+    "betweenness": 0.0038257969121344767,
+    "clustering": 0.022222222222222223,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.fillWithdrawal",
+    "short_name": "fillWithdrawal",
+    "is_bug": false,
+    "degree": 12,
+    "betweenness": 0.005976025106270638,
+    "clustering": 0.015151515151515152,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.getDailyFiatMinted",
+    "short_name": "getDailyFiatMinted",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.getExpressAvailable",
+    "short_name": "getExpressAvailable",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.getExpressFillerDebt",
+    "short_name": "getExpressFillerDebt",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 9,
+    "betweenness": 0.005588296976747517,
+    "clustering": 0.027777777777777776,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.mintAndStake",
+    "short_name": "mintAndStake",
+    "is_bug": false,
+    "degree": 9,
+    "betweenness": 0.006241854610902145,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.mintFrom",
+    "short_name": "mintFrom",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.0034397872731498336,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.mintFromUsd",
+    "short_name": "mintFromUsd",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0007725844458639339,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.mintRewards",
+    "short_name": "mintRewards",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0037039285036348808,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.pause",
+    "short_name": "pause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.payExpressDebt",
+    "short_name": "payExpressDebt",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.requestExpressWithdrawal",
+    "short_name": "requestExpressWithdrawal",
+    "is_bug": false,
+    "degree": 8,
+    "betweenness": 0.006641669398728802,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.requestWithdrawal",
+    "short_name": "requestWithdrawal",
+    "is_bug": false,
+    "degree": 8,
+    "betweenness": 0.006641669398728802,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.setDailyFiatMintCap",
+    "short_name": "setDailyFiatMintCap",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.supportsInterface",
+    "short_name": "supportsInterface",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.unpause",
+    "short_name": "unpause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateAllowedList",
+    "short_name": "updateAllowedList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateCustodianList",
+    "short_name": "updateCustodianList",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateExpressPaybackAddress",
+    "short_name": "updateExpressPaybackAddress",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateExpressWithdrawal",
+    "short_name": "updateExpressWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateVault",
+    "short_name": "updateVault",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateVaultAdapter",
+    "short_name": "updateVaultAdapter",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDManager.updateWithdrawal",
+    "short_name": "updateWithdrawal",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._checkDeviation",
+    "short_name": "_checkDeviation",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 6.84084945064478e-05,
+    "clustering": 0.6,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._checkSequencerStatus",
+    "short_name": "_checkSequencerStatus",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.00040839030119560135,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._getLatestPrice",
+    "short_name": "_getLatestPrice",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0008862586485692898,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._isSequencerHealthy",
+    "short_name": "_isSequencerHealthy",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 2.381907507154092e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._isWithinDeviation",
+    "short_name": "_isWithinDeviation",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0010593666987746605,
+    "clustering": 0.3,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle._requireValidStalenessThreshold",
+    "short_name": "_requireValidStalenessThreshold",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.getLatestPrice",
+    "short_name": "getLatestPrice",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.getPriceDecimals",
+    "short_name": "getPriceDecimals",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 6.203396980186351e-07,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.getTokenAmount",
+    "short_name": "getTokenAmount",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.0014602932302702919,
+    "clustering": 0.2,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.getUsdValue",
+    "short_name": "getUsdValue",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.0014602932302702919,
+    "clustering": 0.2,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.removeOracle",
+    "short_name": "removeOracle",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.setDeviationThreshold",
+    "short_name": "setDeviationThreshold",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.setGracePeriod",
+    "short_name": "setGracePeriod",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.setOracle",
+    "short_name": "setOracle",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0027346974432236547,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.setSequencerUptimeFeed",
+    "short_name": "setSequencerUptimeFeed",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.setStalenessThreshold",
+    "short_name": "setStalenessThreshold",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDOracle.validatePrice",
+    "short_name": "validatePrice",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0002254590169132172,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._claimVestedRewards",
+    "short_name": "_claimVestedRewards",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0029695757285985694,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._deposit",
+    "short_name": "_deposit",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0007138817234225476,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._isBlockedAddress",
+    "short_name": "_isBlockedAddress",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.002802574665620155,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._update",
+    "short_name": "_update",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.00010078045778460545,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._validateAddress",
+    "short_name": "_validateAddress",
+    "is_bug": false,
+    "degree": 8,
+    "betweenness": 0.005978179009330852,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs._withdraw",
+    "short_name": "_withdraw",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.claimVestedRewards",
+    "short_name": "claimVestedRewards",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0013230945041654586,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.decimals",
+    "short_name": "decimals",
+    "is_bug": false,
+    "degree": 10,
+    "betweenness": 0.00597379092507299,
+    "clustering": 0.06666666666666667,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.excessDreUSD",
+    "short_name": "excessDreUSD",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.001139958533490511,
+    "clustering": 0.3333333333333333,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.maxDeposit",
+    "short_name": "maxDeposit",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 9.35679044511441e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.maxMint",
+    "short_name": "maxMint",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 9.35679044511441e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.maxRedeem",
+    "short_name": "maxRedeem",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 9.35679044511441e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.maxWithdraw",
+    "short_name": "maxWithdraw",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 9.35679044511441e-05,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.pause",
+    "short_name": "pause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.setRewardsDistributor",
+    "short_name": "setRewardsDistributor",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.setShareOFTAdapter",
+    "short_name": "setShareOFTAdapter",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.totalAssets",
+    "short_name": "totalAssets",
+    "is_bug": false,
+    "degree": 2,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.unpause",
+    "short_name": "unpause",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreUSDs.withdrawExcessDreUSD",
+    "short_name": "withdrawExcessDreUSD",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0008498653862855299,
+    "clustering": 0.3333333333333333,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreVault.checkUpkeep",
+    "short_name": "checkUpkeep",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreVault.performUpkeep",
+    "short_name": "performUpkeep",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreVault.recoverEther",
+    "short_name": "recoverEther",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreVault.recoverToken",
+    "short_name": "recoverToken",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalKeeperBot._availableLiquidity",
+    "short_name": "_availableLiquidity",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.0010238559015869474,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalKeeperBot._collectFillableTokenIds",
+    "short_name": "_collectFillableTokenIds",
+    "is_bug": false,
+    "degree": 14,
+    "betweenness": 0.008211175533179894,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalKeeperBot.checkUpkeep",
+    "short_name": "checkUpkeep",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalKeeperBot.performUpkeep",
+    "short_name": "performUpkeep",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT._authorizeUpgrade",
+    "short_name": "_authorizeUpgrade",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT._exists",
+    "short_name": "_exists",
+    "is_bug": false,
+    "degree": 5,
+    "betweenness": 0.0023655576344235544,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT._getPosition",
+    "short_name": "_getPosition",
+    "is_bug": false,
+    "degree": 3,
+    "betweenness": 0.000868475577226089,
+    "clustering": 0.0,
+    "is_cut_vertex": true
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT._update",
+    "short_name": "_update",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT._validateAddress",
+    "short_name": "_validateAddress",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.burn",
+    "short_name": "burn",
+    "is_bug": false,
+    "degree": 6,
+    "betweenness": 0.004798576039883301,
+    "clustering": 0.13333333333333333,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.getOriginalUser",
+    "short_name": "getOriginalUser",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.getPendingRange",
+    "short_name": "getPendingRange",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.getPosition",
+    "short_name": "getPosition",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0013627961486911704,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.getPositions",
+    "short_name": "getPositions",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.getTokensByIndexes",
+    "short_name": "getTokensByIndexes",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.getUsdcAmount",
+    "short_name": "getUsdcAmount",
+    "is_bug": false,
+    "degree": 1,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.initialize",
+    "short_name": "initialize",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.mint",
+    "short_name": "mint",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.positionExists",
+    "short_name": "positionExists",
+    "is_bug": false,
+    "degree": 4,
+    "betweenness": 0.0011044377058916175,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.setDreUSD",
+    "short_name": "setDreUSD",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.setDreUSDManager",
+    "short_name": "setDreUSDManager",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  },
+  {
+    "corpus": "dreUSDs",
+    "node": "dreWithdrawalNFT.supportsInterface",
+    "short_name": "supportsInterface",
+    "is_bug": false,
+    "degree": 0,
+    "betweenness": 0.0,
+    "clustering": 0.0,
+    "is_cut_vertex": false
+  }
+]

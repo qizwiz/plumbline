@@ -1,0 +1,386 @@
+[
+  {
+    "name": "puppy-raffle",
+    "n_v": 9,
+    "n_bugs": 5,
+    "n_clean": 4,
+    "ok": true,
+    "bug_names_in_answers": 16,
+    "bug_degree": {
+      "n": 5,
+      "mean": 0,
+      "median": 0,
+      "stdev": 0.0
+    },
+    "clean_degree": {
+      "n": 4,
+      "mean": 0.5,
+      "median": 0.5,
+      "stdev": 0.5773502691896257
+    },
+    "mwU_degree": 5.0,
+    "p_degree": 0.22067136191984682,
+    "bug_betweenness": {
+      "n": 5,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "clean_betweenness": {
+      "n": 4,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_betweenness": 10.0,
+    "p_betweenness": 1.0,
+    "bug_clustering": {
+      "n": 5,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "clean_clustering": {
+      "n": 4,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_clustering": 10.0,
+    "p_clustering": 1.0,
+    "bug_is_cut_vertex": {
+      "n": 5,
+      "mean": 0,
+      "median": 0,
+      "stdev": 0.0
+    },
+    "clean_is_cut_vertex": {
+      "n": 4,
+      "mean": 0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_is_cut_vertex": 10.0,
+    "p_is_cut_vertex": 1.0
+  },
+  {
+    "name": "t-swap",
+    "n_v": 21,
+    "n_bugs": 7,
+    "n_clean": 14,
+    "ok": true,
+    "bug_names_in_answers": 30,
+    "bug_degree": {
+      "n": 7,
+      "mean": 1.5714285714285714,
+      "median": 1,
+      "stdev": 1.1338934190276817
+    },
+    "clean_degree": {
+      "n": 14,
+      "mean": 0.9285714285714286,
+      "median": 1.0,
+      "stdev": 1.071611705960535
+    },
+    "mwU_degree": 32.0,
+    "p_degree": 0.20469795356714748,
+    "bug_betweenness": {
+      "n": 7,
+      "mean": 0.015413533834586466,
+      "median": 0.0,
+      "stdev": 0.019303940831988213
+    },
+    "clean_betweenness": {
+      "n": 14,
+      "mean": 0.005075187969924812,
+      "median": 0.0,
+      "stdev": 0.013515949560230221
+    },
+    "mwU_betweenness": 37.0,
+    "p_betweenness": 0.3706499793198532,
+    "bug_clustering": {
+      "n": 7,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "clean_clustering": {
+      "n": 14,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_clustering": 49.0,
+    "p_clustering": 1.0,
+    "bug_is_cut_vertex": {
+      "n": 7,
+      "mean": 0.42857142857142855,
+      "median": 0,
+      "stdev": 0.5345224838248488
+    },
+    "clean_is_cut_vertex": {
+      "n": 14,
+      "mean": 0.21428571428571427,
+      "median": 0.0,
+      "stdev": 0.4258153136263201
+    },
+    "mwU_is_cut_vertex": 38.5,
+    "p_is_cut_vertex": 0.43342193095607373
+  },
+  {
+    "name": "thunder-loan",
+    "n_v": 42,
+    "n_bugs": 11,
+    "n_clean": 31,
+    "ok": true,
+    "bug_names_in_answers": 29,
+    "bug_degree": {
+      "n": 11,
+      "mean": 1.5454545454545454,
+      "median": 0,
+      "stdev": 2.018099916438052
+    },
+    "clean_degree": {
+      "n": 31,
+      "mean": 1.3870967741935485,
+      "median": 1,
+      "stdev": 1.7064079104918752
+    },
+    "mwU_degree": 169.5,
+    "p_degree": 0.9771776672200385,
+    "bug_betweenness": {
+      "n": 11,
+      "mean": 0.004286110231232183,
+      "median": 0.0,
+      "stdev": 0.007381878556840179
+    },
+    "clean_betweenness": {
+      "n": 31,
+      "mean": 0.002786753962009666,
+      "median": 0.0,
+      "stdev": 0.005789027433151476
+    },
+    "mwU_betweenness": 162.0,
+    "p_betweenness": 0.8078788514588577,
+    "bug_clustering": {
+      "n": 11,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "clean_clustering": {
+      "n": 31,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_clustering": 170.5,
+    "p_clustering": 1.0,
+    "bug_is_cut_vertex": {
+      "n": 11,
+      "mean": 0,
+      "median": 0,
+      "stdev": 0.0
+    },
+    "clean_is_cut_vertex": {
+      "n": 31,
+      "mean": 0.06451612903225806,
+      "median": 0,
+      "stdev": 0.24973103811470745
+    },
+    "mwU_is_cut_vertex": 159.5,
+    "p_is_cut_vertex": 0.7530031183151268
+  },
+  {
+    "name": "boss-bridge",
+    "n_v": 9,
+    "n_bugs": 5,
+    "n_clean": 4,
+    "ok": true,
+    "bug_names_in_answers": 10,
+    "bug_degree": {
+      "n": 5,
+      "mean": 0.4,
+      "median": 0,
+      "stdev": 0.5477225575051661
+    },
+    "clean_degree": {
+      "n": 4,
+      "mean": 0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_degree": 6.0,
+    "p_degree": 0.32718687779030575,
+    "bug_betweenness": {
+      "n": 5,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "clean_betweenness": {
+      "n": 4,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_betweenness": 10.0,
+    "p_betweenness": 1.0,
+    "bug_clustering": {
+      "n": 5,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "clean_clustering": {
+      "n": 4,
+      "mean": 0.0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_clustering": 10.0,
+    "p_clustering": 1.0,
+    "bug_is_cut_vertex": {
+      "n": 5,
+      "mean": 0,
+      "median": 0,
+      "stdev": 0.0
+    },
+    "clean_is_cut_vertex": {
+      "n": 4,
+      "mean": 0,
+      "median": 0.0,
+      "stdev": 0.0
+    },
+    "mwU_is_cut_vertex": 10.0,
+    "p_is_cut_vertex": 1.0
+  },
+  {
+    "name": "sequence",
+    "n_v": 148,
+    "n_bugs": 3,
+    "n_clean": 145,
+    "ok": true,
+    "bug_names_in_answers": 10,
+    "bug_degree": {
+      "n": 3,
+      "mean": 3,
+      "median": 2,
+      "stdev": 3.605551275463989
+    },
+    "clean_degree": {
+      "n": 145,
+      "mean": 2.613793103448276,
+      "median": 2,
+      "stdev": 3.0395225477050936
+    },
+    "mwU_degree": 209.0,
+    "p_degree": 0.9079244154174365,
+    "bug_betweenness": {
+      "n": 3,
+      "mean": 0.01950724303118798,
+      "median": 0.001593338344480542,
+      "stdev": 0.03241745523885874
+    },
+    "clean_betweenness": {
+      "n": 145,
+      "mean": 0.004806894189953673,
+      "median": 9.689700776081725e-05,
+      "stdev": 0.010614180504370952
+    },
+    "mwU_betweenness": 165.0,
+    "p_betweenness": 0.47500964809199553,
+    "bug_clustering": {
+      "n": 3,
+      "mean": 0.015873015873015872,
+      "median": 0.0,
+      "stdev": 0.02749286996141075
+    },
+    "clean_clustering": {
+      "n": 145,
+      "mean": 0.03569109051867672,
+      "median": 0.0,
+      "stdev": 0.13850738136246052
+    },
+    "mwU_clustering": 186.5,
+    "p_clustering": 0.673165348948187,
+    "bug_is_cut_vertex": {
+      "n": 3,
+      "mean": 0.3333333333333333,
+      "median": 0,
+      "stdev": 0.5773502691896257
+    },
+    "clean_is_cut_vertex": {
+      "n": 145,
+      "mean": 0.19310344827586207,
+      "median": 0,
+      "stdev": 0.3961016936648188
+    },
+    "mwU_is_cut_vertex": 187.0,
+    "p_is_cut_vertex": 0.6781386831954503
+  },
+  {
+    "name": "dreUSDs",
+    "n_v": 403,
+    "n_bugs": 0,
+    "n_clean": 403,
+    "ok": true,
+    "bug_names_in_answers": 0,
+    "bug_degree": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "stdev": null
+    },
+    "clean_degree": {
+      "n": 403,
+      "mean": 1.196029776674938,
+      "median": 0,
+      "stdev": 2.2896661902541027
+    },
+    "mwU_degree": null,
+    "p_degree": null,
+    "bug_betweenness": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "stdev": null
+    },
+    "clean_betweenness": {
+      "n": 403,
+      "mean": 0.0005341848273037393,
+      "median": 0.0,
+      "stdev": 0.0016724892554217574
+    },
+    "mwU_betweenness": null,
+    "p_betweenness": null,
+    "bug_clustering": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "stdev": null
+    },
+    "clean_clustering": {
+      "n": 403,
+      "mean": 0.007694456081552855,
+      "median": 0.0,
+      "stdev": 0.048385199240208655
+    },
+    "mwU_clustering": null,
+    "p_clustering": null,
+    "bug_is_cut_vertex": {
+      "n": 0,
+      "mean": null,
+      "median": null,
+      "stdev": null
+    },
+    "clean_is_cut_vertex": {
+      "n": 403,
+      "mean": 0.08188585607940446,
+      "median": 0,
+      "stdev": 0.27453156280937235
+    },
+    "mwU_is_cut_vertex": null,
+    "p_is_cut_vertex": null
+  }
+]
