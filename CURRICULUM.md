@@ -254,7 +254,42 @@ Re-evaluate. Write the next curriculum from evidence. Or write none and
 take a week off. Either is allowed. **What's not allowed is starting a
 new architecture project on day 19 to escape the result.**
 
-### CRITICAL ADDITION 2026-06-09 23:30 — Validator calibration test exposed deeper issue
+### CRITICAL ADDITION 2026-06-09 23:10 — Curvature swarm decision: SHIP v2 multi-mode redesign
+
+After the validator calibration test exposed the depth, JH surfaced "what about curvature?" The curvature-research-swarm Workflow (7 agents + synthesis, ~602k tokens, ~12 min) returned a clear verdict:
+
+**Framing assessment:** PARTIALLY SUPPORTED, partially novel. Strongest support: Cousot's abstract-interpretation precision hierarchy (Miné HOSC 2006), Trace2Inv (FSE 2024, Chen et al., arXiv 2404.14580) empirically confirms 6 of 8 deployed-invariant categories are flat scalar, PropertyGPT (NDSS'25 Distinguished Paper) ships a 4-mode emitter at 80% recall. STRONGEST EVIDENCE AGAINST using "curvature" in print: directed-algebraic-topology (Goubault/Pratt/Mimram) uses curvature literally for concurrency execution geometry — reviewers will catch the repurposing. **Frame as "representation-mode hierarchy" not "curvature."** Cite Miné/Trace2Inv/PropertyGPT. Footnote curvature as informal motivation.
+
+**Hyperbolic embeddings: NO.** Empirical crossover at d≈50; plumbline runs d=384 (Euclidean-favorable). Defer to post-cutoff experiment.
+
+**Feasibility call: YES, ship the v2 redesign before Day-5 cutoff.** 6.5-hour migration plan with explicit kill criterion (sample-50 by 2pm tomorrow, ship/revert call). Kelly math: upside is +1 working pipeline for DRE, downside is 6.5h + $1.50 sunk + mechanical rollback via .pkl.bak.
+
+**H12 (replaces H8): Representation-Mode Adequacy.** Pass A v1 (scalar-only) achieves 14% CLEAN. Pass A v2 (scalar + relational + temporal + counting + null) predicted to lift CLEAN per-mode. **Falsification criterion:** if v2 sample-50 CLEAN is not significantly above 14% (Wilson 95% CI overlapping baseline) AND per-mode CLEAN distribution is flat, H12 is falsified — bottleneck is prompt quality / adversarial-critic strictness, not representation dimensionality. Either result is publishable.
+
+**Spec files committed:**
+- `docs/design/pass_a_v2_redesign.json` — synthesis spec
+- `docs/design/pass_a_v2_redesign.md` — human-readable summary with migration plan + mode-backend table
+- `docs/design/curvature_swarm_research.json` — full 7-agent research data for reference
+
+**Day 2 morning EXECUTION PLAN (overrides earlier prompt-iteration plan):**
+
+Per `docs/design/pass_a_v2_redesign.md`'s 7-step migration plan (6.5 hours, $1.50):
+
+1. **(30 min)** Bump `pass_a_spec.json` schema_version to 2; replace `invariant_field_schema` with v2 multi-mode schema; add `representation_mode_list` top-level key.
+2. **(2 hours)** Rewrite `llm_prompt_full_text` to require mode selection first; add mode-specific assertion shape instructions for scalar/relational/temporal/counting; update 8 existing few-shot examples + add 2 new (counting + relational two-state).
+3. **(1 hour)** Update `tools/annotate_corpus_invariants.py`: add `REPRESENTATION_MODES`, `BACKEND_MAP`, `route_invariant()` validator; add jsonschema validation; bump partial.jsonl path to v2 dir.
+4. **(1 hour)** Update `VALIDATOR_PROMPT_TEMPLATE` to add a 7th question: "Does the representation_mode match the bug shape?"
+5. **(30 min)** Run `--sample 50` over lunch (~30 min, $1.50). Check per-mode CLEAN distribution.
+6. **(decision point at 2pm tomorrow)** If overall CLEAN ≥25% OR any single mode CLEAN ≥40%: SHIP. Run `--full` afternoon. Estimated $15-20 OpenRouter, 30-45 min unattended. Otherwise: revert to v1 via .pkl.bak, accept 14% CLEAN, document as Section 7 limitation.
+7. **(1 hour)** If shipped: gold-label 20 samples to validate critic, write Section 7 H12 measurement paragraph.
+
+**Hard constraints documented in synthesis:**
+- NO TLA+/TLC/Z3 on the critical path — discharge stays halmos-only for v2 (every mode lowers to halmos check_*/invariant_*/ghost-hook patterns). Adding fresh integrations is week-of-yak-shaving.
+- NO manifold_constraint as a 5th mode — collapse into relational with epsilon field.
+- NO retrieval / embedding redesign — defer hyperbolic experiment to post-cutoff afternoon.
+
+**---  OLD validator-calibration plan from 23:00, superseded by above ---**
+
 
 Day-1 evening ran a calibration test on the adversarial validator: 3 known bugs with hand-authored (good_invariant, bad_invariant) pairs. The validator refuted ALL 6 — including the "good" invariants. **And on inspection, the validator was right** — even my carefully-thought-out invariants for bugs I've been studying all day were subtly off-target (wrong abstraction layer, wrong hash key, mis-located the invariant).
 
