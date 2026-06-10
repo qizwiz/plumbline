@@ -202,6 +202,46 @@ This is a real follow-up. It fits in a focused week sometime after the arXiv pap
 - It does NOT propose merging plumbline and pact wholesale; surgical composition at the proposer seam only.
 - It DOES name the open questions that could derail the build, before they show up at runtime.
 
+## REVISED 2026-06-09 EVENING — curvature framing exposes a deeper problem
+
+Day 1 evening: ran Pass A skeleton + N=50 sample run with adversarial REFUTE-default validator. Result: 7/50 CLEAN (14%), 43/50 REFUTED. Calibration test showed the validator was correctly catching even hand-authored "good" invariants for known bugs.
+
+**JH surfaced the deeper framing** (which I missed initially): the 14% CLEAN rate may not be a prompt-quality issue. It may be a **representation-dimensionality** issue. The 9-category taxonomy in `pass_a_spec.json` expects single boolean assertions over current state — a 1D, scalar, algebraic representation. But many real bugs live on **curved manifolds**:
+
+- **Reentrancy** is a trajectory in (state × call-depth) space — temporal, not single-state
+- **First-depositor inflation** is a hyperbolic relation `share_price = totalAssets / totalSupply` — relational, not algebraic
+- **Signature replay** is a cardinality constraint `count_of_uses(msg) ≤ 1` — counting, not predicate
+- **MEV / front-running** is a hyperproperty over multi-transaction orderings — multi-trajectory
+
+A flat boolean assertion collapses curved spaces to flat predicates. The information loss explains the validator's high refute rate: even "good" extractions are subtly wrong because the representation is fundamentally too lossy.
+
+**Implication for the structural_proposer redesign:**
+
+Pass A should produce **multi-mode** structural invariants:
+- `scalar_check` (current) — single boolean over current state → halmos check_* single function
+- `relational_constraint` — algebraic relation between 2+ state variables → halmos check_* with multiple state snapshots
+- `temporal_invariant` — sequence of state assertions across actions → halmos targetContract + invariant_*
+- `counting_invariant` — cardinality bound over a domain → ghost variable + halmos
+- `manifold_constraint` — region in state space → TLA+ INVARIANT + TLC discharge
+
+Each mode routes to a different discharge backend in Pass B. The current architecture assumed one backend (halmos check_*); the redesign needs to route by mode.
+
+**The curvature-research-swarm Workflow is in flight** (launched 2026-06-09 evening). Returns synthesis containing:
+- Honest verdict: is curvature framing novel / supported / refuted by the literature?
+- Concrete redesigned JSON schema for Pass A
+- Mode-to-backend mapping table
+- Migration plan with time estimates
+- Yes/no call on whether to attempt this redesign before Day-5 cutoff
+- Section 7 H12 framing (testable hypothesis)
+
+**Tomorrow morning's first task** (regardless of swarm result):
+- JH reads the swarm synthesis
+- If swarm says GO: implement the multi-mode schema, regenerate Pass A spec, re-run sample, target ≥40% CLEAN (lower threshold acknowledges representational diversity)
+- If swarm says NO-GO: accept 14% CLEAN, restrict Pass B to scalar-extractable findings only, document as Section 7 limitation
+- Either way, the curvature framing goes in Section 7 as either H12 (new hypothesis) or as limitation discussion
+
+---
+
 ## Discipline boundary
 
 **This file is design, not build.** Building begins after:
