@@ -55,15 +55,36 @@ Stages:
 
 ### 3.1 Sherlock 1259, Issue #1 — First-Depositor Inflation via Vested-Rewards Channel
 
-*[JH: write this. You did this work. Source: runs/2026-06-08-dre-structural/SHERLOCK_SUBMISSION.md
-+ corpus/calibration/2026-06-08-dre-labs-dreusd-source/dreusd/test/PoC_FirstDepositorInflation*.t.sol
-Cover:*
-- *The contract: dreUSDs ERC-4626 vault with _virtualBalance mitigation*
-- *The structural gap: vested-rewards channel bypasses the mitigation*
-- *The cluster-guided discovery (corpus NN ranked the vulnerable function)*
-- *The PoC: Alice with 1 wei + admin adds rewards → victim deposits get rounded to 0*
-- *Severity / Sherlock submission status*
-*]*
+**Target.** dreUSDs is an ERC-4626 vault with the standard `_virtualBalance` mitigation against direct-transfer share-inflation attacks. The mitigation tracks deposits + claimed rewards in a state variable; subsequent share-price calculations use `_virtualBalance` rather than the raw asset balance, so an attacker depositing 1 wei then donating tokens directly to the contract cannot inflate the share-price.
+
+**The structural gap.** `totalAssets()` is implemented as `_virtualBalance + rewardsDistributor.vestedAmount()`. The vested-amount channel grows over real time *without touching `_virtualBalance`*. An attacker who deposits 1 wei first, then waits for the admin to add rewards and for time to pass, sees `totalAssets()` climb without `_virtualBalance` changing. A subsequent victim deposit computes `shares = depositAmount * totalSupply / totalAssets`; with `totalSupply = 1` and `totalAssets` inflated by the vested amount, the victim's share count rounds toward zero. Both redeem; the attacker captures a disproportionate fraction of the combined `_virtualBalance + vested`.
+
+The bug is the same family as classic first-depositor inflation, but the inflation channel is the *documented mitigation's own dependency contract*, not a direct token transfer. The `_virtualBalance` mitigation is silently bypassed because no one wrote down the structural invariant *"all state changes affecting share-price must flow through `_virtualBalance`"* — the vested-rewards channel is an auxiliary path no one tagged as share-price-relevant.
+
+**How the bug was actually found (honest pathway).** Plumbline's structural-cascade clustering (`tools/mine_contest.py`) embedded the 157 DRE functions against a corpus of 1,191 prior Code4rena findings, ranking each function by nearest-neighbor cosine similarity to past bug descriptions. The top 20 surfaced (with their highest-cosine prior match):
+
+- #1 `dreRewardsDistributor._claimVested` (cos 0.84) ← *"AuraVault::claim reward calculation does not deduct fees from reward amount, causing DoS"*
+- #2 `dreOVaultComposer._redeemAndSend` (cos 0.83) ← *"`AuraVault::redeem` calculation error"*
+- #4 `dreUSDs._claimVestedRewards` (cos 0.81) ← same AuraVault::claim prior
+- #16 `dreUSDs._withdraw` (cos 0.80) ← *"`Share 1:1 Conversion`: if vault incurs a loss, the last user to withdraw..."*
+- #20 `dreRewardsDistributor.vestedAmount` (cos 0.80) ← *"`_vested()` claimable amount calculation error"*
+
+The cluster ranking correctly surfaced the contracts that contain the bug's components — dreRewardsDistributor (the vested channel) and dreUSDs (the share-price calculation). It did NOT surface the specific functions where the bug *manifests* (`_deposit`, `_convertToShares`). The bug emerges from the *interaction* between the contracts, not from any single function.
+
+Manual inspection of the top-20 list (with LLM-assisted synthesis) identified the structural pattern: vested rewards in `totalAssets()` bypass the `_virtualBalance` mitigation. A TLA+ shape was then authored (`docs/tla/PausedDistributorPricingAsymmetry.tla` for the related M-1 case; the H-1 case used direct PoC authoring), and a Foundry proof-of-concept was constructed reproducing the inflation arithmetic. Sherlock submission verified the bug at HIGH severity (format-validated by the contest bot; awaiting final judging).
+
+**Plumbline's contribution to this finding, measured honestly.** A blind cold-test of plumbline's `sol_intent` LLM-direct proposer on the full DRE codebase (Anthropic Sonnet 4.5 via OpenRouter, single run, June 9 2026) was conducted to disambiguate plumbline's automated contribution from the human-in-the-loop. The cold-test result: `sol_intent` examined 16 NatSpec promises across dreUSDManager, dreShareOFT, dreOVaultComposer, and dreRewardsDistributor and reported **zero violations**, explicitly noting *"no implementation provided"* for the relevant internal functions. The first-depositor inflation hypothesis was never proposed.
+
+We therefore attribute the finding pathway as follows:
+
+| Stage | Plumbline contribution | Notes |
+|---|---|---|
+| Scope narrowing | ✅ 7.8× search reduction (157 → top-20 candidates) | NN-cos 0.79-0.84 against the 1,191-finding corpus |
+| Structural pattern surfacing | ✅ Correct contracts in top 20 | Both dreRewardsDistributor and dreUSDs surfaced |
+| Bug hypothesis proposal | ❌ Sol_intent did not propose this hypothesis cold | Sol_intent's intent-vs-implementation model is text-based; the bug is a structural-invariant violation across two contracts and not anchored in any NatSpec promise |
+| PoC authoring + verification | ✅ Foundry test reproducing inflation arithmetic | Built from the synthesis, not derived automatically |
+
+The honest claim: **plumbline narrowed the haystack 7.8×; the needle was found by human reading of the top-ranked candidates with LLM-assisted synthesis.** This is a real contribution — search-space reduction at this ratio over a 50K-LOC codebase is genuinely useful for an organized solo auditor — but it is not autonomous bug identification. Section 5 (Limitations) discusses the architectural seam in the current pipeline that prevents the proposer stage from carrying the cluster-rank's structural signal forward as a hypothesis; Section 7 (H8) names this as the next-build hypothesis to test.
 
 ### 3.2 Sherlock 1259, Issue #2 — Paused-Distributor Pricing Asymmetry
 
@@ -159,6 +180,8 @@ The present work suggests several hypotheses that are out of scope to evaluate h
 **Hypothesis H2 (the trivialization claim).** With sufficient independent dimensions added in sequence, smart-contract auditing becomes near-trivial in the sense that bug-class detection collapses to a high-confidence nearest-neighbor lookup with rare manual intervention. **Proposed test:** define a precision/recall scoring against a frozen corpus of Sherlock-judged findings; measure how each added dimension shifts the precision/recall curve; H2 is supported if the marginal contribution of each dimension follows a saturating curve approaching ~1.0 precision at recall meaningful for contest participation (say recall ≥ 0.5).
 
 **Hypothesis H3 (the shape/fluency/soundness factoring is correct).** The three-way pairing — human=shape, LLM=fluency, verifier=soundness — is the right factoring of audit work in the verifier-discharged frame. **Proposed test:** compare end-to-end audit yield (validated findings per hour) across (a) human alone, (b) human + LLM no verifier, (c) human + verifier no LLM, (d) full pipeline. Falsified if condition (d) is not significantly better than the maximum of (a)–(c).
+
+**Hypothesis H8 (corpus-prior-informed structural proposer).** The current pipeline has an architectural seam at the proposer stage: structural-cascade clustering produces nearest-neighbor matches between candidate functions and corpus bug descriptions, but the proposer (`sol_intent`) ignores the NN-rank's structural signal and falls back to intent-vs-implementation text comparison against NatSpec promises. Section 3.1 reports the cold-test result: sol_intent failed to surface the DRE first-depositor inflation hypothesis on independent invocation. We hypothesize that a *corpus-prior-informed* proposer — one that ingests `(candidate function AST, matched corpus shape, the structural invariant violated in the matched prior)` and emits a structural-invariant hypothesis carrying the prior's bug class forward — would surface the bug from the same cluster-rank input. **Proposed test:** build the structural proposer (likely composed of pact's `invariant_agent.py` structural-invariant generator + corpus-prior conditioning), re-run on DRE without human intervention, and measure whether the first-depositor inflation hypothesis is proposed within the top-N leads. Test extends to other Sherlock-judged contests at scale via `c4_ingest.py`'s 1,191-finding corpus. Falsified if the structural proposer's cold-test recall on Sherlock contests does not exceed sol_intent's by a measurable margin (≥ 0.2 recall delta at fixed precision).
 
 ### 7.2 The larger program (position-paper scope)
 
