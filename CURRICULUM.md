@@ -253,3 +253,25 @@ Open this file. Read the Daily Log. Read the Sherlock judging results.
 Re-evaluate. Write the next curriculum from evidence. Or write none and
 take a week off. Either is allowed. **What's not allowed is starting a
 new architecture project on day 19 to escape the result.**
+
+### CRITICAL ADDITION 2026-06-09 23:30 — Validator calibration test exposed deeper issue
+
+Day-1 evening ran a calibration test on the adversarial validator: 3 known bugs with hand-authored (good_invariant, bad_invariant) pairs. The validator refuted ALL 6 — including the "good" invariants. **And on inspection, the validator was right** — even my carefully-thought-out invariants for bugs I've been studying all day were subtly off-target (wrong abstraction layer, wrong hash key, mis-located the invariant).
+
+This means:
+1. Writing precise structural invariants is genuinely harder than the H8 design assumed.
+2. Pass A's 14% CLEAN rate may reflect reality, not just prompt quality.
+3. Even prompt iteration may only lift CLEAN to 30-40%, not to the 50%+ target.
+4. The downstream H8 falsification criterion (structural_proposer beats sol_intent by 0.2 recall delta) is at risk if the input invariant precision is low.
+
+**Day 2 morning addition (BEFORE prompt iteration):**
+
+1. JH manually reviews 20 sample extractions (10 CLEAN, 10 REFUTED) in `runs/2026-06-09-pass-a/validation.md`. For each, the manual verdict: did the validator decide correctly?
+2. If validator is usually right (>70% agreement) → CLEAN rate is reality, redesign Pass A to use lower-volume-higher-quality extractions, accept ~14-30% effective annotation rate.
+3. If validator is over-strict (<50% agreement) → soften the validator prompt (remove "default to refuted") and re-run sample.
+4. Document the gold-label data in `runs/2026-06-09-pass-a/gold_labels.md` — that data itself is research output.
+
+**Honest H8 implication:**
+If the precise-invariant extraction problem turns out genuinely hard, H8 may be falsified at the input layer, not the proposer layer. That's still publishable — *"we built the H8 pipeline, found its precision limit lies in invariant extraction rather than proposer routing, here's the measurement."* Section 7 should be updated tomorrow to reflect this risk before week 2's paper-writing phase.
+
+The Day-5 cutoff still applies. If by Friday we can't get a clean H8 result, we revert to the paper-first sequence with this finding included as the honest limitation.
