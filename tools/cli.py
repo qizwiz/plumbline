@@ -371,10 +371,16 @@ def cmd_scan(args):
     if not target.exists():
         print(f"plumbline: no such path: {target}", file=sys.stderr)
         sys.exit(2)
+    # Use the same skip set sol_graph.analyze() will apply later — otherwise
+    # the precheck passes on a tree whose .sol files are all in skipped dirs
+    # (lib/, interfaces/, mocks/), leaving the user with an empty scan and
+    # no diagnostic. Mirror sol_graph._SKIP exactly.
+    from sol_graph import _SKIP as SOL_GRAPH_SKIP
     n_sol = sum(1 for p in target.rglob("*.sol")
-                if "node_modules" not in p.parts and "test" not in p.parts)
+                if not any(part in SOL_GRAPH_SKIP for part in p.parts))
     if n_sol == 0:
-        print(f"plumbline: no .sol files under {target}", file=sys.stderr)
+        print(f"plumbline: no .sol files under {target} "
+              f"(after excluding {sorted(SOL_GRAPH_SKIP)})", file=sys.stderr)
         sys.exit(2)
 
     c = C(enabled=_supports_color() and not args.no_color)

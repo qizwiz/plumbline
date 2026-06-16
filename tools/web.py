@@ -35,34 +35,12 @@ app = Flask(__name__)
 
 
 # ---------- helpers ----------------------------------------------------------
-
-def _read_corpora_from_status() -> list[dict]:
-    """Parse the `## Corpora curated` table out of STATUS.md.
-
-    Best-effort. If the heading/table shape drifts, we return [] and the
-    dashboard just shows "no corpora parsed."
-    """
-    if not os.path.isfile(STATUS_PATH):
-        return []
-    text = open(STATUS_PATH).read()
-    # find the corpora section
-    m = re.search(r"## Corpora curated.*?\n(.*?)(?:\n##|\Z)", text, re.S)
-    if not m:
-        return []
-    block = m.group(1)
-    rows = []
-    for line in block.splitlines():
-        # markdown row: | name | findings | source |
-        if not line.strip().startswith("|"):
-            continue
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) < 3:
-            continue
-        # skip header + separator
-        if cells[0].lower() in ("corpus", "") or set(cells[0]) <= set("-: "):
-            continue
-        rows.append({"name": cells[0], "findings": cells[1], "source": cells[2]})
-    return rows
+#
+# (Removed _read_corpora_from_status — the dashboard now reads disk reality
+# via _real_corpora() instead of parsing STATUS.md's '## Corpora curated'
+# table. STATUS.md is human prose now; if you want a corpus to appear in
+# the dashboard, add it to corpus/scabench/curated.json or examples/
+# .ANSWERS.md or log a rep referencing it.)
 
 
 def _rep_count() -> int:
