@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# plumbline — CLI wrapper. Activates the venv created by bootstrap.sh and dispatches.
+set -e
+# Resolve through symlinks so `plumbline` works when installed at ~/.local/bin
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -L "$SOURCE" ]]; do
+  TGT="$(readlink "$SOURCE")"
+  [[ "$TGT" = /* ]] && SOURCE="$TGT" || SOURCE="$(dirname "$SOURCE")/$TGT"
+done
+HERE="$(cd "$(dirname "$SOURCE")" && pwd)"
+ROOT="$(cd "$HERE/.." && pwd)"
+if [[ ! -d "$ROOT/.venv" ]]; then
+  echo "plumbline: no .venv — run $ROOT/bootstrap.sh first" >&2
+  exit 1
+fi
+exec "$ROOT/.venv/bin/python" "$ROOT/tools/cli.py" "$@"

@@ -72,8 +72,10 @@ def fn_info(fn, rel, contract):
         if m not in {"function", "external", "public", "internal", "private", "view", "pure",
                      "payable", "virtual", "override", "returns", name} and m not in mods:
             mods.append(m)
+    # tree-sitter rows are 0-indexed; editors are 1-indexed
+    line = fn.start_point[0] + 1
     return {"name": name, "vis": vis, "mods": mods, "sig": sig.strip()[:160], "body": btext,
-            "rel": rel, "contract": contract, "id": f"{contract}.{name}"}
+            "rel": rel, "contract": contract, "id": f"{contract}.{name}", "line": line}
 
 
 def collect_functions(files):
@@ -98,7 +100,7 @@ def call_graph(fns):
         by_name.setdefault(f["name"], []).append(f["id"])
     G = nx.DiGraph()
     for f in fns:
-        G.add_node(f["id"], **{k: f[k] for k in ("vis", "rel", "contract")})
+        G.add_node(f["id"], **{k: f[k] for k in ("vis", "rel", "contract", "line")})
     for f in fns:
         called = set(re.findall(r"\b([a-zA-Z_]\w*)\s*\(", f["body"]))
         for cn in called:

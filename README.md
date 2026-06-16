@@ -1,11 +1,62 @@
-# Plumbline
+# plumbline
 
-**Autonomous AI agents that do the rule-bound, evidence-heavy work — with governance that's *proven*, not promised.**
+Audit-priority scanner for Solidity. Point it at a directory.
+It ranks functions by call-graph centrality + Ollivier-Ricci curvature
++ structural detector hits. Audit the red ones first.
 
-The hard part of deploying an AI *workforce* — not copilots, not RPA — isn't the model. It's
-**governance**: how do you trust an agent making high-volume, rule-bound decisions when being
-confidently wrong costs real money? Most "AI governance" is dashboards and review queues bolted on
-after the fact. Plumbline is a working architecture where the governance is **theorem-checked**.
+```
+$ ./bootstrap.sh                     # one-time, ~30s
+$ bin/plumbline scan ./src           # ranks 392 functions in ~0.5s
+
+  plumbline scan  ./src
+  46 files · 399 functions · 573 call edges · 0.44s
+
+  ┃ 🔴 high — audit first
+  ┃      1.  PoolV3._updateBaseInterest       hub(0.015)  curv -0.45
+  ┃      2.  PoolV3.expectedLiquidity         hub(0.014)  curv -0.40
+  ┃      3.  CDPVault.modifyCollateralAndDebt hub(0.010)  curv -0.45
+  ┃ 🟡 med  — audit second
+  ┃      ...
+  ┃ ⚪ low  — skim only
+  ┃      ...
+
+  98 high · 98 med · 196 low  out of 392 functions
+  why is #1 here? bin/plumbline blame PoolV3._updateBaseInterest
+```
+
+Built on tree-sitter (no compile step). Works on partial/broken repos.
+Output is structured JSON (`--json`) for piping into your existing tools.
+The full ranking is saved to `<dir>/.plumbline/scan-latest.json`.
+
+**Tested:** finds known H-01 site (`_updateBaseInterest`) at #1 on loopfi,
+the `uint64`-cast bug at #1 on puppy-raffle. Two recognizable examples in
+`examples/`.
+
+**Flags:**
+
+```
+bin/plumbline scan <dir> [--top N] [--blame Contract.fn] [--json] [--no-color] [--quiet]
+bin/plumbline blame Contract.fn --dir <dir>     # reuse cached scan
+```
+
+---
+
+## The longer story (for researchers + collaborators)
+
+The CLI above is the audit-priority surface. The rest of this repo is the
+research substrate — corpora, reps, scoreboard, dashboard — used to validate
+the ranking method. If you came for the tool, you can stop reading here.
+
+If you came for the science:
+
+**The thesis.** Smart-contract dependency graphs are negatively curved
+(δ-hyperbolic). Vulnerabilities cluster at predictable geometric positions
+within these graphs. The ranking above is a structural prior for symbolic
+execution and LLM-driven audit, not a replacement for either.
+
+**The architecture.** AI agents propose findings. A formally-verified gate
+(Halmos + Z3 + Lean kernel) checks them. Anything the gate cannot soundly
+settle is escalated, never auto-accepted.
 
 > **The AI proposes. A formally-verified gate disposes. The agent never grades its own homework.
 > Humans govern only the edge cases the gate escalates.**

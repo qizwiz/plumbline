@@ -1,4 +1,20 @@
+# Core LLM + FV stack
 anthropic
 z3-solver
 halmos
 python-dotenv
+
+# Structural / graph layer — used by sol_graph.py and tools/measure_graph_hyperbolicity.py
+# tree-sitter-solidity 1.2.x ships grammar v15; needs tree-sitter >=0.25 (v15 support).
+# Versions 0.21–0.23 ship parsers that only support grammar v13–v14 and will throw
+# "Incompatible Language version 15" on import. Verified working: 0.25.2 + 1.2.13.
+tree-sitter>=0.25,<0.26
+tree-sitter-solidity>=1.2,<2.0
+networkx>=3.0
+
+# Numeric — needed by networkx.pagerank and tools/measure_graph_hyperbolicity.py
+numpy>=1.24
+scipy>=1.10
+
+# Web frontend (tools/web.py)
+flask>=3.0
