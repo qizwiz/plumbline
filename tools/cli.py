@@ -180,6 +180,12 @@ def rank(G: nx.DiGraph, dets: list, top_red: int = 10, top_yel: int = 20) -> lis
         det_count = len(det_by_node.get(n, []))
         det_boost = min(det_count * 0.15, 0.45)
         score = 0.45 * cent + 0.45 * curv_norm + det_boost
+        # Deprioritize view/pure functions: high PageRank because they're called
+        # everywhere, but they don't mutate state — rarely bug sites. Halve the
+        # score so they sink below real audit targets but stay visible.
+        mut = G.nodes[n].get("mut")
+        if mut in ("view", "pure"):
+            score *= 0.5
 
         # Interpretable percentiles
         cent_pct = _pctile(pr_vals, pr.get(n, 0), higher_is_better=True)
@@ -193,6 +199,8 @@ def rank(G: nx.DiGraph, dets: list, top_red: int = 10, top_yel: int = 20) -> lis
             reasons.append(f"curv p{curv_pct}")
         for kind in det_by_node.get(n, []):
             reasons.append(f"+{DETECTOR_LABELS.get(kind, kind)}")
+        if mut in ("view", "pure"):
+            reasons.append(f"-{mut}/2")
 
         items.append({
             "name": n,

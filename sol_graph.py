@@ -23,7 +23,8 @@ import tree_sitter_solidity as tss
 from tree_sitter import Language, Parser
 
 LANG = Language(tss.language())
-_SKIP = {"lib", "node_modules", "test", "tests", ".git", "mock", "mocks", "interfaces"}
+_SKIP = {"lib", "node_modules", "test", "tests", ".git", "mock", "mocks", "interfaces",
+         "dummy", "dummies"}
 
 
 def _walk(n, t, acc):
@@ -63,6 +64,10 @@ def fn_info(fn, rel, contract):
     sig = _text(fn).split("{", 1)[0]
     vis = ("external" if re.search(r"\bexternal\b", sig) else "public" if re.search(r"\bpublic\b", sig)
            else "private" if re.search(r"\bprivate\b", sig) else "internal")
+    # mutability: view/pure read-only functions are rarely bug sites — capture so
+    # downstream ranking can deprioritize them (mirrors tools/admin_trust_filter Check 4)
+    mut = ("view" if re.search(r"\bview\b", sig) else "pure" if re.search(r"\bpure\b", sig)
+           else "payable" if re.search(r"\bpayable\b", sig) else "nonpayable")
     mods = []
     for c in fn.children:
         if c.type == "modifier_invocation":
@@ -74,8 +79,8 @@ def fn_info(fn, rel, contract):
             mods.append(m)
     # tree-sitter rows are 0-indexed; editors are 1-indexed
     line = fn.start_point[0] + 1
-    return {"name": name, "vis": vis, "mods": mods, "sig": sig.strip()[:160], "body": btext,
-            "rel": rel, "contract": contract, "id": f"{contract}.{name}", "line": line}
+    return {"name": name, "vis": vis, "mut": mut, "mods": mods, "sig": sig.strip()[:160],
+            "body": btext, "rel": rel, "contract": contract, "id": f"{contract}.{name}", "line": line}
 
 
 def collect_functions(files):
@@ -100,7 +105,7 @@ def call_graph(fns):
         by_name.setdefault(f["name"], []).append(f["id"])
     G = nx.DiGraph()
     for f in fns:
-        G.add_node(f["id"], **{k: f[k] for k in ("vis", "rel", "contract", "line")})
+        G.add_node(f["id"], **{k: f[k] for k in ("vis", "mut", "rel", "contract", "line")})
     for f in fns:
         called = set(re.findall(r"\b([a-zA-Z_]\w*)\s*\(", f["body"]))
         for cn in called:
