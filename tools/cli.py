@@ -183,8 +183,11 @@ def rank(G: nx.DiGraph, dets: list, top_red: int = 10, top_yel: int = 20) -> lis
         # Deprioritize view/pure functions: high PageRank because they're called
         # everywhere, but they don't mutate state — rarely bug sites. Halve the
         # score so they sink below real audit targets but stay visible.
+        # EXCEPT when a detector fires — a real signal (cast, unchecked-call,
+        # tx.origin, etc.) overrides the view-is-probably-fine prior.
         mut = G.nodes[n].get("mut")
-        if mut in ("view", "pure"):
+        view_demoted = mut in ("view", "pure") and det_count == 0
+        if view_demoted:
             score *= 0.5
 
         # Interpretable percentiles
@@ -199,14 +202,19 @@ def rank(G: nx.DiGraph, dets: list, top_red: int = 10, top_yel: int = 20) -> lis
         if cent_pct >= 90:
             reasons.append(f"hub p{cent_pct}")
             reasons_obj.append({"kind": "hub", "percentile": cent_pct})
-        if curv_pct >= 90 and curv < 0:
+        # Show curv reason whenever it contributes to the score (top decile by
+        # percentile), regardless of sign. Previously gated on `curv < 0`,
+        # which silently hid the explanation on dense-positive-curvature graphs
+        # while still letting curvature boost the score — mismatch between
+        # displayed reasons and actual ranking math.
+        if curv_pct >= 90:
             reasons.append(f"curv p{curv_pct}")
             reasons_obj.append({"kind": "curv", "percentile": curv_pct, "raw": round(curv, 4)})
         for kind in det_by_node.get(n, []):
             tag = DETECTOR_LABELS.get(kind, kind)
             reasons.append(f"+{tag}")
             reasons_obj.append({"kind": "detector", "name": kind, "tag": tag})
-        if mut in ("view", "pure"):
+        if view_demoted:
             reasons.append(f"-{mut}/2")
             reasons_obj.append({"kind": "demotion", "reason": mut, "factor": 0.5})
 

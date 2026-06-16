@@ -60,9 +60,9 @@ def main():
     fhint = f"   filter: {corpus_filter!r}" if corpus_filter else ""
     print(f"\n  total reps: {len(rows)}   shown: {shown}   groups: {len(groups)}{fhint}   log: {REP_LOG}")
     print()
-    cols = ["corpus", "n", "proposer", "rec", "prec", "P@10", "P@20", "P@50", "lift@50"]
-    print(f"  {cols[0]:36s} {cols[1]:>3s}  {cols[2]:20s} {cols[3]:>11s} {cols[4]:>11s} {cols[5]:>6s} {cols[6]:>6s} {cols[7]:>6s} {cols[8]:>8s}")
-    print(f"  {'-'*36} {'-'*3}  {'-'*20} {'-'*11} {'-'*11} {'-'*6} {'-'*6} {'-'*6} {'-'*8}")
+    cols = ["corpus", "n", "proposer", "rec", "prec", "leads", "P@10", "P@20", "P@50", "lift@50"]
+    print(f"  {cols[0]:36s} {cols[1]:>3s}  {cols[2]:20s} {cols[3]:>11s} {cols[4]:>11s} {cols[5]:>6s} {cols[6]:>6s} {cols[7]:>6s} {cols[8]:>6s} {cols[9]:>8s}")
+    print(f"  {'-'*36} {'-'*3}  {'-'*20} {'-'*11} {'-'*11} {'-'*6} {'-'*6} {'-'*6} {'-'*6} {'-'*8}")
     for key, grp in sorted(groups.items()):
         # split by proposer kind for honest comparison (manual vs sol_intent)
         by_proposer = defaultdict(list)
@@ -99,13 +99,24 @@ def main():
                 lor = (r.get("score", {}) or {}).get("lift_over_random")
                 if lor is not None and not used_verifier_lift:
                     lifts.append(lor)
+            # leads_n: prefer explicit score.n_leads (old sol_intent/manual rows)
+            # fall back to len(rep.leads) for newer ricci rows that omit n_leads.
+            leads_ns = []
+            for r in sub:
+                sc = r.get("score") or {}
+                n_leads = sc.get("n_leads")
+                if n_leads is None:
+                    n_leads = len(r.get("leads") or []) or None
+                if n_leads is not None:
+                    leads_ns.append(n_leads)
+            leads_s = f"{statistics.mean(leads_ns):.1f}" if leads_ns else "—"
             rec_s = _fmt(rec)
             prec_s = _fmt(prec)
             p10 = _fmt(p_at[10], width=2)
             p20 = _fmt(p_at[20], width=2)
             p50 = _fmt(p_at[50], width=2)
             lift_s = f"{statistics.mean(lifts):.2f}×" if lifts else "—"
-            print(f"  {key:36s} {len(sub):>3d}  {kind:20s} {rec_s:>11s} {prec_s:>11s} {p10:>6s} {p20:>6s} {p50:>6s} {lift_s:>8s}")
+            print(f"  {key:36s} {len(sub):>3d}  {kind:20s} {rec_s:>11s} {prec_s:>11s} {leads_s:>6s} {p10:>6s} {p20:>6s} {p50:>6s} {lift_s:>8s}")
     print()
 
 
