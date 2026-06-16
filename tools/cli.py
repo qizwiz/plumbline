@@ -191,16 +191,24 @@ def rank(G: nx.DiGraph, dets: list, top_red: int = 10, top_yel: int = 20) -> lis
         cent_pct = _pctile(pr_vals, pr.get(n, 0), higher_is_better=True)
         curv_pct = _pctile(ricci_vals, curv, higher_is_better=False)  # low curv = top
 
-        # Reasons in human terms (percentile, not raw float)
+        # Reasons in two parallel forms:
+        #   - `reasons` (strings) for human rendering — keep for back-compat
+        #   - `reasons_obj` (structured) for agent filtering — schema_version 1
         reasons = []
+        reasons_obj = []
         if cent_pct >= 90:
             reasons.append(f"hub p{cent_pct}")
+            reasons_obj.append({"kind": "hub", "percentile": cent_pct})
         if curv_pct >= 90 and curv < 0:
             reasons.append(f"curv p{curv_pct}")
+            reasons_obj.append({"kind": "curv", "percentile": curv_pct, "raw": round(curv, 4)})
         for kind in det_by_node.get(n, []):
-            reasons.append(f"+{DETECTOR_LABELS.get(kind, kind)}")
+            tag = DETECTOR_LABELS.get(kind, kind)
+            reasons.append(f"+{tag}")
+            reasons_obj.append({"kind": "detector", "name": kind, "tag": tag})
         if mut in ("view", "pure"):
             reasons.append(f"-{mut}/2")
+            reasons_obj.append({"kind": "demotion", "reason": mut, "factor": 0.5})
 
         items.append({
             "name": n,
@@ -210,6 +218,7 @@ def rank(G: nx.DiGraph, dets: list, top_red: int = 10, top_yel: int = 20) -> lis
             "centrality_pct": cent_pct,
             "curvature_pct": curv_pct,
             "reasons": reasons,
+            "reasons_obj": reasons_obj,
             "detectors": det_by_node.get(n, []),
             "file": G.nodes[n].get("rel"),
             "line": G.nodes[n].get("line"),
@@ -318,7 +327,6 @@ def print_blame(items, target: str, c: C):
 def save_scan(items, target_dir: Path) -> Path:
     out_dir = target_dir / ".plumbline"
     out_dir.mkdir(exist_ok=True)
-    # Stable, sortable timestamp filename
     ts_path = out_dir / f"scan-latest.json"
     payload = {
         "target": str(target_dir),
@@ -328,7 +336,35 @@ def save_scan(items, target_dir: Path) -> Path:
     return ts_path
 
 
+def save_scan_payload(payload: dict, target_dir: Path) -> Path:
+    """Save the full schema_version-1 payload (used by --json path)."""
+    out_dir = target_dir / ".plumbline"
+    out_dir.mkdir(exist_ok=True)
+    ts_path = out_dir / "scan-latest.json"
+    ts_path.write_text(json.dumps(payload, indent=2, default=str))
+    return ts_path
+
+
 # ---------- main -------------------------------------------------------------
+
+def _sha256_dir(target: Path) -> str:
+    """Stable hash over all .sol files under target (sorted by relpath).
+    Identity for the directory's Solidity content — same files in, same hash out."""
+    import hashlib
+    h = hashlib.sha256()
+    for p in sorted(target.rglob("*.sol")):
+        if any(x in p.parts for x in ("node_modules", ".git")):
+            continue
+        rel = str(p.relative_to(target)).encode()
+        h.update(rel + b"\x00")
+        try:
+            with open(p, "rb") as f:
+                for chunk in iter(lambda: f.read(8192), b""):
+                    h.update(chunk)
+        except (OSError, IOError):
+            continue
+    return h.hexdigest()
+
 
 def cmd_scan(args):
     target = Path(args.dir).resolve()
@@ -342,22 +378,59 @@ def cmd_scan(args):
         sys.exit(2)
 
     c = C(enabled=_supports_color() and not args.no_color)
+
+    # Idempotent scan: if --force not set, check whether the cached scan's
+    # sha256_dir matches today's. If so, replay the cached result instantly.
+    # Agent-side: a batch loop over 31 projects skips re-work after the first run.
+    cache_path = target / ".plumbline" / "scan-latest.json"
+    force = getattr(args, "force", False)
+    current_sha = None
+    if not force and cache_path.exists() and not args.blame:
+        try:
+            cached = json.loads(cache_path.read_text())
+            if cached.get("sha256_dir"):
+                current_sha = _sha256_dir(target)
+                if cached["sha256_dir"] == current_sha:
+                    if args.json:
+                        cached["cache_hit"] = True
+                        print(json.dumps(cached, indent=2, default=str))
+                        return
+                    # Human path: render from cache so the table still appears
+                    items = cached["ranking"]
+                    if not args.quiet:
+                        print_human(items, cached["files"], cached["functions"],
+                                    cached["edges"], args.top, 0.0, c, target)
+                        print(f"  full ranking: {c.DIM}{cache_path} (cached){c.RST}")
+                        if items:
+                            print(f"  why is #1 here? {c.B}plumbline blame {items[0]['name']}{c.RST}")
+                            print()
+                    return
+        except (json.JSONDecodeError, KeyError):
+            pass  # fall through to fresh scan
+
     t0 = time.time()
     files, fns, G, dets = analyze(str(target))
     items = rank(G, dets)
     scan_time = time.time() - t0
+    if current_sha is None:
+        current_sha = _sha256_dir(target)
+
+    payload = {
+        "schema_version": 1,
+        "command": "scan",
+        "target": str(target),
+        "sha256_dir": current_sha,
+        "files": len(files),
+        "functions": len(fns),
+        "edges": G.number_of_edges(),
+        "scan_time_s": round(scan_time, 3),
+        "ranking": items,
+    }
 
     if args.json:
-        print(json.dumps({
-            "schema_version": 1,
-            "command": "scan",
-            "target": str(target),
-            "files": len(files),
-            "functions": len(fns),
-            "edges": G.number_of_edges(),
-            "scan_time_s": round(scan_time, 3),
-            "ranking": items,
-        }, indent=2, default=str))
+        print(json.dumps(payload, indent=2, default=str))
+        # still persist so blame/diff can read it
+        save_scan_payload(payload, target)
         return
 
     if args.blame:
@@ -367,7 +440,7 @@ def cmd_scan(args):
     if not args.quiet:
         print_human(items, len(files), len(fns), G.number_of_edges(),
                     args.top, scan_time, c, target)
-    saved = save_scan(items, target)
+    saved = save_scan_payload(payload, target)
     if not args.quiet:
         print(f"  full ranking: {c.DIM}{saved}{c.RST}")
         if items:
@@ -446,6 +519,175 @@ def cmd_run(args):
         }, indent=2, default=str))
 
 
+def cmd_reps_query(args):
+    """Query reps.jsonl with filters. Returns matching rows + aggregate stats."""
+    import statistics
+    HERE = Path(__file__).resolve().parent.parent
+    reps_path = HERE / "reps.jsonl"
+    if not reps_path.exists():
+        print(json.dumps({"schema_version": 1, "command": "reps.query", "rows": [], "n": 0}))
+        return
+    rows = []
+    for ln in open(reps_path):
+        ln = ln.strip()
+        if not ln:
+            continue
+        try:
+            r = json.loads(ln)
+        except json.JSONDecodeError:
+            continue
+        # Filters
+        contract = r.get("contract", {}) or {}
+        corpus = contract.get("project_id") or os.path.basename(
+            (contract.get("path") or "").rstrip("/"))
+        if args.corpus and args.corpus not in corpus:
+            continue
+        proposer_kind = (r.get("proposer", {}) or {}).get("kind", "")
+        if args.proposer and args.proposer not in proposer_kind:
+            continue
+        if args.leads_contain:
+            leads = r.get("leads") or []
+            if not any(args.leads_contain.lower() in str(l).lower() for l in leads):
+                continue
+        rows.append(r)
+    rows = rows[-args.limit:] if args.limit > 0 else rows
+    # Aggregate
+    precs = [r["score"].get("precision") for r in rows if (r.get("score") or {}).get("precision") is not None]
+    recs = [r["score"].get("recall") for r in rows if (r.get("score") or {}).get("recall") is not None]
+    agg = {
+        "n_total": len(rows),
+        "precision_mean": round(statistics.mean(precs), 4) if precs else None,
+        "precision_n": len(precs),
+        "recall_mean": round(statistics.mean(recs), 4) if recs else None,
+        "recall_n": len(recs),
+    }
+    if args.fields:
+        # project to a subset of fields per rep to keep output small
+        wanted = set(args.fields.split(","))
+        slim = []
+        for r in rows:
+            slim_row = {}
+            for k in wanted:
+                if "." in k:
+                    parts = k.split(".")
+                    v = r
+                    for part in parts:
+                        v = (v or {}).get(part) if isinstance(v, dict) else None
+                    slim_row[k] = v
+                else:
+                    slim_row[k] = r.get(k)
+            slim.append(slim_row)
+        rows = slim
+    print(json.dumps({
+        "schema_version": 1,
+        "command": "reps.query",
+        "filters": {"corpus": args.corpus, "proposer": args.proposer,
+                    "leads_contain": args.leads_contain, "limit": args.limit},
+        "aggregate": agg,
+        "rows": rows,
+    }, indent=2, default=str))
+
+
+def cmd_diff(args):
+    """Compare two scan outputs and report added/removed/moved rankings."""
+    def _load(path_or_dir):
+        p = Path(path_or_dir)
+        if p.is_dir():
+            p = p / ".plumbline" / "scan-latest.json"
+        if not p.exists():
+            print(json.dumps({"schema_version": 1, "command": "diff",
+                              "error": f"no scan at {p}"}))
+            sys.exit(2)
+        return json.loads(p.read_text())
+    a = _load(args.baseline)
+    b = _load(args.target)
+    items_a = a.get("ranking") or []
+    items_b = b.get("ranking") or []
+    rank_a = {it["name"]: it.get("rank", i + 1) for i, it in enumerate(items_a)}
+    rank_b = {it["name"]: it.get("rank", i + 1) for i, it in enumerate(items_b)}
+    names_a = set(rank_a)
+    names_b = set(rank_b)
+    added = sorted(names_b - names_a, key=lambda n: rank_b[n])[:50]
+    removed = sorted(names_a - names_b, key=lambda n: rank_a[n])[:50]
+    moved = []
+    for name in names_a & names_b:
+        delta = rank_a[name] - rank_b[name]   # positive = moved up
+        if abs(delta) >= max(1, args.threshold):
+            moved.append({"name": name, "from": rank_a[name], "to": rank_b[name], "delta": delta})
+    moved.sort(key=lambda x: -abs(x["delta"]))
+    print(json.dumps({
+        "schema_version": 1,
+        "command": "diff",
+        "baseline": str(args.baseline),
+        "target": str(args.target),
+        "n_added": len(added),
+        "n_removed": len(removed),
+        "n_moved": len(moved),
+        "added": added,
+        "removed": removed,
+        "moved": moved[:args.top],
+    }, indent=2, default=str))
+
+
+def cmd_surface(args):
+    """Auto-generate a markdown report from reps + scans."""
+    import statistics
+    from collections import defaultdict
+    HERE = Path(__file__).resolve().parent.parent
+    reps_path = HERE / "reps.jsonl"
+    if not reps_path.exists():
+        print(json.dumps({"schema_version": 1, "command": "surface",
+                          "error": "no reps.jsonl"}))
+        sys.exit(2)
+    by_corpus = defaultdict(list)
+    for ln in open(reps_path):
+        ln = ln.strip()
+        if not ln:
+            continue
+        try:
+            r = json.loads(ln)
+        except json.JSONDecodeError:
+            continue
+        c = r.get("contract", {}) or {}
+        key = c.get("project_id") or os.path.basename((c.get("path") or "?").rstrip("/"))
+        by_corpus[key].append(r)
+    lines = [f"# plumbline surface report",
+             f"",
+             f"Generated by `plumbline surface`. Total reps: {sum(len(v) for v in by_corpus.values())}. Corpora: {len(by_corpus)}.",
+             f"",
+             f"## Per-corpus aggregate (sorted by precision μ desc)",
+             f"",
+             f"| corpus | n | proposer kinds | precision μ±σ | recall μ±σ |",
+             f"|---|---|---|---|---|"]
+    rows = []
+    for corpus, reps in sorted(by_corpus.items()):
+        precs = [r["score"].get("precision") for r in reps if (r.get("score") or {}).get("precision") is not None]
+        recs = [r["score"].get("recall") for r in reps if (r.get("score") or {}).get("recall") is not None]
+        kinds = sorted({(r.get("proposer", {}) or {}).get("kind", "?") for r in reps})
+        def _fmt(xs):
+            if not xs:
+                return "—"
+            mu = statistics.mean(xs)
+            if len(xs) == 1:
+                return f"{mu:.2f}"
+            return f"{mu:.2f}±{statistics.stdev(xs):.2f}"
+        rows.append((statistics.mean(precs) if precs else -1, corpus, len(reps), kinds, _fmt(precs), _fmt(recs)))
+    rows.sort(key=lambda r: -r[0])
+    for _, corpus, n, kinds, ps, rs in rows:
+        lines.append(f"| `{corpus}` | {n} | {', '.join(kinds)} | {ps} | {rs} |")
+    out_path = Path(args.to)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text("\n".join(lines) + "\n")
+    print(json.dumps({
+        "schema_version": 1,
+        "command": "surface",
+        "path": str(out_path),
+        "n_corpora": len(by_corpus),
+        "n_reps": sum(len(v) for v in by_corpus.values()),
+        "bytes_written": out_path.stat().st_size,
+    }, indent=2, default=str))
+
+
 def main():
     p = argparse.ArgumentParser(
         prog="plumbline",
@@ -460,6 +702,7 @@ def main():
     sp.add_argument("--json", action="store_true", help="machine-readable output (auto-on when stdout is piped)")
     sp.add_argument("--no-color", action="store_true", help="disable ANSI color")
     sp.add_argument("--quiet", action="store_true", help="ranked list only, no header/footer")
+    sp.add_argument("--force", action="store_true", help="bypass sha256_dir cache and re-scan")
 
     sb = sub.add_parser("blame", help="alias for `scan --blame <fn>`")
     sb.add_argument("fn", help="Contract.function to explain")
@@ -477,6 +720,28 @@ def main():
     csl.add_argument("--untouched", action="store_true", help="only show corpora with 0 reps")
     csl.add_argument("--json", action="store_true")
     csl.add_argument("--no-color", action="store_true")
+
+    sq = sub.add_parser("reps", help="reps.jsonl operations (query)")
+    sq_sub = sq.add_subparsers(dest="reps_cmd")
+    sqq = sq_sub.add_parser("query", help="filter reps.jsonl with corpus/proposer/leads filters")
+    sqq.add_argument("--corpus", default=None, help="substring match on corpus/project_id")
+    sqq.add_argument("--proposer", default=None, help="substring match on proposer.kind")
+    sqq.add_argument("--leads-contain", default=None, help="substring match in any lead string")
+    sqq.add_argument("--limit", type=int, default=50, help="last N rows after filter (default 50)")
+    sqq.add_argument("--fields", default=None,
+                     help="comma-separated fields to project per rep (e.g. 'rep_id,contract.project_id,score.precision')")
+    sqq.add_argument("--json", action="store_true")
+
+    sd = sub.add_parser("diff", help="compare two scan outputs")
+    sd.add_argument("baseline", help="path to baseline scan json or scan dir")
+    sd.add_argument("target", help="path to target scan json or scan dir")
+    sd.add_argument("--top", type=int, default=20, help="show top N moved (default 20)")
+    sd.add_argument("--threshold", type=int, default=5, help="min rank delta to report (default 5)")
+    sd.add_argument("--json", action="store_true")
+
+    ss = sub.add_parser("surface", help="auto-generate a markdown report from reps + scans")
+    ss.add_argument("--to", required=True, help="output markdown path")
+    ss.add_argument("--json", action="store_true")
 
     args = p.parse_args()
 
@@ -521,6 +786,16 @@ def main():
         else:
             sc.print_help()
             sys.exit(1)
+    elif args.cmd == "reps":
+        if args.reps_cmd == "query":
+            cmd_reps_query(args)
+        else:
+            sq.print_help()
+            sys.exit(1)
+    elif args.cmd == "diff":
+        cmd_diff(args)
+    elif args.cmd == "surface":
+        cmd_surface(args)
     else:
         p.print_help()
         sys.exit(1)
