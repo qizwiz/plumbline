@@ -76,20 +76,28 @@ def main():
             lifts = []
             for r in sub:
                 vr = (r.get("verifier", {}) or {}).get("result") or {}
+                used_verifier_lift = False
                 if isinstance(vr, dict):
                     for K in (10, 20, 50):
                         cell = vr.get(str(K)) or vr.get(K)
                         if isinstance(cell, dict):
-                            v = cell.get("ricci_low") or cell.get("precision")
-                            if v is not None:
-                                p_at[K].append(v)
+                            # Use explicit key presence — `0.0 or x` would
+                            # silently substitute precision for a legit zero
+                            # ricci_low score, inflating the displayed P@K.
+                            if "ricci_low" in cell and cell["ricci_low"] is not None:
+                                p_at[K].append(cell["ricci_low"])
+                            elif "precision" in cell and cell["precision"] is not None:
+                                p_at[K].append(cell["precision"])
                             rand = cell.get("random")
                             ricci = cell.get("ricci_low")
                             if K == 50 and rand is not None and ricci is not None and rand > 0:
                                 lifts.append(ricci / rand)
-                # also accept score.lift_over_random as a fallback
+                                used_verifier_lift = True
+                # Fallback per rep — not gated on whether the group already
+                # has any lifts (the old `not lifts` guard dropped subsequent
+                # reps' fallbacks after the first verifier-derived one).
                 lor = (r.get("score", {}) or {}).get("lift_over_random")
-                if lor is not None and not lifts:
+                if lor is not None and not used_verifier_lift:
                     lifts.append(lor)
             rec_s = _fmt(rec)
             prec_s = _fmt(prec)

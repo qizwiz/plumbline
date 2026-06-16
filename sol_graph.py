@@ -100,6 +100,18 @@ def collect_functions(files):
 def call_graph(fns):
     """Approximate call graph: edge fn -> g when fn's body names g (any function of that name). Name-based,
     no inheritance resolution — a floor for centrality/clustering, not a sound dependency analysis."""
+    # Disambiguate overloads: Solidity allows `function deposit(uint)` and
+    # `function deposit(uint, address)` in the same contract. Both produce
+    # the same `f"{contract}.{name}"` id, and the second `add_node` overwrites
+    # the first's `line` attribute. Suffix overloads as `/0`, `/1`, ... so
+    # each overload keeps its own source line and gets ranked separately.
+    occ: dict[str, int] = {}
+    for f in fns:
+        base = f["id"]
+        n = occ.get(base, 0)
+        if n > 0:
+            f["id"] = f"{base}/{n}"
+        occ[base] = n + 1
     by_name = {}
     for f in fns:
         by_name.setdefault(f["name"], []).append(f["id"])

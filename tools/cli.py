@@ -302,8 +302,9 @@ def print_blame(items, target: str, c: C):
         print(f"    {c.DIM}curvature (graph bottleneck){c.RST}    "
               f"p{it.get('curvature_pct', 50)}     "
               f"{c.DIM}({it['curvature']:+.3f} raw){c.RST}")
+        dets = it.get('detectors') or []
         print(f"    {c.DIM}structural detectors{c.RST}             "
-              f"{', '.join(it['detectors']) if it['detectors'] else '(none)'}")
+              f"{', '.join(dets) if dets else '(none)'}")
         print()
         if it["reasons"]:
             print(f"  {c.DIM}why it ranks here:{c.RST}")

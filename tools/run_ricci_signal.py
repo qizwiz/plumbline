@@ -55,8 +55,13 @@ def fetch_project(project_id: str) -> Path:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     proj_dir = CACHE_DIR / project_id
     tarball = CACHE_DIR / f"{project_id}.tar.gz"
+    # Sentinel — `.complete` is touched only after a full extract. A bare
+    # proj_dir without it is treated as partial (prior curl/tar killed mid-run).
+    sentinel = proj_dir / ".plumbline_extract_complete"
 
-    if not proj_dir.exists():
+    if not sentinel.exists():
+        if proj_dir.exists():
+            shutil.rmtree(proj_dir)
         if not tarball.exists():
             print(f"  [fetch] {cb['tarball_url']}")
             subprocess.run(
@@ -69,6 +74,7 @@ def fetch_project(project_id: str) -> Path:
             ['tar', 'xzf', str(tarball), '-C', str(proj_dir), '--strip-components=1'],
             check=True,
         )
+        sentinel.touch()
 
     # Find Solidity source root: prefer src/, contracts/, or first dir with many .sol
     candidates = [proj_dir / 'src', proj_dir / 'contracts', proj_dir]
@@ -88,19 +94,23 @@ def extract_vuln_targets(project_id: str) -> dict:
     contract_mentions = set()
     fn_mentions = set()
     precise_locs = set()
-    for v in proj['vulnerabilities']:
+    # Solidity is case-sensitive but contract files often have lowercase or
+    # underscore-prefix names (erc20.sol, iVault.sol, _admin.sol) that the
+    # original uppercase-only regex skipped — case-insensitive match catches
+    # them. Filter dropped tokens (keywords, articles) at the contract-set step.
+    for v in proj.get('vulnerabilities', []):
         text = (v.get('title', '') + ' ' + v.get('description', ''))
-        for m in re.finditer(r'([A-Z][A-Za-z0-9]+)\.sol#?(\w+)?\b', text):
+        for m in re.finditer(r'([A-Za-z_][A-Za-z0-9_]*)\.sol#?(\w+)?\b', text):
             contract_mentions.add(m.group(1))
             if m.group(2):
                 precise_locs.add((m.group(1), m.group(2)))
                 fn_mentions.add(m.group(2))
-        for m in re.finditer(r'([A-Z][A-Za-z0-9]+)::(\w+)', text):
+        for m in re.finditer(r'([A-Za-z_][A-Za-z0-9_]*)::(\w+)', text):
             contract_mentions.add(m.group(1))
             precise_locs.add((m.group(1), m.group(2)))
             fn_mentions.add(m.group(2))
     return {
-        'n_findings': len(proj['vulnerabilities']),
+        'n_findings': len(proj.get('vulnerabilities', [])),
         'contract_mentions': contract_mentions,
         'fn_mentions': fn_mentions,
         'precise_locs': precise_locs,

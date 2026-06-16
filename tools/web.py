@@ -15,6 +15,7 @@ Surgical scout — sized to "is a web UI worth building"? Not a product.
 """
 from __future__ import annotations
 
+import html
 import json
 import os
 import re
@@ -279,11 +280,14 @@ def dashboard() -> Response:
                 )
             else:
                 reps_cell = "<span class='muted-er'>—</span>"
+            # html.escape on every user/disk-derived string — corpus names
+            # come from directory names, scabench project_id, reps.jsonl
+            # basename(path); any `<` would otherwise render as HTML.
             rows.append(
                 f"<tr class='{cls}'>"
-                f"<td><code>{c['name']}</code></td>"
-                f"<td>{c['findings']}</td>"
-                f"<td><span class='muted'>{c['source']}</span></td>"
+                f"<td><code>{html.escape(str(c['name']))}</code></td>"
+                f"<td>{html.escape(str(c['findings']))}</td>"
+                f"<td><span class='muted'>{html.escape(str(c['source']))}</span></td>"
                 f"<td>{reps_cell}</td>"
                 f"</tr>"
             )
@@ -337,10 +341,12 @@ def scoreboard() -> Response:
         err = proc.stderr or ""
     except subprocess.TimeoutExpired:
         out, err = "", "(timed out after 30s)"
+    # subprocess stdout includes reps.jsonl-derived strings (project_id,
+    # proposer.kind) — escape before <pre> to prevent injected `<script>`
     body = (
         f"<h3>scoreboard.py output</h3>"
-        f"<pre>{out}</pre>"
-        + (f"<h5 class='text-danger'>stderr</h5><pre>{err}</pre>" if err.strip() else "")
+        f"<pre>{html.escape(out)}</pre>"
+        + (f"<h5 class='text-danger'>stderr</h5><pre>{html.escape(err)}</pre>" if err.strip() else "")
     )
     return Response(_html_page("scoreboard", body), mimetype="text/html")
 
