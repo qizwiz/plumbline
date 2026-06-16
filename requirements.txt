@@ -18,3 +18,8 @@ scipy>=1.10
 
 # Web frontend (tools/web.py)
 flask>=3.0
+
+
+# Optional — for `plumbline scan --compare slither`. Requires solc-select (auto-installed) +
+# Foundry (https://book.getfoundry.sh) for projects that use forge.
+slither-analyzer

@@ -45,13 +45,14 @@ class C:
             self.RED_B = "\033[1;31m"
             self.YEL = "\033[33m"
             self.YEL_B = "\033[1;33m"
+            self.GRN = "\033[32m"
             self.GRY = "\033[90m"
             self.DIM = "\033[2m"
             self.B = "\033[1m"
             self.RST = "\033[0m"
             self.UND = "\033[4m"
         else:
-            self.RED = self.RED_B = self.YEL = self.YEL_B = ""
+            self.RED = self.RED_B = self.YEL = self.YEL_B = self.GRN = ""
             self.GRY = self.DIM = self.B = self.RST = self.UND = ""
 
 
@@ -355,6 +356,148 @@ def save_scan_payload(payload: dict, target_dir: Path) -> Path:
 
 # ---------- main -------------------------------------------------------------
 
+def _which(prog: str) -> str | None:
+    """Locate a binary on PATH (or in the active venv's bin/)."""
+    import shutil
+    return shutil.which(prog)
+
+
+def _run_slither(target: Path, timeout: int = 180) -> dict:
+    """Run slither and return parsed comparison data.
+
+    Returns a dict with:
+      - n_findings: int
+      - findings_by_fn: {"Contract.function": [{check, impact, lines}]}
+      - findings_by_file: {"file.sol": [{check, impact, lines, fn}]}
+      - error: str | None  (None on success)
+      - command: str (the slither invocation, for reproducibility)
+      - slither_version: str | None
+    """
+    import subprocess, tempfile
+    from collections import defaultdict
+    slither_bin = _which("slither")
+    if not slither_bin:
+        return {
+            "n_findings": 0, "findings_by_fn": {}, "findings_by_file": {},
+            "error": "slither not on PATH (try: pip install slither-analyzer)",
+            "command": None, "slither_version": None,
+        }
+    version = None
+    try:
+        v = subprocess.run([slither_bin, "--version"], capture_output=True, text=True, timeout=10)
+        version = (v.stdout or v.stderr).strip().split()[0] if (v.stdout or v.stderr) else None
+    except Exception:
+        pass
+    # Slither writes JSON to a file path passed via --json — but refuses to
+    # overwrite an existing file. Take a unique path from mkstemp, close the
+    # descriptor, and DELETE the placeholder before invoking slither.
+    fd, json_path = tempfile.mkstemp(suffix='.json', prefix='plumbline-slither-')
+    os.close(fd)
+    os.unlink(json_path)
+    cmd = [slither_bin, str(target), "--json", json_path]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.unlink(json_path)
+        return {"n_findings": 0, "findings_by_fn": {}, "findings_by_file": {},
+                "error": f"slither timed out after {timeout}s", "command": " ".join(cmd),
+                "slither_version": version}
+    if not os.path.exists(json_path) or os.path.getsize(json_path) == 0:
+        # slither failed to compile; the stderr will tell us why
+        stderr_tail = (r.stderr or "").strip().splitlines()[-3:]
+        os.path.exists(json_path) and os.unlink(json_path)
+        return {"n_findings": 0, "findings_by_fn": {}, "findings_by_file": {},
+                "error": f"slither produced no output (exit={r.returncode}): " + " | ".join(stderr_tail),
+                "command": " ".join(cmd), "slither_version": version}
+    try:
+        with open(json_path) as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        return {"n_findings": 0, "findings_by_fn": {}, "findings_by_file": {},
+                "error": f"slither output is not valid JSON: {e}", "command": " ".join(cmd),
+                "slither_version": version}
+    finally:
+        os.path.exists(json_path) and os.unlink(json_path)
+
+    findings_by_fn: dict[str, list[dict]] = defaultdict(list)
+    findings_by_file: dict[str, list[dict]] = defaultdict(list)
+    detectors = data.get("results", {}).get("detectors", []) or []
+    for det in detectors:
+        check = det.get("check")
+        impact = det.get("impact")
+        elements = det.get("elements") or []
+        src = (elements[0] if elements else {}).get("source_mapping", {}) or {}
+        fname = src.get("filename_short") or src.get("filename_relative") or src.get("filename_absolute")
+        lines = src.get("lines") or []
+        # Extract Contract.function id when present
+        fn_id = None
+        for el in elements:
+            if el.get("type") == "function":
+                fn = el.get("name", "?")
+                parent = (el.get("type_specific_fields") or {}).get("parent") or {}
+                if parent.get("type") == "contract":
+                    fn_id = f"{parent.get('name', '?')}.{fn}"
+                else:
+                    fn_id = fn
+                break
+        record = {"check": check, "impact": impact, "lines": lines}
+        if fn_id:
+            findings_by_fn[fn_id].append(record)
+        if fname:
+            findings_by_file[fname].append({**record, "fn": fn_id})
+    return {
+        "n_findings": len(detectors),
+        "findings_by_fn": dict(findings_by_fn),
+        "findings_by_file": dict(findings_by_file),
+        "error": None,
+        "command": " ".join(cmd),
+        "slither_version": version,
+    }
+
+
+def _build_slither_comparison(items: list[dict], slither: dict, top_n: int = 10) -> dict:
+    """Build the comparison block for a plumbline ranking + slither results."""
+    if slither.get("error"):
+        return {"tool": "slither", "n_findings": 0, "error": slither["error"],
+                "slither_version": slither.get("slither_version")}
+    top = items[:top_n]
+    top_names = {it["name"] for it in top}
+    agree = []
+    plumbline_only = []
+    fbf = slither["findings_by_fn"]
+    for it in top:
+        s_hits = fbf.get(it["name"], [])
+        if s_hits:
+            agree.append({"name": it["name"], "rank": it.get("rank"), "slither": s_hits})
+        else:
+            plumbline_only.append({"name": it["name"], "rank": it.get("rank")})
+    slither_only = []
+    for fn_id, findings in fbf.items():
+        if fn_id not in top_names:
+            # Did plumbline rank it lower?
+            ranked_below = next((it for it in items if it["name"] == fn_id), None)
+            slither_only.append({
+                "name": fn_id,
+                "plumbline_rank": ranked_below.get("rank") if ranked_below else None,
+                "slither": findings,
+            })
+    # Sort slither-only by impact (high → low)
+    impact_order = {"High": 0, "Medium": 1, "Low": 2, "Informational": 3, "Optimization": 4}
+    slither_only.sort(key=lambda x: min((impact_order.get(f["impact"], 9) for f in x["slither"]), default=9))
+    return {
+        "tool": "slither",
+        "slither_version": slither.get("slither_version"),
+        "n_slither_findings": slither["n_findings"],
+        "top_n": top_n,
+        "agree_in_top_n": len(agree),
+        "plumbline_only_in_top_n": len(plumbline_only),
+        "slither_only_outside_top_n": len(slither_only),
+        "agree": agree,
+        "plumbline_only": plumbline_only,
+        "slither_only": slither_only[:20],
+    }
+
+
 def _sha256_dir(target: Path) -> str:
     """Stable hash over all .sol files under target (sorted by relpath).
     Identity for the directory's Solidity content — same files in, same hash out."""
@@ -429,6 +572,23 @@ def cmd_scan(args):
     if current_sha is None:
         current_sha = _sha256_dir(target)
 
+    # Optional: --compare slither runs Slither and overlays its findings on
+    # the plumbline ranking. Mariam's actual workflow uses Slither already;
+    # showing the overlap makes plumbline the umbrella, not a parallel tool.
+    comparison = None
+    if getattr(args, "compare", None):
+        wanted = [t.strip() for t in args.compare.split(",") if t.strip()]
+        comparison = {}
+        if "slither" in wanted:
+            t_slither = time.time()
+            slither = _run_slither(target)
+            comparison["slither"] = _build_slither_comparison(items, slither)
+            comparison["slither"]["wall_time_s"] = round(time.time() - t_slither, 2)
+            # Annotate each ranked item with its slither hits (so blame can show them too)
+            if not slither.get("error"):
+                for it in items:
+                    it["slither_findings"] = slither["findings_by_fn"].get(it["name"], [])
+
     payload = {
         "schema_version": 1,
         "command": "scan",
@@ -440,6 +600,8 @@ def cmd_scan(args):
         "scan_time_s": round(scan_time, 3),
         "ranking": items,
     }
+    if comparison:
+        payload["comparison"] = comparison
 
     if args.json:
         print(json.dumps(payload, indent=2, default=str))
@@ -454,6 +616,30 @@ def cmd_scan(args):
     if not args.quiet:
         print_human(items, len(files), len(fns), G.number_of_edges(),
                     args.top, scan_time, c, target)
+        # Optional: small slither overlap section
+        if comparison and "slither" in comparison:
+            cs = comparison["slither"]
+            if cs.get("error"):
+                print(f"  {c.DIM}slither: {c.YEL}skipped{c.RST}{c.DIM} ({cs['error'][:80]}){c.RST}")
+            else:
+                agree_n = cs["agree_in_top_n"]
+                top_n = cs["top_n"]
+                only_n = cs["slither_only_outside_top_n"]
+                wall = cs.get("wall_time_s", 0)
+                print(f"  ┃ {c.B}slither overlap{c.RST} {c.DIM}(top-{top_n}, {wall}s){c.RST}")
+                print(f"  ┃   {c.GRN if agree_n else c.GRY}✓ {agree_n} of {top_n}{c.RST} {c.DIM}also flagged by slither{c.RST}")
+                if cs.get("agree"):
+                    for a in cs["agree"][:5]:
+                        checks = ", ".join({f['check'] for f in a['slither']})
+                        print(f"  ┃     {c.DIM}#{a['rank']:>2}{c.RST} {a['name']:50s} {c.DIM}({checks}){c.RST}")
+                if only_n:
+                    print(f"  ┃   {c.YEL_B}! {only_n} slither-only{c.RST} {c.DIM}(slither flagged, plumbline didn't rank top-{top_n}){c.RST}")
+                    for s in cs.get("slither_only", [])[:3]:
+                        checks = ", ".join({f['check'] for f in s['slither']})
+                        rank_s = f"#{s['plumbline_rank']}" if s.get('plumbline_rank') else "unranked"
+                        print(f"  ┃     {c.DIM}{rank_s:>3}{c.RST} {s['name']:50s} {c.DIM}({checks}){c.RST}")
+                print(f"  ┃")
+                print()
     saved = save_scan_payload(payload, target)
     if not args.quiet:
         print(f"  full ranking: {c.DIM}{saved}{c.RST}")
@@ -717,6 +903,9 @@ def main():
     sp.add_argument("--no-color", action="store_true", help="disable ANSI color")
     sp.add_argument("--quiet", action="store_true", help="ranked list only, no header/footer")
     sp.add_argument("--force", action="store_true", help="bypass sha256_dir cache and re-scan")
+    sp.add_argument("--compare", default=None,
+                    help="comma-separated comparison tools (currently: 'slither'). "
+                         "Annotates each ranked function with slither hits and adds an overlap summary.")
 
     sb = sub.add_parser("blame", help="alias for `scan --blame <fn>`")
     sb.add_argument("fn", help="Contract.function to explain")
