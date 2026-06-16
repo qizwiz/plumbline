@@ -349,10 +349,13 @@ def cmd_scan(args):
 
     if args.json:
         print(json.dumps({
+            "schema_version": 1,
+            "command": "scan",
             "target": str(target),
             "files": len(files),
             "functions": len(fns),
             "edges": G.number_of_edges(),
+            "scan_time_s": round(scan_time, 3),
             "ranking": items,
         }, indent=2, default=str))
         return
@@ -372,10 +375,81 @@ def cmd_scan(args):
             print()
 
 
+def cmd_corpus_ls(args):
+    """List corpora in corpus/scabench/curated.json with rep counts."""
+    from collections import defaultdict
+    HERE = Path(__file__).resolve().parent.parent
+    curated_path = HERE / 'corpus' / 'scabench' / 'curated.json'
+    reps_path = HERE / 'reps.jsonl'
+    if not curated_path.exists():
+        print(json.dumps({"schema_version": 1, "error": "no corpus/scabench/curated.json"}))
+        sys.exit(2)
+    rep_counts = defaultdict(int)
+    if reps_path.exists():
+        for ln in open(reps_path):
+            ln = ln.strip()
+            if not ln:
+                continue
+            try:
+                r = json.loads(ln)
+            except json.JSONDecodeError:
+                continue
+            pid = r.get("contract", {}).get("project_id")
+            if pid:
+                rep_counts[pid] += 1
+    curated = json.loads(curated_path.read_text())
+    rows = []
+    for p in curated:
+        pid = p.get("project_id", "?")
+        n_v = len(p.get("vulnerabilities", []))
+        n_r = rep_counts.get(pid, 0)
+        if args.untouched and n_r > 0:
+            continue
+        rows.append({
+            "project_id": pid,
+            "platform": p.get("platform"),
+            "name": p.get("name"),
+            "n_vulnerabilities": n_v,
+            "n_reps": n_r,
+        })
+    rows.sort(key=lambda r: -r["n_vulnerabilities"])
+    if args.json:
+        print(json.dumps({
+            "schema_version": 1,
+            "command": "corpus.ls",
+            "n_total": len(curated),
+            "n_shown": len(rows),
+            "rows": rows,
+        }, indent=2, default=str))
+    else:
+        c = C(enabled=_supports_color() and not getattr(args, "no_color", False))
+        for r in rows:
+            mark = c.RED_B + "○" + c.RST if r["n_reps"] == 0 else c.GRY + "●" + c.RST
+            print(f"  {mark}  {r['project_id']:50s}  {r['n_vulnerabilities']:>3} vulns  {r['n_reps']:>3} reps")
+
+
+def cmd_run(args):
+    """Fetch + scan + Ricci + log rep for one or more project_ids."""
+    # Delegate to the existing research-loop runner; share its code rather
+    # than re-import its main() so the CLI surface and the script stay aligned.
+    import importlib.util
+    HERE = Path(__file__).resolve().parent
+    spec = importlib.util.spec_from_file_location("run_ricci_signal", HERE / "run_ricci_signal.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    results = [mod.run_one(pid) for pid in args.project_ids]
+    if args.json:
+        print(json.dumps({
+            "schema_version": 1,
+            "command": "run",
+            "results": results,
+        }, indent=2, default=str))
+
+
 def main():
     p = argparse.ArgumentParser(
         prog="plumbline",
-        description="audit-priority scanner for Solidity",
+        description="audit-priority scanner for Solidity (agent-ergonomic: auto-JSON when stdout is piped)",
     )
     sub = p.add_subparsers(dest="cmd")
 
@@ -383,7 +457,7 @@ def main():
     sp.add_argument("dir", help="directory containing Solidity sources")
     sp.add_argument("--top", type=int, default=20, help="how many to show (default 20)")
     sp.add_argument("--blame", help="explain a single function's ranking")
-    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--json", action="store_true", help="machine-readable output (auto-on when stdout is piped)")
     sp.add_argument("--no-color", action="store_true", help="disable ANSI color")
     sp.add_argument("--quiet", action="store_true", help="ranked list only, no header/footer")
 
@@ -391,25 +465,62 @@ def main():
     sb.add_argument("fn", help="Contract.function to explain")
     sb.add_argument("--dir", default=".", help="directory to scan (default .)")
     sb.add_argument("--no-color", action="store_true")
+    sb.add_argument("--json", action="store_true")
+
+    sr = sub.add_parser("run", help="fetch + scan + Ricci + log rep for a scabench project_id")
+    sr.add_argument("project_ids", nargs="+", help="one or more curated.json project_ids")
+    sr.add_argument("--json", action="store_true", help="machine-readable output")
+
+    sc = sub.add_parser("corpus", help="corpus operations (ls)")
+    cs_sub = sc.add_subparsers(dest="corpus_cmd")
+    csl = cs_sub.add_parser("ls", help="list scabench corpora with rep counts")
+    csl.add_argument("--untouched", action="store_true", help="only show corpora with 0 reps")
+    csl.add_argument("--json", action="store_true")
+    csl.add_argument("--no-color", action="store_true")
 
     args = p.parse_args()
+
+    # Agent-ergonomic default: if stdout isn't a tty (piped / captured), the
+    # caller is almost always a script or agent — emit JSON automatically so
+    # they don't have to remember `--json` every time.
+    if hasattr(args, "json") and not args.json and not sys.stdout.isatty():
+        args.json = True
+
     if args.cmd == "scan":
         cmd_scan(args)
     elif args.cmd == "blame":
-        # Find latest scan and reuse it if possible; else rescan
         target = Path(args.dir).resolve()
         cache = target / ".plumbline" / "scan-latest.json"
         if cache.exists():
             data = json.loads(cache.read_text())
             items = data["ranking"]
-            c = C(enabled=_supports_color() and not args.no_color)
-            print_blame(items, args.fn, c)
+            if args.json:
+                match = [it for it in items if it["name"] == args.fn
+                         or it["name"].endswith("." + args.fn)
+                         or it["name"].startswith(args.fn + ".")]
+                print(json.dumps({
+                    "schema_version": 1,
+                    "command": "blame",
+                    "target": str(target),
+                    "query": args.fn,
+                    "matches": match,
+                }, indent=2, default=str))
+            else:
+                c = C(enabled=_supports_color() and not args.no_color)
+                print_blame(items, args.fn, c)
         else:
             args.blame = args.fn
             args.top = 20
-            args.json = False
             args.quiet = False
             cmd_scan(args)
+    elif args.cmd == "run":
+        cmd_run(args)
+    elif args.cmd == "corpus":
+        if args.corpus_cmd == "ls":
+            cmd_corpus_ls(args)
+        else:
+            sc.print_help()
+            sys.exit(1)
     else:
         p.print_help()
         sys.exit(1)
