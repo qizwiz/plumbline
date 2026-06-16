@@ -40,7 +40,13 @@ OPTIONAL_KEYS_TYPED = {
     "verifier_route": list,           # ['tlc', 'halmos', ...]
     "verifier_outcome": dict,         # {'tlc': 'discharged', ...}
 }
-ALLOWED_PROPOSERS = {"manual", "sol_intent", "halmos", "ensemble"}
+ALLOWED_PROPOSERS = {
+    "manual", "sol_intent", "halmos", "ensemble",
+    # Q3-sprint research proposer for the call-graph + curvature ranker
+    # (tools/run_ricci_signal.py, bin/plumbline run). Logged with the same
+    # Layer-2 prior='random' as the other allowed kinds.
+    "ricci-curvature-rank",
+}
 ALLOWED_VERIFIER_ROUTES = {"slither_will_catch", "halmos_will_decide",
                            "tlc_will_decide", "human_only"}
 UUID_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
