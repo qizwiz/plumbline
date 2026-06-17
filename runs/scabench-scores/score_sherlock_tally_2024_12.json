@@ -1,0 +1,133 @@
+{
+  "project": "sherlock_tally_2024_12",
+  "timestamp": "2026-06-16T20:22:35.332365",
+  "total_expected": 11,
+  "total_found": 6,
+  "true_positives": 3,
+  "false_negatives": 8,
+  "false_positives": 3,
+  "detection_rate": 0.2727272727272727,
+  "precision": 0.5,
+  "f1_score": 0.3529411764705882,
+  "matched_findings": [
+    {
+      "id": "sherlock_tally_2024_12_expected_001",
+      "expected": "Updating earning power for de-",
+      "matched": "Improper access control on reward claims allows deposit owner to bypass designated claimer",
+      "confidence": 0.8,
+      "justification": "The finding describes improper access control on reward claims which allows the deposit owner to bypass the designated claimer, thereby draining rewards, aligning with the impact of malicious depositors draining rewards as described in the expected vulnerability.",
+      "severity": "high",
+      "expected_description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/31\n\n**Impact:**\nAll of the rewards available at a given time can be drained by a malicious depositor\n\n**Recommendation:**\nPlease consider adding checkpointing of rewards to _alter Delegatee and _alter Claimer : Governance Staker.sol#L 619-L 624: function _alter Delegatee ( Deposit storage deposit, Deposit Identifier _deposit Id, address _new Delegatee ) internal virtual { _revert If Address Zero (_new Delegatee); + _checkpoint Global Reward (); + _checkpoint Reward (deposit); Governance Staker.sol#L 645-L 650: function _alter Claimer ( Deposit storage deposit, Deposit Identifier _deposit Id, address _new Claimer ) internal virtual { _revert If Address Zero (_new Claimer); + _checkpoint Global Reward (); + _checkpoint Reward (deposit);",
+      "found_description": "The claimReward function allows either the deposit owner OR the designated claimer to withdraw rewards and directs the payout to msg.sender. This contradicts the documented intent that only the claimer should have the right to withdraw rewards and that tokens are sent to the claimer address. As a result, when the claimer is a distinct party (e.g., a service or integrator), the deposit owner can front-run or otherwise claim the rewards to themselves, bypassing the designated claimer and any intended revenue-sharing or operational flow.\nWhere: claimReward() function\nWhy it's a security issue: It breaks the access control boundary implied by the \"claimer\" role, enabling unauthorized reward redirection by the owner when the claimer is intended to be the sole authorized withdrawer.\nPotential impact: Loss of funds for the intended claimer/integrator; violation of protocol assumptions and integrations relying on claimer exclusivity.",
+      "found_id": "de4c63dfa7c3bd33",
+      "tool_finding_index": 1
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_005",
+      "expected": "Oracle begins in stale state due",
+      "matched": "Missing zero-address validation for critical roles can disable oracle updates (accidental DoS)",
+      "confidence": 0.8,
+      "justification": "The finding describes an issue related to potential oracle staleness due to missing zero-address validation for critical roles, which aligns with the expected vulnerability concerning the initialization of last Oracle Update Time.",
+      "severity": "low",
+      "expected_description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/39\n\n**Recommendation:**\nPlease consider initializing last Oracle Update Time , to avoid it being stale at the start: Binary Eligibility Oracle Earning Power Calculator.sol#L 109-L 122: constructor ( address _owner, address _score Oracle, uint 256 _stale Oracle Window, address _oracle Pause Guardian, uint 256 _delegatee Score Eligibility Threshold, uint 256 _update Eligibility Delay 16 ) Ownable (_owner) { _set Score Oracle (_score Oracle); STALE_ORACLE_WINDOW = _stale Oracle Window; _set Oracle Pause Guardian (_oracle Pause Guardian); _set Delegatee Score Eligibility Threshold (_delegatee Score Eligibility Threshold); _set Update Eligibility Delay (_update Eligibility Delay); + last Oracle Update Time = block.timestamp; }",
+      "found_description": "The contract allows setting scoreOracle and oraclePauseGuardian to the zero address without checks. Setting scoreOracle to address(0) makes updateDelegateeScore permanently unusable until reconfigured, which can lead to oracle staleness and force all stakers to receive full earning power after STALE_ORACLE_WINDOW elapses. Similarly, misconfiguring oraclePauseGuardian to address(0) prevents the guardian from pausing/unpausing directly (owner can still recover by changing the guardian). While owner-controlled, this lack of validation increases the risk of accidental or malicious misconfiguration causing temporary denial of service or unintended protocol behavior. The issue occurs in setScoreOracle/_setScoreOracle and setOraclePauseGuardian/_setOraclePauseGuardian which accept arbitrary addresses including zero.",
+      "found_id": "2f9c580ce989888e",
+      "tool_finding_index": 3
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_007",
+      "expected": "Deposits can be maliciously",
+      "matched": "Overflow-triggered revert in getNewEarningPower due to unbounded updateEligibilityDelay causes DoS",
+      "confidence": 0.8,
+      "justification": "The finding discusses a vulnerability in the 'getNewEarningPower' function, which is related to the described issue of stale or paused oracles impacting deposits, indicating a strong connection to the expected vulnerability.",
+      "severity": "low",
+      "expected_description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/36\n\n**Summary:**\nWhen the score oracle in Binary Eligibility Oracle Earning Power Calculator.sol becomes stale or paused, _amount Staked is returned as the earning power instead of the old earning power. As a result, a keeper can bump all ineligible deposits to eligible deposits when the oracle becomes stale/paused and bump them back to ineligible once the oracle becomes fresh/unpaused.\n\n**Vulnerability Detail:**\n1. Let\u2019s say there are 1,000 deposits delegated to ineligible delegatees, so their earning powers are currently zero. 2. Due to some reason, the oracle becomes stale or paused. 3. In this situation, the get New Earning Power function of the binary eligibility calculator returns _amount Staked as the earning power instead of zero because of the following line: if (_is Oracle Stale ()||is Oracle Paused ) return (_amount Staked , true); 4. As a result, keepers can bump all these ineligible deposits, as their earning powers change from zero to non-zero, and collect bump tips. 5. Once the oracle becomes normal again, those deposits can be bumped back, changing their earning powers from non-zero to zero, allowing keepers to extract bump tips again.\n\n**Impact:**\nDeposits lose their rewards unfairly.\n\n**Code Snippet:**\nfunction get New Earning Power (\nuint 256 _amount Staked ,\naddress,/* _staker */\n20\naddress _delegatee ,\nuint 256 /* _old Earning Power */\n) external viewreturns (uint 256, bool){\n// @audit-issue\nif (_is Oracle Stale ()||is Oracle Paused ) return (_amount Staked , true);\nif (!_is Delegatee Eligible (_delegatee )){\nbool_is Update Delay Elapsed =(time Of Ineligibility [_delegatee ]+\nupdate Eligibility Delay )<=block.timestamp ; ,\u2192\nreturn (0,_is Update Delay Elapsed );\n}\nreturn (_amount Staked , true);\n}\nTool used\nManual Review\n\n**Recommendation:**\nReturn _old Earning Power when oracle becomes stale or paused.",
+      "found_description": "The function getNewEarningPower computes whether the update delay has elapsed using (timeOfIneligibility[_delegatee] + updateEligibilityDelay) <= block.timestamp. Because Solidity 0.8 reverts on arithmetic overflow, setting updateEligibilityDelay to a very large value (e.g., close to type(uint256).max) can cause the addition to overflow and revert whenever timeOfIneligibility[_delegatee] > 0 (i.e., after a delegatee has once transitioned from eligible to ineligible). This will make getNewEarningPower revert for those delegatees, potentially breaking any integrator logic that relies on calling this function on-chain, leading to a denial of service for earning power updates. The issue occurs in getNewEarningPower() when calculating _isUpdateDelayElapsed, and is enabled by the lack of bounds/validation in setUpdateEligibilityDelay/_setUpdateEligibilityDelay.",
+      "found_id": "7868b6e18f00e5d8",
+      "tool_finding_index": 2
+    }
+  ],
+  "missed_findings": [
+    {
+      "id": "sherlock_tally_2024_12_expected_000",
+      "title": "_requested Tip is not deduced",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/33\n\n**Impact:**\nRewards are denied to legitimate participants (rewards insolvency) 4\n\n**Recommendation:**\nConsider subtracting the tip from the depositor rewards: Governance Staker.sol#L 508: // Send tip to the receiver Safe ERC 20.safe Transfer (REWARD_TOKEN, _tip Receiver, _requested Tip); + deposit.scaled Unclaimed Reward Checkpoint = +deposit.scaled Unclaimed Reward Checkpoint - (_requested Tip * SCALE_FACTOR);",
+      "severity": "high",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_002",
+      "title": "Frequently bumping to increase",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/42\n\n**Impact:**\nDepositor rewards are stolen by keepers\n\n**Recommendation:**\nMultiple mitigations may envisioned: \u2022Design _is Qualified For Bump calculation in the calculator in order to rate limit bumping \u2022Limit bump tip to a fraction of rewards in the increase case",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_003",
+      "title": "Earning power is close to",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/41\n\n**Recommendation:**\nDocument this limitation/restriction for future calculator implementations.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_004",
+      "title": "Unused import",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/40\n\nDelegation Surrogate Votes\nSource: https://github.com/sherlock-audit/2024-11-tally/issues/40\nDescription\nDelegation Surrogate Votes is imported in Governance Staker.sol but is never used\n// SPDX-License-Identifier: AGPL-3.0-only\npragma solidity ^0.8.23;\nimport{Delegation Surrogate }from\"src/Delegation Surrogate.sol\" ;\n//@audit unused import\nimport{Delegation Surrogate Votes }from\"src/Delegation Surrogate Votes.sol\" ;\nimport{INotifiable Reward Receiver }from\n\"src/interfaces/INotifiable Reward Receiver.sol\" ; ,\u2192\nDiscussion\nalexkeating\nWill fix\nCergy K\nFixed by https://github.com/withtally/staker/pull/89\n15",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_006",
+      "title": "Increasing delegate eligibility",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/37\n\n**Recommendation:**\nPlease consider adding a timestamp last Eligibility Score Updated which should also be compared against when determining grace period.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_008",
+      "title": "Increasing the earning power of",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/35\n\n**Summary:**\nBumping to increase the earning power of a deposit might fail in valid scenarios.\n\n**Vulnerability Detail:**\nConsider a case where the earning power of a deposit is zero, but a few unclaimed rewards exist for the deposit. The user claims the rewards, where a portion is deducted as a claiming fee, and the remaining amount is received by the user. At this point, there will be no more unclaimed rewards. However, if the delegate of the deposit later becomes eligible, the deposit needs to be bumped to increase its earning power. Since there are no unclaimed rewards in the deposit, the bump Earning Power function would revert due to the following check: if (_new Earning Power >deposit.earning Power &&_unclaimed Rewards <_requested Tip ){ revert Governance Staker__Insufficient Unclaimed Rewards (); }\n\n**Impact:**\nIt is important to bump the deposit immediately when the delegate becomes eligible. However, due to the issue mentioned above, this fails, and the user loses rewards until they manually interact with their deposit. Note that claim Rewards would also fail, so the user must use any other action such as withdraw , stake More or alter functions to update the deposit state in order to increase its earning power.\n\n**Code Snippet:**\nhttps://github.com/sherlock-audit/2024-11-tally/blob/main/govstaking/src/Governanc\ne Staker.sol#L 489-L 491\nTool used\nManual Review\n22\n\n**Recommendation:**\nAdd a check in the claim Reward function to ensure that at least an amount equivalent to max Bump Tip remains in the deposit",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_009",
+      "title": "_calculate Total Earning Power for-",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/34\n\nmula can be simplified\nSource: https://github.com/sherlock-audit/2024-11-tally/issues/34\nDescription\n_calculate Total Earning Power can be simplified to the equivalent formula:\nGovernance Staker.sol#L 759-L 768:\nfunction _calculate Total Earning Power (\nuint 256 _deposit Old Earning Power,\nuint 256 _deposit New Earning Power,\nuint 256 _total Earning Power\n) internal pure returns (uint 256 _new Total Earning Power) {\n- if (_deposit New Earning Power >= _deposit Old Earning Power) {\n-return _total Earning Power + (_deposit New Earning Power -\n_deposit Old Earning Power); ,\u2192\n- }\n- return _total Earning Power - (_deposit Old Earning Power -\n_deposit New Earning Power); ,\u2192\n+ return _total Earning Power + _deposit New Earning Power - _deposit Old Earning Power;\n}\nDiscussion\nalexkeating\nWill fix\nCergy K\nFixed by https://github.com/withtally/staker/pull/89\n24",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "sherlock_tally_2024_12_expected_010",
+      "title": "Governance Staker On Behalf",
+      "description": "Source: https://github.com/sherlock-audit/2024-11-tally/issues/32\n\n**Impact:**\nAny action done on Governance Staker On Behalf can be DOSed by a malicious actor bumping the nonce on behalf of the victim user\n\n**Recommendation:**\nOnly use the nonce when the signature has been confirmed as valid. Here instead of _use Nonce , the function nonces () can be used to get the nonce: Governance Staker On Behalf.sol#L 259: function claim Reward On Behalf ( Deposit Identifier _deposit Id, uint 256 _deadline, bytes memory _signature ) external virtual returns (uint 256) { _revert If Past Deadline (_deadline); Deposit storage deposit = deposits[_deposit Id]; bytes 32 _claimer Hash = _hash Typed Data V 4 ( keccak 256 ( -abi.encode (CLAIM_REWARD_TYPEHASH, _deposit Id, _use Nonce (deposit.claimer), _deadline) ,\u2192 +abi.encode (CLAIM_REWARD_TYPEHASH, _deposit Id, nonces (deposit.claimer), _deadline) ,\u2192 ) ); ... } And then the nonce should be used once the signature has been validated",
+      "severity": "low",
+      "reason": "Not found"
+    }
+  ],
+  "undecided_findings": [],
+  "extra_findings": [
+    {
+      "id": "sherlock_tally_2024_12_tool_000",
+      "title": "Use of fee-on-transfer/non-standard ERC20 as stake token can lock funds (DoS)",
+      "description": "The contract assumes STAKE_TOKEN is a standard, non-deflationary ERC20. It credits deposits with the requested amount before transferring tokens and moves staked tokens between surrogate and owner using transferFrom without adjusting for transfer fees or deflation. If STAKE_TOKEN charges transfer fees, rebases, or otherwise transfers less than the requested amount, the surrogate may not hold the accounted balance. Subsequent withdraw or delegatee change operations that attempt to transfer the full accounted amount will revert, effectively locking user funds.\nWhere: _stake(), _stakeMore(), _alterDelegatee(), _withdraw() pathways that call _stakeTokenSafeTransferFrom(..., _amount)\nWhy it's a security issue: Incompatible token behavior can cause persistent reverts on withdrawals or internal transfers, resulting in denial of service for users\u2019 staked funds.\nPotential impact: Permanent or long-term inability to withdraw staked tokens; denial of service.",
+      "severity": "medium",
+      "original_id": "8fddf453d7d5427f"
+    },
+    {
+      "id": "sherlock_tally_2024_12_tool_004",
+      "title": "Authorized reward notifier can cause global claim DoS by notifying without funding",
+      "description": "notifyRewardAmount updates the reward rate based on the provided _amount and only performs a coarse balance check against the contract\u2019s current REWARD_TOKEN balance. A whitelisted notifier can call this function without actually transferring tokens (or transfer insufficient tokens), leading to a shortfall when users claim. SafeERC20.safeTransfer in claim paths will then revert due to insufficient balance, blocking all claims until the shortfall is covered. The code comments acknowledge this limitation and rely on admin whitelisting discipline, but from a protocol perspective it is still a DoS vector controlled by the notifier role.\nWhere: notifyRewardAmount(uint256 _amount)\nWhy it's a security issue: A privileged/notifier account can halt claims for all users by misreporting rewards.\nPotential impact: Denial of service for reward claims across the protocol until additional funds are provided.",
+      "severity": "low",
+      "original_id": "88c764bca5f89a31"
+    },
+    {
+      "id": "sherlock_tally_2024_12_tool_005",
+      "title": "Unchecked ERC20 approve return value can cause allowance to silently fail",
+      "description": "The constructor calls _token.approve(msg.sender, type(uint256).max) without checking the returned boolean. Some ERC20 tokens are non-standard and may return false instead of reverting on failure. In such cases, deployment will succeed but the allowance will remain zero, preventing the deployer from moving tokens from this contract. This can lead to a denial of service for legitimate operations and potentially trap funds sent to the surrogate. Location: constructor(IERC20 _token), line 12. Impact: If used with a token that returns false on approve (non-reverting), the deployer will be unable to transferFrom tokens held by the surrogate, effectively locking funds with no recovery path provided by this contract.",
+      "severity": "medium",
+      "original_id": "e2d2146dac2fc6d9"
+    }
+  ],
+  "potential_matches": []
+}

@@ -1,0 +1,203 @@
+{
+  "project": "cantina_minimal-delegation_2025_04",
+  "timestamp": "2026-06-16T20:16:04.340079",
+  "total_expected": 17,
+  "total_found": 10,
+  "true_positives": 3,
+  "false_negatives": 14,
+  "false_positives": 7,
+  "detection_rate": 0.17647058823529413,
+  "precision": 0.3,
+  "f1_score": 0.22222222222222224,
+  "matched_findings": [
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_000",
+      "expected": "execute calls can be front-run",
+      "matched": "Nonce consumed before signature verification allows DoS on execute(SignedBatchedCall)",
+      "confidence": 0.8,
+      "justification": "The finding discusses the publicly callable 'execute' function which suffers from nonce consumption before signature verification, leading to denial of service (DoS) on the execute call, related to front-running, aligning with the front-running concern in the expected vulnerability.",
+      "severity": "high",
+      "expected_description": "The function: implemented in theMinimalDelegationcontract is publicly callable, enabling any external address to invoke it if a valid signature is provided. This implementation allows anyone to front-run anyexecutecall as the code simply checks the signature and does not confirm the identity of the caller. Since there is no field for the intended executor address in the signed digest, any party that obtains the signature can submit it first. A very detrimental scenario could be a malicious user supplying no Ether (e.g.,msg.value == 0) in a front-runexecutecall that was supposed to use it, potentially forcing part of the batched calls to revert. IfsignedBatchedCall.shouldRevert = false, the attacker can easily break the intended call flow. Meanwhile, the legitimate user\u2019s subsequent call will revert because the same signature and nonce have already been consumed.",
+      "found_description": "In _handleVerifySignature, the nonce is consumed via _useNonce(signedBatchedCall.nonce) before the signature is verified. Because execute(SignedBatchedCall, bytes) is publicly callable, any external caller can submit arbitrary data to this function and cause nonces to be marked as used even when the signature is invalid (the call later reverts with InvalidSignature). If the NonceManager enforces sequential or otherwise predictable nonces, an attacker can pre-consume expected nonces (e.g., 0,1,2,...) and deny legitimate transactions from being executed, or invalidate pre-signed messages. Even if nonces are not strictly sequential, an attacker can still grief by burning arbitrary nonces. This is a denial-of-service via nonce misuse.\n\nWhere: MinimalDelegation._handleVerifySignature() (first statement), called from execute(SignedBatchedCall, bytes).\n\nWhy it's a security issue: Nonces are intended to prevent replay for authorized operations. Consuming the nonce before verifying authorization lets unauthorized callers invalidate nonces.\n\nPotential impact: Denial of service against legitimate signers by blocking expected nonces or invalidating pre-signed operations. Severity depends on the NonceManager design (sequential vs. arbitrary nonces) but can fully brick the \"signed execute\" flow if sequential nonces are used.",
+      "found_id": "c8a093c022e86699",
+      "tool_finding_index": 0
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_002",
+      "expected": "Potential double-counting allowance risk",
+      "matched": "Global spender-scoped key (no owner/domain separation) can conflate allowances",
+      "confidence": 0.9,
+      "justification": "The second finding flags a high severity issue related to global spender-scoped keys combining allowances without proper owner separation, which aligns closely with the risk of double-counting allowances due to stacking approvals. It describes a similar problem of managing allowances where unintended aggregations could lead to excessive spending.",
+      "severity": "low",
+      "expected_description": "TheMinimalDelegationwallet supports two forms of native allowances: Because the code separately tracks ephemeral and persistent allowances, a user\u2019s total effective approval can unintentionally stack. For example, if the user or the contract sets a persistent allowance of 1000 and then separately grants a transient allowance of 1000, the spender might see an aggregate of 2000. This could exceed the user\u2019s intended limit and lead to accidental over-spending.",
+      "found_description": "The library derives the storage key solely from the spender address (_computeSlot(spender) = keccak256(spender)) and does not include an owner or any domain-separation salt. If this is used to represent an 'allowance', it becomes a single, contract-wide allowance per spender rather than per (owner, spender). Because transient storage persists across all calls to the same contract within a transaction, a value set for one context/owner can be observed and consumed in another. This can enable unauthorized actions in callers that assume per-owner allowances (e.g., a spender allowance set in one code path being reused to spend from a different owner in the same transaction or via reentrancy).",
+      "found_id": "7c1ae905e93dc3a3",
+      "tool_finding_index": 6
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_007",
+      "expected": "Incorrect comment",
+      "matched": "Improper masking in isAdmin() allows privilege escalation",
+      "confidence": 0.9,
+      "justification": "The finding describes a security issue related to the isAdmin function which shifts settings by 200 bits, aligning closely with the expected vulnerability's description about incorrect comments in the same context.",
+      "severity": "informational",
+      "expected_description": "In theSettingsLiblibrary, the comment claims: However, the code actually shifts by 200 bits (shr(200, settings)), using 56 bits (7 bytes) for the admin portion. This is inconsistent with the stated \u201c8 bits\u201d approach. Consequently, bits [200..255] become the \u201cadmin region,\u201d not [248..255].",
+      "found_description": "The isAdmin function shifts the Settings value right by 200 bits and directly interprets the result as a boolean without masking to the intended 8-bit isAdmin field. Because the top 6 bytes are marked as UNUSED, any non-zero bits in those 6 bytes will also be shifted into the returned value, causing isAdmin() to evaluate to true even if the isAdmin byte itself is zero. This occurs in isAdmin(Settings) at lines 21-24 (specifically _isAdmin := shr(200, settings)). This is a security issue because any code that relies on SettingsLib.isAdmin for access control can be bypassed if an attacker can set or influence the top 6 bytes of the Settings value (e.g., by providing or constructing a Settings with bits set above bit 207). Impact: unauthorized admin privilege, leading to potential fund loss, unauthorized state changes, or protocol manipulation. A fix is to mask to the isAdmin byte before converting to bool, e.g., _isAdmin := iszero(iszero(and(shr(200, settings), 0xFF))).",
+      "found_id": "de1fa9568ccf2793",
+      "tool_finding_index": 4
+    }
+  ],
+  "missed_findings": [
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_001",
+      "title": "execute calls can be forced to fail with an out of gas error",
+      "description": "In theexecute(SignedBatchedCall memory signedBatchedCall, bytes memory wrappedSignature) public payableflow, a malicious user can specify a gas limit for the overall transaction that is large enough for the \u201chigh-level\u201d portion of theexecutecall to succeed but leaves insufficient gas for the low-level call performed in_dispatch\u2192_execute, where: Due to the EIP-150 \u201c63/64 gas\u201d rule, only 63/64 of the remaining gas is forwarded to a subcall. If the subcall fails for insufficient gas andsignedBatchedCall.shouldRevert == false, the entire batch may partially complete with no revert, thus forcing the intended function call to fail. As a result, the user\u2019s signed batch is sabotaged by the attacker controlling the available gas, while the high-level transaction still succeeds consuming the signature's nonce.",
+      "severity": "high",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_003",
+      "title": "off-by-one issue inisExpired()",
+      "description": "When the protocol checks if the setting is expired, it considersexpiration == block.timestampto be invalid. While invalidateUserOp(),expirationis used asvalidUntilinvalidationData. And in EntryPoint,validUntil == block.timestampis considered valid.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_004",
+      "title": "Potential privilege escalation in nonce management",
+      "description": "InNonceManager, allkeyHashesuse the same underlying nonce mapping. And by design, onlykeyHasheswith admin privileges can invalidate any nonce byinvalidateNonce(), butkeyHasheswithout admin privileges can sign anynonceKeyto invalidate any nonce, which can be used in the front-run attack to invalidate execute calls from otherkeyHashes.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_005",
+      "title": "_checkExpiry will revert if the signature is expired in validateUserOp",
+      "description": "Within thevalidateUserOpflow, the contract verifies the signature and then calls_checkExpiry(settings). If the key is expired,_checkExpiry(settings)unconditionally reverts with aKeyExpired(expiry)error. As a result, the entire operation fails with a revert rather than returningSIG_VALIDATION_FAILEDas stated in theEIP-4337 spec.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_006",
+      "title": "ModeDecoder implements a subset of EIP\u20117821",
+      "description": "InModeDecoderandMinimalDelegation, particularly in theexecute(bytes32 mode, bytes calldata executionData)andsupportsExecutionMode(bytes32 mode)functions, only recognizes two specific \u201cbatched\u201d modes: and checks them via: This approach diverges from theEIP\u20117821 specification, which defines more granular modes. For example,0x01000000000000000000...or0x01000000000078210001...for single-batch with optionalopDataand a multi-batch approach0x01000000000078210002....Additionally,MinimalDelegationdoes not parse any optionalopDatanor supports \u201cbatch of batches\u201d recursion. Instead, it decodes only a singleCall[]and toggles revert behavior on failure, ignoring the extended modes described in EIP\u20117821. This design is not inc",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_008",
+      "title": "hookData is not included in the signature digest",
+      "description": "MinimalDelegationexposeshookDatain calls tohandleAfterVerifySignatureandhandleAfterIsValidSignaturefunction, but does not incorporatehookDatainto the EIP\u2011712 signature digest. Consequently, any external caller can supply arbitrary bytes inwrappedSignature: and the contract then passes this untrustedhookDatato the hook. If the hook logic expectshookDatato be genuine, an attacker can cause reverts or trigger unexpected behaviors. For example, the attacker can supply malicious input that is decoded incorrectly in the hook, forcing the transaction to revert. SincehookDatais not signed by the user\u2019s private key, an attacker can alter it and the signature would still be valid. The final impact is really dependant on thehook's final implementation.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_009",
+      "title": "MinimalDelegation EntryPoint compatibility",
+      "description": "After reviewing the latestEntryPointversions, theMinimalDelegationsmart wallet can only be used with the v0.7.0 and v0.8.0 versions, being incompatible with the v0.6.0 as this version does not yet support theexecuteUserOpoperations. TheexecuteUserOpsupport was introduced in thev0.7.0 version.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_010",
+      "title": "EntryPoint Version v0.6.0",
+      "description": "After reviewing the latestEntryPointversions, theMinimalDelegationsmart wallet can only be used with the v0.7.0 and v0.8.0 versions, being incompatible with the v0.6.0 as this version does not yet support theexecuteUserOpoperations. TheexecuteUserOpsupport was introduced in thev0.7.0 version.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_011",
+      "title": "EntryPoint Version v0.7.0",
+      "description": "After reviewing the latestEntryPointversions, theMinimalDelegationsmart wallet can only be used with the v0.7.0 and v0.8.0 versions, being incompatible with the v0.6.0 as this version does not yet support theexecuteUserOpoperations. TheexecuteUserOpsupport was introduced in thev0.7.0 version.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_012",
+      "title": "EntryPoint Version v0.8.0",
+      "description": "After reviewing the latestEntryPointversions, theMinimalDelegationsmart wallet can only be used with the v0.7.0 and v0.8.0 versions, being incompatible with the v0.6.0 as this version does not yet support theexecuteUserOpoperations. TheexecuteUserOpsupport was introduced in thev0.7.0 version.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_013",
+      "title": "Use of unlicensed smart contracts",
+      "description": "All the smart contracts in the codebase are currently marked as unlicensed, as indicated by the SPDX license identifier at the top of the file: Using an unlicensed contract can lead to legal uncertainties and potential conflicts regarding the usage, modification and distribution rights of the code. This may deter other developers from using or contributing to the project and could lead to legal issues in the future.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_014",
+      "title": "When transferring 0 amount, ERC7914 is better to return true",
+      "description": "When transferring 0 amounts, ERC7914 returns false, which indicates that the transfer failed. This makes ERC7914 behave like the ERC20 token that disallows 0 amount transfers, which has caused many integration issues. When transferring 0 amount, in a sense it succeeds even if we do nothing, so returning true makes sense and can avoid integration issues.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_015",
+      "title": "_execute()may callhandleAfterExecute()on stale hook",
+      "description": "In_execute(), it callshandleAfterExecute()directly on hook that cached beforeto.call(). An edge case is ifto.call()callsKeyManagement.update()to update the setting, it may execute calls on stale hook.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_expected_016",
+      "title": "validateUserOp()should not return early when the signature is invalid",
+      "description": "According to thespecs,validateUserOp()shouldn't return early even if the signature is invalid for gas estimation. But inMinimalDelegation.validateUserOp(), the invalid signature causes early return and does not execute the following code, this makes it inconsistent with the specs. And when the userOp is actually executed, the invalid signature will cause the transaction to revert in EntryPoint, so this will not cause the hook call to be actually executed.",
+      "severity": "informational",
+      "reason": "Not found"
+    }
+  ],
+  "undecided_findings": [],
+  "extra_findings": [
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_001",
+      "title": "verify() secp256k1 path can revert on malformed signatures (DoS)",
+      "description": "The verify function intends to return a boolean, but in the secp256k1 branch it calls OpenZeppelin's ECDSA.recover directly. ECDSA.recover reverts on invalid signatures (e.g., wrong length, invalid v/s values, or malleable s), causing verify to revert instead of returning false. Additionally, abi.decode(key.publicKey, (address)) will revert if the publicKey bytes are not a valid ABI-encoded address. If verify is used on untrusted inputs (e.g., ERC-1271 validation, batched verifications, or within loops), an attacker can supply a malformed signature or improperly encoded key to force a revert and cause denial-of-service for the enclosing call.\n- Where: verify() function, secp256k1 branch (ECDSA.recover); also abi.decode(key.publicKey, (address)) in the same branch.\n- Why it's a security issue: Unexpected reverts allow a malicious caller to halt execution instead of cleanly failing signature checks.\n- Potential impact: Transaction reverts, griefing of batched flows or signature validation paths (e.g., ERC-1271), and potential DoS of functions that expect a boolean result.",
+      "severity": "medium",
+      "original_id": "9c77d599b1e6b157"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_002",
+      "title": "WebAuthn verification does not require user verification (UV)",
+      "description": "In the WebAuthnP256 branch, verify calls WebAuthn.verify with requireUV set to false. This accepts assertions without user verification (e.g., no biometric/PIN), depending on authenticator behavior. While the cryptographic check still enforces possession of the private key, disabling UV reduces protection against unauthorized use if an attacker or background process can trigger authentications on a user's device.\n- Where: verify() function, WebAuthnP256 branch (requireUV: false).\n- Why it's a security issue: Weakens authentication guarantees; some threat models expect UV to prevent silent or coerced signatures.\n- Potential impact: Potential unauthorized actions if an attacker can cause the authenticator to sign without explicit user verification.",
+      "severity": "low",
+      "original_id": "92836b3b73e040e2"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_003",
+      "title": "Root key sentinel bytes32(0) can be abused if keyHash from untrusted input is treated as root",
+      "description": "The library designates bytes32(0) as the ROOT_KEY_HASH and provides isRootKey(bytes32) that returns true when keyHash == 0x0. If a consuming contract accepts a keyHash from user input and uses isRootKey(keyHash) to grant elevated privileges, an attacker can supply 0x0 to impersonate the root key. The library cannot enforce correct usage, but exposing a zero sentinel and a generic isRootKey(bytes32) is a footgun with real privilege escalation risk in downstream code.\n- Where: isRootKey(bytes32) and ROOT_KEY_HASH constant.\n- Why it's a security issue: Treating a magic value (0x0) as root without binding it to an authenticated principal enables trivial forgery when keyHash is user-controlled.\n- Potential impact: Privilege escalation to root in consumers that trust user-provided keyHash and call isRootKey(bytes32) for authorization.",
+      "severity": "medium",
+      "original_id": "fad148c61a5c152e"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_005",
+      "title": "Unchecked calldata length causes underflow and out-of-bounds slice in removeSelector",
+      "description": "The removeSelector function subtracts 4 from the provided bytes length in inline assembly without verifying that data.length >= 4. In inline assembly, arithmetic is unchecked; if data.length < 4 (e.g., empty or short calldata to a fallback/receive), params.length underflows to a very large value and params.offset is advanced by 4. This produces a bytes calldata slice that extends far beyond the actual calldata. Using this slice (e.g., reading params.length, copying to memory, or abi.decode) can cause denial of service via excessive memory allocation/out-of-gas and may bypass ABI input-length checks, leading to mis-decoding with zero-padded values. This occurs in removeSelector()'s assembly block where params.length := sub(data.length, 4) and params.offset := add(data.offset, 4) are set without bounds checks.",
+      "severity": "medium",
+      "original_id": "ede069fcf28dc20e"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_007",
+      "title": "No domain separation in transient storage key allows cross-module key collisions",
+      "description": "The key derivation for transient storage is keccak256(spender) without any fixed salt or namespace. Any other code in the same contract that also uses TSTORE/TLOAD with a similarly derived key (e.g., keccak256(userControlledAddress)) can alias to the same slot, causing state corruption. An attacker can intentionally choose spender values that collide with other modules' keys, overwriting or reading unintended transient state. This can lead to logic bypasses or denial of service in complex contracts that use transient storage for multiple features.",
+      "severity": "medium",
+      "original_id": "8ff56165e7d6699a"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_008",
+      "title": "Hard dependency on EIP-1153 (TLOAD/TSTORE) can brick on unsupported networks",
+      "description": "The library uses TLOAD/TSTORE opcodes directly. On networks that have not activated EIP-1153 (e.g., pre-Cancun or certain L2s), these opcodes are invalid and will cause any function that executes them to revert, resulting in denial of service. Without a feature flag or fallback path, deploying or calling this on unsupported chains will break functionality.",
+      "severity": "low",
+      "original_id": "061702d35ebf389d"
+    },
+    {
+      "id": "cantina_minimal-delegation_2025_04_tool_009",
+      "title": "msg.value can be reused across subcalls in multicall, enabling value double-counting",
+      "description": "The multicall function executes each payload via delegatecall to the same contract. delegatecall preserves msg.sender and msg.value. Thus, any payable function in the inheriting contract that credits or otherwise relies on msg.value (e.g., deposit, buy, mint) will observe the same msg.value for every subcall in a single multicall invocation. An attacker can invoke such a function multiple times within one multicall and be credited multiple times while only sending the value once, causing accounting errors and potential loss of funds. Occurs in the multicall() function where address(this).delegatecall(data[i]) is used.\n- Where: multicall(), line 13 (address(this).delegatecall)\n- Why it's a security issue: It breaks the assumption that msg.value represents the amount sent for that specific function call; instead, it is reused across all subcalls.\n- Potential impact: Over-crediting balances, draining protocol funds, incorrect accounting.\n- Mitigations: Forbid value-dependent functions from being callable via multicall, or implement a mechanism to track and consume msg.value only once per multicall; alternatively provide a multicall variant that forwards distinct values per subcall without delegatecall and redesign authorization accordingly.",
+      "severity": "high",
+      "original_id": "2f180c346d18af2f"
+    }
+  ],
+  "potential_matches": []
+}

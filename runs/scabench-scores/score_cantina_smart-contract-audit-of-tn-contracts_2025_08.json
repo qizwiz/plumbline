@@ -1,0 +1,276 @@
+{
+  "project": "cantina_smart-contract-audit-of-tn-contracts_2025_08",
+  "timestamp": "2026-06-16T20:29:03.375760",
+  "total_expected": 23,
+  "total_found": 15,
+  "true_positives": 5,
+  "false_negatives": 18,
+  "false_positives": 10,
+  "detection_rate": 0.21739130434782608,
+  "precision": 0.3333333333333333,
+  "f1_score": 0.26315789473684204,
+  "matched_findings": [
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_000",
+      "expected": "Validator can bypass delegator for staking rewards",
+      "matched": "Rewards are computed after zeroing balance in _unstake, resulting in zeroed rewards and misallocation",
+      "confidence": 0.8,
+      "justification": "Finding 0 describes a similar logical flaw in the _unstake function that can lead to users missing out on rewards, which correlates with the intended issue of validators bypassing delegators for staking rewards, despite the functions being different.",
+      "severity": "high",
+      "expected_description": "TheConsensusRegistrycontract implements delegated staking to allow non-validators to stake on behalf of validators. However, the reward claiming and unstaking functions contain a logical flaw that allows validators to collect rewards and unstaked funds directly, bypassing the delegator who provided the stake. BothclaimStakeRewards()andunstake()functions follow this pattern: This logic sets therecipientto the validator address by default and only checks for delegation if the caller is not the validator. This means that even if a validator has a delegator who provided the stake, the validator can directly call these functions and receive the rewards or unstaked funds for themselves.",
+      "found_description": "In _unstake, the code sets the validator's balance to 0 before computing rewards: 'info.balance = 0;' followed by 'rewards = _getRewards(validatorAddress, stakeAmt);'. Since _getRewards reads the current stored balance, rewards will always be 0 at this point. The function then forwards the entire previous balance 'bal' as msg.value to Issuance.distributeStakeReward(recipient, rewards) but passes 'rewards' as 0, which likely causes the staker/delegator to miss all accrued rewards. This is a logic/accounting bug that can directly cause loss of funds for users and inconsistent accounting on the Issuance contract. Occurs in: _unstake(address validatorAddress, address recipient, uint256 tokenId, uint8 validatorVersion) internal.",
+      "found_id": "399aa963168c736b",
+      "tool_finding_index": 2
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_005",
+      "expected": "PayablepermitWrapfunction can silently lose user funds",
+      "matched": "permitWrap is payable but ignores msg.value, allowing ETH to be trapped and bypassing receive() restriction",
+      "confidence": 0.9,
+      "justification": "The finding identifies the same vulnerability related to the permitWrap function being payable but ignoring msg.value, leading to trapped ETH, closely matching the expected vulnerability's description.",
+      "severity": "low",
+      "expected_description": "ThepermitWrap()function in the InterchainTEL contract is marked aspayablebut does not use the sent native funds, causing any ETH sent to the function to be permanently lost. This is concerning because:",
+      "found_description": "The function permitWrap is declared payable yet does not use msg.value anywhere in its logic. This allows callers to send native ETH directly to the contract via this function, bypassing the receive() guard that only allows ETH from the WETH (baseERC20) contract. Any ETH sent this way is neither refunded nor used and will remain stuck in the contract balance. This breaks the intended invariant that all ETH entering the contract should come from WETH.withdraw, and can lead to user fund loss if ETH is accidentally sent with the transaction. Additionally, it can skew internal accounting by increasing the contract's ETH reserves without corresponding WETH backing or iTEL supply changes.\n- Where: permitWrap() function (payable), around its declaration in InterchainTEL.sol.\n- Why it's a security issue: Users can inadvertently lose ETH by sending value with the permitWrap call; ETH becomes irrecoverable for the sender and is not tracked by the wrapper/token accounting. It also undermines the receive() safeguard meant to restrict ETH inflows to WETH-only sources.\n- Potential impact: Permanent loss of funds for users who mistakenly send ETH; accumulation of unaccounted ETH in the contract that could later be used to fund unrelated mints, creating accounting mismatches and potential protocol-level confusion.",
+      "found_id": "245080c43acf3031",
+      "tool_finding_index": 10
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_007",
+      "expected": "Invalid committee size check when ejecting validator",
+      "matched": "Committee-size check allows zero-member committees (potential consensus DoS)",
+      "confidence": 0.9,
+      "justification": "The finding identifies a committee size check issue in the _ejectFromCommittees function that aligns closely with the described invalid committee size check when ejecting a validator. It accurately describes a logical error and the potential for creating zero-member committees. The match is strong, though slightly phrased differently.",
+      "severity": "low",
+      "expected_description": "In theConsensusRegistrycontract, the_ejectFromCommitteesfunction contains a logical error when checking the resulting committee size after ejecting a validator. The function assumes that the validator being ejected is always a member of the committee, which may not be true. The problematic code is in the_ejectFromCommitteesfunction: The issue is that the function calls_checkCommitteeSize(numEligible, currentCommittee.length - 1)before actually ejecting the validator, assuming that the post-ejection size will becurrentCommittee.length - 1. However, if the validator is not actually in the committee, the actual post-ejection size would still becurrentCommittee.length, making the check incorrect.",
+      "found_description": "The helper _checkCommitteeSize(activeOrPending, committeeSize) only reverts when activeOrPending == 0 or when committeeSize > activeOrPending. It does not enforce committeeSize > 0. This check is used in critical paths like concludeEpoch (to validate the new committee) and _ejectFromCommittees (to validate committee size after ejection). As implemented, it is possible for a zero-sized committee to be accepted. In particular:\n- concludeEpoch(): after updating epoch info, it calls _checkCommitteeSize(newActive.length, newCommittee.length) but will not revert if newCommittee.length == 0.\n- _ejectFromCommittees(): intended to prevent reducing a committee to an invalid size, but the check currently allows size to become zero. The comment claims it prevents an empty committee, but the code does not enforce that.\nWhy it's a security issue: A zero-member committee can halt consensus or make protocol progress impossible, leading to a denial of service. While concludeEpoch and applySlashes are onlySystemCall and burns are onlyOwner, the contract explicitly attempts to enforce safety at the contract layer and the current logic fails to do so.\nPotential impact: Consensus halt/DoS due to empty committee for current or upcoming epochs.",
+      "found_id": "bef8c6e5741d800e",
+      "tool_finding_index": 4
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_011",
+      "expected": "Rewards are payed out fromStakeManagerinstead ofIssuance",
+      "matched": "No recipient zero-address validation can irreversibly burn funds",
+      "confidence": 0.8,
+      "justification": "Finding 3 details an issue in the StakeManager where rewards can be burnt if the recipient address is zero, aligning with the concern of mismanagement of funds that should be associated with rewards.",
+      "severity": "low",
+      "expected_description": "This finding is a combination of two inconsistencies where theStakeManagerforwards the total balance of a validator which includes the accumulated rewards to the Issuance contract. Then it calculates the rewards  as the surplus above the initial stake to indicate to the Issuance contract the amount to be added from the balance of the Issuance contract. However before this calculation is performed the balance is set to0which results in an indicated reward of0. The net result is that the StakeManager is supplying the rewards from what is supposed to be reserved for staked funds.",
+      "found_description": "distributeStakeReward sends value to the provided recipient without checking that recipient != address(0) (lines 33\u201341). If the StakeManager (potentially using user-supplied payout addresses) passes the zero address, the transfer will succeed and the funds are permanently burned. This can lead to irreversible loss of funds due to input error or malicious manipulation upstream.",
+      "found_id": "d30a6b8ded6f643e",
+      "tool_finding_index": 8
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_015",
+      "expected": "Incorrect balance check in Issuance'sdistributeStakeReward()",
+      "matched": "Unbounded external call to recipient enables reentrancy into StakeManager and gas griefing",
+      "confidence": 0.8,
+      "justification": "The issue described in finding 2 involves a low-level call with unbounded gas usage which can enable reentrancy into the StakeManager, and relates to how rewards are distributed. This closely relates to the incorrect balance check described in the expected vulnerability, where additional sent value is not accounted for.",
+      "severity": "informational",
+      "expected_description": "In theIssuancecontract, thedistributeStakeReward()function contains an incorrect balance check that only verifies if the contract has enough balance for the reward amount, but doesn't account for any additional value sent with the function call. The issue is in the balance check. The function attempts to sendtotalAmount(which isrewardAmount + msg.value), but only checks if the contract's balance is greater thanrewardAmount. This means that if: Then the function will revert during the transfer attempt rather than providing a clear error message through theInsufficientBalancecheck.",
+      "found_description": "distributeStakeReward performs a low-level call to an arbitrary recipient with all available gas: (bool res,) = recipient.call{ value: totalAmount }(\"\") (line 40). This executes untrusted code during a StakeManager-controlled flow. A malicious recipient contract can: (1) reenter StakeManager or other protocol contracts in the same transaction to manipulate state if upstream contracts are not reentrancy-safe; and/or (2) consume most of the gas in its fallback/receive, potentially causing the outer StakeManager transaction to run out of gas and revert, resulting in denial of service for claims/unstakes/rewards distribution. Because gas is not capped and there is no reentrancy protection at this boundary, the risk propagates to the broader protocol.",
+      "found_id": "8259b0248cc270cc",
+      "tool_finding_index": 7
+    }
+  ],
+  "missed_findings": [
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_001",
+      "title": "Missing validators in_getValidators()due to token ID gaps",
+      "description": "The_getValidators()function retrieves validator information based on their status. It loops through validator IDs from 1 tototalSupplyto find matching validators: The issue arises when a validator's ConsensusNFT is burned, which decreasestotalSupplybut doesn't affect the ID sequence. For example: This problem affects all functions that rely on_getValidators(), including critical functions that manage the validator lifecycle and committee selection.",
+      "severity": "high",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_002",
+      "title": "Slashing penalties circumvented due to missing balance reset in_consensusBurn()",
+      "description": "The_consensusBurn()function is called fromapplySlashes()when a validator's balance would be reduced to zero after slashing, and also from theburn()function when a validator is forcefully removed. The function is responsible for ejecting the validator from committees, exiting, retiring, and unstaking them. However, it does not set the validator's balance to zero before unstaking. The issue arises from the condition inapplySlashes()that calls_consensusBurn(): Since_consensusBurn()doesn't set the balance to zero, the unstaking process in_unstake()will use the pre-slash balance (bal) which is inconsistent with the intent of the slashing mechanism:",
+      "severity": "high",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_003",
+      "title": "Change of epoch Issuance takes effect in the current epoch potentially leading to higher rewards than expected",
+      "description": "When updating the StakeConfig he current version is increased and the new values are stored in theversionsmapping. The duration of the current epoch was set when the previous epoch ended: At the (correct) end of the current epoch the newly updated issuance is taken to calculate the validators' rewards.",
+      "severity": "medium",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_004",
+      "title": "Missing BLS public key uniqueness check allows duplicate validator keys",
+      "description": "In the ConsensusRegistry contract, the_recordStaked()function stores validator information without verifying that the BLS public key is unique: The function accepts a BLS public key as input but doesn't check if it has been previously registered by another validator. A duplicate BLS key could cause several issues: As confirmed by the project team, the protocol requires unique BLS public keys, but this requirement is not enforced at the contract level.",
+      "severity": "medium",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_006",
+      "title": "stakedoes not validate all intended staking parameters",
+      "description": "When governance changes the parameters of theStakeConfigviaupgradeStakeVersionit specifies thetakeAmount,minWithdrawAmount,epochIssuanceandepochDuration. When a validator stakes they implicitly do so under the currentstakeConfig. If however some time before the stake transaction is submitted astakeConfigupdate has happened that keeps the samestakeAmountthe check on themsg.valuewill pass but the other staking parameters that apply will be those of the newer version.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_008",
+      "title": "Missing validation inupgradeStakeVersion()function",
+      "description": "TheupgradeStakeVersion()function in the ConsensusRegistry contract lacks proper validation of the input parameters, potentially allowing configuration values that could break protocol functionality. This function accepts a newStakeConfigstruct containing four key protocol parameters: However, the function doesn't perform any validation on these values, which could lead to several issues:",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_009",
+      "title": "Missing Transfer events in InterchainTEL's_mint()and_burn()functions",
+      "description": "The InterchainTEL contract overrides the_mint()and_burn()functions but does not emit the standard ERC20Transferevents, making the contract non-compliant with the ERC20 standard. This can cause issues with third-party applications, tools, and interfaces that rely on these events for tracking token movements. In the ERC20 standard,Transferevents must be emitted for all token transfers, including minting (transfer from address(0)) and burning (transfer to address(0)). The InterchainTEL contract overrides these functions without ensuring these events are properly emitted: The parent implementation (RecoverableWrapper) does not emit the required Transfer events, and neither does the InterchainTEL contract. This makes the contract non-compliant with the ERC20 standard and can cause issues with tracking token minting and burning operations.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_010",
+      "title": "Incorrect eligible validators check during validator ejection",
+      "description": "In the_consensusBurn()function of the ConsensusRegistry contract, there is a potential issue with the way the number of eligible validators is calculated before ejecting a validator from committees. The issue is thatnumEligibleis calculated before the validator has been ejected from the active set. If the validator being ejected is part of the active validators (which is often the case), then the actual number of eligible validators after ejection will benumEligible - 1. This could lead to incorrect committee size validation in the_ejectFromCommittees()function, which usesnumEligibleto check if the committee would still have enough validators after ejection:",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_012",
+      "title": "Missing zero committee size check in_checkCommitteeSize()function",
+      "description": "In the ConsensusRegistry contract, the_checkCommitteeSize()function is responsible for ensuring that committees maintain a valid size. However, it does not explicitly check ifcommitteeSizeis zero, which could potentially lead to an empty committee. The function checks if: However, it doesn't explicitly check ifcommitteeSizeis zero. An empty committee would be technically valid according to this function, but would prevent the network from reaching consensus, effectively causing a network halt.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_013",
+      "title": "Genesis validator stake allocation lacks explicit verification",
+      "description": "In the ConsensusRegistry contract, genesis validators are assigned stake without a clear mechanism for capturing or verifying the corresponding funds. During initialization, the contract assigns stake to validators: However, there's no explicit mechanism in the constructor to: According to a project comment, genesis validator stake \"is done from the protocol side and decremented directly from the InterchainTEL contract during genesis.\" However, the InterchainTEL contract doesn't contain a visible function for this purpose.",
+      "severity": "low",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_014",
+      "title": "Missing event emission for validator slashing",
+      "description": "TheapplySlashes()function in the ConsensusRegistry contract applies penalties to validators but does not emit any events to record these actions. This makes it difficult to track slashing occurrences off-chain. While the function changes validator state by reducing their balance or ejecting them entirely, it fails to emit events that would allow external systems to monitor these critical security actions. This contrasts with other state-changing operations in the contract, such as validator activation, exit, and rewards claiming, all of which emit appropriate events.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_016",
+      "title": "_updateEpochInfostores end block number of previous epoch instead of start block of the new epoch",
+      "description": "At the end of each epoch_updateEpochInfois called to update certain parameters of the current and next epoch.\nTheEpochInfois supposed to indicate the start of the epoch but the as this is called byconcludeEpochtheblock.numberis actually the last block of the previous epoch.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_017",
+      "title": "Incorrect iTEL mint amount if baseERC20 charges fees",
+      "description": "When callingdoubleWrapthe same number of iTEL tokens as native tokens deposited are minted. However if the underlyingbaseERC20would charge a fee or have an exchange rate different from 1:1 the amount of iTEL tokens minted would differ from the amount of WTEL tokens received. This is highly unlikely but as thebaseERC20is a parameter of the constructor the used implementation is not guaranteed to be that of the current WTEL/WETH which does return the same amount.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_018",
+      "title": "NewEpoch event mixes information about different epochs",
+      "description": "When concluding an epoch theNewEpochevent is emitted indicating thenewCommitteeblocknumber +1as the start block and duration. HowevernewCommitterelates tonewEpoch + 2, the start block number relates tonewEpochand the duration can still change even before the end ofnewEpoch.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_019",
+      "title": "Consider seperating the pauser role",
+      "description": "Pausing is currently only allowed by the contract owner. It is best practice to have a separate role for pausing and unpausing for separation of duty and so that the pauser role can be easily automated.",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_020",
+      "title": "Ineffective replay protection in validator delegation",
+      "description": "The ConsensusRegistry contract contains a flaw in its nonce handling for validator delegations, which renders the intended replay protection ineffective. In thedelegateStake()function, a nonce is used as part of the signature verification process to prevent replay attacks. However, due to a logic error, the incremented nonce value is not properly stored, effectively nullifying this protection. The issue is that:",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_021",
+      "title": "Delegation risk and reward asymmetry in consensus system",
+      "description": "In the current delegation model implemented in ConsensusRegistry, there's a significant imbalance in the risk/reward structure between validators and delegators: While the intended behavior is for all staking rewards to flow to the stake originator (the delegator), this creates an unusual economic arrangement where validators perform ongoing node operation duties with no direct protocol rewards, and delegators receive all rewards despite not actively participating in validation. This structure creates two opposing asymmetries:",
+      "severity": "informational",
+      "reason": "Not found"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_expected_022",
+      "title": "Potential duplicate validators in committee without validation",
+      "description": "TheconcludeEpoch()function in the ConsensusRegistry contract accepts a new committee array without validating it for duplicate validator addresses: This function is called by the system at epoch boundaries and assigns voting rights to validators in the committee. However, the function does not: This could potentially lead to:",
+      "severity": "informational",
+      "reason": "Not found"
+    }
+  ],
+  "undecided_findings": [],
+  "extra_findings": [
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_000",
+      "title": "Unrestricted mutation of writtenStorageSlots enables permanent DoS for a target deployment key",
+      "description": "The function saveWrittenSlots is public and lacks access control. It writes to the persistent mapping writtenStorageSlots[simulatedDeployment] after checking that the array is currently empty, and there is no provided way to clear it later. An attacker can call saveWrittenSlots with any simulatedDeployment address whose entry is empty and craft Vm.AccountAccess[] records so that at least one write is recorded for that address. This will push at least one slot, making the array non-empty. Subsequent legitimate calls to saveWrittenSlots for that same simulatedDeployment will revert due to the require(slots.length == 0, \"Must clear storage array before populating\"). This creates a persistent denial of service for that key, blocking the intended pipeline that relies on repopulating these slots. Where: saveWrittenSlots(address simulatedDeployment, Vm.AccountAccess[] memory records) and the writtenStorageSlots mapping.",
+      "severity": "low",
+      "original_id": "6ddba509d5657e38"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_001",
+      "title": "Quadratic-time duplicate check can cause gas exhaustion on large inputs",
+      "description": "In saveWrittenSlots, for each detected write to the target account, the code performs a linear scan over the existing slots array to avoid duplicates. Because this happens inside nested loops over records and their storageAccesses, the overall complexity can become quadratic in the number of unique slots. A caller can supply a large records array with many unique writes to the same simulatedDeployment to drive gas usage high and potentially cause out-of-gas reverts, resulting in a denial of service for the transaction or script run. While this is a tooling/helper contract, it still represents a practical DoS vector if invoked with untrusted inputs or very large datasets. Where: saveWrittenSlots(), inner duplicate check loop: for (uint256 k; k < slots.length; ++k) { if (slots[k] == currentStorageAccess.slot) ... }.",
+      "severity": "low",
+      "original_id": "bab9c7d2490e1f47"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_003",
+      "title": "Silent failure of ETH transfer to Issuance in _unstake",
+      "description": "When the validator has been slashed (bal < stakeAmt), the function attempts to 'consolidate remainder' by sending 'stakeAmt - bal' to the Issuance contract via a low-level call: '(bool r,) = issuance.call{ value: stakeAmt - bal }(\"\"); r;'. The return value is ignored and there is no revert on failure. If the call fails (e.g., Issuance rejects the payment or runs out of gas), the transaction continues, leaving the expected transfer incomplete and creating accounting inconsistencies between StakeManager and Issuance. Funds may remain unexpectedly in StakeManager, and invariants about principal consolidation can be broken. Occurs in: _unstake(address validatorAddress, address recipient, uint256 tokenId, uint8 validatorVersion) internal.",
+      "severity": "medium",
+      "original_id": "6afaf3d2d45bfe5f"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_005",
+      "title": "Token ID truncation mismatch between ERC721 IDs (uint256) and internal indices (uint24)",
+      "description": "The contract stores validator records in mappings keyed by uint24 token IDs (e.g., validators[uint24(tokenId)] and stakeInfo[addr].tokenId is uint24), while the ERC721 tokenId is uint256. Several places explicitly cast uint256 tokenId to uint24, which silently truncates in Solidity (no runtime check), leading to potential inconsistencies:\n- mint(): stakeInfo[validatorAddress].tokenId = uint24(tokenId) (silent truncation). The subsequent validation `if (tokenId != newSupply && !isRetired(tokenId)) revert ...` uses the full uint256 tokenId and isRetired(tokenId) itself truncates internally. This allows minting a uint256 tokenId > 2^24-1 as long as its low 24 bits correspond to a retired slot, resulting in the ERC721 token having a large ID while internal mappings reference the truncated uint24 ID.\n- getValidatorByTokenId(uint256 tokenId): verifies _exists(tokenId) and then returns validators[uint24(tokenId)], which may point to a different validator if the tokenId exceeds 2^24-1.\n- isRetired(uint256 tokenId): if tokenId does not exist as an ERC721 (including values > 2^24-1), it returns validators[uint24(tokenId)].isRetired, which may not correspond to the queried ERC721 ID.\nWhy it's a security issue: This mismatch can corrupt invariants between the ERC721 layer and the validator bookkeeping, causing incorrect lookups, misreporting, or operational DoS for the affected validator (e.g., inability to pass _checkConsensusNFTOwner due to mismatched IDs, or returning the wrong ValidatorInfo for a valid ERC721 token). Although mint() is onlyOwner, the contract\u2019s logic and public views assume consistency between ERC721 and internal mappings, which this truncation can break.\nPotential impact: Data corruption and operational DoS for validators minted with out-of-range token IDs; incorrect state reporting to off-chain components; potential misrouting of future state updates if logic elsewhere relies on these mappings.",
+      "severity": "low",
+      "original_id": "98ed41db512fee0f"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_006",
+      "title": "Unrestricted CREATE3 deployment enables address squatting and unauthorized deployments",
+      "description": "The create3Deploy function is declared public and performs an external call to Create3Deployer.deploy with caller-supplied init code and salt without any access control or validation. In Axelar's CREATE3 model, the deterministic address is derived from the salt and the msg.sender seen by Create3Deployer. Because this function calls Create3Deployer from this contract, an attacker can call create3Deploy directly and deploy arbitrary bytecode at the deterministic addresses that this utility intends to reserve for core components (e.g., gatewaySalt, tmSalt, etc.). This allows an attacker to pre-deploy contracts at those addresses (address squatting), permanently blocking legitimate deployments with the same salt, or causing the system to interact with attacker-controlled contracts if other components compute and trust these deterministic addresses. Impact: denial of service of deployment workflows and potential protocol manipulation via malicious contracts at expected addresses.",
+      "severity": "critical",
+      "original_id": "1d8d92d3595ce47d"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_009",
+      "title": "Unrestricted ETH spending via public token registration function",
+      "description": "The function eth_registerCustomTokenAndLinkToken is public and forwards ETH from this contract's balance to an arbitrary InterchainTokenFactory provided by the caller. It calls factory.registerCustomToken{ value: gasValue_ }(...) and factory.linkToken{ value: gasValue_ }(...), but the function itself is non-payable and performs no access control or validation of the factory address. As a result, any external caller can invoke this function and drain all ETH held by this contract by supplying a malicious factory and large gasValue_. A malicious 'factory' can implement the called functions to simply accept ETH and return values, enabling direct theft of funds from this contract.\n- What: Unrestricted external value transfers with caller-chosen target\n- Where: eth_registerCustomTokenAndLinkToken(...), calls to factory.registerCustomToken{ value: gasValue_ } and factory.linkToken{ value: gasValue_ }\n- Why it's a security issue: Anyone can trigger ETH transfers from the contract's balance without authorization, to an attacker-controlled contract\n- Potential impact: Complete loss of all ETH held by this contract; denial of service of intended registration by depleting funds",
+      "severity": "critical",
+      "original_id": "26d6a36a11dcfec5"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_011",
+      "title": "Anyone can trigger drips on behalf of any recipient (griefing/DoS vector)",
+      "description": "The drip(address token, address recipient) function is publicly callable and not bound to msg.sender. It updates the recipient\u2019s last-drip timestamp and then performs the drip for the provided recipient address. As a result, any arbitrary caller can repeatedly call drip for a victim address, consuming that recipient\u2019s claim window and controlling the timing of when they can next receive a drip. If _checkDrip enforces per-recipient rate limits or cooldowns (as is typical), an attacker can front-run or continuously claim on behalf of the victim, preventing the victim from claiming when intended. While the tokens still go to the victim, this enables denial of service over claim timing and can be used to grief users or manipulate distribution schedules. Location: drip() function.",
+      "severity": "medium",
+      "original_id": "82e6824b51d0133e"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_012",
+      "title": "Public, unauthenticated deployment/configuration allows protocol misconfiguration and DoS",
+      "description": "All instantiate* functions are declared public and many accept critical configuration addresses as parameters (e.g., gateway_, gasService_, tokenManagerDeployer_, itDeployer_, tokenManagerImpl_, etc.). Deployments use deterministic CREATE3 salts (from Create3Utils.salts/implSalts), so each salt can be used only once. Any external caller can front-run and invoke these functions first, permanently deploying core components with attacker-chosen dependencies or with uninitialized storage parameters (e.g., owner addresses potentially being zero). Subsequent legitimate deployment attempts will fail due to salt reuse, leading to permanent misconfiguration or lockup (e.g., owners set to zero address, wrong gateway/gas service wired in). While the attacker may not directly seize ownership if owner variables are already correctly set, they can still cause protocol manipulation or denial of service by cementing incorrect constructor parameters.\n- What: Unauthenticated, single-use CREATE3 deployments with caller-controlled parameters\n- Where: Multiple instantiate* functions including:\n  - instantiateInterchainTokenImpl(its_)\n  - instantiateInterchainTokenDeployer(interchainTokenImpl_)\n  - instantiateGatewayCaller(gateway_, axelarGasService_)\n  - instantiateITSImpl(tokenManagerDeployer_, itDeployer_, gateway_, gasService_, itFactory_, tokenManagerImpl_, tokenHandler_, gatewayCaller_)\n  - instantiateITS(impl)\n  - instantiateITFImpl(its_)\n  - instantiateITF(impl)\n  - instantiateAxelarAmplifierGatewayImpl()\n  - instantiateAxelarAmplifierGateway(impl)\n  - instantiateAxelarGasServiceImpl()\n  - instantiateAxelarGasService(impl)\n  - instantiateTokenManagerImpl(its_)\n  - instantiateTokenManagerDeployer()\n  - instantiateTokenHandler()\n  - instantiateWTEL()\n  - instantiateInterchainTEL(its_)\n  - instantiateInterchainTELTokenManager(its_, customLinkedTokenId_)\n- Why it's a security issue: Anyone can pre-deploy and lock in parameters for core contracts using deterministic salts, resulting in permanent misconfiguration or bricking of the system\n- Potential impact: Denial of service of the deployment process; permanent loss of admin control if owners are deployed to zero; protocol manipulation by wiring in attacker-chosen dependencies",
+      "severity": "high",
+      "original_id": "9db5064bf742bd94"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_013",
+      "title": "Unrestricted arbitrary storage writes to external contracts via Foundry cheatcodes",
+      "description": "Multiple public instantiate functions invoke Foundry VM cheatcodes (e.g., vm.startStateDiffRecording, saveWrittenSlots, copyContractState) to copy storage from a simulated deployment into target contract addresses set via _setGenesisTargets. There is no access control on these functions. Where: instantiateAxelarAmplifierGatewayImpl(), instantiateAxelarAmplifierGateway(), instantiateTokenManagerDeployer(), instantiateInterchainTokenImpl(), instantiateInterchainTokenDeployer(), instantiateTokenManagerImpl(), instantiateTokenHandler(), instantiateAxelarGasServiceImpl(), instantiateAxelarGasService(), instantiateGatewayCaller(), instantiateITSImpl(), instantiateITS(), instantiateITFImpl(), instantiateITF(), instantiateWTEL(), instantiateInterchainTEL(), instantiateInterchainTELTokenManager() \u2014 specifically the calls to vm.startStateDiffRecording / vm.stopAndReturnStateDiff, saveWrittenSlots, and copyContractState in each function. What/Why: copyContractState is intended to \"copy simulated state changes to target address in storage\". Combined with Foundry cheatcodes, this can directly write to the storage of arbitrary target contracts (gateway, token managers, token contracts, gas service, etc.) without going through their governance or access controls. Because these functions are public and lack authorization, any external caller can trigger storage mutations of third-party contracts referenced in this contract's state. Impact: An attacker can arbitrarily reconfigure or corrupt state of core protocol contracts (e.g., mint/burn balances in token contracts, change token managers, alter gateway/gas service parameters), leading to total protocol compromise, loss of funds, or denial of service. If deployed in any environment where these cheatcodes or precompilers are enabled (e.g., devnets, custom chains, or during genesis), this is a critical, practical exploit path.",
+      "severity": "critical",
+      "original_id": "dd4356769ab5d0e4"
+    },
+    {
+      "id": "cantina_smart-contract-audit-of-tn-contracts_2025_08_tool_014",
+      "title": "Chain name hash collision allows potential cross-chain spoofing",
+      "description": "The constant TESTNET_SEPOLIA_CHAINNAMEHASH is set to the same value as MAINNET_CHAINNAMEHASH. Specifically, both are 0x564ccaf7594d66b1eaaea24fe01f0585bf52ee70852af4eac0cc4b04711cd0e2. If these chain-name hashes are used anywhere for authenticating, routing, or authorizing cross-chain messages (a common pattern in interchain systems), messages originating from the testnet chain 'ethereum-sepolia' could be misidentified as coming from the mainnet chain 'Ethereum'. This can enable unauthorized message acceptance, protocol manipulation, or improper trust assignment across chains.\n\nWhere: Constant declarations near the top of the file\n- MAINNET_CHAINNAMEHASH\n- TESTNET_SEPOLIA_CHAINNAMEHASH (incorrectly equal to MAINNET_CHAINNAMEHASH)\n\nWhy it's a security issue: Chain identifiers are fundamental to cross-chain security. A collision between a trusted mainnet identifier and a testnet identifier can allow an adversary to relay or craft messages from a less-trusted environment and have them treated as if they originated from a highly trusted one. Depending on how these constants are used in the broader system (e.g., authorizing token mint/burn, message dispatch, or administrative actions), this could lead to loss of funds, unauthorized state changes, or governance bypass.\n\nPotential impact: Unauthorized acceptance of messages purported to be from Ethereum mainnet that actually originate from Ethereum Sepolia testnet; cross-chain routing/verification bypass; possible minting, unlocking, or administrative operations on the wrong trust level.",
+      "severity": "high",
+      "original_id": "0cad44c7e56a3aa8"
+    }
+  ],
+  "potential_matches": []
+}

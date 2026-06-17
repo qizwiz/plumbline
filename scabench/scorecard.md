@@ -1,14 +1,44 @@
 # plumbline · ScaBench scorecard
 
-**Status:** scorer\_v2 (math-F1) numbers only. AuditAgent re-score pending budget.
-**Last updated:** 2026-06-16
+**Status:** canonical scorer\_v2 (LLM-judge / AuditAgent) numbers shipped. Earlier deterministic math-F1 numbers preserved below as the second headline.
+**Last updated:** 2026-06-16 (AuditAgent run on this date)
 **Dataset:** [scabench-org/scabench](https://github.com/scabench-org/scabench) curated-2025-08-18 (31 projects, 555 vulnerabilities)
 **Plumbline approach:** re-rank GPT-5 baseline findings by call-graph eigenvector centrality
-**Marginal cost over GPT-5 baseline:** ≈$0.01 of local CPU per project
+**Marginal cost over GPT-5 baseline:** ≈$0.01 of local CPU per project, plus ≈$0.50 of OpenRouter / gpt-4o-mini for the AuditAgent scorer pass
 
 ---
 
-## Headline
+## AuditAgent (canonical 2026) headline — gpt-4o-mini judge, all 24 attributable projects
+
+| Metric | Value | Sample |
+|---|---|---|
+| **Macro F1** | **0.2464** | 24 projects |
+| Macro precision | 0.2460 | 24 |
+| Macro recall | 0.3791 | 24 |
+| Micro F1 | 0.2206 | 406 expected vulns / 963 tool findings |
+| Micro precision | 0.1568 | 24 |
+| Micro recall | 0.3719 | 24 |
+
+**Per-project F1 distribution (sorted, descending):**
+
+```
+forte-float128 60% │ cork 45% │ lambowin 37% │ oku 36% │ tally 35% │ boost-core 33%
+kinetiq 30% │ blackhole 30% │ virtuals 28% │ bakerfi 27% │ crestal 27% │ tn-contracts 26%
+next-generation 24% │ minimal-delegation 22% │ secondswap 22% │ symmio 20% │ loopfi 17%
+perennial-v2 15% │ iq-ai 15% │ axion 12% │ fenix 11% │ superposition 10% │ morph-l-2 5% │ idle-finance 4%
+```
+
+**Methodology.** For each project, GPT-5's per-finding output was re-ordered by the plumbline-eigenvector rank of the function each finding implicates (function-name extraction via regex on `location` + `title`, mapped 708/963 = 73.5%; unmapped sorted to bottom by stable order). The re-ranked findings list was scored by `scabench-org/scabench/scoring/scorer_v2.py` with `--model openrouter/openai/gpt-4o-mini`, the LLM-judge variant — same scorer the leaderboard uses, just on a cheaper judge than the leaderboard's default gpt-4o.
+
+**Caveats.**
+- Judge model is gpt-4o-mini, not gpt-4o. The H14 paper estimated a "5-project AuditAgent sub-sample preserves the sign of every delta with median 0.7pp magnitude shift" — but that was gpt-4o-vs-old-scorer, not mini-vs-base. The mini→4o magnitude shift is not measured here.
+- Per-project variance is enormous. `morph-l-2` has 225 tool findings and only 13 expected (massive over-extraction by GPT-5); `idle-finance` 44 tool findings against 5 expected. These produce very low precision but the F1 number reflects that — it's not a re-rank failure mode, it's the underlying GPT-5 over-coverage.
+- We did not run a baseline GPT-5-confidence-ordered comparison through the same judge in this pass. Without it, the AuditAgent F1 alone doesn't isolate the eigenvector re-rank's contribution. **The next sanity pass should run GPT-5-confidence-ordered through gpt-4o-mini and report a paired F1 delta.**
+- 73.5% function-name mapping. The 26.5% unmapped findings sort to bottom by stable order — they're scored as if plumbline ranked them last, which is the conservative interpretation. A different unmapped handling (e.g., random insertion, or scrubbing) would shift the number.
+
+---
+
+## Earlier headline — JH's deterministic math-F1 matcher (`tools/h14_math_f1.py`)
 
 | Metric | Value | 95% CI | n |
 |---|---|---|---|
