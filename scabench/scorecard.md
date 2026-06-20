@@ -124,11 +124,34 @@ Aggregate statistics: see [docs/arxiv/h14-empirical-paper-v3.md §4.8](../docs/a
 
 ---
 
+## 2026-06-20 update — attribution fix + two empirical kills
+
+A 13-agent win/loss diagnostic on the 6/6/17 helped/hurt/flat sign breakdown surfaced two free fixes and predicted a next signal. The fixes were tested via `tools/h14_lift_simulator.py`, which re-uses scorer_v2's per-finding TP labels to A/B many orderings against fixed judgments at $0/run. Full report: [scabench/h14_lift_2026-06-20.md](h14_lift_2026-06-20.md).
+
+| condition (K=10, N=24) | macro F1 | Δ vs baseline |
+|---|---:|---:|
+| baseline (GPT-5 conf order) | 0.1938 | — |
+| H14 pre-cleanup | 0.2177 | +0.0240 |
+| **H14 + attribution fix (setdefault → max)** | **0.2214** | **+0.0276** |
+| H14 + dedupe-at-K | 0.2004 | +0.0066 |
+| inv_eig (memo's "anti-symmetric" proxy) | 0.1760 | -0.0178 |
+
+**Wins.** Attribution fix in `tools/scabench_rerank.py` (setdefault → max in `_build_node_score_map`) earned +0.0037 macro F1 over the pre-cleanup ordering. Old behavior lost the higher-centrality contract when two contracts shared a function name; fix recovers loopfi +0.118, oku +0.069, fenix +0.160 at K=10.
+
+**Empirical kills (both predicted by the synthesis memo, both rejected by the data):**
+1. **Dedupe-at-K**: predicted free win; measured -0.0210 on H14. H14's wins on hub-architecture projects come from multiple TP findings on the same orchestration function being bubbled up together; dedup collapses them.
+2. **Centrality inversion** (as theoretical proxy for the memo's recommended dataflow-distance signal): predicted to flip sign on H14-losers if bugs really live at *sources* not *sinks*. Inv_eig went the **same direction** as H14 on all 6 losers, not opposite. Memo's pre-specified kill criterion (≥4/5 same sign = collinear = stop) fires 6/6. Dataflow-distance bet KILLED.
+
+**Implication for the FV-gated architecture plan**: the structural-signal-on-call-graph lever caps at ~0.22 macro F1 at K=10. The plumbline target (0.34+) requires a different lever — either better proposer (Sonnet 4.6 vs GPT-5), proposer-level enumeration fix (per the idle-finance diagnostic), or accepting the ceiling and writing up the negative results.
+
+---
+
 ## What's next
 
 1. **AuditAgent re-score** — pending ~$50 OpenAI-API budget. When run, the F1/lift numbers above are replaced with the canonical 2026 metric. Sign-preserved per the 5-project sub-sample, so we don't expect the conclusion to invert.
 2. **Repo-aware comparator** — replace the file-by-file GPT-5 baseline with a whole-repo GPT-5 (or CodeRabbit Codegraph, or AuditAgent-as-finder). The plumbline lift will shrink; magnitude shift is the open question.
-3. **scabench.com/submit** — once that form is live and the scorer is the AuditAgent, plumbline submits. Waitlist is the today-state.
+3. **Proposer-level bet (added 2026-06-20)** — Sonnet 4.6 audit on the 6 H14-loser projects, scored with scorer_v2 (currently uninstalled; rebuild needed). Tests whether the K=10 ceiling is the ranker (≤0.22) or the model.
+4. **scabench.com/submit** — once that form is live and the scorer is the AuditAgent, plumbline submits. Waitlist is the today-state.
 
 ---
 
