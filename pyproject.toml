@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plumbline"
+version = "0.1.0"
+description = "Audit-priority scanner + grounded self-improving auditor for Solidity"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Jonathan Hill", email = "jonathan.f.hill@gmail.com"},
+]
+dependencies = [
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "hypothesis"]
+
+[tool.setuptools]
+packages = ["plumbline"]
+package-dir = {"plumbline" = "."}
+
+[tool.setuptools.package-data]
+plumbline = ["prompts/*.md", "prompts/specialists/*.md", "schemas/*.json", "templates/*.j2"]
