@@ -18,18 +18,6 @@
       "status": "proposed"
     },
     {
-      "title": "No handling for fee-on-transfer/rebasing tokens can break accounting and lead to undercollateralization",
-      "description": "The reserve assumes the 6\u2011dec fiat token transfers the exact requested amount. In _pull (line 32) and _push (line 37), it does not check actual balances before/after transfer to detect transfer fees or rebases. If the fiat token is deflationary, fee-on-transfer, or rebasing, the contract may receive less than expected on deposits or send less/more than expected on withdrawals. Combined with higher-level mint/burn logic (in ReserveBase), this can cause minted DSU to be undercollateralized or users to receive less on redemption, leading to loss of funds or insolvency. The code comments suggest USDC/USDT as targets (which are not fee-on-transfer), but there is no on-chain enforcement of this assumption.",
-      "vulnerability_type": "token integration risk / accounting mismatch",
-      "severity": "medium",
-      "confidence": 0.6,
-      "location": "_pull() function, line 32; _push() function, line 37; _unallocated() function, line 42",
-      "file": "NoopFiatReserve.sol",
-      "id": "9cd6a4523842a7c6",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Asymmetric rounding on deposit/withdraw leads to systematic user value loss (dust accumulation)",
       "description": "The contract converts between 18\u2011decimals (internal accounting/DSU) and a 6\u2011decimals fiat token using different rounding directions in deposit vs. withdrawal flows. In _pull (deposit), UFixed6Lib.from(amount, true) rounds up (line 32), causing users to transfer slightly more fiat than the exact 18\u21926 decimal conversion. In _push (withdraw), UFixed6Lib.from(amount) (line 37) likely rounds down by default, causing users to receive slightly fewer fiat tokens than the exact conversion. This asymmetry systematically accrues dust to the contract over time at users' expense. While each instance is small (\u2264 1 unit of the 6\u2011dec token), across many operations it can sum to meaningful value. If any privileged actor can later sweep or otherwise access this dust, it can translate into loss of user funds.",
       "vulnerability_type": "numerical precision/rounding",
@@ -38,6 +26,18 @@
       "location": "_pull() function, line 32; _push() function, line 37",
       "file": "NoopFiatReserve.sol",
       "id": "4d5d5ac09ec2d884",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "No handling for fee-on-transfer/rebasing tokens can break accounting and lead to undercollateralization",
+      "description": "The reserve assumes the 6\u2011dec fiat token transfers the exact requested amount. In _pull (line 32) and _push (line 37), it does not check actual balances before/after transfer to detect transfer fees or rebases. If the fiat token is deflationary, fee-on-transfer, or rebasing, the contract may receive less than expected on deposits or send less/more than expected on withdrawals. Combined with higher-level mint/burn logic (in ReserveBase), this can cause minted DSU to be undercollateralized or users to receive less on redemption, leading to loss of funds or insolvency. The code comments suggest USDC/USDT as targets (which are not fee-on-transfer), but there is no on-chain enforcement of this assumption.",
+      "vulnerability_type": "token integration risk / accounting mismatch",
+      "severity": "medium",
+      "confidence": 0.6,
+      "location": "_pull() function, line 32; _push() function, line 37; _unallocated() function, line 42",
+      "file": "NoopFiatReserve.sol",
+      "id": "9cd6a4523842a7c6",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

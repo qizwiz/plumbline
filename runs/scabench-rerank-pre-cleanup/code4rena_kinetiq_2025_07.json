@@ -6,30 +6,6 @@
   "total_findings": 21,
   "findings": [
     {
-      "title": "Unbounded gas forwarded to oracle adapters enables denial-of-service",
-      "description": "The generatePerformance function makes external calls to untrusted oracle adapters without limiting the gas forwarded. A malicious active oracle can consume all remaining gas (e.g., via an infinite loop) during getPerformance, causing the entire transaction to run out of gas and revert. try/catch does not help if the callee consumes all gas, because there is no gas left to execute the catch path. This occurs in generatePerformance() within the loop over authorizedOracles when calling IOracleAdapter(oracle).getPerformance(validator). Impact: The operator cannot successfully execute generatePerformance while a malicious active oracle exists, halting validator performance updates and reward/slashing reporting until the oracle is deactivated.",
-      "vulnerability_type": "denial of service (untrusted external call gas griefing)",
-      "severity": "high",
-      "confidence": 0.9,
-      "location": "generatePerformance() loop calling IOracleAdapter(oracle).getPerformance(validator)",
-      "file": "OracleManager.sol",
-      "id": "b1e41bb485e5525c",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Aggregation of unbounded oracle values can overflow and revert (DoS)",
-      "description": "Untrusted oracle outputs for balance, accRewardAmount, and accSlashAmount are summed across oracles without upper bounds. A malicious active oracle can return extremely large values (e.g., close to type(uint256).max). When a second valid oracle\u2019s values are added, the addition overflows under Solidity 0.8 and reverts, aborting the entire transaction. This occurs in generatePerformance() during aggregation: totalBalance += balance; totalRewardAmount += accRewardAmount; totalSlashAmount += accSlashAmount. Scores are bounded by maxPerformanceBound, but balances/rewards/slashes are not. Impact: A single malicious active oracle can reliably cause generatePerformance to revert (especially when at least one other oracle report is valid), blocking performance updates and reward/slashing reporting until the oracle is deactivated.",
-      "vulnerability_type": "denial of service (arithmetic overflow from untrusted input)",
-      "severity": "high",
-      "confidence": 0.9,
-      "location": "generatePerformance() aggregation of oracle data (totalBalance/totalRewardAmount/totalSlashAmount additions)",
-      "file": "OracleManager.sol",
-      "id": "3d360259b1b8e6fb",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Deposits can be accepted and moved to L1 with no validator configured (funds stuck/DoS)",
       "description": "In stake() -> _distributeStake(amount, OperationType.UserDeposit), the contract retrieves the current validator via validatorManager.getDelegation(address(this)) but does not validate that it is non-zero or active before proceeding. In the UserDeposit branch of _distributeStake, ETH is sent to L1 (payable(L1_HYPE_CONTRACT).call{value: amount}(...)) and a cDeposit is executed before queueing a delegation for whatever validator address was returned. If no validator is set (address(0)) or the validator is inactive, the L1 delegation operation will be queued with an invalid destination. When processL1Deposits runs, l1Write.sendTokenDelegate(op.validator, ...) may revert or send to a null/invalid validator, potentially causing the queue to be unprocessable and leaving user funds stranded on L1 spot balance. This is a real denial-of-service and potential funds-stuck condition caused by missing validation in the UserDeposit/SpotDeposit/RebalanceDeposit branches. Where: _distributeStake() (UserDeposit/SpotDeposit/RebalanceDeposit paths), called from stake(); no require on validator != address(0) or validatorManager.validatorActiveState(validator). Why it's a security issue: Users can successfully stake and have their ETH moved off the chain before any validator safety checks, and the operation may be impossible to complete if no valid validator is configured, leaving funds stuck. Potential impact: DoS of deposit processing and funds stuck on L1 spot balance, requiring privileged intervention and potentially risky manual recovery.",
       "vulnerability_type": "validation/logic error",
@@ -126,26 +102,14 @@
       "status": "proposed"
     },
     {
-      "title": "Privileged arbitrary burning from any address by BURNER_ROLE",
-      "description": "The burn function allows any account with BURNER_ROLE to burn tokens from any address without that address's consent or allowance. Location: burn(address from, uint256 amount). This is a security issue because a compromised or malicious BURNER_ROLE can destroy user balances unilaterally. Potential impact includes direct loss of user funds, censorship/denial of access to balances, and reputational or legal risk if users expect non-custodial behavior.",
-      "vulnerability_type": "access control / privilege abuse",
+      "title": "Unbounded gas forwarded to oracle adapters enables denial-of-service",
+      "description": "The generatePerformance function makes external calls to untrusted oracle adapters without limiting the gas forwarded. A malicious active oracle can consume all remaining gas (e.g., via an infinite loop) during getPerformance, causing the entire transaction to run out of gas and revert. try/catch does not help if the callee consumes all gas, because there is no gas left to execute the catch path. This occurs in generatePerformance() within the loop over authorizedOracles when calling IOracleAdapter(oracle).getPerformance(validator). Impact: The operator cannot successfully execute generatePerformance while a malicious active oracle exists, halting validator performance updates and reward/slashing reporting until the oracle is deactivated.",
+      "vulnerability_type": "denial of service (untrusted external call gas griefing)",
       "severity": "high",
       "confidence": 0.9,
-      "location": "KHYPE.sol: burn() function",
-      "file": "KHYPE.sol",
-      "id": "a2b31cd46f1f38fc",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "External call in pause check before reentrancy guard allows reentrancy window",
-      "description": "The whenNotPaused modifier calls an external contract pauserRegistry.isPaused(address(this)) before function execution. Several state-changing functions apply modifiers in the order whenNotPaused nonReentrant ... (e.g., rebalanceWithdrawal, closeRebalanceRequests, deactivateValidator, reactivateValidator, setDelegation). Because modifiers execute left-to-right, the external call to pauserRegistry occurs before the ReentrancyGuard is engaged. A malicious or compromised pauserRegistry could reenter this contract during the pause check. While role checks on state-changing functions mitigate most direct exploits, a misconfigured setup where pauserRegistry also holds privileged roles (e.g., MANAGER_ROLE) would allow it to perform privileged actions via reentrancy, bypassing expected sequencing and potentially causing inconsistent state or unexpected side effects. At minimum, this widens the attack surface and violates the Checks-Effects-Interactions pattern.",
-      "vulnerability_type": "reentrancy",
-      "severity": "low",
-      "confidence": 0.6,
-      "location": "whenNotPaused modifier and any function using it before nonReentrant (e.g., rebalanceWithdrawal(), closeRebalanceRequests(), deactivateValidator(), reactivateValidator(), setDelegation(), activateValidator())",
-      "file": "ValidatorManager.sol",
-      "id": "4219c01dfa73ddef",
+      "location": "generatePerformance() loop calling IOracleAdapter(oracle).getPerformance(validator)",
+      "file": "OracleManager.sol",
+      "id": "b1e41bb485e5525c",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -158,6 +122,18 @@
       "location": "supportsInterface(bytes4) function",
       "file": "DefaultAdapter.sol",
       "id": "5eafaef0280815a4",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Privileged arbitrary burning from any address by BURNER_ROLE",
+      "description": "The burn function allows any account with BURNER_ROLE to burn tokens from any address without that address's consent or allowance. Location: burn(address from, uint256 amount). This is a security issue because a compromised or malicious BURNER_ROLE can destroy user balances unilaterally. Potential impact includes direct loss of user funds, censorship/denial of access to balances, and reputational or legal risk if users expect non-custodial behavior.",
+      "vulnerability_type": "access control / privilege abuse",
+      "severity": "high",
+      "confidence": 0.9,
+      "location": "KHYPE.sol: burn() function",
+      "file": "KHYPE.sol",
+      "id": "a2b31cd46f1f38fc",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -194,6 +170,18 @@
       "location": "setSlashingTolerance(), setRewardsTolerance(), setScoreTolerance(), setMaxScoreBound()",
       "file": "ValidatorSanityChecker.sol",
       "id": "991b9788f818d00a",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "External call in pause check before reentrancy guard allows reentrancy window",
+      "description": "The whenNotPaused modifier calls an external contract pauserRegistry.isPaused(address(this)) before function execution. Several state-changing functions apply modifiers in the order whenNotPaused nonReentrant ... (e.g., rebalanceWithdrawal, closeRebalanceRequests, deactivateValidator, reactivateValidator, setDelegation). Because modifiers execute left-to-right, the external call to pauserRegistry occurs before the ReentrancyGuard is engaged. A malicious or compromised pauserRegistry could reenter this contract during the pause check. While role checks on state-changing functions mitigate most direct exploits, a misconfigured setup where pauserRegistry also holds privileged roles (e.g., MANAGER_ROLE) would allow it to perform privileged actions via reentrancy, bypassing expected sequencing and potentially causing inconsistent state or unexpected side effects. At minimum, this widens the attack surface and violates the Checks-Effects-Interactions pattern.",
+      "vulnerability_type": "reentrancy",
+      "severity": "low",
+      "confidence": 0.6,
+      "location": "whenNotPaused modifier and any function using it before nonReentrant (e.g., rebalanceWithdrawal(), closeRebalanceRequests(), deactivateValidator(), reactivateValidator(), setDelegation(), activateValidator())",
+      "file": "ValidatorManager.sol",
+      "id": "4219c01dfa73ddef",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -242,6 +230,18 @@
       "location": "initialize() function (initializer pattern on proxy deployment)",
       "file": "PauserRegistry.sol",
       "id": "4ede71af1cc15b46",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Aggregation of unbounded oracle values can overflow and revert (DoS)",
+      "description": "Untrusted oracle outputs for balance, accRewardAmount, and accSlashAmount are summed across oracles without upper bounds. A malicious active oracle can return extremely large values (e.g., close to type(uint256).max). When a second valid oracle\u2019s values are added, the addition overflows under Solidity 0.8 and reverts, aborting the entire transaction. This occurs in generatePerformance() during aggregation: totalBalance += balance; totalRewardAmount += accRewardAmount; totalSlashAmount += accSlashAmount. Scores are bounded by maxPerformanceBound, but balances/rewards/slashes are not. Impact: A single malicious active oracle can reliably cause generatePerformance to revert (especially when at least one other oracle report is valid), blocking performance updates and reward/slashing reporting until the oracle is deactivated.",
+      "vulnerability_type": "denial of service (arithmetic overflow from untrusted input)",
+      "severity": "high",
+      "confidence": 0.9,
+      "location": "generatePerformance() aggregation of oracle data (totalBalance/totalRewardAmount/totalSlashAmount additions)",
+      "file": "OracleManager.sol",
+      "id": "3d360259b1b8e6fb",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

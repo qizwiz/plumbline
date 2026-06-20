@@ -90,18 +90,6 @@
       "status": "proposed"
     },
     {
-      "title": "Unrestricted owner minting allows unlimited supply inflation",
-      "description": "The mint function allows the owner (set to the provided Agent address) to mint an arbitrary amount of tokens to any address without any cap or constraints. This occurs in the mint(address to, uint256 amount) function. If the owner contract/account is malicious or compromised, it can arbitrarily inflate the token supply, causing severe dilution of existing holders and potential downstream loss of funds if the token is used as collateral or in other protocols.",
-      "vulnerability_type": "access control (excessive privileges)",
-      "severity": "high",
-      "confidence": 0.95,
-      "location": "mint(address,uint256) function",
-      "file": "AIToken.sol",
-      "id": "372fee96798f8037",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Reliance on LiquidityManager(owner).owner() can brick fee sweeping and kill",
       "description": "The internal _sweepFees() calls LiquidityManager(owner).owner() to fetch the fee recipient. If owner is an EOA or a contract without a compatible owner() function or one that reverts, the external call will revert when decoding the return data. This makes sweepFees() and kill() (which calls _sweepFees() first) permanently revert, preventing fee withdrawal and pool shutdown, effectively locking fees and potentially operationally bricking administrative controls.",
       "vulnerability_type": "external dependency / improper interface assumption",
@@ -170,6 +158,18 @@
       "location": "proposalThreshold(), votingDelay(), votingPeriod()",
       "file": "TokenGovernor.sol",
       "id": "38f243b1a7000945",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Unrestricted owner minting allows unlimited supply inflation",
+      "description": "The mint function allows the owner (set to the provided Agent address) to mint an arbitrary amount of tokens to any address without any cap or constraints. This occurs in the mint(address to, uint256 amount) function. If the owner contract/account is malicious or compromised, it can arbitrarily inflate the token supply, causing severe dilution of existing holders and potential downstream loss of funds if the token is used as collateral or in other protocols.",
+      "vulnerability_type": "access control (excessive privileges)",
+      "severity": "high",
+      "confidence": 0.95,
+      "location": "mint(address,uint256) function",
+      "file": "AIToken.sol",
+      "id": "372fee96798f8037",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

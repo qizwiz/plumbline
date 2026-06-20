@@ -30,18 +30,6 @@
       "status": "proposed"
     },
     {
-      "title": "Unbounded discountPct can cause underflow/overflow and DoS in pricing",
-      "description": "There is no upper bound validation for discountPct when creating a listing. In _getDiscountedPrice, if discountPct exceeds BASE (10000), the calculation for FIX discount (discountedPrice = price * (BASE - discountPct) / BASE) underflows and reverts. For LINEAR discount, (_amount * discountPct) / listing.total can exceed BASE, making (BASE - ...) underflow and revert; additionally, the multiplication _amount * discountPct can overflow for large values. These reverts make affected listings unpurchasable (DoS) until delisted. Locations: listVesting() (missing bounds check on _discountPct), _getDiscountedPrice(Listing storage listing, uint256 _amount).",
-      "vulnerability_type": "arithmetic underflow/overflow, denial of service",
-      "severity": "medium",
-      "confidence": 0.85,
-      "location": "listVesting(...), _getDiscountedPrice(...)",
-      "file": "SecondSwap_Marketplace.sol",
-      "id": "4f6e3d77e56b6619",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Reentrancy/CEI violation in unlistVesting allows reentry before state is updated",
       "description": "The unlistVesting function makes external calls before updating critical state. Specifically, it calls IVestingManager.unlistVesting(listing.seller, _vestingPlan, listing.balance) while listing.status is still LIST and listing.balance is unchanged. If the external vesting manager (or a token used for penalty payment) is malicious or compromised and re-enters the marketplace (e.g., via a callback), it can trigger logic that assumes the listing is still active. Depending on the vesting manager's implementation, this could result in double-unlisting or other inconsistent state in the vesting system, potentially leading to unintended token releases. Location: unlistVesting() before setting listing.status = DELIST and listing.balance = 0.",
       "vulnerability_type": "reentrancy",
@@ -50,6 +38,18 @@
       "location": "unlistVesting(address _vestingPlan, uint256 _listingId)",
       "file": "SecondSwap_Marketplace.sol",
       "id": "ab90da070fa0bb44",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Unbounded discountPct can cause underflow/overflow and DoS in pricing",
+      "description": "There is no upper bound validation for discountPct when creating a listing. In _getDiscountedPrice, if discountPct exceeds BASE (10000), the calculation for FIX discount (discountedPrice = price * (BASE - discountPct) / BASE) underflows and reverts. For LINEAR discount, (_amount * discountPct) / listing.total can exceed BASE, making (BASE - ...) underflow and revert; additionally, the multiplication _amount * discountPct can overflow for large values. These reverts make affected listings unpurchasable (DoS) until delisted. Locations: listVesting() (missing bounds check on _discountPct), _getDiscountedPrice(Listing storage listing, uint256 _amount).",
+      "vulnerability_type": "arithmetic underflow/overflow, denial of service",
+      "severity": "medium",
+      "confidence": 0.85,
+      "location": "listVesting(...), _getDiscountedPrice(...)",
+      "file": "SecondSwap_Marketplace.sol",
+      "id": "4f6e3d77e56b6619",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

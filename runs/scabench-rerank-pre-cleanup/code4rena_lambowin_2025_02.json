@@ -126,18 +126,6 @@
       "status": "proposed"
     },
     {
-      "title": "Unprotected initializer allows arbitrary mint of full supply and metadata takeover",
-      "description": "The initialize() function is public and lacks any access control, only checking that _totalSupply == 0. Because the constructor immediately renounces ownership (Ownable(msg.sender) followed by _transferOwnership(address(0))), there is no owner to gate initialize(). As a result, the first caller can set the token name and symbol arbitrarily and mint LaunchPadUtils.TOTAL_AMOUNT_OF_QUOTE_TOKEN to themselves via _mint(msg.sender, ...). This enables anyone to front-run deployment or the intended initializer, seize the entire token supply, and permanently set misleading metadata. Impact: complete loss of intended token supply to an attacker and permanent metadata spoofing, effectively bricking the legitimate deployment.",
-      "vulnerability_type": "access control",
-      "severity": "critical",
-      "confidence": 0.98,
-      "location": "initialize() function; constructor (ownership renounced)",
-      "file": "LamboToken.sol",
-      "id": "49fcc0ee728b513b",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Flash loan repayment ignores premium/fee, making rebalance unusable",
       "description": "The flash loan callback only approves the principal (assets) back to the lender and does not account for any premium/fee. In onMorphoFlashLoan, the code calls IERC20(weth).approve(morphoVault, assets) and does not include the fee. If the Morpho flash loan requires repayment of principal + fee (typical behavior), the lender's transferFrom will fail due to insufficient allowance, reverting the entire flash loan and thus the rebalance call. Impact: rebalance() will consistently revert on any non-zero fee flash loan, causing a denial of service of core functionality.",
       "vulnerability_type": "denial of service / logic error",
@@ -158,6 +146,18 @@
       "location": "onMorphoFlashLoan() function; no validation that 'assets' were credited before operations; unconditional approval to morphoVault",
       "file": "LamboRebalanceOnUniwap.sol",
       "id": "5361ff3be0584c4a",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Unprotected initializer allows arbitrary mint of full supply and metadata takeover",
+      "description": "The initialize() function is public and lacks any access control, only checking that _totalSupply == 0. Because the constructor immediately renounces ownership (Ownable(msg.sender) followed by _transferOwnership(address(0))), there is no owner to gate initialize(). As a result, the first caller can set the token name and symbol arbitrarily and mint LaunchPadUtils.TOTAL_AMOUNT_OF_QUOTE_TOKEN to themselves via _mint(msg.sender, ...). This enables anyone to front-run deployment or the intended initializer, seize the entire token supply, and permanently set misleading metadata. Impact: complete loss of intended token supply to an attacker and permanent metadata spoofing, effectively bricking the legitimate deployment.",
+      "vulnerability_type": "access control",
+      "severity": "critical",
+      "confidence": 0.98,
+      "location": "initialize() function; constructor (ownership renounced)",
+      "file": "LamboToken.sol",
+      "id": "49fcc0ee728b513b",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     }

@@ -114,6 +114,18 @@
       "status": "proposed"
     },
     {
+      "title": "Unrestricted ETH spending via public token registration function",
+      "description": "The function eth_registerCustomTokenAndLinkToken is public and forwards ETH from this contract's balance to an arbitrary InterchainTokenFactory provided by the caller. It calls factory.registerCustomToken{ value: gasValue_ }(...) and factory.linkToken{ value: gasValue_ }(...), but the function itself is non-payable and performs no access control or validation of the factory address. As a result, any external caller can invoke this function and drain all ETH held by this contract by supplying a malicious factory and large gasValue_. A malicious 'factory' can implement the called functions to simply accept ETH and return values, enabling direct theft of funds from this contract.\n- What: Unrestricted external value transfers with caller-chosen target\n- Where: eth_registerCustomTokenAndLinkToken(...), calls to factory.registerCustomToken{ value: gasValue_ } and factory.linkToken{ value: gasValue_ }\n- Why it's a security issue: Anyone can trigger ETH transfers from the contract's balance without authorization, to an attacker-controlled contract\n- Potential impact: Complete loss of all ETH held by this contract; denial of service of intended registration by depleting funds",
+      "vulnerability_type": "access control / arbitrary value transfer",
+      "severity": "critical",
+      "confidence": 0.95,
+      "location": "eth_registerCustomTokenAndLinkToken()",
+      "file": "ITSUtils.sol",
+      "id": "26d6a36a11dcfec5",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
       "title": "permitWrap is payable but ignores msg.value, allowing ETH to be trapped and bypassing receive() restriction",
       "description": "The function permitWrap is declared payable yet does not use msg.value anywhere in its logic. This allows callers to send native ETH directly to the contract via this function, bypassing the receive() guard that only allows ETH from the WETH (baseERC20) contract. Any ETH sent this way is neither refunded nor used and will remain stuck in the contract balance. This breaks the intended invariant that all ETH entering the contract should come from WETH.withdraw, and can lead to user fund loss if ETH is accidentally sent with the transaction. Additionally, it can skew internal accounting by increasing the contract's ETH reserves without corresponding WETH backing or iTEL supply changes.\n- Where: permitWrap() function (payable), around its declaration in InterchainTEL.sol.\n- Why it's a security issue: Users can inadvertently lose ETH by sending value with the permitWrap call; ETH becomes irrecoverable for the sender and is not tracked by the wrapper/token accounting. It also undermines the receive() safeguard meant to restrict ETH inflows to WETH-only sources.\n- Potential impact: Permanent loss of funds for users who mistakenly send ETH; accumulation of unaccounted ETH in the contract that could later be used to fund unrelated mints, creating accounting mismatches and potential protocol-level confusion.",
       "vulnerability_type": "ether handling / accounting flaw",
@@ -134,18 +146,6 @@
       "location": "drip(address token, address recipient)",
       "file": "TNFaucet.sol",
       "id": "82e6824b51d0133e",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Unrestricted ETH spending via public token registration function",
-      "description": "The function eth_registerCustomTokenAndLinkToken is public and forwards ETH from this contract's balance to an arbitrary InterchainTokenFactory provided by the caller. It calls factory.registerCustomToken{ value: gasValue_ }(...) and factory.linkToken{ value: gasValue_ }(...), but the function itself is non-payable and performs no access control or validation of the factory address. As a result, any external caller can invoke this function and drain all ETH held by this contract by supplying a malicious factory and large gasValue_. A malicious 'factory' can implement the called functions to simply accept ETH and return values, enabling direct theft of funds from this contract.\n- What: Unrestricted external value transfers with caller-chosen target\n- Where: eth_registerCustomTokenAndLinkToken(...), calls to factory.registerCustomToken{ value: gasValue_ } and factory.linkToken{ value: gasValue_ }\n- Why it's a security issue: Anyone can trigger ETH transfers from the contract's balance without authorization, to an attacker-controlled contract\n- Potential impact: Complete loss of all ETH held by this contract; denial of service of intended registration by depleting funds",
-      "vulnerability_type": "access control / arbitrary value transfer",
-      "severity": "critical",
-      "confidence": 0.95,
-      "location": "eth_registerCustomTokenAndLinkToken()",
-      "file": "ITSUtils.sol",
-      "id": "26d6a36a11dcfec5",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

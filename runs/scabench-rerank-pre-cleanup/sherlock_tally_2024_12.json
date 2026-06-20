@@ -42,18 +42,6 @@
       "status": "proposed"
     },
     {
-      "title": "Authorized reward notifier can cause global claim DoS by notifying without funding",
-      "description": "notifyRewardAmount updates the reward rate based on the provided _amount and only performs a coarse balance check against the contract\u2019s current REWARD_TOKEN balance. A whitelisted notifier can call this function without actually transferring tokens (or transfer insufficient tokens), leading to a shortfall when users claim. SafeERC20.safeTransfer in claim paths will then revert due to insufficient balance, blocking all claims until the shortfall is covered. The code comments acknowledge this limitation and rely on admin whitelisting discipline, but from a protocol perspective it is still a DoS vector controlled by the notifier role.\nWhere: notifyRewardAmount(uint256 _amount)\nWhy it's a security issue: A privileged/notifier account can halt claims for all users by misreporting rewards.\nPotential impact: Denial of service for reward claims across the protocol until additional funds are provided.",
-      "vulnerability_type": "privileged griefing / denial of service",
-      "severity": "low",
-      "confidence": 0.6,
-      "location": "notifyRewardAmount(uint256)",
-      "file": "GovernanceStaker.sol",
-      "id": "88c764bca5f89a31",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Missing zero-address validation for critical roles can disable oracle updates (accidental DoS)",
       "description": "The contract allows setting scoreOracle and oraclePauseGuardian to the zero address without checks. Setting scoreOracle to address(0) makes updateDelegateeScore permanently unusable until reconfigured, which can lead to oracle staleness and force all stakers to receive full earning power after STALE_ORACLE_WINDOW elapses. Similarly, misconfiguring oraclePauseGuardian to address(0) prevents the guardian from pausing/unpausing directly (owner can still recover by changing the guardian). While owner-controlled, this lack of validation increases the risk of accidental or malicious misconfiguration causing temporary denial of service or unintended protocol behavior. The issue occurs in setScoreOracle/_setScoreOracle and setOraclePauseGuardian/_setOraclePauseGuardian which accept arbitrary addresses including zero.",
       "vulnerability_type": "access control / misconfiguration",
@@ -62,6 +50,18 @@
       "location": "setScoreOracle()/_setScoreOracle(); setOraclePauseGuardian()/_setOraclePauseGuardian()",
       "file": "BinaryEligibilityOracleEarningPowerCalculator.sol",
       "id": "2f9c580ce989888e",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Authorized reward notifier can cause global claim DoS by notifying without funding",
+      "description": "notifyRewardAmount updates the reward rate based on the provided _amount and only performs a coarse balance check against the contract\u2019s current REWARD_TOKEN balance. A whitelisted notifier can call this function without actually transferring tokens (or transfer insufficient tokens), leading to a shortfall when users claim. SafeERC20.safeTransfer in claim paths will then revert due to insufficient balance, blocking all claims until the shortfall is covered. The code comments acknowledge this limitation and rely on admin whitelisting discipline, but from a protocol perspective it is still a DoS vector controlled by the notifier role.\nWhere: notifyRewardAmount(uint256 _amount)\nWhy it's a security issue: A privileged/notifier account can halt claims for all users by misreporting rewards.\nPotential impact: Denial of service for reward claims across the protocol until additional funds are provided.",
+      "vulnerability_type": "privileged griefing / denial of service",
+      "severity": "low",
+      "confidence": 0.6,
+      "location": "notifyRewardAmount(uint256)",
+      "file": "GovernanceStaker.sol",
+      "id": "88c764bca5f89a31",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

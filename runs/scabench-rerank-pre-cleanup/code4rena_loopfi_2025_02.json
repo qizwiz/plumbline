@@ -90,18 +90,6 @@
       "status": "proposed"
     },
     {
-      "title": "Approval to arbitrary vault in onCreditFlashLoan without registry/initiator checks can leak funds",
-      "description": "onCreditFlashLoan approves underlyingToken to address(leverParams.vault) for subDebt + fee before any registry check or validation, and without verifying the flash-loan initiator. There is no onlyRegisteredVault check in the callback. An attacker can trigger credit flash-loan callbacks through the flashlender with LeverParams.vault set to a malicious contract implementing ICDPVault, causing this contract to grant it an allowance. The malicious vault can then pull any underlying balance held by this contract during the callback (e.g., dust or mistakenly sent tokens), and return success so the callback proceeds.\n\nWhere: onCreditFlashLoan(), line with underlyingToken.forceApprove(address(leverParams.vault), subDebt + fee) and subsequent ICDPVault(leverParams.vault).modifyCollateralAndDebt(...) call.\n\nWhy it's a security issue: Granting allowance to an attacker-controlled contract enables that contract to transfer tokens from this contract. Combined with the missing initiator verification, an attacker can unilaterally trigger this flow. Although typical usage intends no tokens to be left on the implementation, any balance present (accidental transfers, dust, or unforeseen states) can be stolen.\n\nPotential impact:\n- Loss of any underlying token balance held by this contract at the time of the forced callback.\n- Even if the later call reverts, an attacker-controlled ICDPVault implementation could attempt to use the allowance within the same call context, leading to theft before revert conditions elsewhere (and in some implementations may still result in irrecoverable transfers).",
-      "vulnerability_type": "improper allowance / access control",
-      "severity": "medium",
-      "confidence": 0.65,
-      "location": "onCreditFlashLoan()",
-      "file": "PositionAction.sol",
-      "id": "6e833159d14b6f5b",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Use of total balanceOf after pool join/exit mixes user funds and can cause loss or DoS",
       "description": "After performing pool operations, the code uses the contract's total token balance instead of computing the delta from the current operation. Specifically: in _onIncreaseLever, after poolAction.join, addCollateralAmount is set to IERC20(underlyingToken).balanceOf(address(this)); and in _onDecreaseLever, after poolAction.exit, tokenOut is set to IERC20(asset).balanceOf(address(this)). This pattern includes any pre-existing balances (dust from previous operations, accidental transfers, or tokens deliberately sent to the contract) in the current user's flow. Impact: (1) Cross-user fund mixing: residual tokens from a previous user can be swept into the next user's position, causing loss for the original owner; (2) Grief/DoS: an attacker can send a large amount of the underlying to this contract, causing subsequent increase/decrease operations to attempt to use the entire balance, which may exceed ERC4626 maxDeposit/maxMint constraints and revert, denying service to honest users, or unintentionally deposit the attacker's tokens into someone else's position.",
       "vulnerability_type": "accounting error / improper balance accounting",
@@ -134,78 +122,6 @@
       "location": "deposit() and withdraw() functions",
       "file": "Locking.sol",
       "id": "a67d11f5f3278f12",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Unbounded loop with `continue` can cause denial of service if a zero-amount earning entry exists",
-      "description": "Both withdraw() and withdrawableBalance() iterate over the _userEarnings array and use `if (earnedAmount == 0) continue;` without incrementing the loop counter before continuing. If any zero-amount entry ever exists in _userEarnings for a user, these loops will never progress, causing an infinite loop and out-of-gas revert. This would block withdrawals in withdraw() and view calculations in withdrawableBalance(). While the normal code paths do not intentionally create zero-amount entries, any unforeseen state mutation (e.g., from future changes, faulty integrations, or manual state migrations) that introduces a zero amount would permanently DoS the affected user.",
-      "vulnerability_type": "denial of service",
-      "severity": "medium",
-      "confidence": 0.7,
-      "location": "withdraw() and withdrawableBalance() loops over _userEarnings (check for `if (earnedAmount == 0) continue;` without increment)",
-      "file": "MultiFeeDistribution.sol",
-      "id": "e600414869c06590",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Owner can arbitrarily lock or extend withdrawals by changing cooldownPeriod at any time",
-      "description": "The owner can set cooldownPeriod to any value at any time via setCooldownPeriod(), with no upper bound, timelock, or safeguard. The withdraw() check uses the current cooldownPeriod at call time (block.timestamp < cooldownStart + cooldownPeriod). This allows the owner to: (1) raise cooldownPeriod after users have deposited or even after they initiated cooldown, delaying or preventing withdrawals; (2) set an extremely large value that can make the addition overflow and revert in Solidity 0.8 (cooldownStart + cooldownPeriod), causing withdraw() to always revert until cooldownPeriod is reduced. This constitutes a centralized denial-of-service risk over user funds.",
-      "vulnerability_type": "access control / denial of service",
-      "severity": "medium",
-      "confidence": 0.85,
-      "location": "setCooldownPeriod() and withdraw() time check",
-      "file": "Locking.sol",
-      "id": "869e141379e1836a",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Critical dependency on external PriceProvider allows global DoS of core user flows",
-      "description": "Multiple user-facing functions call IPriceProvider.update() and revert if the external price provider reverts. Specifically, getReward() (via _getReward), claimFromConverter(), zapVestingToLp(), and _withdrawTokens() all invoke update(). A malfunctioning, malicious, or unavailable price provider will cause these functions to revert, preventing users from claiming rewards and, in some cases, withdrawing. Because the update() call is not wrapped in try/catch and is executed after state changes and transfers are prepared, it can effectively lock protocol functionality if the provider misbehaves.",
-      "vulnerability_type": "external call dependency / denial of service",
-      "severity": "high",
-      "confidence": 0.8,
-      "location": "IPriceProvider.update() is called in: getReward() (after _getReward), claimFromConverter(), zapVestingToLp(), and _withdrawTokens()",
-      "file": "MultiFeeDistribution.sol",
-      "id": "51843864bc7a1d46",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Update reverts for Balancer pools with more than 3 tokens (hard-coded token slots)",
-      "description": "The contract only stores three pool token addresses (token0, token1, token2) at construction, but update() iterates over all pool weights returned by IWeightedPool(pool).getNormalizedWeights(). If the pool has more than 3 tokens, _getTokenPrice(i) will revert for i >= 3 due to BalancerOracle__getTokenPrice_invalidIndex(), causing update() to always revert. This prevents currentPrice from ever being updated, which in turn keeps safePrice stale and makes the oracle unusable for dependent protocols.\n\nWhere: update() loop over weights; _getTokenPrice(uint256 index) for index >= 3.\nWhy it's an issue: Any pool with >3 tokens will make updates impossible.\nPotential impact: Denial of service for price updates; dependent systems may receive stale or invalid prices and fail or be forced to halt.",
-      "vulnerability_type": "denial of service",
-      "severity": "high",
-      "confidence": 0.95,
-      "location": "update() and _getTokenPrice(), indices >= 3",
-      "file": "BalancerOracle.sol",
-      "id": "b185f10820c0e5a7",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Upgradeability can be blocked by keepers (status-gated _authorizeUpgrade)",
-      "description": "The UUPS upgrade authorization forbids upgrades when the oracle status is valid: _authorizeUpgrade() reverts if _getStatus() returns true. Since _getStatus() is set by update() (safePrice != 0 and not stale), any address with KEEPER_ROLE can keep calling update() to maintain a valid status and effectively prevent upgrades. This couples liveness with governance and allows a privileged but non-governance role to DoS upgrades until the price becomes stale or the role is revoked.\n\nWhere: _authorizeUpgrade() and update()/_getStatus() interaction.\nWhy it's an issue: A KEEPER can indefinitely prevent timely upgrades (including security patches) by keeping the oracle fresh.\nPotential impact: Denial of service of the upgrade path; inability to deploy critical fixes until status becomes invalid or roles are changed.",
-      "vulnerability_type": "access control / denial of service",
-      "severity": "medium",
-      "confidence": 0.85,
-      "location": "_authorizeUpgrade(address) and update()",
-      "file": "BalancerOracle.sol",
-      "id": "591613257feb7b07",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Emission schedule applies new rewards rate only after a mass update (one-cycle mis-accounting)",
-      "description": "In setScheduledRewardsPerSecond(), when a new emission point is reached, the contract first calls _massUpdatePools() and only then updates rewardsPerSecond to the new rate. This applies the old rewardsPerSecond to the entire period up to the update, even if part of that period should use the new rate. Consequences: when the scheduled rate decreases, the first update after the boundary over-allocates rewards at the old higher rate; when it increases, it under-allocates. This can be exploited by calling a function right after the schedule boundary to lock in an over-allocation for that update, reducing the remaining rewards pool and ending emissions earlier than intended.",
-      "vulnerability_type": "logic error / protocol manipulation",
-      "severity": "medium",
-      "confidence": 0.75,
-      "location": "setScheduledRewardsPerSecond() and its invocation from _updateEmissions()",
-      "file": "ChefIncentivesController.sol",
-      "id": "daee1d428842964a",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -246,18 +162,6 @@
       "status": "proposed"
     },
     {
-      "title": "Withdrawal DoS due to MIN_SHARES post-withdrawal invariant",
-      "description": "The contract enforces an invariant that totalSupply must not be a small non\u2011zero amount by reverting whenever totalSupply > 0 and totalSupply < MIN_SHARES. This check is executed after both deposits and withdrawals in _checkMinShares(), which is called from _deposit() and _withdraw(). While it prevents certain donation-based ratio attacks, it creates a denial-of-service condition where legitimate users can be permanently unable to redeem or start a cooldown. Example: if totalSupply = 0.012 shares and two users each hold 0.006 shares (MIN_SHARES = 0.01), any single user's withdrawal would leave totalSupply = 0.006 (< MIN_SHARES) and will revert, trapping both users' funds unless a third party deposits to raise totalSupply. Because cooldownAssets() and cooldownShares() internally call _withdraw, they are also blocked, preventing users from entering the cooldown path as well. This can lead to locked funds and loss of liveness for withdrawals.",
-      "vulnerability_type": "denial of service",
-      "severity": "high",
-      "confidence": 0.9,
-      "location": "_checkMinShares() and its use in _deposit() and _withdraw(); specifically in _deposit(...) and _withdraw(...), where _checkMinShares() is called after state changes",
-      "file": "StakingLPEth.sol",
-      "id": "5782d9b8b683053b",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Delegatecall to external poolAction can enable arbitrary code execution in this contract\u2019s context",
       "description": "The contract uses _delegateCall to invoke poolAction.join and poolAction.exit. Delegatecall executes the callee\u2019s code in the context of this contract, giving it access to this contract\u2019s storage and token approvals/balances. If poolAction is upgradable, replaceable, or otherwise controllable by an untrusted party, this enables full compromise: draining ERC20 balances, corrupting state, or bypassing any assumed invariants. Even if presently set to a trusted address, any ability to change it post-deployment would be a critical centralization risk.\nWhere: PositionActionPendle._onWithdraw() and _onIncreaseLever()/_onDecreaseLever(), calls to _delegateCall(address(poolAction), ...).\nWhy: Delegatecall to an external address without strong immutability/ownership guarantees is equivalent to giving that address full execution privileges.\nPotential impact: Loss of funds, privilege escalation, and protocol manipulation if poolAction can be set/controlled by an attacker.",
       "vulnerability_type": "arbitrary delegatecall / upgradeability risk",
@@ -266,30 +170,6 @@
       "location": "_onWithdraw(), _onIncreaseLever(), _onDecreaseLever() delegatecalls to poolAction",
       "file": "PositionActionPendle.sol",
       "id": "ea36c344bc742c0a",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Units mismatch in _onIncreaseLever return value can corrupt collateral accounting",
-      "description": "In _onIncreaseLever, the function sums upFrontAmount and swapAmountOut (both documented as CDPVault.tokenScale()) into addCollateralAmount and returns it unchanged. The function\u2019s documentation says it should return the amount of collateral added in wad, but no conversion from tokenScale to wad is performed. Where: PositionAction20._onIncreaseLever. What: addCollateralAmount is computed and returned in token decimals, while the caller likely expects wad. Why it's a security issue: If upstream logic assumes the returned value is wad, it may miscalculate deposited collateral, debt, or leverage adjustments by orders of magnitude (e.g., 1e6 vs 1e18 for 6-decimal tokens), leading to undercollateralized positions or unexpected behavior. Potential impact: Loss of funds due to positions being opened or adjusted with incorrect collateral amounts, causing liquidations or enabling users to borrow more than safely allowed.",
-      "vulnerability_type": "data corruption/precision (units mismatch)",
-      "severity": "high",
-      "confidence": 0.7,
-      "location": "_onIncreaseLever() function",
-      "file": "PositionAction20.sol",
-      "id": "68bea3b751c49715",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Incorrect token approved during leverage increase",
-      "description": "In _onIncreaseLever, the contract computes the balance of the actual vault collateral token (ICDPVault(leverParams.vault).token()) but then approves leverParams.collateralToken for the vault to spend. If leverParams.collateralToken differs from the vault\u2019s actual collateral token, the approval is applied to the wrong ERC20. This can lead to: (a) denial of service because the subsequent deposit pull by the vault (which will attempt to transferFrom the actual collateral token) lacks allowance and reverts; (b) if the caller can choose an arbitrary vault or if a malicious/incorrectly whitelisted vault is used, the vault could transferFrom the wrongly approved token balance from this contract, potentially draining tokens held by this contract.\nWhere: PositionActionPendle._onIncreaseLever(), the line approving IERC20(leverParams.collateralToken).forceApprove(leverParams.vault, addCollateralAmount) after computing addCollateralAmount from ICDPVault(leverParams.vault).token().balanceOf.\nWhy: Approval is granted on a token that may not match the vault\u2019s collateral token.\nPotential impact: Denial of service of leverage flow and, under certain configurations (malicious or unvalidated vault/token params), unauthorized token transfer (loss of funds).",
-      "vulnerability_type": "logic error / improper token approval",
-      "severity": "medium",
-      "confidence": 0.7,
-      "location": "_onIncreaseLever() function, approval of leverParams.collateralToken instead of the vault\u2019s token",
-      "file": "PositionActionPendle.sol",
-      "id": "8c55149ddd633007",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -378,6 +258,18 @@
       "status": "proposed"
     },
     {
+      "title": "Approval to arbitrary vault in onCreditFlashLoan without registry/initiator checks can leak funds",
+      "description": "onCreditFlashLoan approves underlyingToken to address(leverParams.vault) for subDebt + fee before any registry check or validation, and without verifying the flash-loan initiator. There is no onlyRegisteredVault check in the callback. An attacker can trigger credit flash-loan callbacks through the flashlender with LeverParams.vault set to a malicious contract implementing ICDPVault, causing this contract to grant it an allowance. The malicious vault can then pull any underlying balance held by this contract during the callback (e.g., dust or mistakenly sent tokens), and return success so the callback proceeds.\n\nWhere: onCreditFlashLoan(), line with underlyingToken.forceApprove(address(leverParams.vault), subDebt + fee) and subsequent ICDPVault(leverParams.vault).modifyCollateralAndDebt(...) call.\n\nWhy it's a security issue: Granting allowance to an attacker-controlled contract enables that contract to transfer tokens from this contract. Combined with the missing initiator verification, an attacker can unilaterally trigger this flow. Although typical usage intends no tokens to be left on the implementation, any balance present (accidental transfers, dust, or unforeseen states) can be stolen.\n\nPotential impact:\n- Loss of any underlying token balance held by this contract at the time of the forced callback.\n- Even if the later call reverts, an attacker-controlled ICDPVault implementation could attempt to use the allowance within the same call context, leading to theft before revert conditions elsewhere (and in some implementations may still result in irrecoverable transfers).",
+      "vulnerability_type": "improper allowance / access control",
+      "severity": "medium",
+      "confidence": 0.65,
+      "location": "onCreditFlashLoan()",
+      "file": "PositionAction.sol",
+      "id": "6e833159d14b6f5b",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
       "title": "Unseen reward accounting can underflow and DoS with deflationary/rebasing reward tokens",
       "description": "_notifyUnseenReward(token) computes `unseen = IERC20(token).balanceOf(address(this)) - r.balance` and reverts on underflow. If a reward token is deflationary, rebasing downward, or otherwise reduces this contract\u2019s token balance independently (or due to non-standard behavior), the current balance can fall below r.balance, causing an underflow and revert. Because _notifyUnseenReward is invoked inside user reward claims (getReward/_getReward and claimFromConverter), this underflow will prevent users from claiming rewards, leading to a denial of service. While addReward is restricted to minters, adding a non-standard token or a rebasing token would break claims for all users.",
       "vulnerability_type": "denial of service / token compatibility",
@@ -402,6 +294,30 @@
       "status": "proposed"
     },
     {
+      "title": "Units mismatch in _onIncreaseLever return value can corrupt collateral accounting",
+      "description": "In _onIncreaseLever, the function sums upFrontAmount and swapAmountOut (both documented as CDPVault.tokenScale()) into addCollateralAmount and returns it unchanged. The function\u2019s documentation says it should return the amount of collateral added in wad, but no conversion from tokenScale to wad is performed. Where: PositionAction20._onIncreaseLever. What: addCollateralAmount is computed and returned in token decimals, while the caller likely expects wad. Why it's a security issue: If upstream logic assumes the returned value is wad, it may miscalculate deposited collateral, debt, or leverage adjustments by orders of magnitude (e.g., 1e6 vs 1e18 for 6-decimal tokens), leading to undercollateralized positions or unexpected behavior. Potential impact: Loss of funds due to positions being opened or adjusted with incorrect collateral amounts, causing liquidations or enabling users to borrow more than safely allowed.",
+      "vulnerability_type": "data corruption/precision (units mismatch)",
+      "severity": "high",
+      "confidence": 0.7,
+      "location": "_onIncreaseLever() function",
+      "file": "PositionAction20.sol",
+      "id": "68bea3b751c49715",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Incorrect token approved during leverage increase",
+      "description": "In _onIncreaseLever, the contract computes the balance of the actual vault collateral token (ICDPVault(leverParams.vault).token()) but then approves leverParams.collateralToken for the vault to spend. If leverParams.collateralToken differs from the vault\u2019s actual collateral token, the approval is applied to the wrong ERC20. This can lead to: (a) denial of service because the subsequent deposit pull by the vault (which will attempt to transferFrom the actual collateral token) lacks allowance and reverts; (b) if the caller can choose an arbitrary vault or if a malicious/incorrectly whitelisted vault is used, the vault could transferFrom the wrongly approved token balance from this contract, potentially draining tokens held by this contract.\nWhere: PositionActionPendle._onIncreaseLever(), the line approving IERC20(leverParams.collateralToken).forceApprove(leverParams.vault, addCollateralAmount) after computing addCollateralAmount from ICDPVault(leverParams.vault).token().balanceOf.\nWhy: Approval is granted on a token that may not match the vault\u2019s collateral token.\nPotential impact: Denial of service of leverage flow and, under certain configurations (malicious or unvalidated vault/token params), unauthorized token transfer (loss of funds).",
+      "vulnerability_type": "logic error / improper token approval",
+      "severity": "medium",
+      "confidence": 0.7,
+      "location": "_onIncreaseLever() function, approval of leverParams.collateralToken instead of the vault\u2019s token",
+      "file": "PositionActionPendle.sol",
+      "id": "8c55149ddd633007",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
       "title": "Missing slippage protection in swap during withdrawal",
       "description": "In _onWithdraw, when converting withdrawn collateral to another token via poolAction.exit, the code hardcodes minOut = 0 in PoolActionParams. This means the swap executes with no minimum acceptable output, exposing the operation to extreme slippage and MEV sandwich attacks. An attacker can manipulate pricing or front-run the transaction to extract value, causing users to receive arbitrarily low amounts. Impact: loss of funds during withdrawals that request conversion to a different token.\nWhere: PositionActionPendle._onWithdraw(), in the branch that prepares PoolActionParams and calls _delegateCall(poolAction.exit) with minOut set to 0.\nWhy: Lack of slippage bound allows trades at any price.\nPotential impact: Direct loss of funds due to unfavorable execution, MEV extraction, and price manipulation.",
       "vulnerability_type": "slippage/price manipulation",
@@ -422,6 +338,30 @@
       "location": "_updateRewardIndex() and _doTransferOutRewards()",
       "file": "RewardManager.sol",
       "id": "9c0a3a4f87274e14",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Critical dependency on external PriceProvider allows global DoS of core user flows",
+      "description": "Multiple user-facing functions call IPriceProvider.update() and revert if the external price provider reverts. Specifically, getReward() (via _getReward), claimFromConverter(), zapVestingToLp(), and _withdrawTokens() all invoke update(). A malfunctioning, malicious, or unavailable price provider will cause these functions to revert, preventing users from claiming rewards and, in some cases, withdrawing. Because the update() call is not wrapped in try/catch and is executed after state changes and transfers are prepared, it can effectively lock protocol functionality if the provider misbehaves.",
+      "vulnerability_type": "external call dependency / denial of service",
+      "severity": "high",
+      "confidence": 0.8,
+      "location": "IPriceProvider.update() is called in: getReward() (after _getReward), claimFromConverter(), zapVestingToLp(), and _withdrawTokens()",
+      "file": "MultiFeeDistribution.sol",
+      "id": "51843864bc7a1d46",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Update reverts for Balancer pools with more than 3 tokens (hard-coded token slots)",
+      "description": "The contract only stores three pool token addresses (token0, token1, token2) at construction, but update() iterates over all pool weights returned by IWeightedPool(pool).getNormalizedWeights(). If the pool has more than 3 tokens, _getTokenPrice(i) will revert for i >= 3 due to BalancerOracle__getTokenPrice_invalidIndex(), causing update() to always revert. This prevents currentPrice from ever being updated, which in turn keeps safePrice stale and makes the oracle unusable for dependent protocols.\n\nWhere: update() loop over weights; _getTokenPrice(uint256 index) for index >= 3.\nWhy it's an issue: Any pool with >3 tokens will make updates impossible.\nPotential impact: Denial of service for price updates; dependent systems may receive stale or invalid prices and fail or be forced to halt.",
+      "vulnerability_type": "denial of service",
+      "severity": "high",
+      "confidence": 0.95,
+      "location": "update() and _getTokenPrice(), indices >= 3",
+      "file": "BalancerOracle.sol",
+      "id": "b185f10820c0e5a7",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -474,6 +414,42 @@
       "status": "proposed"
     },
     {
+      "title": "Upgradeability can be blocked by keepers (status-gated _authorizeUpgrade)",
+      "description": "The UUPS upgrade authorization forbids upgrades when the oracle status is valid: _authorizeUpgrade() reverts if _getStatus() returns true. Since _getStatus() is set by update() (safePrice != 0 and not stale), any address with KEEPER_ROLE can keep calling update() to maintain a valid status and effectively prevent upgrades. This couples liveness with governance and allows a privileged but non-governance role to DoS upgrades until the price becomes stale or the role is revoked.\n\nWhere: _authorizeUpgrade() and update()/_getStatus() interaction.\nWhy it's an issue: A KEEPER can indefinitely prevent timely upgrades (including security patches) by keeping the oracle fresh.\nPotential impact: Denial of service of the upgrade path; inability to deploy critical fixes until status becomes invalid or roles are changed.",
+      "vulnerability_type": "access control / denial of service",
+      "severity": "medium",
+      "confidence": 0.85,
+      "location": "_authorizeUpgrade(address) and update()",
+      "file": "BalancerOracle.sol",
+      "id": "591613257feb7b07",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Emission schedule applies new rewards rate only after a mass update (one-cycle mis-accounting)",
+      "description": "In setScheduledRewardsPerSecond(), when a new emission point is reached, the contract first calls _massUpdatePools() and only then updates rewardsPerSecond to the new rate. This applies the old rewardsPerSecond to the entire period up to the update, even if part of that period should use the new rate. Consequences: when the scheduled rate decreases, the first update after the boundary over-allocates rewards at the old higher rate; when it increases, it under-allocates. This can be exploited by calling a function right after the schedule boundary to lock in an over-allocation for that update, reducing the remaining rewards pool and ending emissions earlier than intended.",
+      "vulnerability_type": "logic error / protocol manipulation",
+      "severity": "medium",
+      "confidence": 0.75,
+      "location": "setScheduledRewardsPerSecond() and its invocation from _updateEmissions()",
+      "file": "ChefIncentivesController.sol",
+      "id": "daee1d428842964a",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Withdrawal DoS due to MIN_SHARES post-withdrawal invariant",
+      "description": "The contract enforces an invariant that totalSupply must not be a small non\u2011zero amount by reverting whenever totalSupply > 0 and totalSupply < MIN_SHARES. This check is executed after both deposits and withdrawals in _checkMinShares(), which is called from _deposit() and _withdraw(). While it prevents certain donation-based ratio attacks, it creates a denial-of-service condition where legitimate users can be permanently unable to redeem or start a cooldown. Example: if totalSupply = 0.012 shares and two users each hold 0.006 shares (MIN_SHARES = 0.01), any single user's withdrawal would leave totalSupply = 0.006 (< MIN_SHARES) and will revert, trapping both users' funds unless a third party deposits to raise totalSupply. Because cooldownAssets() and cooldownShares() internally call _withdraw, they are also blocked, preventing users from entering the cooldown path as well. This can lead to locked funds and loss of liveness for withdrawals.",
+      "vulnerability_type": "denial of service",
+      "severity": "high",
+      "confidence": 0.9,
+      "location": "_checkMinShares() and its use in _deposit() and _withdraw(); specifically in _deposit(...) and _withdraw(...), where _checkMinShares() is called after state changes",
+      "file": "StakingLPEth.sol",
+      "id": "5782d9b8b683053b",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
       "title": "Over-transfer in Balancer transferAndJoin can strand surplus funds in the contract (stealable via leftover approvals)",
       "description": "transferAndJoin() for the Balancer path transfers maxAmountsIn from 'from' to this contract for each asset, but _balancerJoin() executes the join with userData specifying assetsIn as the actual amounts to be used. If assetsIn < maxAmountsIn for any asset, the difference remains in this contract with no refund mechanism. Those stranded tokens can later be stolen by anyone due to the leftover approval issue to the Balancer Vault (or by calling join() publicly using the contract's balances). This design can cause direct user fund loss when parameters are mismatched or in error conditions.",
       "vulnerability_type": "funds at risk due to incorrect token handling/authorization",
@@ -482,30 +458,6 @@
       "location": "transferAndJoin() Balancer branch (transfers maxAmountsIn); _balancerJoin() (uses assetsIn for join)",
       "file": "PoolAction.sol",
       "id": "4ef0983410bd8c48",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Upgrade authorization permanently gated by \"valid\" oracle status",
-      "description": "_authorizeUpgrade() reverts whenever _getStatus() returns true, i.e., when the oracle is currently healthy. This design prevents emergency upgrades while the oracle is functioning, potentially prolonging exposure to critical bugs unrelated to the price feeds. Additionally, if getStatus() ever reverts due to the issues above, upgrade authorization is also blocked. Where: _authorizeUpgrade() and _getStatus() in PendleLPOracle.sol. Why: Hard gating upgrades to an external status introduces a governance liveness/DoS risk. Impact: Denial of service on governance: inability to deploy urgent patches while the oracle remains valid.",
-      "vulnerability_type": "access control / governance liveness",
-      "severity": "medium",
-      "confidence": 0.6,
-      "location": "_authorizeUpgrade()",
-      "file": "PendleLPOracle.sol",
-      "id": "42a3e690a3ae3147",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Units mismatch in requiredUsdValue leads to double application of price and incorrect eligibility checks",
-      "description": "The function requiredUsdValue(address) computes the required USD value as (debt * requiredDepositRatio) / RATIO_DIVISOR, but then incorrectly calls _lockedUsdValue(required), which multiplies the input by the LP price again. _lockedUsdValue is intended to convert an LP token amount to USD, not to be applied to an already-USD amount. As a result, requiredUsdValue returns a value scaled by price a second time (effectively USD * price / 1e18), not USD.\n\nWhere: requiredUsdValue(address) and its use in isEligibleForRewards(address) and lastEligibleTime(address). The incorrect conversion occurs inside requiredUsdValue, which then propagates to isEligibleForRewards (when computing requiredValue) and lastEligibleTime (when comparing locked USD value against the incorrectly scaled required value).\n\nWhy it's a security issue: Because requiredUsdValue is overstated by a factor of LP price, eligibility comparisons become invalid. Typically this makes requiredValue far larger than the actual required USD value, causing users to be incorrectly deemed ineligible. Conversely, with very small or zero prices, integer truncation can yield requiredValue == 0, which makes isEligibleForRewards always return false due to the requiredValue != 0 guard. This results in a denial of rewards to users who should be eligible.\n\nPotential impact: System-wide denial of rewards or incorrect disqualification/eligibility outcomes. Downstream components relying on isEligibleForRewards/lastEligibleTime may malfunction, leading to protocol-level denial-of-service for reward distribution and potential governance or incentive distortions.",
-      "vulnerability_type": "business logic / units mismatch",
-      "severity": "high",
-      "confidence": 0.93,
-      "location": "requiredUsdValue(address) function (used by isEligibleForRewards and lastEligibleTime)",
-      "file": "EligibilityDataProvider.sol",
-      "id": "fb55eb8ab93cf095",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -534,6 +486,18 @@
       "status": "proposed"
     },
     {
+      "title": "Registry authorization tied to original owner and not updated on proxy ownership transfer",
+      "description": "The registry authorizes management actions (installing/uninstalling plugins, setting permissions) based on whether msg.sender has an entry in _proxies, i.e., whether they were the owner when the proxy was deployed. The mappings _proxies[owner] and _owners[proxy] are only set in _deploy() and never updated thereafter. If the PRBProxy contract supports ownership transfer (e.g., via transferOwnership), the registry will not reflect the new owner. As a result: (1) the new owner cannot call installPlugin, uninstallPlugin, or setPermission because onlyCallerWithProxy will fail (since _proxies[newOwner] == address(0)); (2) the old owner remains authorized to call those management functions, but their changes affect only the old owner\u2019s per-owner state and are ignored by the proxy, which consults permissions/plugins using proxy.owner() (see getMethodsByProxy/getPluginByProxy/getPermissionByProxy). This creates a denial-of-service for the new owner to manage the proxy via the registry and leaves stale authorization state for the old owner.\nWhere: Authorization modifier onlyCallerWithProxy (uses _proxies[msg.sender]); state set in _deploy(); functions impacted include installPlugin(), uninstallPlugin(), and setPermission().\nWhy it's a security issue: Ownership transfer is a legitimate lifecycle event. After transfer, the new owner is blocked from managing permissions/plugins via the registry. This can operationally lock out management of envoys or plugins, potentially disrupting protocol operations that rely on them.\nPotential impact: Denial of service for the new owner\u2019s ability to manage the proxy through the registry; inconsistent/stale authorization state in the registry.",
+      "vulnerability_type": "access control / state inconsistency / denial of service",
+      "severity": "medium",
+      "confidence": 0.65,
+      "location": "onlyCallerWithProxy modifier; _deploy(); installPlugin(); uninstallPlugin(); setPermission()",
+      "file": "PRBProxyRegistry.sol",
+      "id": "d054714f4ce40057",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
       "title": "Anyone can force-stop a user's emissions when whitelist is inactive",
       "description": "The manualStopEmissionsFor() and manualStopAllEmissionsFor() functions are protected only by the isWhitelisted modifier, which enforces access control only if whitelistActive is true. By default (no initialization sets it), whitelistActive is false, meaning any address can call these functions. An attacker can repeatedly call manualStopEmissionsFor() or manualStopAllEmissionsFor() on arbitrary users to set their user.amount to 0 across pools, update rewardDebt, and set dq time via eligibleDataProvider.setDqTime(). This halts further reward accrual for the victim (denial of service), and can be repeated at any time.",
       "vulnerability_type": "access control, denial of service",
@@ -546,14 +510,26 @@
       "status": "proposed"
     },
     {
-      "title": "Registry authorization tied to original owner and not updated on proxy ownership transfer",
-      "description": "The registry authorizes management actions (installing/uninstalling plugins, setting permissions) based on whether msg.sender has an entry in _proxies, i.e., whether they were the owner when the proxy was deployed. The mappings _proxies[owner] and _owners[proxy] are only set in _deploy() and never updated thereafter. If the PRBProxy contract supports ownership transfer (e.g., via transferOwnership), the registry will not reflect the new owner. As a result: (1) the new owner cannot call installPlugin, uninstallPlugin, or setPermission because onlyCallerWithProxy will fail (since _proxies[newOwner] == address(0)); (2) the old owner remains authorized to call those management functions, but their changes affect only the old owner\u2019s per-owner state and are ignored by the proxy, which consults permissions/plugins using proxy.owner() (see getMethodsByProxy/getPluginByProxy/getPermissionByProxy). This creates a denial-of-service for the new owner to manage the proxy via the registry and leaves stale authorization state for the old owner.\nWhere: Authorization modifier onlyCallerWithProxy (uses _proxies[msg.sender]); state set in _deploy(); functions impacted include installPlugin(), uninstallPlugin(), and setPermission().\nWhy it's a security issue: Ownership transfer is a legitimate lifecycle event. After transfer, the new owner is blocked from managing permissions/plugins via the registry. This can operationally lock out management of envoys or plugins, potentially disrupting protocol operations that rely on them.\nPotential impact: Denial of service for the new owner\u2019s ability to manage the proxy through the registry; inconsistent/stale authorization state in the registry.",
-      "vulnerability_type": "access control / state inconsistency / denial of service",
+      "title": "Units mismatch in requiredUsdValue leads to double application of price and incorrect eligibility checks",
+      "description": "The function requiredUsdValue(address) computes the required USD value as (debt * requiredDepositRatio) / RATIO_DIVISOR, but then incorrectly calls _lockedUsdValue(required), which multiplies the input by the LP price again. _lockedUsdValue is intended to convert an LP token amount to USD, not to be applied to an already-USD amount. As a result, requiredUsdValue returns a value scaled by price a second time (effectively USD * price / 1e18), not USD.\n\nWhere: requiredUsdValue(address) and its use in isEligibleForRewards(address) and lastEligibleTime(address). The incorrect conversion occurs inside requiredUsdValue, which then propagates to isEligibleForRewards (when computing requiredValue) and lastEligibleTime (when comparing locked USD value against the incorrectly scaled required value).\n\nWhy it's a security issue: Because requiredUsdValue is overstated by a factor of LP price, eligibility comparisons become invalid. Typically this makes requiredValue far larger than the actual required USD value, causing users to be incorrectly deemed ineligible. Conversely, with very small or zero prices, integer truncation can yield requiredValue == 0, which makes isEligibleForRewards always return false due to the requiredValue != 0 guard. This results in a denial of rewards to users who should be eligible.\n\nPotential impact: System-wide denial of rewards or incorrect disqualification/eligibility outcomes. Downstream components relying on isEligibleForRewards/lastEligibleTime may malfunction, leading to protocol-level denial-of-service for reward distribution and potential governance or incentive distortions.",
+      "vulnerability_type": "business logic / units mismatch",
+      "severity": "high",
+      "confidence": 0.93,
+      "location": "requiredUsdValue(address) function (used by isEligibleForRewards and lastEligibleTime)",
+      "file": "EligibilityDataProvider.sol",
+      "id": "fb55eb8ab93cf095",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Unbounded loop with `continue` can cause denial of service if a zero-amount earning entry exists",
+      "description": "Both withdraw() and withdrawableBalance() iterate over the _userEarnings array and use `if (earnedAmount == 0) continue;` without incrementing the loop counter before continuing. If any zero-amount entry ever exists in _userEarnings for a user, these loops will never progress, causing an infinite loop and out-of-gas revert. This would block withdrawals in withdraw() and view calculations in withdrawableBalance(). While the normal code paths do not intentionally create zero-amount entries, any unforeseen state mutation (e.g., from future changes, faulty integrations, or manual state migrations) that introduces a zero amount would permanently DoS the affected user.",
+      "vulnerability_type": "denial of service",
       "severity": "medium",
-      "confidence": 0.65,
-      "location": "onlyCallerWithProxy modifier; _deploy(); installPlugin(); uninstallPlugin(); setPermission()",
-      "file": "PRBProxyRegistry.sol",
-      "id": "d054714f4ce40057",
+      "confidence": 0.7,
+      "location": "withdraw() and withdrawableBalance() loops over _userEarnings (check for `if (earnedAmount == 0) continue;` without increment)",
+      "file": "MultiFeeDistribution.sol",
+      "id": "e600414869c06590",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -582,6 +558,18 @@
       "status": "proposed"
     },
     {
+      "title": "Upgrade authorization permanently gated by \"valid\" oracle status",
+      "description": "_authorizeUpgrade() reverts whenever _getStatus() returns true, i.e., when the oracle is currently healthy. This design prevents emergency upgrades while the oracle is functioning, potentially prolonging exposure to critical bugs unrelated to the price feeds. Additionally, if getStatus() ever reverts due to the issues above, upgrade authorization is also blocked. Where: _authorizeUpgrade() and _getStatus() in PendleLPOracle.sol. Why: Hard gating upgrades to an external status introduces a governance liveness/DoS risk. Impact: Denial of service on governance: inability to deploy urgent patches while the oracle remains valid.",
+      "vulnerability_type": "access control / governance liveness",
+      "severity": "medium",
+      "confidence": 0.6,
+      "location": "_authorizeUpgrade()",
+      "file": "PendleLPOracle.sol",
+      "id": "42a3e690a3ae3147",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
       "title": "Incorrect slippage validation forces dangerously high slippage thresholds",
       "description": "setAutocompound() and setUserSlippage() validate slippage with `if (slippage < MAX_SLIPPAGE || slippage >= PERCENT_DIVISOR) revert` where MAX_SLIPPAGE is 9000 (intended as 10%). This logic only allows values in [9000, 9999], i.e., 90%\u201399.99% maximum slippage, which is the opposite of the intended constraint and exposes users to catastrophic trade execution when used by compounding components. Although this contract does not execute swaps itself, it stores the userSlippage used by other protocol components (e.g., the reward converter) to execute trades on the user's behalf. As a result, this bug can plausibly lead to substantial user losses during compounding.",
       "vulnerability_type": "logic error / user fund risk",
@@ -602,6 +590,18 @@
       "location": "addVault(ICDPVault vault) function",
       "file": "VaultRegistry.sol",
       "id": "5fef4ddb4b7f9c4d",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Owner can arbitrarily lock or extend withdrawals by changing cooldownPeriod at any time",
+      "description": "The owner can set cooldownPeriod to any value at any time via setCooldownPeriod(), with no upper bound, timelock, or safeguard. The withdraw() check uses the current cooldownPeriod at call time (block.timestamp < cooldownStart + cooldownPeriod). This allows the owner to: (1) raise cooldownPeriod after users have deposited or even after they initiated cooldown, delaying or preventing withdrawals; (2) set an extremely large value that can make the addition overflow and revert in Solidity 0.8 (cooldownStart + cooldownPeriod), causing withdraw() to always revert until cooldownPeriod is reduced. This constitutes a centralized denial-of-service risk over user funds.",
+      "vulnerability_type": "access control / denial of service",
+      "severity": "medium",
+      "confidence": 0.85,
+      "location": "setCooldownPeriod() and withdraw() time check",
+      "file": "Locking.sol",
+      "id": "869e141379e1836a",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

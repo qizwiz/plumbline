@@ -42,18 +42,6 @@
       "status": "proposed"
     },
     {
-      "title": "Payable ERC721 functions can trap ETH with no recovery path",
-      "description": "Several ERC721 methods are marked payable (transferFrom, safeTransferFrom, approve), but the contract provides no mechanism to withdraw or use received ETH. Any ETH sent alongside these calls will be permanently locked in the contract. While not an attack vector per se, it can cause user loss of funds via UI mistakes or malicious frontends prompting value transfers.\n- Where: transferFrom (both overloads), safeTransferFrom (both overloads), approve (all marked payable).\n- Why it's a security issue: ETH sent to the contract cannot be recovered, leading to user fund loss.\n- Potential impact: Permanent loss of ETH mistakenly sent with ERC721 operations.",
-      "vulnerability_type": "funds lock/ether sink",
-      "severity": "low",
-      "confidence": 0.7,
-      "location": "transferFrom(), safeTransferFrom(), approve() functions marked payable; no withdraw/receive logic",
-      "file": "OwnershipNFTs.sol",
-      "id": "bb0d326b84c86728",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Inverted ERC721Receiver check makes safeTransferFrom unsafe and blocks compliant receivers",
       "description": "The safe transfer callback check is incorrect. In _onTransferReceived, the code requires that the receiver's onERC721Received NOT return the expected selector, reverting when it does and allowing transfers when it doesn't. Specifically, it executes require(data != IERC721TokenReceiver.onERC721Received.selector, \"bad nft transfer received data\"); which is the inverse of the ERC721 requirement (it should require equality). This causes:\n- Safe transfers to ERC721-compliant contracts to revert (DoS against correct receivers).\n- Safe transfers to non-compliant contracts to succeed, potentially locking NFTs in contracts that cannot move them out.\n- Where: _onTransferReceived() function.\n- Why it's a security issue: Breaks the safety guarantees of safeTransferFrom, enabling asset lock-up and preventing interaction with compliant contracts.\n- Potential impact: Denial of service to compliant receivers; NFTs stuck in non-receiver contracts; user asset loss due to irretrievable NFTs.",
       "vulnerability_type": "denial of service / incorrect receiver validation",
@@ -62,6 +50,18 @@
       "location": "_onTransferReceived(): require(data != IERC721TokenReceiver.onERC721Received.selector, ...)",
       "file": "OwnershipNFTs.sol",
       "id": "35f600a98c74b1e8",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Payable ERC721 functions can trap ETH with no recovery path",
+      "description": "Several ERC721 methods are marked payable (transferFrom, safeTransferFrom, approve), but the contract provides no mechanism to withdraw or use received ETH. Any ETH sent alongside these calls will be permanently locked in the contract. While not an attack vector per se, it can cause user loss of funds via UI mistakes or malicious frontends prompting value transfers.\n- Where: transferFrom (both overloads), safeTransferFrom (both overloads), approve (all marked payable).\n- Why it's a security issue: ETH sent to the contract cannot be recovered, leading to user fund loss.\n- Potential impact: Permanent loss of ETH mistakenly sent with ERC721 operations.",
+      "vulnerability_type": "funds lock/ether sink",
+      "severity": "low",
+      "confidence": 0.7,
+      "location": "transferFrom(), safeTransferFrom(), approve() functions marked payable; no withdraw/receive logic",
+      "file": "OwnershipNFTs.sol",
+      "id": "bb0d326b84c86728",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

@@ -6,18 +6,6 @@
   "total_findings": 11,
   "findings": [
     {
-      "title": "Unrestricted trusted forwarder allows arbitrary sender spoofing",
-      "description": "The setTrustedForwarder function is publicly callable without any access control, allowing any address to set itself as the trusted forwarder. Once set, the _msgSender() override treats calls from this address as ERC-2771 forwarded calls and extracts the last 20 bytes of calldata as the 'original sender'. An attacker can then call ERC20 functions (e.g., transfer, approve) from their forwarder and append any victim address to calldata, making the contract believe the victim is the caller. This enables unauthorized transfers from victims' balances and bypasses access controls in derived contracts that rely on _msgSender() (e.g., onlyOwner/roles), leading to loss of funds and privilege escalation. Additionally, if the attacker omits the 20-byte suffix, _msgSender() becomes address(0), which can cause unexpected behavior in contracts that do not defensively check for zero addresses.",
-      "vulnerability_type": "access control / ERC-2771 sender spoofing",
-      "severity": "critical",
-      "confidence": 0.99,
-      "location": "setTrustedForwarder(address) and _msgSender() override",
-      "file": "ERC20MetaTxUpgradeable.sol",
-      "id": "4986217de4081862",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Missing EIP-712 domain binding allows cross-domain signature replay",
       "description": "The contract accepts an arbitrary EIP-712 domainSeparator provided by the caller when verifying signatures. In _verifySig(), the digest is computed as keccak256(\"\\x19\\x01\" || domainSeparator || keccak256(_getEncoded(...))). Because domainSeparator is not tied to this contract (e.g., verifyingContract = address(this), chainId = block.chainid), any signature produced for the same structured data under a different domain (another contract address or chain) will be considered valid here if the nonce matches. This issue occurs in _verifySig(...) and is reachable via verify(...) and execute(...), which both take domainSeparator as a parameter and pass it unvalidated to _verifySig(). Security impact: An attacker can reuse a signature a user signed for a different forwarder or on a different chain (with the same request fields and a matching nonce, e.g., 0 for first-time use) to execute a token transfer via this forwarder. As execute() only enforces req.to == _eurfAddress and the selector == transfer(address,uint256), a victim\u2019s previously signed request can be replayed here, causing unintended EURF token transfers.",
       "vulnerability_type": "replay attack / signature verification flaw",
@@ -50,6 +38,18 @@
       "location": "payGaslessBasefee(address payer, address paymaster) function",
       "file": "Token.sol",
       "id": "cc0ae17a53b3e639",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Unrestricted trusted forwarder allows arbitrary sender spoofing",
+      "description": "The setTrustedForwarder function is publicly callable without any access control, allowing any address to set itself as the trusted forwarder. Once set, the _msgSender() override treats calls from this address as ERC-2771 forwarded calls and extracts the last 20 bytes of calldata as the 'original sender'. An attacker can then call ERC20 functions (e.g., transfer, approve) from their forwarder and append any victim address to calldata, making the contract believe the victim is the caller. This enables unauthorized transfers from victims' balances and bypasses access controls in derived contracts that rely on _msgSender() (e.g., onlyOwner/roles), leading to loss of funds and privilege escalation. Additionally, if the attacker omits the 20-byte suffix, _msgSender() becomes address(0), which can cause unexpected behavior in contracts that do not defensively check for zero addresses.",
+      "vulnerability_type": "access control / ERC-2771 sender spoofing",
+      "severity": "critical",
+      "confidence": 0.99,
+      "location": "setTrustedForwarder(address) and _msgSender() override",
+      "file": "ERC20MetaTxUpgradeable.sol",
+      "id": "4986217de4081862",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },

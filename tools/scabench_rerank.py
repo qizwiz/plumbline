@@ -66,7 +66,13 @@ def _build_node_score_map(h14_features: list) -> dict[str, float]:
         out[node] = score
         if "." in node:
             fn = node.split(".", 1)[1]
-            out.setdefault(fn, score)
+            # Take max across contracts: when GPT-5's finding mentions a bare
+            # function name (e.g. "permitWrap") that exists on several
+            # contracts, we want it attributed to the highest-centrality
+            # version, not whichever one happened to be enumerated first.
+            # Fixed 2026-06-20 — old `setdefault` lost permitWrap on tn-contracts.
+            if score > out.get(fn, 0.0):
+                out[fn] = score
     return out
 
 

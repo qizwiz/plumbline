@@ -18,18 +18,6 @@
       "status": "proposed"
     },
     {
-      "title": "Unauthenticated reputation inflation of arbitrary solver addresses",
-      "description": "The function deploymentRequest(...) calls setReputation(solverAddress) unconditionally. Public entry points (createDeploymentRequest, createDeploymentRequestWithSig, createMultipleDeploymentRequest, createPrivateDeploymentRequest, etc.) allow any caller to provide any non-zero solverAddress. There is no proof that the solverAddress actually proposed anything or is linked to the request. Why this is an issue: Any user can spam deployment requests and arbitrarily increase solverReputation[solverAddress] for any target address, manipulating reputation-based selection or rewards. Potential impact: Protocol manipulation (reputation gaming), unfair prioritization of malicious or sybil addresses, undermining trust in the reputation system.",
-      "vulnerability_type": "protocol manipulation",
-      "severity": "medium",
-      "confidence": 0.85,
-      "location": "deploymentRequest() via createDeploymentRequest(), createDeploymentRequestWithSig(), createMultipleDeploymentRequest(), createPrivateDeploymentRequest(), etc.",
-      "file": "BlueprintCoreV4.sol",
-      "id": "39d54052f3e2b624",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Legacy project ID collision/hijack due to insufficient newProject() checks",
       "description": "The newProject(bytes32 projectId) modifier only checks projects[projectId].id == 0. It does not check the legacy mapping projectIDs[projectId]. In an upgrade scenario where projectIDs contains existing v1 project IDs, a malicious user can create a new v2 project using an existing v1 projectId as long as projects[projectId].id == 0, effectively hijacking that identifier in the new storage. Why this is an issue: Off-chain systems and compatibility logic may treat projectId as globally unique across versions. Hijacking an existing ID can corrupt data, mix event streams, and bypass locks intended for the legacy project. Potential impact: Data corruption, confusion across versions, and potential unauthorized actions under a known project identifier.",
       "vulnerability_type": "logic flaw",
@@ -50,6 +38,18 @@
       "location": "createDeploymentRequestWithSig(...), createPrivateDeploymentRequestWithSig(...), createProjectIDAndPrivateDeploymentRequestWithSig(...)",
       "file": "BlueprintV3.sol",
       "id": "92db405db4b07144",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Unauthenticated reputation inflation of arbitrary solver addresses",
+      "description": "The function deploymentRequest(...) calls setReputation(solverAddress) unconditionally. Public entry points (createDeploymentRequest, createDeploymentRequestWithSig, createMultipleDeploymentRequest, createPrivateDeploymentRequest, etc.) allow any caller to provide any non-zero solverAddress. There is no proof that the solverAddress actually proposed anything or is linked to the request. Why this is an issue: Any user can spam deployment requests and arbitrarily increase solverReputation[solverAddress] for any target address, manipulating reputation-based selection or rewards. Potential impact: Protocol manipulation (reputation gaming), unfair prioritization of malicious or sybil addresses, undermining trust in the reputation system.",
+      "vulnerability_type": "protocol manipulation",
+      "severity": "medium",
+      "confidence": 0.85,
+      "location": "deploymentRequest() via createDeploymentRequest(), createDeploymentRequestWithSig(), createMultipleDeploymentRequest(), createPrivateDeploymentRequest(), etc.",
+      "file": "BlueprintCoreV4.sol",
+      "id": "39d54052f3e2b624",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
@@ -162,30 +162,6 @@
       "status": "proposed"
     },
     {
-      "title": "RequestID not bound to projectId enables cross-project event spoofing",
-      "description": "Functions that accept both projectId and requestID do not verify that the requestID actually belongs to the provided projectId. They only check that the projectId exists (hasProject) and that the requestID exists in requestDeploymentStatus. This allows callers to supply any existing projectId and an unrelated requestID, leading to events emitted under the wrong project and actions performed on mismatched IDs.\nWhere: submitDeploymentRequest, submitProofOfDeployment, updateWorkerDeploymentConfig\nWhy it's a security issue: Off-chain services relying on events can be misled (AcceptDeployment/GeneratedProofOfDeployment/UpdateDeploymentConfig emitted with a forged projectId), enabling protocol manipulation and auditability issues.\nPotential impact: Event spoofing causing incorrect off-chain processing, accounting, or automated actions for the wrong project.",
-      "vulnerability_type": "data integrity / event spoofing",
-      "severity": "medium",
-      "confidence": 0.85,
-      "location": "submitDeploymentRequest(bytes32 projectId, bytes32 requestID), submitProofOfDeployment(bytes32 projectId, bytes32 requestID, ...), updateWorkerDeploymentConfig(bytes32 projectId, bytes32 requestID, ...)",
-      "file": "BlueprintV3.sol",
-      "id": "17958721081b0b4b",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
-      "title": "Anyone can reset request status and emit config update events",
-      "description": "updateWorkerDeploymentConfig lacks authorization checks and permits any address to call it for any picked requestID. It also resets status from GeneratedProof back to Pickup, even if the caller is not the assigned worker or project owner.\nWhere: updateWorkerDeploymentConfig(bytes32 projectId, bytes32 requestID, string updatedBase64Config)\nWhy it's a security issue: Unauthorized actors can mutate request status and spam UpdateDeploymentConfig events, undermining the finality of proofs and confusing off-chain consumers.\nPotential impact: Denial of service on workflow finality (reopening completed requests), event spam, and potential protocol manipulation off-chain.",
-      "vulnerability_type": "access control",
-      "severity": "medium",
-      "confidence": 0.85,
-      "location": "updateWorkerDeploymentConfig(bytes32 projectId, bytes32 requestID, string updatedBase64Config)",
-      "file": "BlueprintV3.sol",
-      "id": "07a4b88e71657e06",
-      "reported_by_model": "gpt-5",
-      "status": "proposed"
-    },
-    {
       "title": "Project ID not bound to request ID enables event spoofing/misattribution",
       "description": "Functions submitDeploymentRequest and submitProofOfDeployment accept an arbitrary projectId parameter and only validate that the project exists. There is no on-chain linkage between a requestID and the projectId supplied in these calls. As long as requestDeploymentStatus[requestID] indicates a valid request (and, for proof submission, that msg.sender is the recorded worker), the functions will emit events using whatever projectId the caller provides. This enables an attacker to emit AcceptDeployment or GeneratedProofOfDeployment events that associate an existing requestID with a different, attacker-chosen projectId, corrupting off-chain indexing and potentially causing incorrect attribution, approvals, or payments.",
       "vulnerability_type": "data integrity/protocol manipulation",
@@ -278,6 +254,30 @@
       "location": "upgradeProject(bytes32 projectId)",
       "file": "BlueprintV3.sol",
       "id": "28b5dac7d8ca4f56",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "RequestID not bound to projectId enables cross-project event spoofing",
+      "description": "Functions that accept both projectId and requestID do not verify that the requestID actually belongs to the provided projectId. They only check that the projectId exists (hasProject) and that the requestID exists in requestDeploymentStatus. This allows callers to supply any existing projectId and an unrelated requestID, leading to events emitted under the wrong project and actions performed on mismatched IDs.\nWhere: submitDeploymentRequest, submitProofOfDeployment, updateWorkerDeploymentConfig\nWhy it's a security issue: Off-chain services relying on events can be misled (AcceptDeployment/GeneratedProofOfDeployment/UpdateDeploymentConfig emitted with a forged projectId), enabling protocol manipulation and auditability issues.\nPotential impact: Event spoofing causing incorrect off-chain processing, accounting, or automated actions for the wrong project.",
+      "vulnerability_type": "data integrity / event spoofing",
+      "severity": "medium",
+      "confidence": 0.85,
+      "location": "submitDeploymentRequest(bytes32 projectId, bytes32 requestID), submitProofOfDeployment(bytes32 projectId, bytes32 requestID, ...), updateWorkerDeploymentConfig(bytes32 projectId, bytes32 requestID, ...)",
+      "file": "BlueprintV3.sol",
+      "id": "17958721081b0b4b",
+      "reported_by_model": "gpt-5",
+      "status": "proposed"
+    },
+    {
+      "title": "Anyone can reset request status and emit config update events",
+      "description": "updateWorkerDeploymentConfig lacks authorization checks and permits any address to call it for any picked requestID. It also resets status from GeneratedProof back to Pickup, even if the caller is not the assigned worker or project owner.\nWhere: updateWorkerDeploymentConfig(bytes32 projectId, bytes32 requestID, string updatedBase64Config)\nWhy it's a security issue: Unauthorized actors can mutate request status and spam UpdateDeploymentConfig events, undermining the finality of proofs and confusing off-chain consumers.\nPotential impact: Denial of service on workflow finality (reopening completed requests), event spam, and potential protocol manipulation off-chain.",
+      "vulnerability_type": "access control",
+      "severity": "medium",
+      "confidence": 0.85,
+      "location": "updateWorkerDeploymentConfig(bytes32 projectId, bytes32 requestID, string updatedBase64Config)",
+      "file": "BlueprintV3.sol",
+      "id": "07a4b88e71657e06",
       "reported_by_model": "gpt-5",
       "status": "proposed"
     },
