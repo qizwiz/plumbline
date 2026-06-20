@@ -98,20 +98,27 @@ def run_one(ex_path: str, truth_override: str | None = None,
 
     if truth is not None:
         findings = sol_match._lines(truth)
-        score = sol_match.match(leads, findings, threshold=0.80)
-        score_row = {
-            "recall": score["recall"],
-            "precision": score["precision"],
-            "matched_n": len(score["matched"]),
-            "missed_n": len(score["missed"]),
-            "n_findings": len(findings),
-            "n_leads": len(leads),
-        }
+        # Move 2 (2026-06-19): compute multi-signal score via the unified critic.
+        # Score.to_json() carries top-level recall/precision back-compat aliases,
+        # so flywheel.py's r["score"]["recall"] reader keeps working unmodified.
+        # New: r["score"]["total"] = product of all signals; any halmos PROVED
+        # would hard-gate to 0. r["score"]["signals"] has per-signal breakdown.
+        from score import default_critic
+        critic = default_critic()
+        s = critic.score(leads, findings, ground_truth_path=truth)
+        score_row = s.to_json()
+        # Preserve legacy extras for any downstream consumers
+        match_result = sol_match.match(leads, findings, threshold=0.80)
+        score_row["matched_n"] = len(match_result["matched"])
+        score_row["missed_n"] = len(match_result["missed"])
+        score_row["n_findings"] = len(findings)
+        score_row["n_leads"] = len(leads)
     else:
         # No ground truth available — still log the rep so the proposer's
         # behavior on this corpus is on record.
-        score_row = {"recall": None, "precision": None, "n_leads": len(leads),
-                     "note": "no ground truth"}
+        score_row = {"total": None, "signals": {}, "meta": {},
+                     "recall": None, "precision": None,
+                     "n_leads": len(leads), "note": "no ground truth"}
 
     row = {
         "contract": {
