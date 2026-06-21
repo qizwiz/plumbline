@@ -1,0 +1,178 @@
+[
+  {
+    "label": "h14+dedup",
+    "ref": "h14",
+    "delta": -0.020977591113440358,
+    "helped": 1,
+    "hurt": 6,
+    "flat": 17,
+    "kill": true,
+    "reason": "\u0394macro F1 -0.0210 < -0.0050 threshold; 6/7 non-flat projects hurt (86% \u2265 66% majority)",
+    "expected": "neg"
+  },
+  {
+    "label": "inv_eig",
+    "ref": "baseline",
+    "delta": -0.006552618657458764,
+    "helped": 4,
+    "hurt": 5,
+    "flat": 15,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0066 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority); likely outlier-driven, not killed",
+    "expected": "neg"
+  },
+  {
+    "label": "h14",
+    "ref": "baseline",
+    "delta": 0.02760635546043491,
+    "helped": 8,
+    "hurt": 3,
+    "flat": 13,
+    "kill": false,
+    "reason": "ok",
+    "expected": "pos"
+  },
+  {
+    "label": "baseline+dedup",
+    "ref": "baseline",
+    "delta": 0.0011938970990695297,
+    "helped": 2,
+    "hurt": 1,
+    "flat": 21,
+    "kill": false,
+    "reason": "ok",
+    "expected": "flat"
+  },
+  {
+    "label": "closeness",
+    "ref": "baseline",
+    "delta": 0.015583108918175687,
+    "helped": 8,
+    "hurt": 5,
+    "flat": 11,
+    "kill": false,
+    "reason": "ok",
+    "expected": null
+  },
+  {
+    "label": "katz",
+    "ref": "baseline",
+    "delta": 0.017048730895457415,
+    "helped": 8,
+    "hurt": 3,
+    "flat": 13,
+    "kill": false,
+    "reason": "ok",
+    "expected": null
+  },
+  {
+    "label": "betweenness",
+    "ref": "baseline",
+    "delta": 0.012924056671425516,
+    "helped": 6,
+    "hurt": 4,
+    "flat": 14,
+    "kill": false,
+    "reason": "ok",
+    "expected": null
+  },
+  {
+    "label": "inv_deg",
+    "ref": "baseline",
+    "delta": -0.009776825006665102,
+    "helped": 4,
+    "hurt": 5,
+    "flat": 15,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0098 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority); likely outlier-driven, not killed",
+    "expected": null
+  },
+  {
+    "label": "closeness  vs h14",
+    "ref": "h14",
+    "delta": -0.012023246542259225,
+    "helped": 1,
+    "hurt": 3,
+    "flat": 20,
+    "kill": true,
+    "reason": "\u0394macro F1 -0.0120 < -0.0050 threshold; 3/4 non-flat projects hurt (75% \u2265 66% majority)",
+    "expected": null
+  },
+  {
+    "label": "katz       vs h14",
+    "ref": "h14",
+    "delta": -0.010557624564977497,
+    "helped": 3,
+    "hurt": 4,
+    "flat": 17,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0106 below threshold but only 4/7 non-flat projects hurt (57% < 66% majority); likely outlier-driven, not killed",
+    "expected": null
+  },
+  {
+    "label": "betweenness vs h14",
+    "ref": "h14",
+    "delta": -0.014682298789009396,
+    "helped": 4,
+    "hurt": 6,
+    "flat": 14,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0147 below threshold but only 6/10 non-flat projects hurt (60% < 66% majority); likely outlier-driven, not killed",
+    "expected": null
+  },
+  {
+    "label": "h14+severity-tiebreak vs h14",
+    "ref": "h14",
+    "delta": -0.012096656933074962,
+    "helped": 4,
+    "hurt": 7,
+    "flat": 13,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0121 below threshold but only 7/11 non-flat projects hurt (64% < 66% majority); likely outlier-driven, not killed",
+    "expected": null
+  },
+  {
+    "label": "h14+confidence-tiebreak vs h14",
+    "ref": "h14",
+    "delta": -0.019371563054842444,
+    "helped": 4,
+    "hurt": 6,
+    "flat": 14,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0194 below threshold but only 6/10 non-flat projects hurt (60% < 66% majority); likely outlier-driven, not killed",
+    "expected": null
+  },
+  {
+    "label": "inv_eig (losers only)",
+    "ref": "baseline",
+    "delta": 0.00925670074606244,
+    "helped": 2,
+    "hurt": 1,
+    "flat": 3,
+    "kill": false,
+    "reason": "ok",
+    "expected": "?"
+  },
+  {
+    "label": "closeness (losers only)",
+    "ref": "baseline",
+    "delta": -0.009888013877375562,
+    "helped": 2,
+    "hurt": 2,
+    "flat": 2,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0099 below threshold but only 2/4 non-flat projects hurt (50% < 66% majority); likely outlier-driven, not killed",
+    "expected": "?"
+  },
+  {
+    "label": "severity-tiebreak (losers only)",
+    "ref": "h14",
+    "delta": -0.005440422461699068,
+    "helped": 1,
+    "hurt": 2,
+    "flat": 3,
+    "kill": true,
+    "reason": "\u0394macro F1 -0.0054 < -0.0050 threshold; 2/3 non-flat projects hurt (67% \u2265 66% majority)",
+    "expected": "?"
+  }
+]
