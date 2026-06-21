@@ -62,6 +62,118 @@ only pranks the approve — the deposit runs unpranked. Always use
 
 Universal template manifests now have this in their setUp by convention.
 
+## Disk-pressure masquerading as MCP failure (learned 2026-06-10, cost ~10 round-trips)
+
+When MCP tools start returning **"missing value"**, tab IDs go `null`, page-content
+requests time out, or Chrome dies with "Google Chrome is not running" — the first
+diagnostic is **`df -h`**, NOT retry-with-different-syntax.
+
+At ≥90% disk capacity, macOS can't grow swap. The Chrome MCP bridge (and other
+tools that allocate working memory on demand) hit ENOSPC or memory-pressure
+failures and return ambiguous truthy-falsy values instead of clean errors.
+You'll waste 5-10 tool calls iterating on selectors / JS syntax / event
+dispatch before realizing the environment is the problem, not the code.
+
+Symptom checklist:
+1. `mcp__Control_Chrome__execute_javascript` returns `"missing value"` for
+   queries that should return strings
+2. `mcp__Control_Chrome__list_tabs` returns entries with `"id": null`
+3. `mcp__Control_Chrome__get_page_content` times out with `MCP error -32001`
+4. Chrome dies mid-session with "Google Chrome is not running"
+5. Builds (lake, cargo, pip) fail with weird codegen errors at ~70% RAM
+
+Diagnostic order when ANY of those fires:
+1. `df -h` — if `/System/Volumes/Data` >90%, that's the cause
+2. `sysctl vm.swapusage` — if used/total >70%, confirms thrashing
+3. `du -sh /tmp/* ~/Library/Application\ Support/Claude/vm_bundles/* 2>/dev/null | sort -rh | head -10`
+   — overnight ML/build runs leave large `/tmp` artifacts; Claude.app's
+   `vm_bundles/warm` pre-warm VM is ~2 GB and disposable
+
+Quick-recover wins (no risk to active session):
+- `rm -rf /tmp/c4_repos` (or whatever overnight-run scratch dir exists)
+- `rm -rf ~/Library/Application\ Support/Claude/vm_bundles/warm`
+  — Claude.app auto-rebuilds it on next session start
+
+NEVER delete `~/Library/Application Support/Claude/vm_bundles/claudevm.bundle` —
+that's the ACTIVE session's VM and deleting it kills the conversation.
+
+Related: the project rule against `precompileModules` is the same family of
+failure — 3GB+ Mathlib IR fills disk, the next build behaves bizarrely instead
+of failing cleanly. When debugging "weird behavior in tool I trust," check disk
+before anything else.
+
+## Don't project time-based artifacts — actually check the clock (added 2026-06-10 PM by JH directive; broadened 2026-06-10 16:08 CDT)
+
+**Whenever firing with a TIME-BASED ARTIFACT — break recommendations, duration claims, ETAs, time-of-day references, future-date claims, "remaining daylight" assertions — run `date "+%Y-%m-%d %H:%M:%S %Z"` BEFORE generating the artifact.** No exceptions.
+
+1. **Run `date` first.** Force time-check before the assertion can be uttered.
+2. **State actual time + remaining daylight in any recommendation.**
+3. **Default to keep-working** on break recommendations. Let JH signal fatigue.
+4. **"Today shipped a lot" is NOT a stop signal.** Quality of work is independent of capacity for more work.
+5. **Defensible durations require evidence** — "the previous run took X:XX" beats vague estimation.
+6. **External dependencies in ETAs need disclosure** — "by Wednesday assuming endorsement clears in 1-3 days" beats unconditional "by Wednesday."
+
+**Acceptable break-recommendation conditions:**
+- Past 9 PM local (sunset + 1 hr — sleep hygiene)
+- JH explicitly mentions feeling tired / fried / drained
+- Long-running compute job needs hours; sleeping more efficient than waiting
+- JH silent / unresponsive for an unusual interval
+
+**Unacceptable break-recommendation conditions:**
+- "Today shipped a lot already"
+- "You've earned a break"
+- "Tomorrow with fresh head" without time-of-day check
+- "Honest energy management" used as a soft excuse
+- Anything that sounds nurturing without time data
+
+If I find myself writing *"recommend break"* — stop the sentence, run `date`, re-evaluate. If marking the time makes the rec look stupid, it was vibes; delete it. (2026-06-10 14:48 CDT with 5.7 hrs daylight remaining is the canonical bad case.)
+
+## Clean up after yourself (added 2026-06-10 by JH directive)
+
+Whenever you USE something transient — a Chrome tab, a /tmp scratch dir,
+a background process, an experimental file, a cloned repo — **close / remove
+it when you're done with the operation it enabled.** Don't let your work
+leave the environment in a worse state than you found it.
+
+This rule exists because session pollution compounds. A single forgotten
+Chrome tab is nothing. Twelve forgotten tabs from a research session push
+the browser into swap. Fifty forgotten /tmp dirs from overnight runs eat
+disk and become the "weird behavior in tool I trust" of the next session
+(see the disk-pressure section above — that bug fired because /tmp/c4_repos
+was left around AFTER the H14 aggregation completed).
+
+The discipline is a per-operation question: *what state did I create that's
+no longer needed?* Specifically:
+
+- **Chrome tabs you opened for an audit / research task**: close them when
+  the synthesis is written. Don't close tabs the user opened before your
+  session started — those are their workflow. Only your own.
+- **/tmp scratch directories from one-shot pipelines**: `rm -rf` after
+  results are saved to a durable location (`runs/`, `docs/`, committed
+  source).
+- **Background processes started for diagnostics** (`ps`, watchers, etc.):
+  kill them when the diagnostic is complete.
+- **Cloned external repos used as input** (like `/tmp/c4_repos/` from the
+  H14 corpus walk): delete after the per-contest pass is complete; don't
+  keep them "in case I need them again."
+- **Test artifacts that were one-shot probes**: don't leave dummy files,
+  fixture files, or experimental output sitting in the working tree.
+- **Failed-experiment state**: when an approach didn't pan out, remove
+  the intermediate files — they pollute searches and confuse the next
+  session.
+
+What NOT to clean:
+- Files the user explicitly authored or asked you to create
+- Tabs the user had open before your session started
+- Anything under `runs/`, `docs/`, source, or persistent project state
+  (those are durable deliverables, not transient)
+- Anything that contains the only copy of work — when in doubt, ask before
+  deleting; never destroy state you can't reconstruct
+
+Default: when finishing an operation, ask yourself *"what did I open / write /
+spawn for this that nothing else needs?"* Close / delete / kill that thing
+before moving to the next task.
+
 ## The ambition (top-of-mind, every turn)
 
 **Find ALL bugs reachable by the right kind of cellular automaton over

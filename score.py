@@ -70,10 +70,16 @@ class Score:
             out["recall"] = self.signals["recall"]
         if "precision" in self.signals:
             out["precision"] = self.signals["precision"]
-        # Precision lives in meta as "recall.precision" when produced by
-        # sol_match_signal. Surface it at the top level so flywheel keeps working.
-        if "precision" not in out and "recall.precision" in self.meta:
-            out["precision"] = self.meta["recall.precision"]
+        # Precision/recall may live in meta keyed under whichever signal stashed
+        # them (sol_match_signal → "recall.precision"; f1_signal → "f1.precision",
+        # "f1.recall"). Surface them at the top level so flywheel keeps working.
+        if "precision" not in out:
+            for k in ("recall.precision", "f1.precision"):
+                if k in self.meta:
+                    out["precision"] = self.meta[k]
+                    break
+        if "recall" not in out and "f1.recall" in self.meta:
+            out["recall"] = self.meta["f1.recall"]
         return out
 
     @classmethod
@@ -140,6 +146,37 @@ def sol_match_signal(leads: list, findings: list, ground_truth_path: str | None,
         "missed": len(r.get("missed", [])),
     }
     return float(r.get("recall", 0.0)), meta
+
+
+def f1_signal(leads: list, findings: list, ground_truth_path: str | None,
+              threshold: float = 0.80) -> tuple[float, dict]:
+    """Return (F1_in_[0,1], meta) using sol_match.match.
+
+    F1 = 2 * p * r / (p + r); 0.0 if (p + r) == 0.
+
+    Stashes precision, recall, matched_n, missed_n in meta so MultiplicativeCritic
+    surfaces them under the "f1." prefix (e.g. meta["f1.precision"]). Back-compat
+    aliasing in Score.to_json() picks these up and lifts precision/recall to the
+    top level for flywheel.py.
+    """
+    if not leads or not findings:
+        return 0.0, {"n_leads": len(leads), "n_findings": len(findings),
+                     "precision": 0.0, "recall": 0.0,
+                     "matched_n": 0, "missed_n": len(findings)}
+    from sol_match import match  # local import so score.py is cheap to load
+    r = match(leads, findings, threshold=threshold)
+    p = float(r.get("precision", 0.0))
+    rec = float(r.get("recall", 0.0))
+    f1 = (2.0 * p * rec / (p + rec)) if (p + rec) > 0 else 0.0
+    meta = {
+        "n_leads": len(leads),
+        "n_findings": len(findings),
+        "precision": p,
+        "recall": rec,
+        "matched_n": len(r.get("matched", [])),
+        "missed_n": len(r.get("missed", [])),
+    }
+    return f1, meta
 
 
 def halmos_signal(halmos_verdicts: list[dict] | None) -> tuple[float, dict]:
@@ -236,24 +273,24 @@ class MultiplicativeCritic:
 # ── Default critic preset ───────────────────────────────────────────────────
 
 def default_critic() -> MultiplicativeCritic:
-    """The recommended composition for plumbline reps as of Move 2 (2026-06-19).
+    """The recommended composition for plumbline reps as of 2026-06-20.
 
-    - recall    (sol_match against .ANSWERS.md)
+    Changed from recall (sol_match_signal) → F1 (f1_signal) after the 2026-06-19
+    adversarial-swarm finding: recall-only is degenerate (more leads = higher recall,
+    lower precision, total goes up while audit quality goes down). F1 balances both.
+
+    - f1        (sol_match-based, 2*p*r/(p+r))   ← was "recall"
     - halmos    (any PROVED → 0)
     - severity  (mean lead severity weight)
 
-    To wire into flywheel.py:
+    Precision/recall remain available at the top level of Score.to_json() (via
+    f1_signal stashing them in meta), so flywheel.py keeps working unchanged.
 
-        from score import default_critic
-        critic = default_critic()
-        score = critic.score(leads, findings,
-                              ground_truth_path=corpus_answers_path,
-                              halmos_verdicts=halmos_verdicts_or_None)
-        rep_row["score"] = score.to_json()
+    For recall-only objective, use sol_match_signal directly (still exported).
     """
     return MultiplicativeCritic({
-        "recall":   lambda leads, findings, **ctx:
-                        sol_match_signal(leads, findings, ctx.get("ground_truth_path")),
+        "f1":       lambda leads, findings, **ctx:
+                        f1_signal(leads, findings, ctx.get("ground_truth_path")),
         "halmos":   lambda leads, findings, **ctx:
                         halmos_signal(ctx.get("halmos_verdicts")),
         "severity": lambda leads, findings, **ctx:
