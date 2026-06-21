@@ -174,6 +174,51 @@ Default: when finishing an operation, ask yourself *"what did I open / write /
 spawn for this that nothing else needs?"* Close / delete / kill that thing
 before moving to the next task.
 
+## ranking_fitness_gate before compute (added 2026-06-21, cost ~$30-50 saved + the inv_eig magnitude bug caught)
+
+**When ANYTHING proposes a ranking change — re-ranker swap, dedup policy,
+signal weighting, ensemble combo — run `tools/ranking_fitness_gate.py`
+against the existing scorer_v2 judgments BEFORE spending Modal/compute
+on it.** It's $0/call, ~2 seconds, sound-refutation verdict.
+
+Proposals come from many sources: a synthesis memo from a workflow,
+JH's intuition, a paper you just read, an LLM brainstorm, your own
+hypothesis. None of them earn a compute commitment without first
+clearing the gate. This is the structural analog of halmos for findings.
+
+API:
+```python
+from tools.ranking_fitness_gate import ranking_fitness_gate
+verdict = ranking_fitness_gate(
+    proposal,                   # (findings, ctx) → ordered_findings
+    label="my-new-idea",
+    reference=h14_current,      # what to compare against (None = baseline)
+    reference_label="h14",
+)
+if verdict["kill"]:
+    print(f"REFUTED: {verdict['kill_reason']}")
+else:
+    print(f"Approved: Δ={verdict['delta']:+.4f}")
+```
+
+Track record so far: 17 proposals tested 2026-06-20→21, exactly 0 beat
+H14 (one tied). The gate is also the discovery mechanism for
+implementation drift — it surfaced a subtle ordering bug in
+`tools/h14_lift_simulator.py` (raw-disk findings vs confidence-sorted)
+that had overstated yesterday's inv_eig kill magnitude.
+
+For larger exploration runs, use `tools/gate_explore.py` — a battery
+that fires the gate on a list of proposals and produces both
+machine-readable JSON and a markdown table. Adding a new proposal to
+the battery is one line.
+
+Full spec: `notes/RANKING_FITNESS_GATE_SPEC_2026-06-20.md`.
+Current empirical findings: `notes/GATE_EXPLORATION_2026-06-21.md`.
+
+This rule supersedes earlier "just run the experiment" instincts for
+ranking-shaped proposals. Compute-first when you have a ranker-shape
+hypothesis is wasted budget — the gate filters before you spend.
+
 ## The ambition (top-of-mind, every turn)
 
 **Find ALL bugs reachable by the right kind of cellular automaton over
