@@ -63,6 +63,21 @@ Three Reciprocal Rank Fusion (RRF, Cormack et al. 2009) ensembles:
 
 Ensembles **dilute** H14's eigenvector signal rather than adding diversity benefit. All four centralities share the hub-bias failure mode; averaging them amplifies the shared error rather than canceling it.
 
+## H14 × LLM-confidence — the first non-negative result
+
+After a follow-up round adding 4 H14 × GPT-5-confidence combinations:
+
+| proposal | Δ vs H14 | helped/hurt/flat |
+|---|---:|---|
+| **H14 × confidence (multiplicative)** | **+0.0019** | 3/4/17 |
+| 0.5·H14 + 0.5·conf (additive) | -0.0067 | 4/5/15 |
+| 0.7·H14 + 0.3·conf (additive) | -0.0046 | 3/5/16 |
+| 0.3·H14 + 0.7·conf (additive) | -0.0061 | 6/7/11 |
+
+**Multiplicative gets the first positive Δ vs H14 across 21 proposals.** It's small (right at the noise floor) and doesn't formally clear the gate's significance threshold, but the *interaction term* (high-eig AND high-conf) appears to help while the linear combinations don't. Suggests GPT-5's confidence and H14's structural prior carry complementary information when multiplied.
+
+The 3/4 mover split means this needs bootstrap CI to know if real. That's the gate v2 work named in the spec — add a statistical floor below which "positive Δ" is treated as noise. Until then, **this is the only proposal I'd consider promoting if you wanted a follow-up empirical test** (still $0 — re-running the gate with confidence intervals would confirm).
+
 ## Correction to yesterday's inv_eig measurement
 
 Yesterday's `scabench/h14_lift_2026-06-20.md` reported inv_eig at -0.0344 on the loser-subset, leading to the "6/6 same sign as H14" kill verdict. Today's gate measures inv_eig differently:

@@ -262,5 +262,49 @@
     "kill": false,
     "reason": "\u0394macro F1 -0.0098 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority); likely outlier-driven, not killed",
     "expected": "?"
+  },
+  {
+    "label": "H14 \u00d7 confidence (mult)",
+    "ref": "h14",
+    "delta": 0.001877352719744041,
+    "helped": 3,
+    "hurt": 4,
+    "flat": 17,
+    "kill": false,
+    "reason": "ok",
+    "expected": "?"
+  },
+  {
+    "label": "0.5\u00b7H14 + 0.5\u00b7conf (additive)",
+    "ref": "h14",
+    "delta": -0.00666109455709335,
+    "helped": 4,
+    "hurt": 5,
+    "flat": 15,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0067 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority); likely outlier-driven, not killed",
+    "expected": "?"
+  },
+  {
+    "label": "0.7\u00b7H14 + 0.3\u00b7conf (additive)",
+    "ref": "h14",
+    "delta": -0.0046119096518712765,
+    "helped": 3,
+    "hurt": 5,
+    "flat": 16,
+    "kill": false,
+    "reason": "ok",
+    "expected": "?"
+  },
+  {
+    "label": "0.3\u00b7H14 + 0.7\u00b7conf (additive)",
+    "ref": "h14",
+    "delta": -0.0061279579638351955,
+    "helped": 6,
+    "hurt": 7,
+    "flat": 11,
+    "kill": false,
+    "reason": "\u0394macro F1 -0.0061 below threshold but only 7/13 non-flat projects hurt (54% < 66% majority); likely outlier-driven, not killed",
+    "expected": "?"
   }
 ]

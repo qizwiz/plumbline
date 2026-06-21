@@ -28,3 +28,7 @@ Verdict of `ranking_fitness_gate` on a battery of no-cost ranking proposals agai
 | `RRF(h14, katz, closeness)` | `h14` | -0.0138 | 1 | 3 | 20 | **🛑 YES** | ? | Δmacro F1 -0.0138 < -0.0050 threshold; 3/4 non-flat projects hurt (75% ≥ 66% majority) |
 | `RRF(h14, katz, closeness, bet)` | `h14` | -0.0159 | 1 | 4 | 19 | **🛑 YES** | ? | Δmacro F1 -0.0159 < -0.0050 threshold; 4/5 non-flat projects hurt (80% ≥ 66% majority) |
 | `RRF(katz, closeness, bet)` | `h14` | -0.0098 | 4 | 5 | 15 | ok | ? | Δmacro F1 -0.0098 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority) |
+| `H14 × confidence (mult)` | `h14` | +0.0019 | 3 | 4 | 17 | ok | ? | ok |
+| `0.5·H14 + 0.5·conf (additive)` | `h14` | -0.0067 | 4 | 5 | 15 | ok | ? | Δmacro F1 -0.0067 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority) |
+| `0.7·H14 + 0.3·conf (additive)` | `h14` | -0.0046 | 3 | 5 | 16 | ok | ? | ok |
+| `0.3·H14 + 0.7·conf (additive)` | `h14` | -0.0061 | 6 | 7 | 11 | ok | ? | Δmacro F1 -0.0061 below threshold but only 7/13 non-flat projects hurt (54% < 66% majority |

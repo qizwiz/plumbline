@@ -122,6 +122,43 @@ def proposal_weighted_composite(weights: dict[str, float]) -> Proposal:
     return _p
 
 
+def proposal_h14_times_confidence() -> Proposal:
+    """Multiplicative combination: H14 score × GPT-5 confidence. Tests whether
+    high-eig findings with high-LLM-confidence rank above either signal alone."""
+    def _p(findings: list[dict], ctx: dict) -> list[dict]:
+        feats = _load_features(ctx.get("project_id", ""))
+        if not feats:
+            return findings
+        sm = _composite_score_map(feats, {"eigenvector":0.6,"katz":0.3,"betweenness":0.1})
+        def combined(f: dict) -> float:
+            return _attribute(f, sm) * (f.get("confidence") or 0)
+        return sorted(findings, key=lambda f: -combined(f))
+    return _p
+
+
+def proposal_h14_plus_confidence(h14_weight: float = 0.5) -> Proposal:
+    """Additive combination: h14_weight·H14_score + (1-h14_weight)·GPT-5_confidence.
+    Both signals normalized to [0,1] within-project before combining."""
+    def _p(findings: list[dict], ctx: dict) -> list[dict]:
+        feats = _load_features(ctx.get("project_id", ""))
+        if not feats:
+            return findings
+        sm = _composite_score_map(feats, {"eigenvector":0.6,"katz":0.3,"betweenness":0.1})
+        # Normalize H14 attributions to [0,1] within this project
+        attribs = [_attribute(f, sm) for f in findings]
+        max_a = max(attribs) if attribs else 1.0
+        max_a = max_a or 1.0
+        confs = [(f.get("confidence") or 0) for f in findings]
+        max_c = max(confs) if confs else 1.0
+        max_c = max_c or 1.0
+        def combined(f: dict) -> float:
+            a = _attribute(f, sm) / max_a
+            c = (f.get("confidence") or 0) / max_c
+            return h14_weight * a + (1 - h14_weight) * c
+        return sorted(findings, key=lambda f: -combined(f))
+    return _p
+
+
 def proposal_reciprocal_rank_fusion(*proposals: Proposal, k_const: int = 60) -> Proposal:
     """Reciprocal rank fusion across multiple proposals — the standard rank
     aggregation method from IR. Each proposal's ordering contributes
@@ -242,6 +279,12 @@ def run() -> None:
         ("RRF(h14, katz, closeness)",         proposal_reciprocal_rank_fusion(h14, katz, closeness), h14, "h14", "?"),
         ("RRF(h14, katz, closeness, bet)",    proposal_reciprocal_rank_fusion(h14, katz, closeness, betweenness), h14, "h14", "?"),
         ("RRF(katz, closeness, bet)",         proposal_reciprocal_rank_fusion(katz, closeness, betweenness), h14, "h14", "?"),
+
+        # --- H14 × LLM-confidence: does high-eig × high-conf beat either alone? ---
+        ("H14 × confidence (mult)",           proposal_h14_times_confidence(), h14, "h14", "?"),
+        ("0.5·H14 + 0.5·conf (additive)",     proposal_h14_plus_confidence(0.5), h14, "h14", "?"),
+        ("0.7·H14 + 0.3·conf (additive)",     proposal_h14_plus_confidence(0.7), h14, "h14", "?"),
+        ("0.3·H14 + 0.7·conf (additive)",     proposal_h14_plus_confidence(0.3), h14, "h14", "?"),
     ]
 
     results = []
