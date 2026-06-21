@@ -1,8 +1,15 @@
 # Proposer-bet full-corpus measurement — 2026-06-21
 
-**Verdict: 🎯 0.34+ target HIT.** Sonnet+H14 macro F1 = **0.3496** on the 24-project scabench overlap (+0.1032 vs GPT-5 baseline 0.2464). The architecture goal from the plumbline deep map is achieved.
+**Verdict: 🎯 0.34+ target HIT.** Sonnet+H14 macro F1 = **0.3496** on the 24-project scabench overlap (+0.1032 vs GPT-5 baseline 0.2464). Bootstrap-verified: Δ 95% CI = [+0.067, +0.140] (10K project-clustered resamples). The architecture goal from the plumbline deep map is achieved.
 
-**Critical nuance**: H14's marginal value on top of Sonnet is tiny (+0.0047 macro) — within noise. The +0.10 lift is **purely from Sonnet**. The story isn't "ranker × proposer compounds" — it's "proposer-level lift dominates; the ranker contributes when the proposer is weak (GPT-5: +0.028 H14 lift) and negligibly when the proposer is strong (Sonnet: +0.005 H14 lift)."
+**Critical nuance, now bootstrap-verified**: H14's marginal value on top of Sonnet is **+0.0047 macro, 95% CI [-0.011, +0.021], which includes zero — NOISE**. The lift is **purely from Sonnet**. The story isn't "ranker × proposer compounds" — it's:
+
+> Structural priors are valuable when the upstream proposer is weak (H14 added +0.028 on top of GPT-5, real); their effect vanishes when the proposer is strong (H14 added +0.005 on top of Sonnet, CI includes zero).
+
+**Operative empirical claims** (bootstrap-verified, 10K resamples):
+- Sonnet vs GPT-5 baseline: **+0.0985, 95% CI [+0.063, +0.135]** ✓ REAL
+- Sonnet+H14 vs GPT-5 baseline: **+0.1031, 95% CI [+0.067, +0.140]** ✓ REAL
+- H14 marginal on top of Sonnet: +0.0047, CI [-0.011, +0.021] ✗ NOISE (positive in 72% of resamples — directional but not significant)
 
 **Workflow:** wk0lfc30t (full-corpus Sonnet + H14 compose + same-prompt control)
 **Salvaged after** the Score/Synthesize phases died (likely Mac restart). Audit phase outputs (24 Sonnet + 6 control) were durable in `~/src/plumbline/runs/proposer-bet/`, scored in-session via fresh `scorer_v2 + gpt-4o-mini` invocations against the same scabench `curated.json` ground truth.
