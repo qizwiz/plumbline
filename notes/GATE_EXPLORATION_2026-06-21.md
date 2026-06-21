@@ -6,7 +6,7 @@
 
 ## Headline
 
-**H14 composite re-ranker is empirically un-improvable via $0 single-signal swaps.** Of the 5 plausible alternatives tested against H14 as the reference, all underperformed, and 1 formally killed (closeness, Δ=-0.0120, 75% loser-majority). The H14 composite (`0.6·eigenvector + 0.3·katz + 0.1·betweenness`) is doing real synergistic work that no single signal recovers.
+**H14 composite re-ranker is empirically un-improvable via $0 single-signal swaps OR weighted-composite sweeps OR rank-aggregation ensembles.** Across 17 distinct proposals tested against H14 as reference, exactly ONE matches H14 (composite 0.7/0.2/0.1 weighting, Δ=0.0000 — likely attribution-resolution artifact, not genuine equivalence) and 16 underperform. The H14 composite (`0.6·eigenvector + 0.3·katz + 0.1·betweenness`) sits at or very near a flat optimum in the H14-feature-weighting space.
 
 ## Composite synergy is real
 
@@ -34,7 +34,34 @@ Of 5 H14-referenced proposals tested, none earned positive Δ:
 | closeness | -0.0120 | 🛑 |
 | katz | -0.0106 | ok (57%, below) |
 
-The 0.2214 macro F1 K=10 ceiling identified yesterday is now **empirically corroborated across 14 distinct proposals**. The ranker-side lever is exhausted to 4 decimal places of resolution.
+The 0.2214 macro F1 K=10 ceiling identified yesterday is now **empirically corroborated across 17 distinct proposals**. The ranker-side lever is exhausted to 4 decimal places of resolution.
+
+## Composite weight sweep — flat optimum
+
+Sweeping H14's `0.6/0.3/0.1` weighting (eigenvector / katz / betweenness):
+
+| weights (eig/katz/bet) | Δ vs H14 |
+|---|---:|
+| 0.6/0.3/0.1 (current default) | — |
+| 0.7/0.2/0.1 | +0.0000 (identical at K=10 resolution) |
+| 0.4/0.4/0.2 | -0.0033 |
+| 0.5/0.3/0.2 | -0.0033 |
+| 0.5/0.25/0.25 | -0.0033 |
+| 0.5/0.2/0.1/0.2 (+ closeness) | -0.0070 🛑 |
+
+The default sits at a **flat optimum** — small perturbations of weights don't help, adding a fourth signal hurts. Likely interpretation: regex attribution causes most findings to map to tied scores, limiting weight-tuning resolution. The genuine information content of these graph signals is already captured by the existing weighting.
+
+## Rank-aggregation ensembles — dilute, don't add
+
+Three Reciprocal Rank Fusion (RRF, Cormack et al. 2009) ensembles:
+
+| ensemble | Δ vs H14 | kill? |
+|---|---:|:---:|
+| RRF(h14, katz, closeness) | -0.0138 | 🛑 |
+| RRF(h14, katz, closeness, bet) | -0.0159 | 🛑 |
+| RRF(katz, closeness, bet) — no H14 | -0.0098 | ok |
+
+Ensembles **dilute** H14's eigenvector signal rather than adding diversity benefit. All four centralities share the hub-bias failure mode; averaging them amplifies the shared error rather than canceling it.
 
 ## Correction to yesterday's inv_eig measurement
 

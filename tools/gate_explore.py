@@ -96,6 +96,53 @@ def proposal_by_h14_signal(signal: str, invert: bool = False) -> Proposal:
     return _p
 
 
+def _composite_score_map(features: list[dict], weights: dict[str, float]) -> dict[str, float]:
+    """Build a node→score map as a weighted sum of feature columns."""
+    out: dict[str, float] = {}
+    for f in features:
+        node = f.get("node")
+        if not node:
+            continue
+        score = sum(w * (f.get(signal) or 0) for signal, w in weights.items())
+        out[node] = max(out.get(node, 0.0), score)
+        if "." in node:
+            short = node.split(".", 1)[1]
+            out[short] = max(out.get(short, 0.0), score)
+    return out
+
+
+def proposal_weighted_composite(weights: dict[str, float]) -> Proposal:
+    """Reorder by an arbitrary weighted sum of H14 features."""
+    def _p(findings: list[dict], ctx: dict) -> list[dict]:
+        feats = _load_features(ctx.get("project_id", ""))
+        if not feats:
+            return findings
+        sm = _composite_score_map(feats, weights)
+        return sorted(findings, key=lambda f: -_attribute(f, sm))
+    return _p
+
+
+def proposal_reciprocal_rank_fusion(*proposals: Proposal, k_const: int = 60) -> Proposal:
+    """Reciprocal rank fusion across multiple proposals — the standard rank
+    aggregation method from IR. Each proposal's ordering contributes
+    1/(k + rank) per finding; sum across proposals, sort descending.
+
+    k_const=60 is the textbook default (Cormack et al. 2009). Lower k_const
+    amplifies the top of each list; higher dampens it."""
+    def _p(findings: list[dict], ctx: dict) -> list[dict]:
+        scores: dict = {}
+        for p in proposals:
+            try:
+                ordered = p(findings, ctx)
+            except Exception:
+                continue
+            for rank, f in enumerate(ordered):
+                fid = f.get("id") or id(f)
+                scores[fid] = scores.get(fid, 0.0) + 1.0 / (k_const + rank)
+        return sorted(findings, key=lambda f: -scores.get(f.get("id") or id(f), 0.0))
+    return _p
+
+
 def proposal_severity_tiebreak(reference: Proposal) -> Proposal:
     """Same as reference, but tiebreak by severity (high → low) when reference
     leaves equal score within a stable-sort window. Approximation: take top-50
@@ -183,6 +230,18 @@ def run() -> None:
         ("inv_eig (losers only)",             inv_eig,                       None, "baseline", "?"),
         ("closeness (losers only)",           closeness,                     None, "baseline", "?"),
         ("severity-tiebreak (losers only)",   severity_tiebreak_h14,         h14, "h14",       "?"),
+
+        # --- weighted-composite sweep: alternatives to default 0.6/0.3/0.1 ---
+        ("composite 0.4/0.4/0.2",             proposal_weighted_composite({"eigenvector":0.4,"katz":0.4,"betweenness":0.2}), h14, "h14", "?"),
+        ("composite 0.5/0.3/0.2",             proposal_weighted_composite({"eigenvector":0.5,"katz":0.3,"betweenness":0.2}), h14, "h14", "?"),
+        ("composite 0.7/0.2/0.1",             proposal_weighted_composite({"eigenvector":0.7,"katz":0.2,"betweenness":0.1}), h14, "h14", "?"),
+        ("composite 0.5/0.25/0.25",           proposal_weighted_composite({"eigenvector":0.5,"katz":0.25,"betweenness":0.25}), h14, "h14", "?"),
+        ("composite + closeness 0.5/0.2/0.1/0.2", proposal_weighted_composite({"eigenvector":0.5,"katz":0.2,"betweenness":0.1,"closeness":0.2}), h14, "h14", "?"),
+
+        # --- rank-aggregation ensembles: can voting beat the best individual? ---
+        ("RRF(h14, katz, closeness)",         proposal_reciprocal_rank_fusion(h14, katz, closeness), h14, "h14", "?"),
+        ("RRF(h14, katz, closeness, bet)",    proposal_reciprocal_rank_fusion(h14, katz, closeness, betweenness), h14, "h14", "?"),
+        ("RRF(katz, closeness, bet)",         proposal_reciprocal_rank_fusion(katz, closeness, betweenness), h14, "h14", "?"),
     ]
 
     results = []

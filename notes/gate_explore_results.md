@@ -20,3 +20,11 @@ Verdict of `ranking_fitness_gate` on a battery of no-cost ranking proposals agai
 | `inv_eig (losers only)` | `baseline` | +0.0093 | 2 | 1 | 3 | ok | ? | ok |
 | `closeness (losers only)` | `baseline` | -0.0099 | 2 | 2 | 2 | ok | ? | Δmacro F1 -0.0099 below threshold but only 2/4 non-flat projects hurt (50% < 66% majority) |
 | `severity-tiebreak (losers only)` | `h14` | -0.0054 | 1 | 2 | 3 | **🛑 YES** | ? | Δmacro F1 -0.0054 < -0.0050 threshold; 2/3 non-flat projects hurt (67% ≥ 66% majority) |
+| `composite 0.4/0.4/0.2` | `h14` | -0.0033 | 0 | 1 | 23 | ok | ? | ok |
+| `composite 0.5/0.3/0.2` | `h14` | -0.0033 | 0 | 1 | 23 | ok | ? | ok |
+| `composite 0.7/0.2/0.1` | `h14` | +0.0000 | 0 | 0 | 24 | ok | ? | ok |
+| `composite 0.5/0.25/0.25` | `h14` | -0.0033 | 0 | 1 | 23 | ok | ? | ok |
+| `composite + closeness 0.5/0.2/0.1/0.2` | `h14` | -0.0070 | 0 | 2 | 22 | **🛑 YES** | ? | Δmacro F1 -0.0070 < -0.0050 threshold; 2/2 non-flat projects hurt (100% ≥ 66% majority) |
+| `RRF(h14, katz, closeness)` | `h14` | -0.0138 | 1 | 3 | 20 | **🛑 YES** | ? | Δmacro F1 -0.0138 < -0.0050 threshold; 3/4 non-flat projects hurt (75% ≥ 66% majority) |
+| `RRF(h14, katz, closeness, bet)` | `h14` | -0.0159 | 1 | 4 | 19 | **🛑 YES** | ? | Δmacro F1 -0.0159 < -0.0050 threshold; 4/5 non-flat projects hurt (80% ≥ 66% majority) |
+| `RRF(katz, closeness, bet)` | `h14` | -0.0098 | 4 | 5 | 15 | ok | ? | Δmacro F1 -0.0098 below threshold but only 5/9 non-flat projects hurt (56% < 66% majority) |
