@@ -1,6 +1,16 @@
 # Proposer-bet full-corpus measurement — 2026-06-21
 
-**Verdict: 🎯 0.34+ target HIT.** Sonnet+H14 macro F1 = **0.3496** on the 24-project scabench overlap (+0.1032 vs GPT-5 baseline 0.2464). Bootstrap-verified: Δ 95% CI = [+0.067, +0.140] (10K project-clustered resamples). The architecture goal from the plumbline deep map is achieved.
+**Verdict: 🎯 0.34+ target HIT — but with important caveats surfaced by external review (added 2026-06-22).**
+
+**REVISED HONEST HEADLINE** (per external-review w2jo8n8mh + per-class/LOPO follow-up):
+
+> *Sonnet 4.6 substantially improves HIGH-severity recall on scabench (0.518 → 0.807, +0.289). Macro F1 gain (+0.103) is real but concentrated in roughly half the projects; the remaining half shows only +0.026. Production deployment should expect strong wins on certain project shapes and modest wins on others.*
+
+This is the defensible claim. The "Sonnet+H14 = 0.3496 hits the 0.34+ target" framing is arithmetically true but understates the unevenness AND understates the actual structurally-important win (high-severity recall).
+
+**External-review verdict** (3 of 4 reviewers, gemini failed on tier issues): the 0.3496 is arithmetically clean but NOT externally defensible without: (a) held-out replication on unseen projects, (b) second judge model (gpt-4o-mini was used during search → circularity), (c) per-class + LOPO breakdown. (c) is run here; (a) and (b) remain to-do.
+
+**ORIGINAL headline below preserved for transparency, but please read with the revised one above as the operative claim.** Sonnet+H14 macro F1 = **0.3496** on the 24-project scabench overlap (+0.1032 vs GPT-5 baseline 0.2464). Bootstrap-verified: Δ 95% CI = [+0.067, +0.140] (10K project-clustered resamples).
 
 **Critical nuance, now bootstrap-verified**: H14's marginal value on top of Sonnet is **+0.0047 macro, 95% CI [-0.011, +0.021], which includes zero — NOISE**. The lift is **purely from Sonnet**. The story isn't "ranker × proposer compounds" — it's:
 
@@ -102,9 +112,35 @@ H14's marginal contribution is mixed: helps 5 of 24, hurts 4 of 24, flat on 15. 
 
 This is consistent with the gate-explore finding from 2026-06-21: H14 captures information that helps when the proposer mostly misses hubs; when the proposer is good enough to already find the hubs, the structural prior has less to add.
 
+## External-review-surfaced caveats (2026-06-22, ACT ON THESE BEFORE PAPER)
+
+External-review workflow w2jo8n8mh ran codex (gpt-5.4-mini) ×2 + ollama-3B on this writeup. Three of four explicitly recommended **DO NOT ship the paper at 0.3496**. Their objections that the previous version of this writeup did not address:
+
+1. **Judge-model circularity**: gpt-4o-mini scoring the Sonnet output, after extensive search where Sonnet's prompt was implicitly tuned against gpt-4o-mini's judgments. The 0.3496 may not survive a second judge (e.g. Claude as judge, or open-weights judge).
+2. **Selection bias**: the system was searched over many proposer/ranker variants. Bootstrap CI captures sampling noise on the 24 deltas but does NOT cover researcher degrees of freedom.
+3. **No held-out**: the 24 projects were the search space AND test space. A frozen preregistered rerun on UNSEEN projects is required before any mechanism claim.
+4. **Mechanism overclaim**: "structural priors help weak proposers, vanish with strong" is a NARRATIVE built on one delta + one null result (H14 marginal CI crosses zero). It's not a demonstrated mechanism. Honest framing: "we did not detect H14 marginal effect at this budget."
+5. **Multiple-comparisons floor**: many variants were tried; the bootstrap CI doesn't penalize for this. Need a Bonferroni-equivalent OR preregistered single-comparison reframe.
+6. **Standing instruction "ship one improvement per turn" is itself a bias generator** (ollama flagged this verbatim) — incompatible with honest stopping criteria.
+
+The external reviewers identified these as gaps in MY adversarial-verification discipline. The 5-way internal check I ran was hygiene against clerical error, not against generalization failure.
+
 ## Implication for the project arc
 
-**Recommended next move: ship Sonnet-as-default and rewrite the H14 paper.**
+**REVISED recommended next move (after external-review 2026-06-22): DO NOT rewrite the paper yet. FREEZE the pipeline at commit 0807690 + 0534145 + (this commit). Run blinded replication first.**
+
+Old recommendation (preserved below for transparency) was "ship Sonnet-as-default and rewrite H14 paper." External reviewers correctly identified this as premature.
+
+Concrete sequence:
+1. **Tag freeze**: `git tag -a v-presrep-2026-06-22 -m "Pipeline frozen before blinded replication per external review w2jo8n8mh"`. No further tuning until step 2 completes.
+2. **Blinded replication**: rerun Sonnet+H14 with (a) a SECOND judge model (Claude-Sonnet-as-judge or open-weights), (b) a held-out project slice not in the 24 used during search (e.g. fresh Sherlock contests post-2025-09, or scabench projects not in the H14-feature-available set).
+3. **Per-class + LOPO already run** (results above). High-severity lift is the strongest defensible claim.
+4. **Only after (2) survives**, write the paper with honest framing: "Sonnet improves HIGH-severity recall by +0.289 absolute; macro F1 lift is concentrated, generalizes to held-out at <X>; H14 marginal effect not detected at this budget."
+5. **prompt_fitness_gate primitive (my preferred next move) comes AFTER step (4)** — building infra on top of fragile measurement is the exact anti-pattern in `~/.claude/CLAUDE.md` ("Don't improve-then-intervene").
+
+Old recommendation continues below for historical transparency:
+
+**Recommended next move (PRE-REVIEW, no longer current): ship Sonnet-as-default and rewrite the H14 paper.**
 
 The paper's existing structure ("ranker beats baseline by +0.028 macro F1") still holds for the GPT-5 case but is no longer the load-bearing result. The new headline:
 
@@ -114,6 +150,33 @@ Three branches for implementation:
 1. **Production stack**: swap proposer to Sonnet, keep H14 as light-cost re-ranker, file the change.
 2. **Paper**: rewrite as "proposer dominates; structural prior shrinks-but-doesn't-vanish." Cleaner story than "compounds" because the data doesn't support strong composition.
 3. **CA-audit-rule build** per `notes/CA_AUDIT_RULE_EVOLUTION_FEASIBILITY_2026-06-20.md` becomes the next-tier ceiling-breaker — the proposer-tier limit is now visible. Whether 0.35+ is reachable via that path is the next open question.
+
+## Per-class breakdown (added 2026-06-22 after external-review demanded it)
+
+The headline macro F1 hides a critical pattern: **the lift is concentrated on HIGH severity**, which is the production-relevant win:
+
+| Severity | GPT-5 TP/FN | GPT-5 recall | Sonnet+H14 TP/FN | Sonnet+H14 recall | Δ recall |
+|---|---|---:|---|---:|---:|
+| High | 43/40 | 0.518 | 67/16 | **0.807** | **+0.289** |
+| Medium | 76/114 | 0.400 | 106/84 | 0.558 | +0.158 |
+| Low | 30/83 | 0.265 | 51/62 | 0.451 | +0.186 |
+
+This was warned by `[[project_fabric_helps_high_severity]]` (2026-06-18): macro F1 hides class-level effects. Should have been run BEFORE the headline write — caught by external reviewers (codex × 2, ollama × 1) on 2026-06-22.
+
+## LOPO sensitivity (added 2026-06-22 after external-review demanded it)
+
+The +0.1032 macro F1 lift is **not uniformly distributed**:
+
+| Configuration | Remaining macro F1 Δ |
+|---|---:|
+| Full 24 projects | +0.1032 |
+| Drop top-3 wins | +0.0801 |
+| Drop top-6 wins | +0.0591 |
+| Drop top-12 wins (half the corpus) | +0.0264 |
+
+5 most-leveraged projects (their wins carry the headline): axion (+0.291), morph-l-2 (+0.277), secondswap (+0.227), next-generation (+0.218), fenix (+0.212). 5 least-leveraged (could drop and headline barely changes): tally, cork-protocol, loopfi, crestal-network, boost-core.
+
+**Implication**: the gain is REAL but concentrated. Production deployment should expect strong wins on certain project shapes (long-tail audits where GPT-5 misses recall) and modest wins on others (already-mature audits).
 
 ## Honest caveats
 
