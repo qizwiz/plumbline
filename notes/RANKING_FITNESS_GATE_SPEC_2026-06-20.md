@@ -41,13 +41,15 @@ class RankingProposal(Protocol):
 def ranking_fitness_gate(
     proposal: RankingProposal,
     *,
-    baseline_run: str = "runs/scabench-scores/",
-    rerank_dir: str = "runs/scabench-rerank/",
     label: str = "anon",
+    reference: RankingProposal | None = None,   # added in build: see below
+    reference_label: str = "baseline",
+    scores_dir: str = "runs/scabench-scores/",
+    baseline_dir: str = "corpus/scabench/baseline-results/",
     K: int = 10,
     kill_threshold: float = -0.005,
-    kill_min_loser_count: int = 4,
     kill_min_loser_majority: float = 0.66,
+    only_projects: Iterable[str] | None = None,
 ) -> dict:
     """Sound-refutation gate for ranking-shaped proposals.
 
@@ -83,6 +85,25 @@ def ranking_fitness_gate(
     """
     ...
 ```
+
+### `reference` parameter — added during build 2026-06-21
+
+The build surfaced a real semantics issue not captured in the v1 spec. The
+`proposal` is always evaluated against **some reference ordering**, not just
+the GPT-5 confidence baseline. Concrete example from yesterday's session:
+the question was "does dedupe-at-K improve on H14?" NOT "does H14+dedupe
+improve on baseline?" — same data, different reference, different verdict
+(H14+dedupe is +0.0066 vs baseline but -0.0210 vs H14, and the latter is
+what got killed).
+
+The gate now takes an optional `reference` callable:
+- default `None` → reference is identity (= GPT-5 confidence ordering)
+- pass any Proposal → compare proposal-vs-reference deltas
+- `reference_label` for display
+
+The 4-smoke sanity suite at the bottom of `tools/ranking_fitness_gate.py`
+reproduces yesterday's `h14+dedupe` kill exactly: macro F1 -0.0210, 6/7
+non-flat projects hurt (86% > 66% majority), kill=True.
 
 ### How the kill rule is "sound enough"
 
