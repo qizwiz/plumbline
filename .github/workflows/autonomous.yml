@@ -10,9 +10,12 @@ name: autonomous-loop
 # Actions runner.
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'   # every 30 min
-  workflow_dispatch:          # manual trigger for testing
+  # cron DISABLED 2026-06-23 — the */30 schedule drained the private-repo Actions
+  # budget (~1,440 runs/mo), which blocked ALL workflows incl. the real `ci`.
+  # Re-enable by uncommenting the schedule if you want the autonomous loop back.
+  # schedule:
+  #   - cron: '*/30 * * * *'
+  workflow_dispatch:          # manual trigger only
 
 # Prevent concurrent runs from stepping on each other's commits
 concurrency:

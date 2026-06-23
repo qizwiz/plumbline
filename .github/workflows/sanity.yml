@@ -1,10 +1,12 @@
 name: sanity
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  # auto-run PAUSED 2026-06-23 — Actions budget exhausted this cycle. Manual-only;
+  # re-enable push/pull_request after the monthly reset or when the repo is public.
+  # push:
+  #   branches: [main]
+  # pull_request:
+  #   branches: [main]
   workflow_dispatch:
 
 jobs:

@@ -18,16 +18,11 @@ permissions:
   contents: write
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'examples/**'
-      - 'sol_match.py'
-      - 'sol_intent.py'
-      - 'rep_log.py'
-      - 'model_rep.py'
-      - 'reps.jsonl'
-      - '.github/workflows/loop.yml'
+  # push trigger DISABLED 2026-06-23 — this rep-loop runs a paid LLM call (~$1/push)
+  # and was burning Actions budget on every examples/** change. Manual-only now.
+  # push:
+  #   branches: [main]
+  #   paths: ['examples/**', 'sol_match.py', 'sol_intent.py', 'rep_log.py', 'model_rep.py', 'reps.jsonl', '.github/workflows/loop.yml']
   workflow_dispatch:
     inputs:
       run_reps:

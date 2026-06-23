@@ -1,7 +1,10 @@
 name: ci
 # Runs the verification toolchain on a glibc runner: Foundry (symbolic execution) + halmos + z3.
 on:
-  push: {}
+  # push auto-run PAUSED 2026-06-23 — Actions budget exhausted this cycle (a */30
+  # cron in autonomous.yml drained it; now disabled). Re-enable `push` after the
+  # monthly reset, or when the repo goes public (Actions free for public repos).
+  # push: {}
   workflow_dispatch: {}
 
 jobs:
