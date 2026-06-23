@@ -48,9 +48,68 @@ def vstyle(v):
     if v.startswith("ESCALATED"): return "var(--yel)", "⊘ ESCALATED — human review"
     return "var(--fg-dim)", html.escape(v)
 
+SPLASH_SVG = '''<svg width="100%" viewBox="0 0 680 392" role="img" xmlns="http://www.w3.org/2000/svg" style="display:block">
+<title>plumbline</title><desc>An Egyptian wall scene: workers haul a stone block toward a pyramid while a plumb-line level swings and settles to true vertical; cartouches morph between glyphs and Ethereum hex. Title: plumbline, true by construction.</desc>
+<rect x="0" y="0" width="680" height="392" fill="#E4D3AC"/>
+<rect x="0" y="0" width="680" height="30" fill="#B98F4D"/>
+<g fill="#7A5524"><rect x="14" y="11" width="9" height="9"/><rect x="38" y="11" width="9" height="9"/><rect x="62" y="11" width="9" height="9"/><rect x="86" y="11" width="9" height="9"/><rect x="110" y="11" width="9" height="9"/><rect x="134" y="11" width="9" height="9"/><rect x="158" y="11" width="9" height="9"/><rect x="182" y="11" width="9" height="9"/><rect x="206" y="11" width="9" height="9"/><rect x="230" y="11" width="9" height="9"/><rect x="254" y="11" width="9" height="9"/><rect x="278" y="11" width="9" height="9"/><rect x="302" y="11" width="9" height="9"/><rect x="326" y="11" width="9" height="9"/><rect x="350" y="11" width="9" height="9"/><rect x="374" y="11" width="9" height="9"/><rect x="398" y="11" width="9" height="9"/><rect x="422" y="11" width="9" height="9"/><rect x="446" y="11" width="9" height="9"/><rect x="470" y="11" width="9" height="9"/><rect x="494" y="11" width="9" height="9"/><rect x="518" y="11" width="9" height="9"/><rect x="542" y="11" width="9" height="9"/><rect x="566" y="11" width="9" height="9"/><rect x="590" y="11" width="9" height="9"/><rect x="614" y="11" width="9" height="9"/><rect x="638" y="11" width="9" height="9"/><rect x="662" y="11" width="9" height="9"/></g>
+<circle cx="602" cy="78" r="25" fill="#E0A93B"/>
+<g stroke="#E0A93B" stroke-width="3" stroke-linecap="round"><line x1="602" y1="40" x2="602" y2="30"/><line x1="640" y1="78" x2="650" y2="78"/><line x1="629" y1="51" x2="636" y2="44"/><line x1="629" y1="105" x2="636" y2="112"/><line x1="575" y1="51" x2="568" y2="44"/></g>
+<polygon points="560,138 470,256 650,256" fill="#C99A5B"/>
+<polygon points="560,138 560,256 650,256" fill="#B5853F"/>
+<g stroke="#9E7333" stroke-width="1" opacity="0.6"><line x1="488" y1="232" x2="632" y2="232"/><line x1="506" y1="208" x2="614" y2="208"/><line x1="524" y1="184" x2="596" y2="184"/><line x1="542" y1="160" x2="578" y2="160"/></g>
+<line x1="20" y1="256" x2="660" y2="256" stroke="#8C6A38" stroke-width="2.5"/>
+<g><polygon points="262,236 304,236 312,256 254,256" fill="#9E7333"/><rect x="266" y="216" width="34" height="22" fill="#B5853F" stroke="#5E4220" stroke-width="1.5"/><line x1="278" y1="216" x2="278" y2="238" stroke="#5E4220" stroke-width="1"/><line x1="288" y1="216" x2="288" y2="238" stroke="#5E4220" stroke-width="1"/></g>
+<line x1="300" y1="226" x2="430" y2="228" stroke="#6E4B22" stroke-width="2"/>
+<g fill="#B0492B" stroke="#3A2415" stroke-width="1.2" stroke-linejoin="round">
+<g transform="translate(340,0)"><circle cx="0" cy="210" r="6"/><polygon points="-5,217 7,214 9,238 -3,240"/><line x1="6" y1="220" x2="-16" y2="226" stroke="#3A2415" stroke-width="3" stroke-linecap="round"/><line x1="3" y1="239" x2="11" y2="255" stroke="#3A2415" stroke-width="4" stroke-linecap="round"/><line x1="-2" y1="239" x2="-9" y2="255" stroke="#3A2415" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(374,0)"><circle cx="0" cy="210" r="6"/><polygon points="-5,217 7,214 9,238 -3,240"/><line x1="6" y1="220" x2="-16" y2="226" stroke="#3A2415" stroke-width="3" stroke-linecap="round"/><line x1="3" y1="239" x2="11" y2="255" stroke="#3A2415" stroke-width="4" stroke-linecap="round"/><line x1="-2" y1="239" x2="-9" y2="255" stroke="#3A2415" stroke-width="4" stroke-linecap="round"/></g>
+<g transform="translate(408,0)"><circle cx="0" cy="210" r="6"/><polygon points="-5,217 7,214 9,238 -3,240"/><line x1="6" y1="220" x2="-16" y2="226" stroke="#3A2415" stroke-width="3" stroke-linecap="round"/><line x1="3" y1="239" x2="11" y2="255" stroke="#3A2415" stroke-width="4" stroke-linecap="round"/><line x1="-2" y1="239" x2="-9" y2="255" stroke="#3A2415" stroke-width="4" stroke-linecap="round"/></g>
+</g>
+<g>
+<line x1="118" y1="256" x2="170" y2="104" stroke="#5E4220" stroke-width="4" stroke-linecap="round"/>
+<line x1="222" y1="256" x2="170" y2="104" stroke="#5E4220" stroke-width="4" stroke-linecap="round"/>
+<line x1="118" y1="256" x2="222" y2="256" stroke="#5E4220" stroke-width="5" stroke-linecap="round"/>
+<line x1="140" y1="190" x2="200" y2="190" stroke="#5E4220" stroke-width="3"/>
+<polygon points="166,256 170,248 174,256" fill="#1C5D99"/>
+<g><line x1="170" y1="104" x2="170" y2="206" stroke="#2A1C0E" stroke-width="1.5"/><polygon points="170,206 164,214 170,228 176,214" fill="#1C5D99" stroke="#123E66" stroke-width="1"/>
+<animateTransform attributeName="transform" type="rotate" dur="7s" repeatCount="indefinite" keyTimes="0;0.07;0.15;0.23;0.31;0.40;0.49;0.86;1" values="19 170 104; -14 170 104; 10 170 104; -6 170 104; 3 170 104; -1 170 104; 0 170 104; 0 170 104; 19 170 104"/></g>
+<text x="196" y="232" font-family="Georgia, serif" font-size="13" fill="#1C5D99" font-style="italic">true<animate attributeName="opacity" dur="7s" repeatCount="indefinite" keyTimes="0;0.45;0.52;0.82;0.9;1" values="0;0;1;1;0;0"/></text>
+</g>
+<rect x="20" y="290" width="640" height="2" fill="#8C6A38" opacity="0.5"/>
+<text x="40" y="338" font-family="Georgia, serif" font-size="40" letter-spacing="2" fill="#9A3B1E">plumbline</text>
+<text x="42" y="360" font-family="Georgia, serif" font-size="14" letter-spacing="3" fill="#6E4B22">true by construction</text>
+<g font-family="ui-monospace, Menlo, monospace" font-size="14" text-anchor="middle">
+<g transform="translate(410,326)"><rect x="-78" y="-17" width="156" height="34" rx="17" fill="none" stroke="#5E4220" stroke-width="2"/><circle cx="-78" cy="0" r="4" fill="#5E4220"/><circle cx="78" cy="0" r="4" fill="#5E4220"/>
+<text x="0" y="5" fill="#6E4B22" letter-spacing="3">&#9765; &#9673; &#8982; &#9737; &#9242;<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" values="1;1;0;0;1" keyTimes="0;0.35;0.5;0.85;1"/></text>
+<text x="0" y="5" fill="#1C5D99" letter-spacing="1">0x7a34f5&#8230;c0de<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.35;0.5;0.85;1"/></text></g>
+<g transform="translate(580,326)"><rect x="-78" y="-17" width="156" height="34" rx="17" fill="none" stroke="#5E4220" stroke-width="2"/><circle cx="-78" cy="0" r="4" fill="#5E4220"/><circle cx="78" cy="0" r="4" fill="#5E4220"/>
+<text x="0" y="5" fill="#6E4B22" letter-spacing="3">&#9765; &#8982; &#9772; &#10038; &#9765;<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" begin="-1.6s" values="1;1;0;0;1" keyTimes="0;0.35;0.5;0.85;1"/></text>
+<text x="0" y="5" fill="#9A3B1E" letter-spacing="0.5" font-size="12">0x&#183;YOUR&#183;WALLET<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" begin="-1.6s" values="0;0;1;1;0" keyTimes="0;0.35;0.5;0.85;1"/></text></g>
+</g>
+<text x="40" y="384" font-family="Georgia, serif" font-size="12" fill="#7A5524" font-style="italic">the plumb line has no opinion about vertical &#8212; and the gate has none about truth</text>
+</svg>'''
+
+
 @app.route("/")
 def home():
-    return redirect("/verification")
+    body = (
+        "<div style='max-width:760px;margin:0 auto;padding:2.4rem 1.1rem 3rem;text-align:center'>"
+        "<div style='border:1px solid var(--bdr);border-radius:14px;overflow:hidden;line-height:0'>"
+        + SPLASH_SVG +
+        "</div>"
+        "<p style='font-size:1.05rem;line-height:1.7;color:var(--fg);max-width:60ch;margin:1.8rem auto 0'>"
+        "An autonomous AI agent audits your Solidity — it proposes vulnerabilities and routes each "
+        "to a formal verifier. Only a real symbolic-EVM proof confirms a finding. "
+        "<b>The agent never grades its own homework.</b></p>"
+        "<a href='/verification' style='display:inline-block;margin:1.6rem 0 0.7rem;background:var(--accent);"
+        "color:#1a1205;font-weight:600;text-decoration:none;padding:0.8rem 1.6rem;border-radius:8px;"
+        "font-size:0.95rem'>Watch it confirm a real exploit &#8594;</a>"
+        "<p class='muted-er' style='font-size:0.78rem;margin:0.6rem 0 0'>"
+        "live halmos counterexamples · machine-checked · escalates what it can’t prove</p>"
+        "</div>"
+    )
+    return Response(page(body), mimetype="text/html")
 
 @app.route("/verification")
 def verification():
