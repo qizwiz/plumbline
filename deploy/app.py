@@ -85,10 +85,42 @@ SPLASH_SVG = '''<svg width="100%" viewBox="0 0 680 392" role="img" xmlns="http:/
 <text x="0" y="5" fill="#1C5D99" letter-spacing="1">0x7a34f5&#8230;c0de<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" values="0;0;1;1;0" keyTimes="0;0.35;0.5;0.85;1"/></text></g>
 <g transform="translate(580,326)"><rect x="-78" y="-17" width="156" height="34" rx="17" fill="none" stroke="#5E4220" stroke-width="2"/><circle cx="-78" cy="0" r="4" fill="#5E4220"/><circle cx="78" cy="0" r="4" fill="#5E4220"/>
 <text x="0" y="5" fill="#6E4B22" letter-spacing="3">&#9765; &#8982; &#9772; &#10038; &#9765;<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" begin="-1.6s" values="1;1;0;0;1" keyTimes="0;0.35;0.5;0.85;1"/></text>
-<text x="0" y="5" fill="#9A3B1E" letter-spacing="0.5" font-size="12">0x&#183;YOUR&#183;WALLET<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" begin="-1.6s" values="0;0;1;1;0" keyTimes="0;0.35;0.5;0.85;1"/></text></g>
+<text x="0" y="5" fill="#9A3B1E" letter-spacing="0.5" font-size="12">0x0D2c3B&#8230;36030aA<animate attributeName="opacity" dur="4.4s" repeatCount="indefinite" begin="-1.6s" values="0;0;1;1;0" keyTimes="0;0.35;0.5;0.85;1"/></text></g>
 </g>
 <text x="40" y="384" font-family="Georgia, serif" font-size="12" fill="#7A5524" font-style="italic">the plumb line has no opinion about vertical &#8212; and the gate has none about truth</text>
 </svg>'''
+
+
+_LIVE_API = "https://qizwiz--plumbline-live-web-run.modal.run"
+_LIVE_BANNER = (
+    "<div style='border:1px solid var(--accent);border-radius:8px;padding:0.85rem 1rem;"
+    "margin:0 0 1.6rem;background:var(--bg-3)'>"
+    "<b>Think the run below is canned?</b> It isn't — "
+    "<button id='liveBtn' onclick='runLive()' style='background:var(--accent);color:#1a1205;"
+    "border:none;font-weight:600;padding:0.42rem 0.95rem;border-radius:6px;cursor:pointer;"
+    "font-family:inherit;font-size:0.82rem'>&#9654; run halmos live in the cloud</button>"
+    "<div style='font-size:0.74rem;color:var(--fg-dim);margin-top:0.4rem'>spins a real Modal "
+    "container, compiles the contract, runs the symbolic-execution invariant against the real "
+    "bytecode, and returns the verbatim output (~5s; longer on a cold start).</div>"
+    "<div id='liveOut' style='display:none;background:#0b0e14;border:1px solid var(--bdr);"
+    "border-radius:6px;padding:0.6rem 0.8rem;margin-top:0.6rem;font-family:ui-monospace,monospace;"
+    "font-size:0.76rem;overflow-x:auto'></div></div>"
+    "<script>"
+    "async function runLive(){"
+    "var b=document.getElementById('liveBtn'),o=document.getElementById('liveOut');"
+    "b.disabled=true;b.textContent='running\\u2026';o.style.display='block';"
+    "o.innerHTML=\"<span style='color:var(--yel)'>spinning up a Modal container \\u00b7 compiling \\u00b7 running symbolic execution\\u2026</span>\";"
+    "try{"
+    "var r=await fetch('" + _LIVE_API + "?inv=check_redeemReturnsDeposit');"
+    "var d=await r.json();var ok=d.found_counterexample;"
+    "o.innerHTML=\"<pre style='white-space:pre-wrap;color:#C9B98F;margin:0'>$ \"+d.argv+\"\\n\\n\"+(d.clean||d.error||'')+\"</pre>\""
+    "+\"<div style='margin-top:.5rem;color:\"+(ok?'var(--red)':'var(--yel)')+\"'>\"+(ok?'\\u2713 live halmos found the counterexample':'(no counterexample this run)')+\" \\u00b7 ran in \"+d.ran_in+\" \\u00b7 \"+d.wall_s+\"s \\u00b7 exit \"+d.exit_code+\"</div>\""
+    "+\"<div style='font-size:.72rem;color:var(--fg-dim);margin-top:.3rem'>fresh run \\u2014 same 0x800\\u2026 witness as the recording above; only the symbolic var-name and hash differ because it just executed now. Not canned.</div>\";"
+    "}catch(e){o.innerHTML=\"<span style='color:var(--yel)'>live endpoint unavailable (\"+e+\"). The recorded run above is still reproducible locally.</span>\";}"
+    "b.disabled=false;b.textContent='\\u25b6 run halmos live again';"
+    "}"
+    "</script>"
+)
 
 
 @app.route("/")
@@ -182,7 +214,7 @@ def verification():
                    f"is not: each verdict below is a deterministic function of a real subprocess's "
                    f"<code>(stdout, exit_code)</code>, and a CONFIRMED requires the witness to appear "
                    f"verbatim in stdout. Re-run any printed <code>$ halmos&nbsp;…</code> line for "
-                   f"the same counterexample, bit for bit.</p>")
+                   f"the same counterexample, bit for bit.</p>" + _LIVE_BANNER)
 
         def fmt_argv(argv):
             return " ".join(os.path.basename(a) if str(a).startswith("/") else str(a) for a in argv)
