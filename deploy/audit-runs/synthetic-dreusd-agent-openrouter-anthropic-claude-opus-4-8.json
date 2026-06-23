@@ -1,0 +1,132 @@
+{
+  "schema_version": 3,
+  "command": "agent-audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/synthetic-dreusd",
+  "target_name": "synthetic-dreusd",
+  "ts": 1782226815.204421,
+  "proposer": {
+    "model": "openrouter/anthropic/claude-opus-4.8",
+    "ok": true,
+    "n": 4
+  },
+  "tools_fired": [
+    "halmos"
+  ],
+  "n_confirmed": 1,
+  "n_cleared": 1,
+  "n_escalated": 2,
+  "findings": [
+    {
+      "severity": "HIGH",
+      "function": "dreUSD.redeem",
+      "claim": "redeem burns 18-decimal dreAmount but transfers the same raw number as 6-decimal USDC, so users can drain ~1e12x more USDC than they deposited (decimal mismatch breaks the peg).",
+      "claim_source": "proposer",
+      "bug_class": "redeem-returns-more-than-deposited",
+      "route": {
+        "chosen_tool": "halmos",
+        "rationale": "The decimal mismatch lets redeem pay out far more value than deposited, exactly what check_redeemReturnsDeposit asserts against.",
+        "rationale_source": "proposer",
+        "invariant": "check_redeemReturnsDeposit"
+      },
+      "verification": {
+        "verdict": "CONFIRMED",
+        "verdict_source": "tool",
+        "bound": true,
+        "steps": [
+          {
+            "tool": "halmos",
+            "argv": [
+              "/Users/jonathanhill/src/plumbline/.venv/bin/halmos",
+              "--function",
+              "check_redeemReturnsDeposit"
+            ],
+            "cwd": "/Users/jonathanhill/src/plumbline/examples/synthetic-dreusd",
+            "exit_code": 1,
+            "wall_s": 2.53,
+            "stdout_sha256": "7a0017873bcdc511",
+            "stdout_excerpt": "No files changed, compilation skipped\n\nRunning 1 tests for test/Properties.t.sol:Properties\nCounterexample: \n    p_deposit_uint256_d27c882_00 = 0x800000000000000\n[FAIL] check_redeemReturnsDeposit(uint256) (paths: 5, time: 0.31s, bounds: [])\nSymbolic test result: 0 passed; 1 failed; time: 0.39s\nWarning: Found unknown `ha",
+            "verdict": "CONFIRMED",
+            "evidence": "p_deposit_uint256_d27c882_00 = 0x800000000000000",
+            "verdict_source": "tool",
+            "bound": true
+          }
+        ]
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "dreUSDs.distributeYield",
+      "claim": "yield deposited before/at a single block lets an attacker deposit just before distribution and withdraw immediately after to capture rewards, defeating time-weighted accrual and enabling sandwich/donation theft.",
+      "claim_source": "proposer",
+      "bug_class": "yield-timing-manipulation",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "Time-weighted accrual/sandwich timing is a temporal economic flaw with no matching invariant or arithmetic obligation, so it escalates to a human.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    },
+    {
+      "severity": "MED",
+      "function": "dreUSD.mint",
+      "claim": "return values of usdc.transferFrom are unchecked, so a non-reverting failed transfer mints unbacked dreUSD.",
+      "claim_source": "proposer",
+      "bug_class": "supply-vs-backing",
+      "route": {
+        "chosen_tool": "halmos",
+        "rationale": "Unchecked transferFrom can mint dreUSD without backing collateral, which check_supplyAtMostBacking directly tests.",
+        "rationale_source": "proposer",
+        "invariant": "check_supplyAtMostBacking"
+      },
+      "verification": {
+        "verdict": "CLEARED",
+        "verdict_source": "tool",
+        "bound": true,
+        "steps": [
+          {
+            "tool": "halmos",
+            "argv": [
+              "/Users/jonathanhill/src/plumbline/.venv/bin/halmos",
+              "--function",
+              "check_supplyAtMostBacking"
+            ],
+            "cwd": "/Users/jonathanhill/src/plumbline/examples/synthetic-dreusd",
+            "exit_code": 0,
+            "wall_s": 1.79,
+            "stdout_sha256": "012f28174c69a232",
+            "stdout_excerpt": "No files changed, compilation skipped\n\nRunning 1 tests for test/Properties.t.sol:Properties\n[PASS] check_supplyAtMostBacking(uint256) (paths: 3, time: 0.26s, bounds: [])\nSymbolic test result: 1 passed; 0 failed; time: 0.29s\nWarning: Found unknown `halmos` config for profile `default` defined in foundry.toml.\nwarning[incorrect-shift]: the order of args in a shift operation is incorrect\n   \u256d\u25b8 lib/solmate/src/auth/authorities/MultiRolesAuthority.sol:98:43\n   \u2502\n98 \u2502             getUserRoles[user] |= bytes32(1 << role);\n   \u2502                                           \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n   \u2502\n   \u2570 help: https://book.getfoundry.sh/reference/forge/forge-lint#incorrect-shift\n\nwarning[incorrect-shift]: the order",
+            "verdict": "CLEARED",
+            "evidence": null,
+            "verdict_source": "tool",
+            "bound": true
+          }
+        ]
+      }
+    },
+    {
+      "severity": "MED",
+      "function": "dreUSDs.deposit",
+      "claim": "first-depositor/donation inflation attack via direct asset transfer can manipulate share price and steal subsequent depositors' funds.",
+      "claim_source": "proposer",
+      "bug_class": "first-depositor-inflation",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "Donation-based share-price inflation depends on external transfers and has no matching invariant; it is not a clean mulDiv rounding obligation, so escalate.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    }
+  ]
+}

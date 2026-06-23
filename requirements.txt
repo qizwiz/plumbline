@@ -1,5 +1,6 @@
-# Core LLM + FV stack
-anthropic
+# Core FV stack (the live `plumbline audit` path). The LLM proposer/router is invoked
+# out-of-process via `uvx --with llm-openrouter llm` (OpenRouter), so no Python LLM SDK is
+# pinned here for the live path.
 z3-solver
 halmos
 python-dotenv
@@ -20,6 +21,6 @@ scipy>=1.10
 flask>=3.0
 
 
-# Optional — for `plumbline scan --compare slither`. Requires solc-select (auto-installed) +
-# Foundry (https://book.getfoundry.sh) for projects that use forge.
+# Optional — for `plumbline scan --compare slither`. Requires a solc on PATH (e.g. via solc-select,
+# installed separately) + Foundry (https://book.getfoundry.sh) for projects that use forge.
 slither-analyzer

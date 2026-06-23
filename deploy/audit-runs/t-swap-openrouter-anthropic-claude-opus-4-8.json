@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "command": "audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/t-swap",
+  "target_name": "t-swap",
+  "ts": 1782203295.198283,
+  "proposer": {
+    "model": "openrouter/anthropic/claude-opus-4.8",
+    "ok": true,
+    "findings": [
+      {
+        "severity": "HIGH",
+        "function": "TSwapPool.getInputAmountBasedOnOutput",
+        "desc": "Fee denominator uses 10000 instead of 1000, overcharging users ~10x the input amount on every swapExactOutput call.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "TSwapPool.swapExactOutput",
+        "desc": "Missing maxInputAmount slippage parameter lets users get drained via unbounded inputAmount during price movement or sandwich attacks.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "TSwapPool._swap",
+        "desc": "The every-10-swaps free 1e18 token incentive drains reserves and breaks the x*y=k invariant, allowing eventual pool depletion.",
+        "status": "CONFIRMED",
+        "invariant": "check_swapPreservesXYK",
+        "counterexample": "p_inputAmount_uint64_34caa6c_00 = 0x800000000000000"
+      },
+      {
+        "severity": "HIGH",
+        "function": "TSwapPool.deposit",
+        "desc": "The minimumLiquidityTokensToMint/liquidityTokensToMint check and parameter ordering bug (LiquidityAdded emits poolTokens and weth swapped) misvalue deposits, with initial-deposit path ignoring poolToken slippage protection.",
+        "status": "ESCALATED (no sound invariant)"
+      }
+    ],
+    "raw": "HIGH | TSwapPool.getInputAmountBasedOnOutput | Fee denominator uses 10000 instead of 1000, overcharging users ~10x the input amount on every swapExactOutput call.\nHIGH | TSwapPool.swapExactOutput | Missing maxInputAmount slippage parameter lets users get drained via unbounded inputAmount during price movement or sandwich attacks.\nHIGH | TSwapPool._swap | The every-10-swaps free 1e18 token incentive drains reserves and breaks the x*y=k invariant, allowing eventual pool depletion.\nHIGH | TSwapPool.deposit | The minimumLiquidityTokensToMint/liquidityTokensToMint check and parameter ordering bug (LiquidityAdded emits poolTokens and weth swapped) misvalue deposits, with initial-deposit path ignoring poolToken slippage protection."
+  },
+  "n_confirmed": 1,
+  "n_cleared": 0,
+  "results": [
+    {
+      "invariant": "check_swapPreservesXYK",
+      "function": "TSwapPool._swap",
+      "finding": "a swap can break the x*y=k constant-product invariant (fee / extra-token bug).",
+      "severity": "HIGH",
+      "gate": "FAIL",
+      "verdict": "CONFIRMED",
+      "counterexample": "p_inputAmount_uint64_34caa6c_00 = 0x800000000000000"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "command": "audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/synthetic-dreusd",
+  "target_name": "synthetic-dreusd",
+  "ts": 1782203267.6970031,
+  "proposer": {
+    "model": "openrouter/anthropic/claude-opus-4.8",
+    "ok": true,
+    "findings": [
+      {
+        "severity": "CRITICAL",
+        "function": "dreUSD.redeem",
+        "desc": "Redeem burns 18-decimal dreAmount but transfers the same number as 6-decimal USDC, scaling mismatch lets attacker drain all USDC reserves (or redeem reverts/underpays depending on direction).",
+        "status": "CONFIRMED",
+        "invariant": "check_redeemReturnsDeposit",
+        "counterexample": "p_deposit_uint256_a41eaf1_00 = 0x800000000000000"
+      },
+      {
+        "severity": "CRITICAL",
+        "function": "dreUSD.mint",
+        "desc": "transferFrom/transfer return values are unchecked, so a failed USDC transfer still mints dreUSD, allowing minting without backing deposit.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "dreUSDs.distributeYield",
+        "desc": "Donating yield via direct transfer enables a first-depositor/donation share-inflation attack that lets an attacker steal subsequent stakers' deposits.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "LOW",
+        "function": "dreUSD",
+        "desc": "The minter role is set but never enforced (mint is permissionless) and there is no access control, making the variable misleading and useless.",
+        "status": "ESCALATED (no sound invariant)"
+      }
+    ],
+    "raw": "CRITICAL | dreUSD.redeem | Redeem burns 18-decimal dreAmount but transfers the same number as 6-decimal USDC, scaling mismatch lets attacker drain all USDC reserves (or redeem reverts/underpays depending on direction).\nCRITICAL | dreUSD.mint | transferFrom/transfer return values are unchecked, so a failed USDC transfer still mints dreUSD, allowing minting without backing deposit.\nHIGH | dreUSDs.distributeYield | Donating yield via direct transfer enables a first-depositor/donation share-inflation attack that lets an attacker steal subsequent stakers' deposits.\nLOW | dreUSD | The minter role is set but never enforced (mint is permissionless) and there is no access control, making the variable misleading and useless."
+  },
+  "n_confirmed": 1,
+  "n_cleared": 1,
+  "results": [
+    {
+      "invariant": "check_redeemReturnsDeposit",
+      "function": "dreUSD.redeem",
+      "finding": "redeem() returns more than was deposited \u2014 a 6\u219218 decimal mismatch (redeem omits the /1e12 scale-down).",
+      "severity": "HIGH",
+      "gate": "FAIL",
+      "verdict": "CONFIRMED",
+      "counterexample": "p_deposit_uint256_a41eaf1_00 = 0x800000000000000"
+    },
+    {
+      "invariant": "check_supplyAtMostBacking",
+      "function": "dreUSD.mint",
+      "finding": "total dreUSD supply could be minted in excess of its collateral backing (insolvency).",
+      "severity": "HIGH",
+      "gate": "PASS",
+      "verdict": "CLEARED (proved safe)",
+      "counterexample": null
+    }
+  ]
+}

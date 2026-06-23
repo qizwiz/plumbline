@@ -106,31 +106,51 @@ def screen(width=_SCREEN_BITS) -> tuple[bool, dict]:
     return all(report.values()), report
 
 
-# Obligations DISCHARGED in Lean = the sound root of trust. An op is ADMITTED only if its obligation
-# is registered here with a Lean proof verified (0 errors, 0 sorry) via:
-#   cd ~/src/rule30 && lake env lean <abs path to lean/SummaryObligation.lean>
-# Verified 2026-06-04 against Rule 30's Mathlib env. z3 only SCREENS; LEAN ADMITS.
+# Obligations DISCHARGED in Lean = the sound root of trust. An op is ADMITTED only when Lean ACTUALLY
+# re-checks its obligation clean (0 errors, 0 sorry) at gate() time — see _lean_discharges. There is
+# NO hardcoded "discharged" flag: admission is a live Lean run. The proof is bare-`lean` checkable in
+# ~3s with no Mathlib/lake: `lean lean/SummaryObligation.lean` → exit 0. z3 only SCREENS; LEAN ADMITS.
 REGISTRY = {
     "mulDiv/convertToShares": {
-        "obligation": "floor bracket + zero-case + floor-monotone + product-monotone (over ℕ, a*s<2^256)",
+        "obligation": "floor bracket + zero-case + floor-monotone + product-monotone (over Nat, a*s<2^256)",
         "lean_proof": "lean/SummaryObligation.lean",
-        "status": "lean-discharged",
     },
 }
+
+
+def _lean_discharges(proof_rel: str) -> bool:
+    """ADMISSION is earned, not declared: actually run Lean on the obligation and require a clean
+    exit (0 errors, 0 sorry). If Lean is unavailable or the proof does not re-check NOW, the op is
+    not admitted — the gate degrades to 'screened-pending-lean' rather than rubber-stamping."""
+    import os, subprocess
+    here = os.path.dirname(os.path.abspath(__file__))
+    proof = os.path.join(here, proof_rel)
+    if not os.path.exists(proof):
+        return False
+    lean = os.path.expanduser("~/.elan/bin/lean")
+    if not os.path.exists(lean):
+        lean = "lean"
+    try:
+        r = subprocess.run([lean, proof], capture_output=True, text=True, timeout=120)
+    except Exception:
+        return False
+    out = (r.stdout + r.stderr).lower()
+    return r.returncode == 0 and "error" not in out and "sorry" not in out
 
 
 def gate(op_key: str = "mulDiv/convertToShares") -> tuple[str, dict]:
     """THE GATE / root of trust. Two honest stages:
       1. z3 REFUTATION screen (fast) — kills unsound candidates outright.
-      2. LEAN proof (sound, unbounded) — the ONLY thing that ADMITS. A summary is NEVER applied on a
+      2. LEAN proof (sound, unbounded) — the ONLY thing that ADMITS, and admission means Lean is
+         ACTUALLY RE-RUN on the obligation here (no hardcoded flag). A summary is NEVER applied on a
          z3-only basis (unsound: z3 can't prove the 256-bit claim — measured exponential wall).
-    Verdicts: 'rejected' (z3 refuted an axiom) | 'screened-pending-lean' (survived screen, no Lean
-    proof yet) | 'admitted' (obligation discharged in Lean, in REGISTRY). Returns (verdict, report)."""
+    Verdicts: 'rejected' (z3 refuted an axiom) | 'screened-pending-lean' (survived screen, Lean proof
+    absent or not re-checking clean) | 'admitted' (Lean re-discharged the obligation now)."""
     survived, report = screen()
     if not survived:
         return "rejected", report
     entry = REGISTRY.get(op_key)
-    if entry and entry.get("status") == "lean-discharged":
+    if entry and entry.get("lean_proof") and _lean_discharges(entry["lean_proof"]):
         return "admitted", report
     return "screened-pending-lean", report
 

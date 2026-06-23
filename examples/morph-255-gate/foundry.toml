@@ -1,0 +1,9 @@
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+libs = ["lib"]
+remappings = [
+    "forge-std/=/Users/jonathanhill/src/plumbline/examples/synthetic-dreusd/lib/forge-std/src/",
+]
+solc = "0.8.20"

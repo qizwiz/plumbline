@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "command": "audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/boss-bridge",
+  "target_name": "boss-bridge",
+  "ts": 1782203516.6297212,
+  "proposer": {
+    "model": "openrouter/google/gemini-3.5-flash",
+    "ok": true,
+    "findings": [
+      {
+        "severity": "HIGH",
+        "function": "L1BossBridge.depositTokensToL2",
+        "desc": "Anyone can drain approved users' funds because the function allows an arbitrary choice of the `from` address in `safeTransferFrom`.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "L1BossBridge.sendToL1",
+        "desc": "Lack of signature replay protection (no nonces or tracking of used signatures) allows an attacker to reuse a single valid signature indefinitely to withdraw all funds.",
+        "status": "CONFIRMED",
+        "invariant": "check_withdrawCannotBeReplayed",
+        "counterexample": "assertion fails with no symbolic input (trivial witness)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "L1BossBridge.sendToL1",
+        "desc": "The function executes arbitrary low-level calls to target addresses, enabling an attacker to trigger the token's `transferFrom` using the bridge's infinite vault approval.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "MED",
+        "function": "L1BossBridge.depositTokensToL2",
+        "desc": "Users can permanently DOS deposits by directly transferring tokens to the vault, artificially inflating the balance beyond the hardcoded `DEPOSIT_LIMIT`.",
+        "status": "ESCALATED (no sound invariant)"
+      }
+    ],
+    "raw": "HIGH | L1BossBridge.depositTokensToL2 | Anyone can drain approved users' funds because the function allows an arbitrary choice of the `from` address in `safeTransferFrom`.\nHIGH | L1BossBridge.sendToL1 | Lack of signature replay protection (no nonces or tracking of used signatures) allows an attacker to reuse a single valid signature indefinitely to withdraw all funds.\nHIGH | L1BossBridge.sendToL1 | The function executes arbitrary low-level calls to target addresses, enabling an attacker to trigger the token's `transferFrom` using the bridge's infinite vault approval.\nMEDIUM | L1BossBridge.depositTokensToL2 | Users can permanently DOS deposits by directly transferring tokens to the vault, artificially inflating the balance beyond the hardcoded `DEPOSIT_LIMIT`."
+  },
+  "n_confirmed": 1,
+  "n_cleared": 0,
+  "results": [
+    {
+      "invariant": "check_withdrawCannotBeReplayed",
+      "function": "L1BossBridge.sendToL1",
+      "finding": "a signed withdrawal can be replayed to drain the vault.",
+      "severity": "HIGH",
+      "gate": "FAIL",
+      "verdict": "CONFIRMED",
+      "counterexample": "assertion fails with no symbolic input (trivial witness)"
+    }
+  ]
+}

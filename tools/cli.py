@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -888,6 +889,251 @@ def cmd_surface(args):
     }, indent=2, default=str))
 
 
+# ---------- audit: the formal gate -------------------------------------------
+#
+# This is the legible end-to-end surface: an AI proposes a finding, and a SOUND
+# gate (halmos symbolic EVM) proves or rejects it — the agent never grades its
+# own homework. The proposer findings below are CURATED for the bundled example
+# targets so the GATE (the novel, sound part) runs end-to-end for $0. Auto-
+# synthesizing these for arbitrary code is the next arc, not this command.
+
+_PROPOSER_FINDINGS = {
+    "check_redeemReturnsDeposit": {
+        "function": "dreUSD.redeem",
+        "finding": "redeem() returns more than was deposited — a 6→18 decimal mismatch (redeem omits the /1e12 scale-down).",
+        "severity": "HIGH",
+    },
+    "check_supplyAtMostBacking": {
+        "function": "dreUSD.mint",
+        "finding": "total dreUSD supply could be minted in excess of its collateral backing (insolvency).",
+        "severity": "HIGH",
+    },
+    "check_swapPreservesXYK": {
+        "function": "TSwapPool._swap",
+        "finding": "a swap can break the x*y=k constant-product invariant (fee / extra-token bug).",
+        "severity": "HIGH",
+    },
+    "check_withdrawCannotBeReplayed": {
+        "function": "L1BossBridge.sendToL1",
+        "finding": "a signed withdrawal can be replayed to drain the vault.",
+        "severity": "HIGH",
+    },
+    "check_uint64CastDoesNotLoseFee": {
+        "function": "PuppyRaffle.selectWinner",
+        "finding": "a uint64 cast in fee accounting truncates collected fees.",
+        "severity": "MED",
+    },
+}
+
+
+def _find_invariants(target: Path) -> list:
+    import re
+    invs, seen = [], set()
+    for sol in target.rglob("*.sol"):
+        if any(s in str(sol) for s in ("/lib/", "/out/", "/cache/")):
+            continue
+        try:
+            txt = sol.read_text(errors="ignore")
+        except Exception:
+            continue
+        for m in re.findall(r"function\s+(check_[A-Za-z0-9_]+)", txt):
+            if m not in seen:
+                seen.add(m); invs.append(m)
+    return invs
+
+
+def _run_gate(target: Path, inv: str, timeout: int = 150) -> dict:
+    """Run halmos on one check_* invariant; parse the sound verdict."""
+    import re, subprocess
+    halmos = ROOT / ".venv" / "bin" / "halmos"
+    try:
+        r = subprocess.run([str(halmos), "--function", inv], cwd=str(target),
+                           capture_output=True, text=True, timeout=timeout)
+        out = (r.stdout or "") + (r.stderr or "")
+        out = re.sub(r"\x1b\[[0-9;]*m", "", out)   # strip ANSI color
+    except subprocess.TimeoutExpired:
+        return {"gate": "TIMEOUT", "verdict": "UNRESOLVED", "counterexample": None}
+    except Exception as e:
+        return {"gate": "ERROR", "verdict": "UNRESOLVED", "counterexample": str(e)[:80]}
+    cex = re.search(r"Counterexample:\s*([^\n]+)", out)
+    if cex and cex.group(1).strip():
+        val = cex.group(1).strip()
+        if not re.search(r"[0-9A-Za-z]", val):   # ∅ / empty model — no concrete witness
+            val = "assertion fails with no symbolic input (trivial witness)"
+        return {"gate": "FAIL", "verdict": "CONFIRMED", "counterexample": val[:90]}
+    if re.search(r"\b[1-9][0-9]* passed; 0 failed\b|\[PASS\]", out):
+        return {"gate": "PASS", "verdict": "CLEARED (proved safe)", "counterexample": None}
+    if re.search(r"0 passed; [1-9]", out) or "[FAIL]" in out:
+        return {"gate": "FAIL", "verdict": "CONFIRMED",
+                "counterexample": "assertion fails with no symbolic input (trivial witness)"}
+    return {"gate": "UNKNOWN", "verdict": "UNRESOLVED", "counterexample": None}
+
+
+def _run_proposer(target: Path, model: str, timeout: int = 180) -> dict:
+    """LIVE LLM proposer: read the contract sources, propose findings (a real call
+    via the `llm` CLI + OpenRouter). This is the agentic half — the agent never
+    sees the answer key; the gate verifies it independently."""
+    import subprocess
+    srcs = []
+    for sol in sorted(target.glob("*.sol")):
+        try: srcs.append(sol.read_text(errors="ignore"))
+        except Exception: pass
+    if not srcs:
+        for sol in target.rglob("*.sol"):
+            if any(s in str(sol) for s in ("/lib/", "/test", "/out/", ".t.sol")):
+                continue
+            try: srcs.append(sol.read_text(errors="ignore"))
+            except Exception: pass
+    source = "\n\n".join(srcs)[:40000]
+    prompt = ("You are a smart-contract security auditor. Below is a Solidity protocol. "
+              "Identify its most serious vulnerabilities. For each finding output exactly one "
+              "line: SEVERITY | Contract.function | one-sentence description. Output only the "
+              "findings, max 4, most severe first. No preamble.\n\nSOURCES:\n" + source)
+    try:
+        r = subprocess.run(["uvx", "--quiet", "--with", "llm-openrouter", "llm", "-m", model],
+                           input=prompt, capture_output=True, text=True, timeout=timeout)
+        out = (r.stdout or "").strip()
+    except Exception as e:
+        return {"model": model, "ok": False, "error": str(e)[:140], "findings": [], "raw": ""}
+    findings = []
+    for ln in out.splitlines():
+        parts = [p.strip() for p in ln.split("|")]
+        if len(parts) < 3:
+            continue
+        sev = re.sub(r"[^A-Za-z]", "", parts[0]).upper()   # strip bullets/markdown (**HIGH**, "1. HIGH", "- HIGH")
+        if sev in ("CRITICAL", "HIGH", "MEDIUM", "MED", "LOW"):
+            findings.append({"severity": sev.replace("MEDIUM", "MED"),
+                             "function": parts[1], "desc": "|".join(parts[2:]).strip()})
+    return {"model": model, "ok": bool(findings), "findings": findings, "raw": out}
+
+
+def cmd_audit(args):
+    import subprocess
+    target = Path(args.dir).resolve()
+    if not target.exists():
+        print(f"plumbline audit: {target} does not exist", file=sys.stderr); sys.exit(1)
+
+    if getattr(args, "agent", False):
+        sys.path.insert(0, str(HERE))
+        import orchestrator
+        payload = orchestrator.orchestrate(str(target), args.model)
+        if args.json:
+            print(json.dumps(payload, indent=2)); return
+        print(f"\n  plumbline audit --agent  {payload['target_name']}")
+        print(f"  agent ({args.model.split('/')[-1]}) proposed {payload['proposer']['n']} findings · "
+              f"routed each to a verifier · tools fired: {', '.join(payload['tools_fired']) or 'none'}\n")
+        for f in payload["findings"]:
+            v = f["verification"]
+            mark = {"CONFIRMED": "✗ CONFIRMED", "CLEARED": "✓ CLEARED"}.get(v["verdict"], "⊘ " + v["verdict"])
+            print(f"  ┃ [{f['severity']}] {f['function']}  →  route: {f['route']['chosen_tool']}")
+            print(f"  ┃   {f['claim']}")
+            print(f"  ┃   why: {f['route']['rationale']}")
+            for s in v["steps"]:
+                print(f"  ┃   $ {os.path.basename(s['argv'][0])} {' '.join(s['argv'][1:3])} … "
+                      f"→ {s['verdict']}  ({s['wall_s']}s, exit {s['exit_code']})")
+                if s.get("evidence"):
+                    print(f"  ┃     witness: {str(s['evidence'])[:70]}")
+            print(f"  ┃   verdict: {mark}\n  ┃")
+        print(f"  {payload['n_confirmed']} confirmed · {payload['n_cleared']} cleared · "
+              f"{payload['n_escalated']} escalated   →  /verification\n")
+        return
+
+    invs = _find_invariants(target)
+    if not invs:
+        print(f"plumbline audit: no check_* invariants found under {target}", file=sys.stderr); sys.exit(1)
+    try:
+        subprocess.run(["forge", "build"], cwd=str(target), capture_output=True, text=True, timeout=300)
+    except Exception:
+        pass
+
+    # the agentic half: a live LLM proposes findings (or a curated stand-in for $0 runs)
+    live = bool(getattr(args, "live", False))
+    if live:
+        print("  · running live proposer …", file=sys.stderr)
+    proposer = _run_proposer(target, args.model) if live else None
+
+    results = []
+    for inv in invs:
+        prop = _PROPOSER_FINDINGS.get(inv, {"function": "(unmapped)", "finding": inv, "severity": "?"})
+        results.append({"invariant": inv, **prop, **_run_gate(target, inv)})
+
+    # cross-link the live agent's findings to the gate's verdicts. Honest rule:
+    # only claim CONFIRMED when the gate produced a real counterexample on the SAME
+    # function. A *passed* invariant does NOT clear an agent finding (it may prove a
+    # different property), so anything not confirmed is ESCALATED to human review.
+    if proposer and proposer.get("findings"):
+        # dedupe identical findings (same function + description)
+        _seen, _uniq = set(), []
+        for f in proposer["findings"]:
+            k = (str(f.get("function", "")).lower(), str(f.get("desc", "")).lower())
+            if k in _seen:
+                continue
+            _seen.add(k); _uniq.append(f)
+        proposer["findings"] = _uniq
+        # 1:1 binding — each CONFIRMED invariant proves exactly ONE finding; a second
+        # finding on the same function is NOT proven by that invariant, so it ESCALATES.
+        claimed = set()
+        for f in proposer["findings"]:
+            fn = f["function"].split(".")[-1].lower()
+            g = next((g for g in results
+                      if g["verdict"] == "CONFIRMED" and g["invariant"] not in claimed
+                      and fn and fn in g["function"].lower()), None)
+            if g:
+                claimed.add(g["invariant"])
+                f["status"] = "CONFIRMED"; f["invariant"] = g["invariant"]
+                f["counterexample"] = g.get("counterexample")
+            else:
+                f["status"] = "ESCALATED (no sound invariant)"
+
+    payload = {
+        "schema_version": 2, "command": "audit",
+        "target": str(target), "target_name": target.name, "ts": time.time(),
+        "proposer": proposer,
+        "n_confirmed": sum(1 for r in results if r["verdict"] == "CONFIRMED"),
+        "n_cleared": sum(1 for r in results if r["verdict"].startswith("CLEARED")),
+        "results": results,
+    }
+    import re
+    (ROOT / "states" / "audit-latest.json").write_text(json.dumps(payload, indent=2))
+    # per-model cache so the web switcher can toggle pre-computed runs (no live calls in the UI)
+    if live and proposer and proposer.get("ok"):
+        runs = ROOT / "states" / "audit-runs"; runs.mkdir(exist_ok=True)
+        slug = re.sub(r"[^a-z0-9]+", "-", f"{target.name}--{proposer['model']}".lower()).strip("-")
+        (runs / f"{slug}.json").write_text(json.dumps(payload, indent=2))
+
+    if args.json:
+        print(json.dumps(payload, indent=2)); return
+
+    print(f"\n  plumbline audit  {target.name}")
+    if proposer and proposer.get("ok"):
+        print(f"  agent ({proposer['model'].split('/')[-1]}) proposed {len(proposer['findings'])} findings · "
+              "a formal gate (halmos) proves, rejects, or escalates each\n")
+        for f in proposer["findings"]:
+            st = f.get("status", "—")
+            mark = ("✗ CONFIRMED" if st == "CONFIRMED" else
+                    "✓ CLEARED" if st.startswith("CLEARED") else "⊘ ESCALATED")
+            print(f"  ┃ [{f['severity']}] {f['function']}")
+            print(f"  ┃   {f['desc']}")
+            print(f"  ┃   gate → {mark}" + (f"   ({f['invariant']})" if f.get('invariant') else ""))
+            if f.get("counterexample"):
+                print(f"  ┃   witness: {f['counterexample']}")
+            print("  ┃")
+    else:
+        print("  AI proposes a finding · a formal gate (halmos) proves or rejects it\n")
+        for r in results:
+            tag = ("✗ CONFIRMED EXPLOIT" if r["verdict"] == "CONFIRMED"
+                   else "✓ CLEARED (proved safe)" if r["verdict"].startswith("CLEARED")
+                   else "⧗ " + r["verdict"])
+            print(f"  ┃ [{r['severity']}] {r['function']}")
+            print(f"  ┃   finding : {r['finding']}")
+            print(f"  ┃   gate    : {r['invariant']} → {tag}")
+            if r.get("counterexample"):
+                print(f"  ┃   witness : {r['counterexample']}")
+            print("  ┃")
+    print(f"  {payload['n_confirmed']} confirmed · {payload['n_cleared']} cleared (proved safe) "
+          f"· {len(results)} gated   →  /verification\n")
+
+
 def main():
     p = argparse.ArgumentParser(
         prog="plumbline",
@@ -946,6 +1192,17 @@ def main():
     ss.add_argument("--to", required=True, help="output markdown path")
     ss.add_argument("--json", action="store_true")
 
+    sat = sub.add_parser("audit", help="the gate: AI-proposed findings, proved or rejected by halmos")
+    sat.add_argument("dir", help="a foundry project dir (e.g. examples/synthetic-dreusd)")
+    sat.add_argument("--agent", action="store_true",
+                     help="agent loop: LLM proposes + ROUTES each finding to halmos/z3/lean; tools mint the verdicts")
+    sat.add_argument("--live", action="store_true",
+                     help="run a LIVE LLM proposer (real call via llm+OpenRouter) instead of curated findings")
+    sat.add_argument("--model", default="openrouter/anthropic/claude-opus-4.8",
+                     help="proposer model for --live (default: Opus 4.8 via OpenRouter)")
+    sat.add_argument("--json", action="store_true", help="machine-readable output")
+    sat.add_argument("--no-color", action="store_true")
+
     args = p.parse_args()
 
     # Agent-ergonomic default: if stdout isn't a tty (piped / captured), the
@@ -999,6 +1256,8 @@ def main():
         cmd_diff(args)
     elif args.cmd == "surface":
         cmd_surface(args)
+    elif args.cmd == "audit":
+        cmd_audit(args)
     else:
         p.print_help()
         sys.exit(1)

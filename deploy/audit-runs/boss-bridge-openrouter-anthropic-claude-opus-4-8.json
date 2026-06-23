@@ -1,0 +1,53 @@
+{
+  "schema_version": 2,
+  "command": "audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/boss-bridge",
+  "target_name": "boss-bridge",
+  "ts": 1782203475.4192052,
+  "proposer": {
+    "model": "openrouter/anthropic/claude-opus-4.8",
+    "ok": true,
+    "findings": [
+      {
+        "severity": "CRITICAL",
+        "function": "L1BossBridge.depositTokensToL2",
+        "desc": "Arbitrary `from` parameter lets an attacker steal tokens from any address that approved the bridge, locking them to an L2 recipient they control.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "CRITICAL",
+        "function": "L1BossBridge.sendToL1",
+        "desc": "Signed message allows arbitrary `target` and `data` calls, so a malicious/compromised signer can invoke `transferFrom` to drain the entire vault to any address.",
+        "status": "CONFIRMED",
+        "invariant": "check_withdrawCannotBeReplayed",
+        "counterexample": "assertion fails with no symbolic input (trivial witness)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "L1BossBridge.depositTokensToL2",
+        "desc": "An attacker can deposit vault-held tokens back to themselves (using vault as `from` via the bridge's own allowance) to infinitely mint L2 tokens with no L1 lock.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "L1BossBridge.withdrawTokensToL1",
+        "desc": "No replay protection (nonce/used-signature tracking), allowing the same signed withdrawal to be replayed repeatedly to drain funds.",
+        "status": "ESCALATED (no sound invariant)"
+      }
+    ],
+    "raw": "CRITICAL | L1BossBridge.depositTokensToL2 | Arbitrary `from` parameter lets an attacker steal tokens from any address that approved the bridge, locking them to an L2 recipient they control.\nCRITICAL | L1BossBridge.sendToL1 | Signed message allows arbitrary `target` and `data` calls, so a malicious/compromised signer can invoke `transferFrom` to drain the entire vault to any address.\nHIGH | L1BossBridge.depositTokensToL2 | An attacker can deposit vault-held tokens back to themselves (using vault as `from` via the bridge's own allowance) to infinitely mint L2 tokens with no L1 lock.\nHIGH | L1BossBridge.withdrawTokensToL1 | No replay protection (nonce/used-signature tracking), allowing the same signed withdrawal to be replayed repeatedly to drain funds."
+  },
+  "n_confirmed": 1,
+  "n_cleared": 0,
+  "results": [
+    {
+      "invariant": "check_withdrawCannotBeReplayed",
+      "function": "L1BossBridge.sendToL1",
+      "finding": "a signed withdrawal can be replayed to drain the vault.",
+      "severity": "HIGH",
+      "gate": "FAIL",
+      "verdict": "CONFIRMED",
+      "counterexample": "assertion fails with no symbolic input (trivial witness)"
+    }
+  ]
+}

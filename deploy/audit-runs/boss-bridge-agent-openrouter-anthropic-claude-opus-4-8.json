@@ -1,0 +1,114 @@
+{
+  "schema_version": 3,
+  "command": "agent-audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/boss-bridge",
+  "target_name": "boss-bridge",
+  "ts": 1782226996.988032,
+  "proposer": {
+    "model": "openrouter/anthropic/claude-opus-4.8",
+    "ok": true,
+    "n": 4
+  },
+  "tools_fired": [
+    "halmos"
+  ],
+  "n_confirmed": 0,
+  "n_cleared": 0,
+  "n_escalated": 4,
+  "findings": [
+    {
+      "severity": "HIGH",
+      "function": "L1BossBridge.depositTokensToL2",
+      "claim": "Arbitrary `from` parameter lets an attacker steal tokens from any address that has approved the bridge, minting L2 tokens to themselves.",
+      "claim_source": "proposer",
+      "bug_class": "fund-theft-arbitrary-from",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "Theft via arbitrary from is an exploit class but no listed invariant tests it; only withdraw-replay is available, so escalate.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "L1BossBridge.depositTokensToL2",
+      "claim": "Anyone can deposit vault tokens on the vault's own behalf (from=vault) to infinitely mint L2 tokens since the vault has approved the bridge.",
+      "claim_source": "proposer",
+      "bug_class": "infinite-mint-supply-vs-backing",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "Supply-exceeds-backing exploit, but no check_ invariant tests minting/backing here, so escalate.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "L1BossBridge.sendToL1",
+      "claim": "The arbitrary `target` and `data` call allows a signed message to invoke `transferFrom` from the vault to drain all funds, and signatures can be replayed indefinitely with no nonce.",
+      "claim_source": "proposer",
+      "bug_class": "arbitrary-call-fund-drain",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "Arbitrary target/data drain is an exploit class but no listed invariant tests this call abuse; withdraw-replay doesn't cover it, so escalate.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "L1BossBridge.withdrawTokensToL1",
+      "claim": "Withdrawal signatures lack a nonce/replay protection, allowing the same valid signature to be reused to repeatedly drain the vault.",
+      "claim_source": "proposer",
+      "bug_class": "signature-replay",
+      "route": {
+        "chosen_tool": "halmos",
+        "rationale": "Withdrawal signature replay is directly tested by check_withdrawCannotBeReplayed.",
+        "rationale_source": "proposer",
+        "invariant": "check_withdrawCannotBeReplayed"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "tool",
+        "bound": true,
+        "steps": [
+          {
+            "tool": "halmos",
+            "argv": [
+              "/Users/jonathanhill/src/plumbline/.venv/bin/halmos",
+              "--function",
+              "check_withdrawCannotBeReplayed"
+            ],
+            "cwd": "/Users/jonathanhill/src/plumbline/examples/boss-bridge",
+            "exit_code": 1,
+            "wall_s": 4.52,
+            "stdout_sha256": "76b3be011f367a52",
+            "stdout_excerpt": "No files changed, compilation skipped\n\nRunning 1 tests for test/Properties.t.sol:Properties\nCounterexample: \u2205\n[FAIL] check_withdrawCannotBeReplayed() (paths: 3, time: 0.19s, bounds: [])\nSymbolic test result: 0 passed; 1 failed; time: 0.43s\nWarning: Found unknown `halmos` config for profile `default` defined in foundry.toml.\nwarning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators\n    \u256d\u25b8 lib/openzeppelin-contracts/contracts/governance/extensions/GovernorTimelockAccess.sol:256:13\n    \u2502\n256 \u2502         if (block.timestamp < etaSeconds) {\n    \u2502             \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n    \u2502\n    \u2570 help: https://book.getfoundry.sh/reference/forge/forge-li",
+            "verdict": "ESCALATED",
+            "evidence": null,
+            "verdict_source": "tool",
+            "bound": true
+          }
+        ]
+      }
+    }
+  ]
+}

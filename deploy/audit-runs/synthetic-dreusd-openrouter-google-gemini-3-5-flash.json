@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "command": "audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/synthetic-dreusd",
+  "target_name": "synthetic-dreusd",
+  "ts": 1782203539.7678342,
+  "proposer": {
+    "model": "openrouter/google/gemini-3.5-flash",
+    "ok": true,
+    "findings": [
+      {
+        "severity": "HIGH",
+        "function": "dreUSD.redeem",
+        "desc": "The function attempts to transfer USDC using the 18-decimal stablecoin amount instead of scaling it down to USDC's 6 decimals, enabling the first redeemer to drain the entire USDC pool.",
+        "status": "CONFIRMED",
+        "invariant": "check_redeemReturnsDeposit",
+        "counterexample": "p_deposit_uint256_5108222_00 = 0x800000000000000"
+      },
+      {
+        "severity": "HIGH",
+        "function": "dreUSDs.distributeYield",
+        "desc": "Direct token transfers instantly increase the vault's share price, enabling MEV searchers to perform sandwich attacks (depositing immediately before and withdrawing immediately after the yield distribution) to steal the rewards.",
+        "status": "ESCALATED (no sound invariant)"
+      },
+      {
+        "severity": "HIGH",
+        "function": "dreUSDs.totalAssets",
+        "desc": "Utilizing Solmate's ERC4626 implementation without virtual shares makes the vault vulnerable to the classic first-depositor inflation attack, allowing an attacker to steal early depositors' funds.",
+        "status": "ESCALATED (no sound invariant)"
+      }
+    ],
+    "raw": "HIGH | dreUSD.redeem | The function attempts to transfer USDC using the 18-decimal stablecoin amount instead of scaling it down to USDC's 6 decimals, enabling the first redeemer to drain the entire USDC pool.\nHIGH | dreUSDs.distributeYield | Direct token transfers instantly increase the vault's share price, enabling MEV searchers to perform sandwich attacks (depositing immediately before and withdrawing immediately after the yield distribution) to steal the rewards.\nHIGH | dreUSDs.totalAssets | Utilizing Solmate's ERC4626 implementation without virtual shares makes the vault vulnerable to the classic first-depositor inflation attack, allowing an attacker to steal early depositors' funds."
+  },
+  "n_confirmed": 1,
+  "n_cleared": 1,
+  "results": [
+    {
+      "invariant": "check_redeemReturnsDeposit",
+      "function": "dreUSD.redeem",
+      "finding": "redeem() returns more than was deposited \u2014 a 6\u219218 decimal mismatch (redeem omits the /1e12 scale-down).",
+      "severity": "HIGH",
+      "gate": "FAIL",
+      "verdict": "CONFIRMED",
+      "counterexample": "p_deposit_uint256_5108222_00 = 0x800000000000000"
+    },
+    {
+      "invariant": "check_supplyAtMostBacking",
+      "function": "dreUSD.mint",
+      "finding": "total dreUSD supply could be minted in excess of its collateral backing (insolvency).",
+      "severity": "HIGH",
+      "gate": "PASS",
+      "verdict": "CLEARED (proved safe)",
+      "counterexample": null
+    }
+  ]
+}
