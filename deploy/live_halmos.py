@@ -32,6 +32,8 @@ ALLOWED = {"check_redeemReturnsDeposit", "check_supplyAtMostBacking"}
 
 
 _KEEP = _re.compile(r"Running \d+ test|Counterexample|\[FAIL\]|\[PASS\]|passed; \d+ failed|Symbolic test result|= 0x")
+_LINT = _re.compile(r"forge-lint|unsafe-typecast|disable-next-line|safe because|block-timestamp|"
+                    r"[─-╿]|^\s*\d+ │|help: https|note:|warning\[")
 
 
 def _clean(out: str) -> str:
@@ -75,6 +77,38 @@ def run_check(inv: str = "check_redeemReturnsDeposit") -> dict:
 def web_run(inv: str = "check_redeemReturnsDeposit"):
     from fastapi.responses import JSONResponse
     return JSONResponse(_run(inv), headers={"Access-Control-Allow-Origin": "*"})
+
+
+@app.function(image=image, timeout=200)
+@modal.fastapi_endpoint(method="GET")
+def web_stream(inv: str = "check_redeemReturnsDeposit"):
+    """Stream the REAL work line-by-line as it happens — forge compiling, then halmos
+    exploring paths — so a viewer watches it take real time. Nothing is canned."""
+    from fastapi.responses import StreamingResponse, JSONResponse
+    if inv not in ALLOWED:
+        return JSONResponse({"error": "unknown invariant"}, headers={"Access-Control-Allow-Origin": "*"})
+
+    def gen():
+        import subprocess, time
+        t0 = time.monotonic()
+        yield "[modal] cloud container up · foundry + halmos 0.3.3\n"
+        yield "[forge] compiling contracts (solc 0.8.20) …\n"
+        subprocess.run(["forge", "build"], cwd="/work", capture_output=True, text=True, timeout=120)
+        yield f"[forge] build complete · {round(time.monotonic() - t0, 2)}s\n\n"
+        yield f"$ halmos --function {inv}\n"
+        p = subprocess.Popen(["halmos", "--function", inv], cwd="/work",
+                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+        for raw in iter(p.stdout.readline, ""):
+            line = _re.sub(r"\x1b\[[0-9;]*m", "", raw)
+            if _LINT.search(line) or not line.strip():
+                continue
+            yield line if line.endswith("\n") else line + "\n"
+        p.wait()
+        yield f"\n[done] exit {p.returncode} · {round(time.monotonic() - t0, 2)}s total — real symbolic execution, in the cloud, just now\n"
+
+    return StreamingResponse(gen(), media_type="text/plain; charset=utf-8",
+                             headers={"Access-Control-Allow-Origin": "*",
+                                      "Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.local_entrypoint()

@@ -28,7 +28,8 @@ code{font-family:inherit}.muted{color:var(--fg-dim)}.muted-er{color:var(--fg-dim
 table{width:100%;border-collapse:collapse;font-size:12.5px}
 th,td{padding:.42rem .7rem;text-align:left;border-bottom:1px solid var(--bdr)}
 th{font-weight:500;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.05em;font-size:.72rem}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:1.4rem 0 2.4rem}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1.2rem;margin:1.4rem 0 2.4rem}
+@media(max-width:600px){body{padding:1.1rem 1rem;font-size:13.5px}h1{font-size:1rem}.stat .value{font-size:1.6rem}}
 .stat{border:1px solid var(--bdr);padding:1rem 1.2rem;border-radius:4px}
 .stat .label{color:var(--fg-dim);text-transform:uppercase;letter-spacing:.06em;font-size:.7rem}
 .stat .value{font-size:2rem;font-weight:600;color:var(--accent);margin:.4rem 0 .2rem}
@@ -38,6 +39,7 @@ th{font-weight:500;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.
 
 def page(body):
     return (f"<!doctype html><html lang=en><head><meta charset=utf-8>"
+            f"<meta name=viewport content='width=device-width,initial-scale=1'>"
             f"<title>plumbline — verification</title><style>{CSS}</style></head>"
             f"<body><h1>plumbline <small>verification</small></h1>{body}</body></html>")
 
@@ -91,7 +93,7 @@ SPLASH_SVG = '''<svg width="100%" viewBox="0 0 680 392" role="img" xmlns="http:/
 </svg>'''
 
 
-_LIVE_API = "https://qizwiz--plumbline-live-web-run.modal.run"
+_STREAM_API = "https://qizwiz--plumbline-live-web-stream.modal.run"
 _LIVE_BANNER = (
     "<div style='border:1px solid var(--accent);border-radius:8px;padding:0.85rem 1rem;"
     "margin:0 0 1.6rem;background:var(--bg-3)'>"
@@ -99,24 +101,26 @@ _LIVE_BANNER = (
     "<button id='liveBtn' onclick='runLive()' style='background:var(--accent);color:#1a1205;"
     "border:none;font-weight:600;padding:0.42rem 0.95rem;border-radius:6px;cursor:pointer;"
     "font-family:inherit;font-size:0.82rem'>&#9654; run halmos live in the cloud</button>"
-    "<div style='font-size:0.74rem;color:var(--fg-dim);margin-top:0.4rem'>spins a real Modal "
-    "container, compiles the contract, runs the symbolic-execution invariant against the real "
-    "bytecode, and returns the verbatim output (~5s; longer on a cold start).</div>"
+    "<div style='font-size:0.74rem;color:var(--fg-dim);margin-top:0.4rem'>streams a REAL Modal "
+    "container compiling the contract and running symbolic execution, line by line as it happens "
+    "(~6s). Run it twice \\u2014 the witness variable is freshly minted each time.</div>"
     "<div id='liveOut' style='display:none;background:#0b0e14;border:1px solid var(--bdr);"
     "border-radius:6px;padding:0.6rem 0.8rem;margin-top:0.6rem;font-family:ui-monospace,monospace;"
-    "font-size:0.76rem;overflow-x:auto'></div></div>"
+    "font-size:0.76rem;white-space:pre-wrap;max-height:320px;overflow:auto;color:#C9B98F'></div></div>"
     "<script>"
     "async function runLive(){"
     "var b=document.getElementById('liveBtn'),o=document.getElementById('liveOut');"
-    "b.disabled=true;b.textContent='running\\u2026';o.style.display='block';"
-    "o.innerHTML=\"<span style='color:var(--yel)'>spinning up a Modal container \\u00b7 compiling \\u00b7 running symbolic execution\\u2026</span>\";"
+    "b.disabled=true;b.textContent='running\\u2026';o.style.display='block';o.textContent='connecting to the cloud\\u2026\\n';"
     "try{"
-    "var r=await fetch('" + _LIVE_API + "?inv=check_redeemReturnsDeposit');"
-    "var d=await r.json();var ok=d.found_counterexample;"
-    "o.innerHTML=\"<pre style='white-space:pre-wrap;color:#C9B98F;margin:0'>$ \"+d.argv+\"\\n\\n\"+(d.clean||d.error||'')+\"</pre>\""
-    "+\"<div style='margin-top:.5rem;color:\"+(ok?'var(--red)':'var(--yel)')+\"'>\"+(ok?'\\u2713 live halmos found the counterexample':'(no counterexample this run)')+\" \\u00b7 ran in \"+d.ran_in+\" \\u00b7 \"+d.wall_s+\"s \\u00b7 exit \"+d.exit_code+\"</div>\""
-    "+\"<div style='font-size:.72rem;color:var(--fg-dim);margin-top:.3rem'>fresh run \\u2014 same 0x800\\u2026 witness as the recording above; only the symbolic var-name and hash differ because it just executed now. Not canned.</div>\";"
-    "}catch(e){o.innerHTML=\"<span style='color:var(--yel)'>live endpoint unavailable (\"+e+\"). The recorded run above is still reproducible locally.</span>\";}"
+    "var resp=await fetch('" + _STREAM_API + "?inv=check_redeemReturnsDeposit');"
+    "var rd=resp.body.getReader(),dec=new TextDecoder(),txt='';"
+    "while(true){var x=await rd.read();if(x.done)break;txt+=dec.decode(x.value,{stream:true});o.textContent=txt;o.scrollTop=o.scrollHeight;}"
+    "var ok=txt.indexOf('Counterexample')>-1,m=txt.match(/p_[A-Za-z0-9_]+/);"
+    "var n=document.createElement('div');n.style.cssText='margin-top:.5rem;font-size:.74rem';"
+    "n.innerHTML=(ok?\"<span style='color:var(--red)'>\\u2713 real halmos found the counterexample</span>\":'(done)')"
+    "+\"<div style='color:var(--fg-dim);margin-top:.3rem'>run it again \\u2014 the witness variable \"+(m?'<b>'+m[0]+'</b>':'name')+\" is freshly minted each run. That changing name is your proof this is live symbolic execution, not a recording.</div>\";"
+    "o.appendChild(n);o.scrollTop=o.scrollHeight;"
+    "}catch(e){o.textContent='live endpoint unavailable: '+e;}"
     "b.disabled=false;b.textContent='\\u25b6 run halmos live again';"
     "}"
     "</script>"

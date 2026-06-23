@@ -1,0 +1,21 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "plumbline-web",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "tools/web.py"
+      ],
+      "port": 5050
+    },
+    {
+      "name": "plumbline-deploy",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "deploy/app.py"
+      ],
+      "port": 8000
+    }
+  ]
+}
