@@ -126,6 +126,18 @@ _LIVE_BANNER = (
     "</script>"
 )
 
+_STRUCTURAL_MAP = (
+    "<details style='margin:0 0 1.7rem;border:1px solid var(--bdr);border-radius:8px;"
+    "padding:.55rem .9rem;background:var(--bg-3)'>"
+    "<summary style='cursor:pointer;color:var(--accent);font-size:.86rem;list-style:none'>"
+    "&#9670; the structural map &mdash; the heat-diffusion prior that focuses the hunt "
+    "<span class='muted-er' style='font-size:.72rem'>(interactive &middot; example: boss-bridge)</span>"
+    "</summary>"
+    "<iframe src='/science' loading='lazy' title='heat-diffusion vulnerability localizer' "
+    "style='width:100%;height:580px;border:0;border-radius:6px;margin-top:.6rem;background:#ECDFC0'></iframe>"
+    "</details>"
+)
+
 
 @app.route("/science")
 def science():
@@ -235,7 +247,7 @@ def verification():
                    f"is not: each verdict below is a deterministic function of a real subprocess's "
                    f"<code>(stdout, exit_code)</code>, and a CONFIRMED requires the witness to appear "
                    f"verbatim in stdout. Re-run any printed <code>$ halmos&nbsp;…</code> line for "
-                   f"the same counterexample, bit for bit.</p>" + _LIVE_BANNER)
+                   f"the same counterexample, bit for bit.</p>" + _LIVE_BANNER + _STRUCTURAL_MAP)
 
         def fmt_argv(argv):
             return " ".join(os.path.basename(a) if str(a).startswith("/") else str(a) for a in argv)
