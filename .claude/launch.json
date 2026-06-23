@@ -16,6 +16,18 @@
         "deploy/app.py"
       ],
       "port": 8000
+    },
+    {
+      "name": "science-preview",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8771",
+        "--directory",
+        "deploy"
+      ],
+      "port": 8771
     }
   ]
 }

@@ -127,6 +127,14 @@ _LIVE_BANNER = (
 )
 
 
+@app.route("/science")
+def science():
+    p = os.path.join(HERE, "science.html")
+    if os.path.exists(p):
+        return Response(open(p, encoding="utf-8").read(), mimetype="text/html")
+    return redirect("/")
+
+
 @app.route("/")
 def home():
     body = (
@@ -135,13 +143,15 @@ def home():
         + SPLASH_SVG +
         "</div>"
         "<p style='font-size:1.05rem;line-height:1.7;color:var(--fg);max-width:60ch;margin:1.8rem auto 0'>"
-        "An autonomous AI agent audits your Solidity — it proposes vulnerabilities and routes each "
-        "to a formal verifier. Only a real symbolic-EVM proof confirms a finding. "
-        "<b>The agent never grades its own homework.</b></p>"
-        "<a href='/verification' style='display:inline-block;margin:1.6rem 0 0.7rem;background:var(--accent);"
+        "A team of specialist AI agents audit your Solidity in parallel — they propose vulnerabilities, "
+        "route each to a formal verifier, and only a real symbolic-EVM proof confirms a finding. "
+        "<b>The agents never grade their own homework.</b></p>"
+        "<a href='/verification' style='display:inline-block;margin:1.6rem 0 0.6rem;background:var(--accent);"
         "color:#1a1205;font-weight:600;text-decoration:none;padding:0.8rem 1.6rem;border-radius:8px;"
         "font-size:0.95rem'>Watch it confirm a real exploit &#8594;</a>"
-        "<p class='muted-er' style='font-size:0.78rem;margin:0.6rem 0 0'>"
+        "<div style='margin:0.5rem 0 0'><a href='/science' style='color:var(--accent);font-size:0.86rem;"
+        "text-decoration:none'>&#9670; the math behind it — the heat-diffusion localizer &#8594;</a></div>"
+        "<p class='muted-er' style='font-size:0.78rem;margin:0.7rem 0 0'>"
         "live halmos counterexamples · machine-checked · escalates what it can’t prove</p>"
         "</div>"
     )

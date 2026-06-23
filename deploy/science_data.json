@@ -1,0 +1,525 @@
+{
+ "meta": {
+  "protocol": "boss-bridge",
+  "source": "examples/boss-bridge (Cyfrin CodeHawks First Flight)",
+  "generator": "plumbline sol_graph.rich_graph + numpy RWR heat solve",
+  "files": [
+   "L1BossBridge.sol",
+   "L1Token.sol",
+   "L1Vault.sol",
+   "TokenFactory.sol"
+  ],
+  "n_functions": 9,
+  "n_nodes": 18,
+  "n_edges": 19,
+  "call_graph_nodes": 9,
+  "call_graph_edges": 1,
+  "alpha": 0.85,
+  "seed_id": "L1BossBridge.depositTokensToL2",
+  "seed_label": "depositTokensToL2",
+  "seed_why": "depositTokensToL2 accepts an arbitrary `from` address \u2014 any caller can pull another user's approved tokens into the vault and mint themselves L2 tokens (boss-bridge High #1).",
+  "heat_formula": "(I - alpha*A_norm) u = (1-alpha) s",
+  "heat_method": "personalized PageRank / random-walk-with-restart (numpy linalg.solve)",
+  "corpus_auc_heat": 0.79,
+  "corpus_auc_null": 0.48,
+  "corpus_protocols": 16,
+  "corpus_functions": 5030
+ },
+ "nodes": [
+  {
+   "id": "L1BossBridge.pause",
+   "label": "pause",
+   "kind": "fn",
+   "contract": "L1BossBridge",
+   "vis": "external",
+   "mut": "nonpayable",
+   "line": 49,
+   "degree": 1,
+   "is_fn": true,
+   "heat": 0.0019356232900013981
+  },
+  {
+   "id": "L1BossBridge.unpause",
+   "label": "unpause",
+   "kind": "fn",
+   "contract": "L1BossBridge",
+   "vis": "external",
+   "mut": "nonpayable",
+   "line": 53,
+   "degree": 1,
+   "is_fn": true,
+   "heat": 0.0019356232900013981
+  },
+  {
+   "id": "L1BossBridge.setSigner",
+   "label": "setSigner",
+   "kind": "fn",
+   "contract": "L1BossBridge",
+   "vis": "external",
+   "mut": "nonpayable",
+   "line": 57,
+   "degree": 2,
+   "is_fn": true,
+   "heat": 0.013319028885511928
+  },
+  {
+   "id": "L1BossBridge.depositTokensToL2",
+   "label": "depositTokensToL2",
+   "kind": "fn",
+   "contract": "L1BossBridge",
+   "vis": "external",
+   "mut": "nonpayable",
+   "line": 70,
+   "degree": 4,
+   "is_fn": true,
+   "heat": 0.33733728434301224
+  },
+  {
+   "id": "L1BossBridge.withdrawTokensToL1",
+   "label": "withdrawTokensToL1",
+   "kind": "fn",
+   "contract": "L1BossBridge",
+   "vis": "external",
+   "mut": "nonpayable",
+   "line": 91,
+   "degree": 3,
+   "is_fn": true,
+   "heat": 0.10808620434106227
+  },
+  {
+   "id": "L1BossBridge.sendToL1",
+   "label": "sendToL1",
+   "kind": "fn",
+   "contract": "L1BossBridge",
+   "vis": "public",
+   "mut": "nonpayable",
+   "line": 112,
+   "degree": 4,
+   "is_fn": true,
+   "heat": 0.09940657166023463
+  },
+  {
+   "id": "L1Vault.approveTo",
+   "label": "approveTo",
+   "kind": "fn",
+   "contract": "L1Vault",
+   "vis": "external",
+   "mut": "nonpayable",
+   "line": 19,
+   "degree": 2,
+   "is_fn": true,
+   "heat": 0.003030330003916083
+  },
+  {
+   "id": "TokenFactory.deployToken",
+   "label": "deployToken",
+   "kind": "fn",
+   "contract": "TokenFactory",
+   "vis": "public",
+   "mut": "nonpayable",
+   "line": 23,
+   "degree": 2,
+   "is_fn": true,
+   "heat": 0.002698781722212045
+  },
+  {
+   "id": "TokenFactory.getTokenAddressFromSymbol",
+   "label": "getTokenAddressFromSymbol",
+   "kind": "fn",
+   "contract": "TokenFactory",
+   "vis": "public",
+   "mut": "view",
+   "line": 31,
+   "degree": 1,
+   "is_fn": true,
+   "heat": 0.0007631584322106466
+  },
+  {
+   "id": "mod::onlyOwner",
+   "label": "onlyOwner",
+   "kind": "mod",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 5,
+   "is_fn": false,
+   "heat": 0.011386019352949401
+  },
+  {
+   "id": "state::L1BossBridge.signers",
+   "label": "signers",
+   "kind": "state",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 2,
+   "is_fn": false,
+   "heat": 0.026784483754142427
+  },
+  {
+   "id": "state::L1BossBridge.token",
+   "label": "token",
+   "kind": "state",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 2,
+   "is_fn": false,
+   "heat": 0.10230859748619106
+  },
+  {
+   "id": "state::L1BossBridge.vault",
+   "label": "vault",
+   "kind": "state",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 2,
+   "is_fn": false,
+   "heat": 0.10230859748619107
+  },
+  {
+   "id": "state::L1BossBridge.DEPOSIT_LIMIT",
+   "label": "DEPOSIT_LIMIT",
+   "kind": "state",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 1,
+   "is_fn": false,
+   "heat": 0.07168417292289009
+  },
+  {
+   "id": "mod::whenNotPaused",
+   "label": "whenNotPaused",
+   "kind": "mod",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 2,
+   "is_fn": false,
+   "heat": 0.09280806940068996
+  },
+  {
+   "id": "mod::nonReentrant",
+   "label": "nonReentrant",
+   "kind": "mod",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 1,
+   "is_fn": false,
+   "heat": 0.021123896477799855
+  },
+  {
+   "id": "state::L1Vault.token",
+   "label": "token",
+   "kind": "state",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 1,
+   "is_fn": false,
+   "heat": 0.001287890251664335
+  },
+  {
+   "id": "state::TokenFactory.s_tokenToAddress",
+   "label": "s_tokenToAddress",
+   "kind": "state",
+   "contract": "",
+   "vis": "",
+   "mut": "",
+   "line": null,
+   "degree": 2,
+   "is_fn": false,
+   "heat": 0.0017956668993191686
+  }
+ ],
+ "edges": [
+  {
+   "source": "L1BossBridge.pause",
+   "target": "mod::onlyOwner",
+   "etype": "mod"
+  },
+  {
+   "source": "L1BossBridge.unpause",
+   "target": "mod::onlyOwner",
+   "etype": "mod"
+  },
+  {
+   "source": "L1BossBridge.setSigner",
+   "target": "state::L1BossBridge.signers",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.setSigner",
+   "target": "mod::onlyOwner",
+   "etype": "mod"
+  },
+  {
+   "source": "L1BossBridge.depositTokensToL2",
+   "target": "state::L1BossBridge.token",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.depositTokensToL2",
+   "target": "state::L1BossBridge.vault",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.depositTokensToL2",
+   "target": "state::L1BossBridge.DEPOSIT_LIMIT",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.depositTokensToL2",
+   "target": "mod::whenNotPaused",
+   "etype": "mod"
+  },
+  {
+   "source": "L1BossBridge.withdrawTokensToL1",
+   "target": "L1BossBridge.sendToL1",
+   "etype": "call"
+  },
+  {
+   "source": "L1BossBridge.withdrawTokensToL1",
+   "target": "state::L1BossBridge.token",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.withdrawTokensToL1",
+   "target": "state::L1BossBridge.vault",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.sendToL1",
+   "target": "state::L1BossBridge.signers",
+   "etype": "state"
+  },
+  {
+   "source": "L1BossBridge.sendToL1",
+   "target": "mod::nonReentrant",
+   "etype": "mod"
+  },
+  {
+   "source": "L1BossBridge.sendToL1",
+   "target": "mod::whenNotPaused",
+   "etype": "mod"
+  },
+  {
+   "source": "L1Vault.approveTo",
+   "target": "state::L1Vault.token",
+   "etype": "state"
+  },
+  {
+   "source": "L1Vault.approveTo",
+   "target": "mod::onlyOwner",
+   "etype": "mod"
+  },
+  {
+   "source": "TokenFactory.deployToken",
+   "target": "state::TokenFactory.s_tokenToAddress",
+   "etype": "state"
+  },
+  {
+   "source": "TokenFactory.deployToken",
+   "target": "mod::onlyOwner",
+   "etype": "mod"
+  },
+  {
+   "source": "TokenFactory.getTokenAddressFromSymbol",
+   "target": "state::TokenFactory.s_tokenToAddress",
+   "etype": "state"
+  }
+ ],
+ "heat_by_seed": {
+  "L1BossBridge.pause": {
+   "L1BossBridge.pause": 0.20346773854386555,
+   "L1BossBridge.unpause": 0.05346773854386554,
+   "L1BossBridge.setSigner": 0.06791164778154227,
+   "L1BossBridge.depositTokensToL2": 0.007742493160005593,
+   "L1BossBridge.withdrawTokensToL1": 0.008590612049708943,
+   "L1BossBridge.sendToL1": 0.02410926347001426,
+   "L1Vault.approveTo": 0.08370683137982861,
+   "TokenFactory.deployToken": 0.07454847038448918,
+   "TokenFactory.getTokenAddressFromSymbol": 0.021080731840623645,
+   "mod::onlyOwner": 0.3145161090815619,
+   "state::L1BossBridge.signers": 0.03398566879453349,
+   "state::L1BossBridge.token": 0.004079286543918722,
+   "state::L1BossBridge.vault": 0.004079286543918722,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.0016452797965011885,
+   "mod::whenNotPaused": 0.006768498283879219,
+   "mod::nonReentrant": 0.005123218487378031,
+   "state::L1Vault.token": 0.03557540333642715,
+   "state::TokenFactory.s_tokenToAddress": 0.04960172197793799
+  },
+  "L1BossBridge.unpause": {
+   "L1BossBridge.pause": 0.05346773854386554,
+   "L1BossBridge.unpause": 0.20346773854386555,
+   "L1BossBridge.setSigner": 0.06791164778154227,
+   "L1BossBridge.depositTokensToL2": 0.007742493160005593,
+   "L1BossBridge.withdrawTokensToL1": 0.008590612049708943,
+   "L1BossBridge.sendToL1": 0.02410926347001426,
+   "L1Vault.approveTo": 0.08370683137982861,
+   "TokenFactory.deployToken": 0.07454847038448918,
+   "TokenFactory.getTokenAddressFromSymbol": 0.021080731840623645,
+   "mod::onlyOwner": 0.3145161090815619,
+   "state::L1BossBridge.signers": 0.03398566879453349,
+   "state::L1BossBridge.token": 0.004079286543918722,
+   "state::L1BossBridge.vault": 0.004079286543918722,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.0016452797965011885,
+   "mod::whenNotPaused": 0.006768498283879219,
+   "mod::nonReentrant": 0.005123218487378031,
+   "state::L1Vault.token": 0.03557540333642715,
+   "state::TokenFactory.s_tokenToAddress": 0.04960172197793799
+  },
+  "L1BossBridge.setSigner": {
+   "L1BossBridge.pause": 0.033955823890771133,
+   "L1BossBridge.unpause": 0.033955823890771133,
+   "L1BossBridge.setSigner": 0.2336501123791552,
+   "L1BossBridge.depositTokensToL2": 0.026638057771023863,
+   "L1BossBridge.withdrawTokensToL1": 0.029556011912374135,
+   "L1BossBridge.sendToL1": 0.08294795227569968,
+   "L1Vault.approveTo": 0.05315980256872192,
+   "TokenFactory.deployToken": 0.047343590745386216,
+   "TokenFactory.getTokenAddressFromSymbol": 0.013387766854615084,
+   "mod::onlyOwner": 0.1997401405339478,
+   "state::L1BossBridge.signers": 0.11692773761972712,
+   "state::L1BossBridge.token": 0.014034790651515243,
+   "state::L1BossBridge.vault": 0.014034790651515241,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.005660587276342571,
+   "mod::whenNotPaused": 0.023287027134928754,
+   "mod::nonReentrant": 0.017626439858586182,
+   "state::L1Vault.token": 0.022592916091706817,
+   "state::TokenFactory.s_tokenToAddress": 0.03150062789321196
+  },
+  "L1BossBridge.depositTokensToL2": {
+   "L1BossBridge.pause": 0.0019356232900013981,
+   "L1BossBridge.unpause": 0.0019356232900013981,
+   "L1BossBridge.setSigner": 0.013319028885511928,
+   "L1BossBridge.depositTokensToL2": 0.33733728434301224,
+   "L1BossBridge.withdrawTokensToL1": 0.10808620434106227,
+   "L1BossBridge.sendToL1": 0.09940657166023463,
+   "L1Vault.approveTo": 0.003030330003916083,
+   "TokenFactory.deployToken": 0.002698781722212045,
+   "TokenFactory.getTokenAddressFromSymbol": 0.0007631584322106466,
+   "mod::onlyOwner": 0.011386019352949401,
+   "state::L1BossBridge.signers": 0.026784483754142427,
+   "state::L1BossBridge.token": 0.10230859748619106,
+   "state::L1BossBridge.vault": 0.10230859748619107,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.07168417292289009,
+   "mod::whenNotPaused": 0.09280806940068996,
+   "mod::nonReentrant": 0.021123896477799855,
+   "state::L1Vault.token": 0.001287890251664335,
+   "state::TokenFactory.s_tokenToAddress": 0.0017956668993191686
+  },
+  "L1BossBridge.withdrawTokensToL1": {
+   "L1BossBridge.pause": 0.0028635373499029827,
+   "L1BossBridge.unpause": 0.0028635373499029827,
+   "L1BossBridge.setSigner": 0.019704007941582762,
+   "L1BossBridge.depositTokensToL2": 0.14411493912141637,
+   "L1BossBridge.withdrawTokensToL1": 0.2730377969571089,
+   "L1BossBridge.sendToL1": 0.1470608626406244,
+   "L1Vault.approveTo": 0.004483033033116215,
+   "TokenFactory.deployToken": 0.003992544572443176,
+   "TokenFactory.getTokenAddressFromSymbol": 0.0011290072225401933,
+   "mod::onlyOwner": 0.016844337352370484,
+   "state::L1BossBridge.signers": 0.03962463668630536,
+   "state::L1BossBridge.token": 0.10798513370114848,
+   "state::L1BossBridge.vault": 0.10798513370114851,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.030624424563300973,
+   "mod::whenNotPaused": 0.06187485787443366,
+   "mod::nonReentrant": 0.03125043331113269,
+   "state::L1Vault.token": 0.001905289039074391,
+   "state::TokenFactory.s_tokenToAddress": 0.0026564875824475137
+  },
+  "L1BossBridge.sendToL1": {
+   "L1BossBridge.pause": 0.006027315867503567,
+   "L1BossBridge.unpause": 0.006027315867503567,
+   "L1BossBridge.setSigner": 0.041473976137849845,
+   "L1BossBridge.depositTokensToL2": 0.09940657166023462,
+   "L1BossBridge.withdrawTokensToL1": 0.11029564698046829,
+   "L1BossBridge.sendToL1": 0.30954101957588537,
+   "L1Vault.approveTo": 0.00943611094716801,
+   "TokenFactory.deployToken": 0.008403706434636624,
+   "TokenFactory.getTokenAddressFromSymbol": 0.0023763905671330566,
+   "mod::onlyOwner": 0.03545479922060922,
+   "state::L1BossBridge.signers": 0.08340390651846183,
+   "state::L1BossBridge.token": 0.052374329788932535,
+   "state::L1BossBridge.vault": 0.05237432978893254,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.021123896477799862,
+   "mod::whenNotPaused": 0.0869013631376755,
+   "mod::nonReentrant": 0.06577746665987565,
+   "state::L1Vault.token": 0.0040103471525464035,
+   "state::TokenFactory.s_tokenToAddress": 0.005591507216783663
+  },
+  "L1Vault.approveTo": {
+   "L1BossBridge.pause": 0.04185341568991431,
+   "L1BossBridge.unpause": 0.04185341568991431,
+   "L1BossBridge.setSigner": 0.05315980256872193,
+   "L1BossBridge.depositTokensToL2": 0.006060660007832166,
+   "L1BossBridge.withdrawTokensToL1": 0.0067245495496743215,
+   "L1BossBridge.sendToL1": 0.01887222189433602,
+   "L1Vault.approveTo": 0.30035759794898526,
+   "TokenFactory.deployToken": 0.05835496703286824,
+   "TokenFactory.getTokenAddressFromSymbol": 0.01650155134295393,
+   "mod::onlyOwner": 0.24619656288184888,
+   "state::L1BossBridge.signers": 0.02660326324425322,
+   "state::L1BossBridge.token": 0.003193179290738726,
+   "state::L1BossBridge.vault": 0.003193179290738726,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.001287890251664335,
+   "mod::whenNotPaused": 0.0052982374042107394,
+   "mod::nonReentrant": 0.0040103471525464035,
+   "state::L1Vault.token": 0.1276519791283187,
+   "state::TokenFactory.s_tokenToAddress": 0.03882717963047983
+  },
+  "TokenFactory.deployToken": {
+   "L1BossBridge.pause": 0.0372742351922446,
+   "L1BossBridge.unpause": 0.0372742351922446,
+   "L1BossBridge.setSigner": 0.047343590745386216,
+   "L1BossBridge.depositTokensToL2": 0.00539756344442409,
+   "L1BossBridge.withdrawTokensToL1": 0.005988816858664762,
+   "L1BossBridge.sendToL1": 0.016807412869273244,
+   "L1Vault.approveTo": 0.058354967032868243,
+   "TokenFactory.deployToken": 0.26111087089559887,
+   "TokenFactory.getTokenAddressFromSymbol": 0.07383663570335428,
+   "mod::onlyOwner": 0.21926020701320348,
+   "state::L1BossBridge.signers": 0.023692601301509707,
+   "state::L1BossBridge.token": 0.002843813675228468,
+   "state::L1BossBridge.vault": 0.0028438136752284688,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.0011469822319401192,
+   "mod::whenNotPaused": 0.004718557466660684,
+   "mod::nonReentrant": 0.003571575234720565,
+   "state::L1Vault.token": 0.024800860988968994,
+   "state::TokenFactory.s_tokenToAddress": 0.17373326047848064
+  },
+  "TokenFactory.getTokenAddressFromSymbol": {
+   "L1BossBridge.pause": 0.02108073184062365,
+   "L1BossBridge.unpause": 0.02108073184062365,
+   "L1BossBridge.setSigner": 0.026775533709230165,
+   "L1BossBridge.depositTokensToL2": 0.0030526337288425865,
+   "L1BossBridge.withdrawTokensToL1": 0.0033870216676205795,
+   "L1BossBridge.sendToL1": 0.009505562268532225,
+   "L1Vault.approveTo": 0.033003102685907865,
+   "TokenFactory.deployToken": 0.14767327140670855,
+   "TokenFactory.getTokenAddressFromSymbol": 0.2765925395660849,
+   "mod::onlyOwner": 0.12400430494484499,
+   "state::L1BossBridge.signers": 0.013399533808485915,
+   "state::L1BossBridge.token": 0.0016083408065382138,
+   "state::L1BossBridge.vault": 0.0016083408065382136,
+   "state::L1BossBridge.DEPOSIT_LIMIT": 0.0006486846673790494,
+   "mod::whenNotPaused": 0.002668616649442147,
+   "mod::nonReentrant": 0.0020199319820630975,
+   "state::L1Vault.token": 0.01402631864151084,
+   "state::TokenFactory.s_tokenToAddress": 0.2978647989790233
+  }
+ }
+}
