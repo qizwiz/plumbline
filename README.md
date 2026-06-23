@@ -162,6 +162,16 @@ live path. The localizer and proposer levers are independently null-/judge-verif
 breadth (more artifact shapes) and a grounded learning layer over the accumulating case library —
 learning from the gate's verified verdicts, not surface similarity.
 
+## Can I point it at my own contract?
+
+Point it at **any** Solidity and the agent reads it and proposes findings — that part is
+contract-agnostic. A *target-bound* verdict (a green CLEARED or a red CONFIRMED) additionally needs
+a Foundry `check_*` invariant for halmos to execute against the real bytecode; the bundled examples
+ship hand-written ones. On code with **no** invariant the agent still proposes, but every finding
+**ESCALATES to a human** — nothing is rubber-stamped (see the `boss-bridge` run, where the gate
+refuses to confirm a claim it can't bind to a test). Auto-synthesizing that invariant from the
+proposed finding — turning *audits the examples* into *audits anything* — is the next build.
+
 ## Quickstart
 
 ```bash
