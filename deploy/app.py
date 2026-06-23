@@ -202,6 +202,12 @@ def verification():
         chips = " ".join("<code class='muted' style='background:var(--bg-3);padding:.15rem .5rem;"
                          f"border-radius:4px'>{html.escape(str(t))}</code>"
                          for t in data.get("tools_fired", [])) or "<span class='muted'>none</span>"
+        agents = ((data.get("proposer") or {}).get("agents")) or []
+        agent_chips = " · ".join(f"<b style='color:var(--accent)'>{html.escape(str(a))}</b>" for a in agents)
+        agent_panel = (f"<p style='font-size:.84rem;margin:.2rem 0 .6rem'>"
+                       f"<b style='color:var(--accent)'>{len(agents)} specialist agents</b> hunted this "
+                       f"contract in parallel — {agent_chips} — each with its own lens; a finding caught "
+                       f"by several is tagged with all of them.</p>") if agents else ""
         summary = ("<div class='stat-grid'>"
                    f"<div class='stat'><div class='label'>target · recorded agent run</div>"
                    f"<div class='value' style='font-size:1.15rem'>{tgt}</div><div class='sub'>{model}</div></div>"
@@ -209,6 +215,7 @@ def verification():
                    f"<div class='value' style='color:var(--red)'>{nconf3}</div><div class='sub'>replayable witness</div></div>"
                    f"<div class='stat'><div class='label'>escalated</div>"
                    f"<div class='value' style='color:var(--yel)'>{nesc3}</div><div class='sub'>to human review</div></div></div>"
+                   + agent_panel +
                    f"<p class='muted' style='font-size:.82rem;margin:.2rem 0 .5rem'>"
                    f"tools the agent actually invoked this run: {chips}</p>"
                    f"<p class='muted-er' style='font-size:.78rem;margin:0 0 1.4rem;line-height:1.6;"
@@ -249,10 +256,13 @@ def verification():
                         else "representative obligation — not target-bound" if v.get("steps") else "—")
             note = (f"<div class='muted' style='font-size:.78rem;margin-top:.4rem'>{html.escape(str(v.get('note')))}</div>"
                     if v.get("note") else "")
+            pb = f.get("proposed_by") or []
+            pbtxt = ("found by " + ", ".join(f"<b style='color:var(--accent)'>{html.escape(str(a))}</b>" for a in pb)
+                     if pb else "claim by proposer")
             cards += (f"<div class='stat' style='border-left:3px solid {color};margin-bottom:1.3rem;padding:1rem 1.1rem'>"
                       f"<div><span class='pill' style='background:{color}'>{html.escape(str(f.get('severity','?')))}</span> "
                       f"<code style='font-size:.95rem'>{html.escape(str(f.get('function','?')))}</code> "
-                      f"<span class='muted-er' style='font-size:.7rem'>· claim by proposer</span></div>"
+                      f"<span class='muted-er' style='font-size:.7rem'>· {pbtxt}</span></div>"
                       f"<div style='margin:.55rem 0 .85rem;line-height:1.55'>{html.escape(str(f.get('claim','')))}</div>"
                       f"<div style='font-size:.83rem;margin:.2rem 0'>"
                       f"<span class='muted'>agent routed&nbsp;→&nbsp;</span><code style='color:var(--accent)'>{tool}</code>"

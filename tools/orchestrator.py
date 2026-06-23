@@ -96,6 +96,88 @@ _Z3_CAST_DEMO = {
     "bits": 64,
 }
 
+# ---- the multi-agent proposer: parallel SPECIALIST hunters, each with its own lens ----
+SPECIALISTS = [
+    {"name": "solvency", "focus":
+        "fund drains, conservation/solvency violations, redeem or withdraw returning more than was "
+        "deposited, total supply exceeding its backing/collateral, reentrancy-enabled theft"},
+    {"name": "precision", "focus":
+        "decimal/scaling mismatches (e.g. 6-decimal USDC vs 18-decimal shares), rounding errors, "
+        "integer overflow or truncation, unsafe casts, fee or share miscalculation"},
+    {"name": "access", "focus":
+        "missing or incorrect access control, signature replay (missing nonce/deadline), arbitrary "
+        "external calls, privilege escalation, unprotected initializers or admin functions"},
+]
+
+
+def _read_sources(target: Path) -> str:
+    srcs = []
+    for sol in sorted(target.glob("*.sol")):
+        try:
+            srcs.append(sol.read_text(errors="ignore"))
+        except Exception:
+            pass
+    if not srcs:
+        for sol in target.rglob("*.sol"):
+            if any(s in str(sol) for s in ("/lib/", "/test", "/out/", ".t.sol")):
+                continue
+            try:
+                srcs.append(sol.read_text(errors="ignore"))
+            except Exception:
+                pass
+    return "\n\n".join(srcs)[:40000]
+
+
+def _run_specialist(source: str, model: str, spec: dict, timeout: int = 180) -> list:
+    """One specialist agent: a real LLM call scoped to a single vulnerability lens."""
+    prompt = (f"You are a smart-contract security auditor specializing ONLY in {spec['name']} bugs: "
+              f"{spec['focus']}. Below is a Solidity protocol. Report ONLY {spec['name']}-class "
+              "vulnerabilities you can substantiate. Output each as exactly one line: "
+              "SEVERITY | Contract.function | one-sentence description. Max 2, most severe first, "
+              "no preamble. If you find none, output exactly: NONE\n\nSOURCES:\n" + source)
+    try:
+        r = subprocess.run(["uvx", "--quiet", "--with", "llm-openrouter", "llm", "-m", model],
+                           input=prompt, capture_output=True, text=True, timeout=timeout)
+        out = (r.stdout or "").strip()
+    except Exception:
+        return []
+    findings = []
+    for ln in out.splitlines():
+        if "|" not in ln or ln.strip().upper().startswith("NONE"):
+            continue
+        parts = [p.strip() for p in ln.split("|")]
+        if len(parts) < 3:
+            continue
+        sevraw = re.sub(r"[^A-Za-z]", "", parts[0]).upper()
+        sev = {"CRITICAL": "CRIT", "HIGH": "HIGH", "MEDIUM": "MED", "MED": "MED",
+               "LOW": "LOW", "INFO": "INFO", "INFORMATIONAL": "INFO"}.get(sevraw, sevraw[:4] or "MED")
+        findings.append({"severity": sev, "function": parts[1], "desc": parts[2], "agent": spec["name"]})
+    return findings
+
+
+def _propose_multi(target: Path, model: str) -> dict:
+    """N specialist proposer agents hunt in PARALLEL (one LLM call each, distinct lens); their
+    findings are merged and de-duplicated, keeping which agent(s) flagged each one. The honest
+    multi-agent: genuinely separate agents with separate prompts, not one model relabeled."""
+    from concurrent.futures import ThreadPoolExecutor
+    source = _read_sources(target)
+    if not source:
+        return {"agents": [s["name"] for s in SPECIALISTS], "findings": []}
+    with ThreadPoolExecutor(max_workers=len(SPECIALISTS)) as ex:
+        results = list(ex.map(lambda s: _run_specialist(source, model, s), SPECIALISTS))
+    merged, order = {}, []
+    for flist in results:
+        for f in flist:
+            key = re.sub(r"[^a-z0-9]", "", str(f["function"]).lower())
+            if key in merged:
+                if f["agent"] not in merged[key]["proposed_by"]:
+                    merged[key]["proposed_by"].append(f["agent"])
+            else:
+                merged[key] = {"severity": f["severity"], "function": f["function"],
+                               "desc": f["desc"], "proposed_by": [f["agent"]]}
+                order.append(key)
+    return {"agents": [s["name"] for s in SPECIALISTS], "findings": [merged[k] for k in order]}
+
 
 def orchestrate(target_dir: str, model: str) -> dict:
     import cli  # lazy to avoid circular import; reuse the proposer + invariant discovery
@@ -107,9 +189,9 @@ def orchestrate(target_dir: str, model: str) -> dict:
     except Exception:
         pass
 
-    # 1. PROPOSE (real live LLM)
-    proposer = cli._run_proposer(target, model)
-    findings = proposer.get("findings", []) if proposer else []
+    # 1. PROPOSE — N specialist agents hunt in PARALLEL (genuine multi-agent)
+    proposal = _propose_multi(target, model)
+    findings = proposal["findings"]
     for i, f in enumerate(findings):
         f["finding_id"] = i
 
@@ -130,6 +212,7 @@ def orchestrate(target_dir: str, model: str) -> dict:
         tool = r.get("chosen_tool", "none")
         rec = {"severity": f.get("severity"), "function": f.get("function"),
                "claim": f.get("desc"), "claim_source": "proposer",
+               "proposed_by": f.get("proposed_by", []),
                "bug_class": r.get("bug_class", ""),
                "route": {"chosen_tool": tool, "rationale": r.get("rationale", ""),
                          "rationale_source": "proposer"}}
@@ -192,7 +275,8 @@ def orchestrate(target_dir: str, model: str) -> dict:
     payload = {
         "schema_version": 3, "command": "agent-audit",
         "target": str(target), "target_name": target.name, "ts": time.time(),
-        "proposer": {"model": model, "ok": bool(findings), "n": len(findings)},
+        "proposer": {"model": model, "ok": bool(findings), "n": len(findings),
+                     "mode": "multi-agent", "agents": proposal["agents"]},
         "tools_fired": tools_fired,
         "n_confirmed": sum(1 for f in out_findings if f["verification"]["verdict"] == V.CONFIRMED),
         "n_cleared": sum(1 for f in out_findings if f["verification"]["verdict"] == V.CLEARED),

@@ -1,9 +1,11 @@
 # plumbline
 
-**plumbline is an autonomous AI agent that audits Solidity** — it proposes vulnerabilities,
-routes each to a formal verifier, and is graded by a sound gate it *cannot fool*: the agent has no
-verdict field, and a finding is confirmed only when a real verifier subprocess emits a concrete
-counterexample whose witness appears verbatim in its output. The agent's creativity is unbounded;
+**plumbline is an autonomous multi-agent system that audits Solidity** — a team of specialist
+agents (solvency, precision, access-control) propose vulnerabilities in parallel, a router agent
+dispatches each finding to the formal verifier that can settle it, and a sound gate grades the
+result — one the agents *cannot fool*: they have no verdict field, and a finding is confirmed only
+when a real verifier subprocess emits a concrete counterexample whose witness appears verbatim in
+its output. The agents' creativity is unbounded;
 its authority to declare truth is zero.
 
 > Most "AI auditors" let a language model judge its own output. That caps out around F1 0.30 and
@@ -51,7 +53,7 @@ and the firewall **refuses to confirm** — it escalates rather than stamp a wit
 
 ```mermaid
 flowchart TD
-    A["LLM proposer (cli._run_proposer — live LLM)<br/>emits findings · NO verdict field"] --> B["LLM router<br/>names ONE tool + invariant per finding"]
+    A["3 specialist agents in parallel<br/>solvency · precision · access<br/>propose findings · NO verdict field"] --> B["LLM router<br/>names ONE tool + invariant per finding"]
     B --> C{"deterministic dispatcher<br/>runs the REAL subprocess"}
     C -->|"halmos --function check_*<br/>bound to THIS bytecode"| H["halmos · symbolic-EVM<br/>TARGET-BOUND"]
     C -->|"z3_cast · representative obligation"| Z["z3<br/>NOT bound"]
