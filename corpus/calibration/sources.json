@@ -1,0 +1,15 @@
+{
+  "_comment": "Third-party audit corpora used for calibration are NOT vendored in this repo (we do not redistribute other people's code, and they are large). They live at their canonical sources and are re-cloned on demand by fetch.sh.",
+  "corpora": {
+    "2026-06-08-cantina-morpho-midnight/midnight": {
+      "url": "https://github.com/morpho-org/midnight.git",
+      "commit": "7538c438513622721e23a94676b93a335b83dace",
+      "access": "public"
+    },
+    "2026-06-08-dre-labs-dreusd-source": {
+      "url": "https://github.com/sherlock-audit/2026-04-dre-labs-audits-qizwiz.git",
+      "commit": "bc8dcd0b5deb7da5caaa7e632b31e13d2ed7cb5d",
+      "access": "private (Sherlock audit fork — clone requires `gh auth`)"
+    }
+  }
+}

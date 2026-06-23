@@ -14,3 +14,11 @@ corpus/sherlock_pdfs/
 examples/puppy-raffle/lib/
 examples/puppy-raffle/cache/
 examples/puppy-raffle/out/
+
+# third-party calibration corpora — fetched on demand via corpus/calibration/fetch.sh, never vendored
+corpus/calibration/2026-06-08-cantina-morpho-midnight/
+corpus/calibration/2026-06-08-dre-labs-dreusd-source/
+
+# macOS noise
+.DS_Store
+**/.DS_Store
