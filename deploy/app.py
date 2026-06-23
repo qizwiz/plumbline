@@ -114,8 +114,16 @@ def verification():
                    f"<div class='value' style='color:var(--red)'>{nconf3}</div><div class='sub'>replayable witness</div></div>"
                    f"<div class='stat'><div class='label'>escalated</div>"
                    f"<div class='value' style='color:var(--yel)'>{nesc3}</div><div class='sub'>to human review</div></div></div>"
-                   f"<p class='muted' style='font-size:.82rem;margin:.2rem 0 1.4rem'>"
-                   f"tools the agent actually invoked this run: {chips}</p>")
+                   f"<p class='muted' style='font-size:.82rem;margin:.2rem 0 .5rem'>"
+                   f"tools the agent actually invoked this run: {chips}</p>"
+                   f"<p class='muted-er' style='font-size:.78rem;margin:0 0 1.4rem;line-height:1.6;"
+                   f"border-left:2px solid var(--bdr);padding-left:.7rem'>"
+                   f"<b>Recorded run.</b> The proposer and router are stochastic — <i>which</i> "
+                   f"findings appear and <i>which</i> tool each routes to vary run-to-run. The gate "
+                   f"is not: each verdict below is a deterministic function of a real subprocess's "
+                   f"<code>(stdout, exit_code)</code>, and a CONFIRMED requires the witness to appear "
+                   f"verbatim in stdout. Re-run any printed <code>$ halmos&nbsp;…</code> line for "
+                   f"the same counterexample, bit for bit.</p>")
 
         def fmt_argv(argv):
             return " ".join(os.path.basename(a) if str(a).startswith("/") else str(a) for a in argv)
