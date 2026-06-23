@@ -15,8 +15,8 @@ RUNS = os.path.join(HERE, "audit-runs")
 app = Flask(__name__)
 
 CSS = """
-:root{--bg:#0f1115;--bg-2:#161922;--bg-3:#1c2030;--fg:#d4d4dc;--fg-dim:#8a8d99;
---fg-dimmer:#5a5d68;--accent:#d97757;--red:#e06c75;--yel:#e5c07b;--grn:#98c379;--bdr:#232735;}
+:root{--bg:#ECDFC0;--bg-2:#E5D6B2;--bg-3:#E2D2A8;--fg:#3E3017;--fg-dim:#7A6034;
+--fg-dimmer:#A28A56;--accent:#B5482A;--red:#A33223;--yel:#946212;--grn:#4E7A1E;--bdr:#CBB180;}
 *{box-sizing:border-box}html,body{background:var(--bg);color:var(--fg);
 font-family:'Berkeley Mono','JetBrains Mono','Menlo',monospace;font-size:13px;line-height:1.55;margin:0}
 body{padding:2rem 2.4rem;max-width:1100px;margin:0 auto}
@@ -233,12 +233,12 @@ def verification():
             term = ""
             for s in v.get("steps", []):
                 ex = html.escape(str(s.get("stdout_excerpt", "")).strip())
-                term += ("<div style='background:#0b0e14;border:1px solid var(--bdr);border-radius:6px;"
+                term += ("<div style='background:#14100A;border:1px solid #3A2E18;border-radius:6px;"
                          "padding:.6rem .8rem;margin:.55rem 0;font-family:ui-monospace,monospace;"
                          "font-size:.78rem;overflow-x:auto'>"
-                         f"<div style='color:var(--accent)'>$ {html.escape(fmt_argv(s.get('argv', [])))}</div>"
-                         f"<pre style='margin:.4rem 0 0;white-space:pre-wrap;color:var(--fg-dim)'>{ex}</pre>"
-                         f"<div class='muted-er' style='font-size:.7rem;margin-top:.4rem'>"
+                         f"<div style='color:#E0A93B'>$ {html.escape(fmt_argv(s.get('argv', [])))}</div>"
+                         f"<pre style='margin:.4rem 0 0;white-space:pre-wrap;color:#C9B98F'>{ex}</pre>"
+                         f"<div style='font-size:.7rem;margin-top:.4rem;color:#9A864E'>"
                          f"exit {s.get('exit_code')} · {s.get('wall_s')}s · sha256:{html.escape(str(s.get('stdout_sha256','')))}</div></div>")
             if not v.get("steps"):
                 term = ("<div class='muted' style='font-size:.8rem;margin:.55rem 0;font-style:italic'>"
