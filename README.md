@@ -1,5 +1,7 @@
 # plumbline
 
+[![ci](https://github.com/qizwiz/plumbline/actions/workflows/ci.yml/badge.svg)](https://github.com/qizwiz/plumbline/actions/workflows/ci.yml) &nbsp;·&nbsp; **[▶ Live demo](https://qizwiz--plumbline-verification-web.modal.run)** &nbsp;·&nbsp; [the math](https://qizwiz--plumbline-verification-web.modal.run/science)
+
 **plumbline is an autonomous multi-agent system that audits Solidity** — a team of specialist
 agents (solvency, precision, access-control) propose vulnerabilities in parallel, a router agent
 dispatches each finding to the formal verifier that can settle it, and a sound gate grades the
