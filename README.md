@@ -108,21 +108,26 @@ width-independent arithmetic obligation) run as **representative** obligations: 
 attached as *supporting* evidence, but the finding is ESCALATED — never auto-confirmed — because the
 obligation isn't bound to this bytecode. Refusing to over-claim is the whole design.
 
-## The orchestration itself is formally verified (TLA+)
+## A TLA+ model of the orchestration loop (model-checked — with honest scope)
 
-Beyond the per-finding gate, the multi-agent loop *as a coordination system* is model-checked.
-`docs/tla/Orchestration.tla` abstracts the propose → route → verify → escalate fabric, and TLC
-proves three properties — **liveness** (every proposed finding is eventually resolved),
-**completion** (the run always terminates), and **no-starvation** (no specialist agent's findings
-are perpetually skipped) — over the full state space (343 distinct states, 0 errors). The fairness
-assumption is load-bearing, not decorative: drop the dispatcher's weak fairness
-(`Orchestration_unfair.cfg`) and TLC hands back a starvation counterexample. Reproduce in seconds:
+We model the propose → route → verify → dispatch loop in TLA+ (`docs/tla/Orchestration.tla`) as an
+*idealized concurrent dispatcher*, and TLC checks that under weak fairness it is **live**,
+**complete**, and **starvation-free** (343 states, 0 errors). The fairness assumption is load-bearing
+*in the model*: drop the dispatcher's weak fairness (`Orchestration_unfair.cfg`) and TLC returns a
+starvation counterexample.
+
+**Scope, stated honestly:** the *shipped* dispatcher is a single bounded `for`-loop that resolves
+every finding by construction — so it satisfies these properties *trivially*. The TLA+ is therefore
+a **design contract** for a future concurrent/queued dispatcher, not a proof that model-checking
+caught a bug the current straight-line code could exhibit. (We hold our own README to the same
+no-vacuous-claims bar the gate holds findings to — this scope note replaced an earlier
+"the orchestration is formally verified" line that an adversarial audit flagged as an overclaim.)
 
 ```bash
 cd docs/tla && java -cp tla2tools.jar tlc2.TLC -config Orchestration.cfg -deadlock Orchestration
 ```
 
-(The same TLA+ layer also models the smart-contract vulnerability *classes* — 40 specs in `docs/tla/`,
+(The TLA+ layer also models the smart-contract vulnerability *classes* — 40 specs in `docs/tla/`,
 each a temporal spec whose TLC counterexample is bridged to a runnable Foundry test.)
 
 ## What's actually verified (measured, not claimed)
