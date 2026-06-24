@@ -108,6 +108,23 @@ width-independent arithmetic obligation) run as **representative** obligations: 
 attached as *supporting* evidence, but the finding is ESCALATED — never auto-confirmed — because the
 obligation isn't bound to this bytecode. Refusing to over-claim is the whole design.
 
+## The orchestration itself is formally verified (TLA+)
+
+Beyond the per-finding gate, the multi-agent loop *as a coordination system* is model-checked.
+`docs/tla/Orchestration.tla` abstracts the propose → route → verify → escalate fabric, and TLC
+proves three properties — **liveness** (every proposed finding is eventually resolved),
+**completion** (the run always terminates), and **no-starvation** (no specialist agent's findings
+are perpetually skipped) — over the full state space (343 distinct states, 0 errors). The fairness
+assumption is load-bearing, not decorative: drop the dispatcher's weak fairness
+(`Orchestration_unfair.cfg`) and TLC hands back a starvation counterexample. Reproduce in seconds:
+
+```bash
+cd docs/tla && java -cp tla2tools.jar tlc2.TLC -config Orchestration.cfg -deadlock Orchestration
+```
+
+(The same TLA+ layer also models the smart-contract vulnerability *classes* — 40 specs in `docs/tla/`,
+each a temporal spec whose TLC counterexample is bridged to a runnable Foundry test.)
+
 ## What's actually verified (measured, not claimed)
 
 - **The gate catches real bugs with replayable witnesses** — across 4 example protocols / 6
