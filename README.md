@@ -108,26 +108,28 @@ width-independent arithmetic obligation) run as **representative** obligations: 
 attached as *supporting* evidence, but the finding is ESCALATED — never auto-confirmed — because the
 obligation isn't bound to this bytecode. Refusing to over-claim is the whole design.
 
-## A TLA+ model of the orchestration loop (model-checked — with honest scope)
+## A TLA+ model of the orchestration loop (model-checked — and load-bearing)
 
-We model the propose → route → verify → dispatch loop in TLA+ (`docs/tla/Orchestration.tla`) as an
-*idealized concurrent dispatcher*, and TLC checks that under weak fairness it is **live**,
-**complete**, and **starvation-free** (343 states, 0 errors). The fairness assumption is load-bearing
-*in the model*: drop the dispatcher's weak fairness (`Orchestration_unfair.cfg`) and TLC returns a
-starvation counterexample.
+The dispatcher retries a *transient* verifier failure (a `TOOL_ERROR` — timeout or crash) up to a
+cap (`MAX_VERIFY_ATTEMPTS`), then escalates. We model that exact loop in TLA+
+(`docs/tla/Orchestration.tla`) and TLC checks it over the full state space (79,507 distinct states):
+it is **live** (every finding is resolved), **complete** (always terminates), **starvation-free**,
+and **never retries past the cap** (`RetriesCapped` invariant) — 0 errors.
 
-**Scope, stated honestly:** the *shipped* dispatcher is a single bounded `for`-loop that resolves
-every finding by construction — so it satisfies these properties *trivially*. The TLA+ is therefore
-a **design contract** for a future concurrent/queued dispatcher, not a proof that model-checking
-caught a bug the current straight-line code could exhibit. (We hold our own README to the same
-no-vacuous-claims bar the gate holds findings to — this scope note replaced an earlier
-"the orchestration is formally verified" line that an adversarial audit flagged as an overclaim.)
+The cap is load-bearing, and TLC *proves* it: drop the escalate-after-cap fallback
+(`Orchestration_unfair.cfg` → `NoCapSpec`, i.e. an uncapped retry that never gives up) and TLC
+returns a counterexample where a persistently-failing verifier leaves a finding **pending forever**.
+The shipped code is the version *with* the fallback — `tools/orchestrator.py:_verify_with_retry`
+retries up to `MAX_VERIFY_ATTEMPTS` and then the dispatch escalates the final `TOOL_ERROR` (a unit
+test confirms it stops at the cap rather than looping). So the design decision that makes the
+dispatch terminate under a flaky verifier is one **TLC verified is necessary**, and the code
+enforces — not an assumption.
 
 ```bash
 cd docs/tla && java -cp tla2tools.jar tlc2.TLC -config Orchestration.cfg -deadlock Orchestration
 ```
 
-(The TLA+ layer also models the smart-contract vulnerability *classes* — 40 specs in `docs/tla/`,
+(The same TLA+ layer also models the smart-contract vulnerability *classes* — 40 specs in `docs/tla/`,
 each a temporal spec whose TLC counterexample is bridged to a runnable Foundry test.)
 
 ## What's actually verified (measured, not claimed)

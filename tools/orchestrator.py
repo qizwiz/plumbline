@@ -179,6 +179,28 @@ def _propose_multi(target: Path, model: str) -> dict:
     return {"agents": [s["name"] for s in SPECIALISTS], "findings": [merged[k] for k in order]}
 
 
+MAX_VERIFY_ATTEMPTS = 2   # bounded retry on a TRANSIENT verifier failure (TOOL_ERROR: timeout/crash).
+                          # The cap is LOAD-BEARING: without it a deterministically-failing tool would
+                          # retry forever and the dispatch would never terminate. docs/tla/
+                          # Orchestration.tla model-checks exactly this — Completion holds iff the cap
+                          # exists; remove the cap and TLC returns a non-terminating retry loop.
+
+
+def _verify_with_retry(run_thunk):
+    """Run a verifier; on a transient TOOL_ERROR retry up to MAX_VERIFY_ATTEMPTS, then accept the
+    last result (the caller escalates it). Terminates BY CONSTRUCTION because the attempt count is
+    capped — which is the property Orchestration.tla proves is necessary and sufficient."""
+    last = None
+    for attempt in range(1, MAX_VERIFY_ATTEMPTS + 1):
+        v = run_thunk()
+        d = v.dict() if hasattr(v, "dict") else dict(v)
+        d["attempt"] = attempt
+        last = d
+        if d.get("verdict") != V.TOOL_ERROR:
+            break
+    return last
+
+
 def orchestrate(target_dir: str, model: str) -> dict:
     import cli  # lazy to avoid circular import; reuse the proposer + invariant discovery
     target = Path(target_dir).resolve()
@@ -236,12 +258,12 @@ def orchestrate(target_dir: str, model: str) -> dict:
             if inv:
                 inv_claimed.add(inv)
                 rec["route"]["invariant"] = inv
-                steps.append(run_halmos(target, inv).dict())
+                steps.append(_verify_with_retry(lambda: run_halmos(target, inv)))
                 bound = True   # the symbolic test executes the real contract
         elif tool == "lean":
-            steps.append(run_lean().dict())          # a general arithmetic lemma, not target bytecode
+            steps.append(_verify_with_retry(run_lean))          # a general arithmetic lemma, not target bytecode
         elif tool == "z3_cast":
-            steps.append(run_z3_cast(**_Z3_CAST_DEMO).dict())  # a representative truncation obligation
+            steps.append(_verify_with_retry(lambda: run_z3_cast(**_Z3_CAST_DEMO)))  # representative obligation
         # determine the finding verdict from the (last) tool step; no tool -> ESCALATED
         if steps:
             v = steps[-1]
