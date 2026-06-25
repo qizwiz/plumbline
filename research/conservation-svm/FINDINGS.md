@@ -119,3 +119,17 @@ there; treat price-manip majority as a separate fork-state-backend problem. Clon
 
 Repro: `python research/conservation-svm/conserve.py examples/synthetic-dreusd/dreUSD.sol dreUSD`
 then `cd examples/synthetic-dreusd && ../../.venv/bin/halmos --function check_autoRoundTripConserves`.
+
+## L2 — programmatic IDIOM DISCOVERY proven (2026-06-24)
+discover.py: an LLM call (opus) INDUCES the invariant class from ONE seed bug (MiniToken:
+totalSupply/balanceOf/mint/burn) and TRANSFERS it to a held-out contract with DIFFERENT surface
+(Vault: g_totalAssets/userShares/enter/exit) by writing a halmos test — no human writes the idiom.
+halmos validates the transfer: clean Vault [PASS] 0.13s, buggy Vault [FAIL] counterexample 0.23s.
+The model mapped roles itself (totalSupply->g_totalAssets etc) and emitted aggDelta==holdDelta.
+SCOPE: proves transfer-ACROSS-SURFACE + sound discrimination; held-out is contrived (not real external
+yet) and it's one-seed-one-idiom. Subtle: a strong model might induce from the held-out alone, so
+"seed load-bearing" isn't proven — clean test is transferring a conservation idiom to an access-control
+contract and watching it correctly DECLINE. NEXT RIGOR: point discover.py at idle StakingRewards (real
+external, already building) + diverse-family decline test + scale to a library from DHL.
+Repro: python research/conservation-svm/discover.py fixtures/MiniTokenBug.sol discovery/src/Vault.sol Vault
+       then halmos --function check_invariant --contract DiscoveredTest (swap Vault.sol clean<->buggy)
