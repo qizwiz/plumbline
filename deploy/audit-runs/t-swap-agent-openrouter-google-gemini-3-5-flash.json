@@ -1,0 +1,112 @@
+{
+  "schema_version": 3,
+  "command": "agent-audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/t-swap",
+  "target_name": "t-swap",
+  "ts": 1782306593.279113,
+  "proposer": {
+    "model": "openrouter/google/gemini-3.5-flash",
+    "ok": true,
+    "n": 3,
+    "mode": "multi-agent",
+    "agents": [
+      "solvency",
+      "precision",
+      "access"
+    ]
+  },
+  "tools_fired": [
+    "halmos"
+  ],
+  "n_confirmed": 1,
+  "n_cleared": 0,
+  "n_escalated": 2,
+  "findings": [
+    {
+      "severity": "HIGH",
+      "function": "TSwapPool._swap",
+      "claim": "Every tenth swap transfers 1 ether of the output token from contract reserves to the caller, allowing pools to be completely drained using repeating low-value swaps.",
+      "claim_source": "proposer",
+      "proposed_by": [
+        "solvency",
+        "precision"
+      ],
+      "bug_class": "fund-drain",
+      "route": {
+        "chosen_tool": "halmos",
+        "rationale": "Draining 1 ether on every tenth swap directly violates the constant product invariant verified by check_swapPreservesXYK.",
+        "rationale_source": "proposer",
+        "invariant": "check_swapPreservesXYK"
+      },
+      "verification": {
+        "verdict": "CONFIRMED",
+        "verdict_source": "tool",
+        "bound": true,
+        "steps": [
+          {
+            "tool": "halmos",
+            "argv": [
+              "/Users/jonathanhill/src/plumbline/.venv/bin/halmos",
+              "--function",
+              "check_swapPreservesXYK"
+            ],
+            "cwd": "/Users/jonathanhill/src/plumbline/examples/t-swap",
+            "exit_code": 1,
+            "wall_s": 3.3,
+            "stdout_sha256": "937e2d5a93359ca3",
+            "stdout_excerpt": "No files changed, compilation skipped\n\nRunning 1 tests for test/Invariants.t.sol:Invariants\nCounterexample: \n    p_inputAmount_uint64_c7e6fcd_00 = 0x800000000000000\n[FAIL] check_swapPreservesXYK(uint64) (paths: 7, time: 0.55s, bounds: [])\nSymbolic test result: 0 passed; 1 failed; time: 0.65s\nWarning: Found unknown `halmos`",
+            "verdict": "CONFIRMED",
+            "evidence": "p_inputAmount_uint64_c7e6fcd_00 = 0x800000000000000",
+            "verdict_source": "tool",
+            "attempt": 1,
+            "bound": true
+          }
+        ]
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "TSwapPool.sellPoolTokens",
+      "claim": "The function incorrectly passes the input pool token amount as the output WETH amount to swapExactOutput, enabling users to drain WETH from the pool.",
+      "claim_source": "proposer",
+      "proposed_by": [
+        "solvency"
+      ],
+      "bug_class": "fund-drain",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "The parameter mismatch in the sellPoolTokens wrapper function is not directly covered by the core swap XYK invariant.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "TSwapPool.getInputAmountBasedOnOutput",
+      "claim": "Use of 10000 instead of 1000 as the scaling multiplier causes the calculated input amount to be ten times larger than required.",
+      "claim_source": "proposer",
+      "proposed_by": [
+        "precision"
+      ],
+      "bug_class": "decimal-scaling",
+      "route": {
+        "chosen_tool": "none",
+        "rationale": "The use of an incorrect constant multiplier (10000 instead of 1000) is a logic/scaling bug that does not fit narrow integer-casting or width-independent arithmetic solvers.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    }
+  ]
+}

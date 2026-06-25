@@ -1,0 +1,91 @@
+{
+  "schema_version": 3,
+  "command": "agent-audit",
+  "target": "/Users/jonathanhill/src/plumbline/examples/t-swap",
+  "target_name": "t-swap",
+  "ts": 1782306534.6147351,
+  "proposer": {
+    "model": "openrouter/anthropic/claude-opus-4.8",
+    "ok": true,
+    "n": 2,
+    "mode": "multi-agent",
+    "agents": [
+      "solvency",
+      "precision",
+      "access"
+    ]
+  },
+  "tools_fired": [
+    "halmos"
+  ],
+  "n_confirmed": 1,
+  "n_cleared": 0,
+  "n_escalated": 1,
+  "findings": [
+    {
+      "severity": "HIGH",
+      "function": "TSwapPool._swap",
+      "claim": "Every 10th swap gifts the caller a free 1e18 of the output token from reserves, draining pool collateral and breaking the x*y=k solvency invariant.",
+      "claim_source": "proposer",
+      "proposed_by": [
+        "solvency",
+        "precision"
+      ],
+      "bug_class": "conservation/solvency",
+      "route": {
+        "chosen_tool": "halmos",
+        "rationale": "The free output-token gift breaks the x*y=k constant-product invariant, which check_swapPreservesXYK directly tests.",
+        "rationale_source": "proposer",
+        "invariant": "check_swapPreservesXYK"
+      },
+      "verification": {
+        "verdict": "CONFIRMED",
+        "verdict_source": "tool",
+        "bound": true,
+        "steps": [
+          {
+            "tool": "halmos",
+            "argv": [
+              "/Users/jonathanhill/src/plumbline/.venv/bin/halmos",
+              "--function",
+              "check_swapPreservesXYK"
+            ],
+            "cwd": "/Users/jonathanhill/src/plumbline/examples/t-swap",
+            "exit_code": 1,
+            "wall_s": 3.16,
+            "stdout_sha256": "9f33464d78eb9717",
+            "stdout_excerpt": "No files changed, compilation skipped\n\nRunning 1 tests for test/Invariants.t.sol:Invariants\nCounterexample: \n    p_inputAmount_uint64_494761f_00 = 0x800000000000000\n[FAIL] check_swapPreservesXYK(uint64) (paths: 7, time: 0.54s, bounds: [])\nSymbolic test result: 0 passed; 1 failed; time: 0.63s\nWarning: Found unknown `halmos`",
+            "verdict": "CONFIRMED",
+            "evidence": "p_inputAmount_uint64_494761f_00 = 0x800000000000000",
+            "verdict_source": "tool",
+            "attempt": 1,
+            "bound": true
+          }
+        ]
+      }
+    },
+    {
+      "severity": "HIGH",
+      "function": "TSwapPool.getInputAmountBasedOnOutput",
+      "claim": "Fee divisor uses 10000 instead of 1000, charging ~10x too little input so swapExactOutput/sellPoolTokens extracts far more output value than input deposited, draining reserves.",
+      "claim_source": "proposer",
+      "proposed_by": [
+        "solvency",
+        "precision"
+      ],
+      "bug_class": "conservation/solvency",
+      "route": {
+        "chosen_tool": "halmos",
+        "rationale": "The wrong fee divisor lets a swap extract more output value than deposited, violating the x*y=k preservation checked by check_swapPreservesXYK.",
+        "rationale_source": "proposer"
+      },
+      "verification": {
+        "verdict": "ESCALATED",
+        "verdict_source": "none",
+        "bound": false,
+        "steps": [],
+        "note": "no formal tool fit \u2014 escalated to human"
+      }
+    }
+  ]
+}

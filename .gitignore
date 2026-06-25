@@ -22,3 +22,9 @@ corpus/calibration/2026-06-08-dre-labs-dreusd-source/
 # macOS noise
 .DS_Store
 **/.DS_Store
+
+# conservation-svm scratch: external corpora + fetched deps (regenerable)
+research/conservation-svm/dhl/
+research/conservation-svm/discharge-idle/lib/
+research/conservation-svm/discharge-idle/out/
+research/conservation-svm/discharge-idle/cache/

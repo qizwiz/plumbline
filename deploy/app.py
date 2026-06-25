@@ -35,13 +35,31 @@ th{font-weight:500;color:var(--fg-dim);text-transform:uppercase;letter-spacing:.
 .stat .value{font-size:2rem;font-weight:600;color:var(--accent);margin:.4rem 0 .2rem}
 .stat .sub{color:var(--fg-dim);font-size:.78rem}
 .pill{font-size:.7rem;padding:1px 6px;border-radius:3px;color:var(--bg);background:var(--accent);font-weight:600}
+nav{display:flex;align-items:baseline;gap:1.3rem;border-bottom:1px solid var(--bdr);padding-bottom:.7rem;margin:0 0 1.7rem;flex-wrap:wrap}
+nav .brand{font-size:1.05rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);text-decoration:none;margin-right:.2rem}
+nav a:not(.brand){color:var(--fg-dim);text-decoration:none;font-size:.82rem;letter-spacing:.03em}
+nav a:hover{color:var(--accent)}
+nav a.active{color:var(--fg);font-weight:600}
+nav .navtag{margin-left:auto;color:var(--fg-dimmer);font-size:.72rem;font-style:italic}
+@media(max-width:600px){nav{gap:1rem}nav .navtag{display:none}}
+.pl-chev{display:inline-block;transition:transform .15s;font-size:.8em}
+details[open] .pl-chev{transform:rotate(90deg)}
 """
 
-def page(body):
+def page(body, active=""):
+    def link(href, label, key):
+        cls = " class=active" if active == key else ""
+        return f"<a href='{href}'{cls}>{label}</a>"
+    nav = ("<nav><a class=brand href='/'>plumbline</a>"
+           + link("/verification", "verification", "verification")
+           + link("/science", "the math", "science")
+           + "<span class=navtag>true by construction</span></nav>")
+    title = "plumbline" + (f" — {active}" if active else "")
     return (f"<!doctype html><html lang=en><head><meta charset=utf-8>"
             f"<meta name=viewport content='width=device-width,initial-scale=1'>"
-            f"<title>plumbline — verification</title><style>{CSS}</style></head>"
-            f"<body><h1>plumbline <small>verification</small></h1>{body}</body></html>")
+            f"<link rel=icon href='/favicon.svg' type='image/svg+xml'>"
+            f"<title>{title}</title><style>{CSS}</style></head>"
+            f"<body>{nav}{body}</body></html>")
 
 def vstyle(v):
     v = str(v)
@@ -102,25 +120,40 @@ _LIVE_BANNER = (
     "border:none;font-weight:600;padding:0.42rem 0.95rem;border-radius:6px;cursor:pointer;"
     "font-family:inherit;font-size:0.82rem'>&#9654; run halmos live in the cloud</button>"
     "<div style='font-size:0.74rem;color:var(--fg-dim);margin-top:0.4rem'>streams a REAL Modal "
-    "container compiling the contract and running symbolic execution, line by line as it happens "
-    "(~6s). Run it twice \\u2014 the witness variable is freshly minted each time.</div>"
+    "container compiling the contract and running symbolic execution, line by line as it happens. "
+    "<b>First run cold-starts a container (~15\\u201330s); re-runs take ~4s.</b> "
+    "Run it twice \\u2014 the witness variable is freshly minted each time.</div>"
     "<div id='liveOut' style='display:none;background:#0b0e14;border:1px solid var(--bdr);"
     "border-radius:6px;padding:0.6rem 0.8rem;margin-top:0.6rem;font-family:ui-monospace,monospace;"
     "font-size:0.76rem;white-space:pre-wrap;max-height:320px;overflow:auto;color:#C9B98F'></div></div>"
     "<script>"
     "async function runLive(){"
     "var b=document.getElementById('liveBtn'),o=document.getElementById('liveOut');"
-    "b.disabled=true;b.textContent='running\\u2026';o.style.display='block';o.textContent='connecting to the cloud\\u2026\\n';"
+    "b.disabled=true;b.textContent='running\\u2026';o.style.display='block';"
+    "var t0=Date.now(),firstByte=false,dots=0;"
+    "var spin=setInterval(function(){if(firstByte)return;dots=(dots+1)%4;"
+    "var el=Math.round((Date.now()-t0)/1000);"
+    "o.textContent='connecting to the cloud'+Array(dots+1).join('.')+'   ('+el+'s'+"
+    "(el>=8?' \\u2014 cold start, the container is booting\\u2026':'')+')';},420);"
+    "var ac=new AbortController(),to=setTimeout(function(){ac.abort();},90000);"
     "try{"
-    "var resp=await fetch('" + _STREAM_API + "?inv=check_redeemReturnsDeposit');"
+    "var resp=await fetch('" + _STREAM_API + "?inv=check_redeemReturnsDeposit',{signal:ac.signal});"
     "var rd=resp.body.getReader(),dec=new TextDecoder(),txt='';"
-    "while(true){var x=await rd.read();if(x.done)break;txt+=dec.decode(x.value,{stream:true});o.textContent=txt;o.scrollTop=o.scrollHeight;}"
+    "while(true){var x=await rd.read();if(x.done)break;"
+    "if(!firstByte){firstByte=true;clearInterval(spin);o.textContent='';}"
+    "txt+=dec.decode(x.value,{stream:true});o.textContent=txt;o.scrollTop=o.scrollHeight;}"
+    "clearTimeout(to);clearInterval(spin);"
     "var ok=txt.indexOf('Counterexample')>-1,m=txt.match(/p_[A-Za-z0-9_]+/);"
     "var n=document.createElement('div');n.style.cssText='margin-top:.5rem;font-size:.74rem';"
-    "n.innerHTML=(ok?\"<span style='color:var(--red)'>\\u2713 real halmos found the counterexample</span>\":'(done)')"
-    "+\"<div style='color:var(--fg-dim);margin-top:.3rem'>run it again \\u2014 the witness variable \"+(m?'<b>'+m[0]+'</b>':'name')+\" is freshly minted each run. That changing name is your proof this is live symbolic execution, not a recording.</div>\";"
+    "if(ok){n.innerHTML=\"<span style='color:var(--red)'>\\u2713 real halmos found the counterexample</span>\""
+    "+\"<div style='color:var(--fg-dim);margin-top:.3rem'>run it again \\u2014 the witness variable \"+(m?'<b>'+m[0]+'</b>':'name')+\" is freshly minted each run. That changing name is your proof this is live symbolic execution, not a recording.</div>\";}"
+    "else{n.innerHTML=\"<span style='color:var(--yel)'>\\u2298 the run finished without a counterexample line</span>\""
+    "+\"<div style='color:var(--fg-dim);margin-top:.3rem'>unexpected for this invariant \\u2014 click run once more.</div>\";}"
     "o.appendChild(n);o.scrollTop=o.scrollHeight;"
-    "}catch(e){o.textContent='live endpoint unavailable: '+e;}"
+    "}catch(e){clearInterval(spin);clearTimeout(to);"
+    "o.textContent=(e&&e.name==='AbortError')"
+    "?'the cloud run passed 90s and was cancelled \\u2014 the container was almost certainly cold-starting. Click run again; it should be warm now.'"
+    ":'live endpoint unreachable right now: '+e+'\\n(the recorded run below is unaffected \\u2014 it is a real captured trace.)';}"
     "b.disabled=false;b.textContent='\\u25b6 run halmos live again';"
     "}"
     "</script>"
@@ -130,14 +163,53 @@ _STRUCTURAL_MAP = (
     "<details style='margin:0 0 1.7rem;border:1px solid var(--bdr);border-radius:8px;"
     "padding:.55rem .9rem;background:var(--bg-3)'>"
     "<summary style='cursor:pointer;color:var(--accent);font-size:.86rem;list-style:none'>"
-    "&#9670; the structural map &mdash; the heat-diffusion prior that focuses the hunt "
-    "<span class='muted-er' style='font-size:.72rem'>(interactive &middot; example: boss-bridge)</span>"
+    "<span class='pl-chev'>&#9656;</span> &#9670; the structural map &mdash; the heat-diffusion prior that focuses the hunt "
+    "<span class='muted-er' style='font-size:.72rem'>(click to open &middot; interactive &middot; example: boss-bridge)</span>"
     "</summary>"
     "<iframe src='/science' loading='lazy' title='heat-diffusion vulnerability localizer' "
     "style='width:100%;height:580px;border:0;border-radius:6px;margin-top:.6rem;background:#ECDFC0'></iframe>"
     "</details>"
 )
 
+# The live-halmos endpoint bakes in ONE contract (synthetic-dreusd) and whitelists ITS invariants,
+# so the streaming button is only honest on that page. On other targets we DON'T fake a live run on
+# the wrong contract — we link to where the live demo really runs and note this page's halmos is replayable.
+_LIVE_LINK_NOTE = (
+    "<div style='margin:0 0 1.7rem;border:1px solid var(--bdr);border-radius:8px;"
+    "padding:.75rem .95rem;background:var(--bg-3);font-size:.86rem;line-height:1.55'>"
+    "<b style='color:var(--accent)'>&#9654; Watch halmos run live</b> on the "
+    "<a href='/verification?project=synthetic-dreusd' style='color:var(--accent);font-weight:600'>"
+    "synthetic-dreusd example</a> &mdash; a real cloud container, streamed line by line as it executes. "
+    "<span class='muted'>The verdicts on <i>this</i> page come from the same halmos; every "
+    "<code>$ halmos&nbsp;&hellip;</code> line below is replayable verbatim and bound to "
+    "<b>this</b> contract's bytecode.</span></div>"
+)
+
+
+_FAVICON = ("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'>"
+            "<rect width='32' height='32' rx='5' fill='#ECDFC0'/>"
+            "<line x1='16' y1='4' x2='16' y2='19' stroke='#5E4220' stroke-width='2'/>"
+            "<polygon points='16,19 11,24 16,31 21,24' fill='#1C5D99' stroke='#123E66' stroke-width='1'/></svg>")
+
+@app.route("/favicon.svg")
+@app.route("/favicon.ico")
+def favicon():
+    return Response(_FAVICON, mimetype="image/svg+xml")
+
+@app.errorhandler(404)
+@app.errorhandler(405)
+def _not_found(e):
+    code = getattr(e, "code", 404)
+    body = ("<div style='max-width:58ch;margin:3.4rem auto 0;text-align:center'>"
+            "<h3 style='border:0;color:var(--fg-dim)'>this page isn’t part of plumbline</h3>"
+            "<p class='muted' style='margin:.4rem 0 1.4rem'>the link you followed doesn’t lead anywhere here "
+            "— but the working demo is one click away.</p>"
+            "<a href='/verification' style='display:inline-block;background:var(--accent);color:#1a1205;"
+            "font-weight:600;text-decoration:none;padding:.7rem 1.4rem;border-radius:8px'>"
+            "Watch it confirm a real exploit &#8594;</a>"
+            "<div style='margin-top:.9rem'><a href='/' style='color:var(--accent);text-decoration:none;"
+            "font-size:.86rem'>&#8592; back to the overview</a></div></div>")
+    return Response(page(body, ""), mimetype="text/html"), code
 
 @app.route("/science")
 def science():
@@ -189,7 +261,7 @@ def verification():
                              "model": str((d.get("proposer") or {}).get("model", fn[:-5])), "data": d})
             except Exception: pass
     if not runs:
-        return Response(page(intro + "<p class='muted'>no cached runs</p>"), mimetype="text/html")
+        return Response(page(intro + "<p class='muted'>no cached runs</p>", "verification"), mimetype="text/html")
     projects = []
     for r in runs:
         if r["target"] not in projects: projects.append(r["target"])
@@ -197,24 +269,32 @@ def verification():
     if sel_proj not in projects:
         sel_proj = "synthetic-dreusd" if "synthetic-dreusd" in projects else projects[0]
     proj_runs = [r for r in runs if r["target"] == sel_proj]
-    chosen = next((r for r in proj_runs if r["slug"] == request.args.get("model")), None) or proj_runs[0]
+    # Prefer the agent run (schema-v3 showcase) as the default for a project, so a fresh
+    # visitor never lands on the stripped legacy view by accident.
+    def is_agent(r): return r["data"].get("command") == "agent-audit" or r["data"].get("schema_version") == 3
+    chosen = (next((r for r in proj_runs if r["slug"] == request.args.get("model")), None)
+              or next((r for r in proj_runs if is_agent(r)), None)
+              or proj_runs[0])
     data = chosen["data"]
+    agent_projects = {r["target"] for r in runs if is_agent(r)}
 
     def sel(name, options, selected):
         opts = "".join(f"<option value='{html.escape(str(v))}'{' selected' if v==selected else ''}>"
                        f"{html.escape(str(lab))}</option>" for v, lab in options)
         return (f"<span class='muted' style='font-size:.8rem'>{name}&nbsp;</span>"
-                f"<select name={name} onchange='this.form.submit()' style='background:var(--bg-3);"
+                f"<select name={name} aria-label='{name}' onchange='this.form.submit()' style='background:var(--bg-3);"
                 "color:var(--accent);border:1px solid var(--bdr);border-radius:4px;padding:.35rem .7rem;"
                 f"font-family:inherit;font-size:.85rem;margin-right:1.1rem'>{opts}</select>")
 
+    def proj_label(p): return p if p in agent_projects else f"{p} · static only"
+    def model_label(r): return r["model"].split("/")[-1] + (" · agent · live" if is_agent(r) else " · static")
+
     sw = ("<form method=get style='margin:-.2rem 0 1.5rem'>"
-          + sel("project", [(p, p) for p in projects], sel_proj)
-          + sel("model", [(r["slug"], r["model"].split("/")[-1]
-                           + (" · agent" if r["data"].get("command") == "agent-audit" else ""))
-                          for r in proj_runs], chosen["slug"])
+          + sel("project", [(p, proj_label(p)) for p in projects], sel_proj)
+          + sel("model", [(r["slug"], model_label(r)) for r in proj_runs], chosen["slug"])
           + "<span class='muted-er' style='font-size:.75rem'>"
-          "same gate · swap the contract or the model</span></form>")
+          "the “· agent · live” run is the showcase (live halmos + structural map); "
+          "“· static” is the same gate on a recorded run. swap the contract or the model.</span></form>")
 
     # ---- agent-orchestration view (schema v3): the visible reasoning trace ----
     if data.get("schema_version") == 3:
@@ -247,7 +327,9 @@ def verification():
                    f"is not: each verdict below is a deterministic function of a real subprocess's "
                    f"<code>(stdout, exit_code)</code>, and a CONFIRMED requires the witness to appear "
                    f"verbatim in stdout. Re-run any printed <code>$ halmos&nbsp;…</code> line for "
-                   f"the same counterexample, bit for bit.</p>" + _LIVE_BANNER + _STRUCTURAL_MAP)
+                   f"the same counterexample, bit for bit.</p>"
+                   + (_LIVE_BANNER if str(data.get("target_name")) == "synthetic-dreusd" else _LIVE_LINK_NOTE)
+                   + _STRUCTURAL_MAP)
 
         def fmt_argv(argv):
             return " ".join(os.path.basename(a) if str(a).startswith("/") else str(a) for a in argv)
@@ -299,7 +381,7 @@ def verification():
                       f"{html.escape(str(v.get('verdict_source','none')))} · {boundtxt}</span></div>" + note + "</div>")
         body = (intro + sw + summary
                 + "<h3>reasoning trace · claim → route → tool → verdict</h3>" + cards)
-        return Response(page(body), mimetype="text/html")
+        return Response(page(body, "verification"), mimetype="text/html")
 
     prop = data.get("proposer") or {}
     finds = prop.get("findings", [])
@@ -337,7 +419,7 @@ def verification():
     gate = f"<table><tr><th>invariant</th><th>halmos verdict (independent)</th></tr>{grows}</table>"
     body = (intro + sw + summary + "<h3>agent findings · recorded LLM run</h3>" + cards
             + "<h3>gate · independent formal verdicts</h3>" + gate)
-    return Response(page(body), mimetype="text/html")
+    return Response(page(body, "verification"), mimetype="text/html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))

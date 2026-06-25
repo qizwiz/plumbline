@@ -60,6 +60,11 @@
 </style>
 
 <div class="pl-sci">
+  <div id="pl-topnav" style="display:flex;gap:1.2rem;align-items:baseline;margin:0 0 16px;font-size:13px;flex-wrap:wrap">
+    <a href="/" style="color:#B5482A;text-decoration:none;font-weight:600;letter-spacing:.07em;text-transform:uppercase">&#8592;&nbsp;plumbline</a>
+    <a href="/verification" style="color:#6B5836;text-decoration:none">the verification demo &#8594;</a>
+  </div>
+  <script>if(window.self!==window.top){var _n=document.getElementById('pl-topnav');if(_n)_n.style.display='none';}</script>
   <h2 class="sr-only">Interactive force-directed graph of the boss-bridge smart contract:
     functions, storage and modifiers coupled as nodes, with a heat-diffusion field
     spreading from a known vulnerability to localize related bugs.</h2>
@@ -80,6 +85,13 @@
     <div class="hint" id="pl-hint">click any node to re-seed the diffusion</div>
     <svg id="pl-svg" viewBox="0 0 920 560" preserveAspectRatio="xMidYMid meet"
          role="img" aria-label="Force-directed graph with animated heat diffusion"></svg>
+    <div id="pl-fallback" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+         padding:22px;text-align:center;color:#6B5836;font-size:13.5px;line-height:1.65;background:var(--panel)">
+      <div><b style="color:#B5482A">Interactive heat-diffusion graph</b> &mdash; needs JavaScript and the D3 library to render.<br>
+      18 functions of the boss-bridge contract, coupled by the <b>storage they share</b> and the <b>modifiers that guard them</b>;
+      heat diffuses from a known bug and pools where held-out bugs tend to live.<br>
+      <b style="color:#B5482A">AUC 0.79</b> localizing held-out bugs vs <b>0.48</b> label-shuffle null, across 16 audited protocols / 5,030 functions.</div>
+    </div>
     <div class="eq">heat: solve&nbsp; <b>(I&nbsp;&minus;&nbsp;&alpha;A)&#8202;u&nbsp;=&nbsp;(1&minus;&alpha;)&#8202;s</b>
       &nbsp;·&nbsp; &part;u/&part;t&nbsp;=&nbsp;&minus;Lu &nbsp;·&nbsp; &alpha;&nbsp;=&nbsp;0.85</div>
   </div>
@@ -256,5 +268,8 @@
   for(var i=0;i<60;i++) sim.tick();
   sim.alpha(0.5).restart();
   setTimeout(function(){ animate(meta.seed_id); }, 350);
+
+  // d3 loaded and the graph initialized — drop the no-JS / CDN-blocked fallback overlay.
+  var _fb=document.getElementById('pl-fallback'); if(_fb) _fb.style.display='none';
 })();
 </script>
