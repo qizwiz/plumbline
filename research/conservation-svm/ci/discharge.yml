@@ -1,0 +1,73 @@
+# Conservation engine — discharge regression suite.
+#
+# SCAVENGED from qizwiz/dreusd-poc-validation/.github/workflows/validate-pocs.yml
+# (same skeleton: foundry-toolchain install -> fetch deps -> run checks gated on PASS/FAIL -> step summary).
+# Differences: runs the ENGINE's deterministic discrimination controls (not hand-written PoCs), adds halmos
+# as the discharge backend, and has NO daily cron (the dreusd-poc one failed daily for a week burning Actions
+# minutes on a doomed private clone — lesson learned: dispatch/push only).
+#
+# STATUS: DRAFT — untested in GitHub Actions (authored locally, the underlying halmos runs were verified
+# locally). Move to .github/workflows/ and watch the first run before trusting it.
+#
+# What it guards: the night's soundness proof — on real external bytecode (idle StakingRewards), the
+# auto-derived conservation invariant must CLEAR the sound contract and CATCH a one-line desync mutant.
+# A vacuous/broken engine would pass both (or fail both); this flip is the regression signal.
+
+name: conservation-engine discharge (regression)
+
+on:
+  workflow_dispatch:
+  push:
+    paths: ['research/conservation-svm/**']
+
+jobs:
+  discharge:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install halmos
+        run: pipx install halmos==0.3.3 || pip install halmos==0.3.3
+
+      - name: Fetch idle StakingRewards deps (OZ v4.5 — gitignored, regenerable)
+        working-directory: research/conservation-svm/discharge-idle
+        run: |
+          mkdir -p lib
+          curl -sSL https://github.com/OpenZeppelin/openzeppelin-contracts/archive/refs/tags/v4.5.0.tar.gz | tar xz -C lib
+          mv lib/openzeppelin-contracts-4.5.0 lib/openzeppelin-contracts
+
+      - name: Discharge — CLEAN StakingRewards must PASS (sound conservation, non-vacuous)
+        working-directory: research/conservation-svm/discharge-idle
+        run: |
+          halmos --function check_idleConservation --contract IdleConservation 2>&1 | tee /tmp/clean.log
+          grep -q '\[PASS\]' /tmp/clean.log
+
+      - name: Discharge — MUTANT must be CAUGHT (desync -> counterexample)
+        working-directory: research/conservation-svm/discharge-idle
+        run: |
+          halmos --function check_idleConservation --contract IdleConservationMutant 2>&1 | tee /tmp/mut.log
+          grep -q 'Counterexample' /tmp/mut.log   # catching the mutant is the PASS condition for this job
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Conservation engine — discharge regression"
+            echo ""
+            echo "Real external contract (idle \`StakingRewards\`), auto-derived conservation invariant:"
+            echo "- clean contract → must **PASS** (invariant proved, non-vacuous)"
+            echo "- one-line desync mutant → must be **CAUGHT** (counterexample)"
+            echo ""
+            echo "The PASS/CATCH flip is the soundness signal. A vacuous engine would pass both."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+# TODO next session (expand the matrix, mirroring validate-pocs.yml's 4-PoC structure):
+#  - add idiom #1 (dreUSD round-trip) + idiom #2 (MiniToken aggregate) controls as their own jobs
+#  - add the L2 discovery transfer as a SEPARATE, manually-triggered job (needs OPENROUTER secret + costs $;
+#    keep it out of the push-triggered deterministic suite)
+#  - parameterise into a matrix over targets: fetch-source -> conserve.py/discover.py -> halmos -> summary
