@@ -63,7 +63,7 @@ def run_verifier(tool: str, argv: list, cwd: str, parser: Parser, timeout: int =
         return ToolVerdict(tool, argv, cwd, -1, round(time.monotonic() - t0, 2),
                            "", str(e)[:200], TOOL_ERROR, evidence=str(e)[:120])
 
-    out = _ANSI.sub("", out)
+    out = _strip_noise(_ANSI.sub("", out))   # drop benign forge/halmos build warnings before hashing/excerpting
     wall = round(time.monotonic() - t0, 2)
     sha = hashlib.sha256(out.encode("utf-8", "replace")).hexdigest()[:16]
     verdict, evidence = parser(out, code)
@@ -75,6 +75,18 @@ def run_verifier(tool: str, argv: list, cwd: str, parser: Parser, timeout: int =
 
     return ToolVerdict(tool, argv, cwd, code, wall, sha,
                        _excerpt(out, evidence, excerpt_len), verdict, evidence)
+
+
+_NOISE = re.compile(r"No files changed|^\s*Warning:|AST source not found|Found unknown|"
+                    r"Compiler run successful|^\s*Warning \(\d|Unused (function parameter|local variable)|"
+                    r"forge-lint|unsafe-typecast")
+
+
+def _strip_noise(out: str) -> str:
+    """Drop benign forge/halmos build warnings so the stored excerpt + sha are the RESULT, not noise.
+    Never touches result/witness lines (Counterexample, [FAIL]/[PASS], `= 0x…`), so the soundness
+    firewall (`evidence in out`) still holds."""
+    return "\n".join(ln for ln in out.splitlines() if not _NOISE.search(ln))
 
 
 def _excerpt(out: str, evidence: Optional[str], n: int) -> str:
