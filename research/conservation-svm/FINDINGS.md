@@ -133,3 +133,29 @@ contract and watching it correctly DECLINE. NEXT RIGOR: point discover.py at idl
 external, already building) + diverse-family decline test + scale to a library from DHL.
 Repro: python research/conservation-svm/discover.py fixtures/MiniTokenBug.sol discovery/src/Vault.sol Vault
        then halmos --function check_invariant --contract DiscoveredTest (swap Vault.sol clean<->buggy)
+
+## Proposer-stage DISCRIMINATION control + a false-positive fix (2026-06-27)
+The precision-1.0-by-soundness claim has a hidden premise: the structural proposer must DECLINE
+where conservation is the wrong law. Every fixture so far was conservation-POSITIVE, so the decline
+half was never regression-guarded. Added the negative control (the $0, no-halmos, no-LLM half of the
+"transfer-to-access-control should DECLINE" test that FINDINGS above asked for):
+  - fixtures/AdminVault.sol      — admin contract; _mint, .transfer, transferFrom present but never
+                                    paired in one function. Must DECLINE.
+  - fixtures/AdminVaultBurn.sol  — same, plus an admin _burn. Must DECLINE.
+  - test_proposer_discrimination.py — asserts PROPOSE on CleanVault, DECLINE on both admin contracts.
+    Non-vacuous by construction (a stuck-yes detector fails the negatives, a stuck-no fails CleanVault).
+
+Building it caught a REAL soundness bug. The `functions()` regex `function ...\)[^{]*\{` jumped across
+`;`-terminated IERC20 interface method declarations and brace-matched the WHOLE contract interior under
+a phantom function named after the first interface method. On AdminVaultBurn that phantom fused
+transferFrom-in+_mint AND _burn+.transfer-out into a spurious inverse pair → conserve.py FALSE-PROPOSED
+`a transfer(x) -> transfer() round-trip must not return more rewardToken than x` on an admin-only
+contract. That is a precision-1.0 violation at the proposer stage (halmos would then vacuously pass or
+spuriously fail a meaningless property).
+
+FIX: tightened the gap class `[^{]*` -> `[^{};]*` in both conserve.py and conserve_agg.py so a
+`;`-terminated declaration can't match as a definition. After the fix: AdminVault/AdminVaultBurn DECLINE;
+CleanVault and dreUSDfixed still PROPOSE but now via their REAL `['mint','redeem']` (the phantom
+interface-method entries are gone — cleaner, same outcome). conserve_agg.py unchanged on MiniToken
+(no interface there) — fix is defensive parity.
+Repro: python research/conservation-svm/test_proposer_discrimination.py   (exit 0 = discrimination holds)

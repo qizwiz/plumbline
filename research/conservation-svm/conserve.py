@@ -27,9 +27,15 @@ def strip_comments(s):
     return s
 
 def functions(src):
-    """Return {name: body} for each external/public function."""
+    """Return {name: body} for each external/public function.
+
+    The gap between `)` and the opening `{` must contain no `;` or `}`: that excludes
+    `;`-terminated *declarations* (interface / abstract method signatures), which otherwise
+    get mis-matched as definitions whose brace-matched "body" is the whole contract interior
+    — a phantom function that fuses every in/out op into a spurious deposit/withdraw pair.
+    """
     out = {}
-    for m in re.finditer(r"function\s+(\w+)\s*\(([^)]*)\)[^{]*\{", src):
+    for m in re.finditer(r"function\s+(\w+)\s*\(([^)]*)\)[^{};]*\{", src):
         name, params = m.group(1), m.group(2)
         # brace-match the body
         i = m.end() - 1; depth = 0

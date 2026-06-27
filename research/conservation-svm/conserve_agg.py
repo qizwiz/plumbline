@@ -23,7 +23,9 @@ def strip(s):
 
 def funcs(src):
     out = {}
-    for m in re.finditer(r"function\s+(\w+)\s*\(([^)]*)\)[^{]*\{", src):
+    # `[^{};]*` (not `[^{]*`): excludes `;`-terminated interface/abstract method declarations,
+    # which otherwise mis-match as a definition whose "body" is the whole contract interior.
+    for m in re.finditer(r"function\s+(\w+)\s*\(([^)]*)\)[^{};]*\{", src):
         i = m.end() - 1; depth = 0
         for j in range(i, len(src)):
             if src[j] == "{": depth += 1
