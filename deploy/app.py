@@ -112,7 +112,12 @@ SPLASH_SVG = '''<svg width="100%" viewBox="0 0 680 392" role="img" xmlns="http:/
 
 
 _STREAM_API = "https://qizwiz--plumbline-live-web-stream.modal.run"
-_LIVE_BANNER = (
+# targets the live-halmos backend can run, and the confirmed-failing invariant for each.
+# A page gets a real run-button iff its target is here; everything else gets the link-note.
+LIVE_TARGETS = {"synthetic-dreusd": "check_redeemReturnsDeposit", "t-swap": "check_swapPreservesXYK"}
+
+def live_banner(target, inv):
+    return (
     "<div style='border:1px solid var(--accent);border-radius:8px;padding:0.85rem 1rem;"
     "margin:0 0 1.6rem;background:var(--bg-3)'>"
     "<b>Think the run below is canned?</b> It isn't — "
@@ -137,7 +142,7 @@ _LIVE_BANNER = (
     "(el>=8?' \\u2014 cold start, the container is booting\\u2026':'')+')';},420);"
     "var ac=new AbortController(),to=setTimeout(function(){ac.abort();},90000);"
     "try{"
-    "var resp=await fetch('" + _STREAM_API + "?inv=check_redeemReturnsDeposit',{signal:ac.signal});"
+    "var resp=await fetch('" + _STREAM_API + "?target=" + target + "&inv=" + inv + "',{signal:ac.signal});"
     "var rd=resp.body.getReader(),dec=new TextDecoder(),txt='';"
     "while(true){var x=await rd.read();if(x.done)break;"
     "if(!firstByte){firstByte=true;clearInterval(spin);o.textContent='';}"
@@ -328,7 +333,8 @@ def verification():
                    f"<code>(stdout, exit_code)</code>, and a CONFIRMED requires the witness to appear "
                    f"verbatim in stdout. Re-run any printed <code>$ halmos&nbsp;…</code> line for "
                    f"the same counterexample, bit for bit.</p>"
-                   + (_LIVE_BANNER if str(data.get("target_name")) == "synthetic-dreusd" else _LIVE_LINK_NOTE)
+                   + (live_banner(_tn, LIVE_TARGETS[_tn]) if (_tn := str(data.get("target_name"))) in LIVE_TARGETS
+                      else _LIVE_LINK_NOTE)
                    + _STRUCTURAL_MAP)
 
         def fmt_argv(argv):
