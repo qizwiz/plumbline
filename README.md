@@ -2,9 +2,9 @@
 
 [![ci](https://github.com/qizwiz/plumbline/actions/workflows/ci.yml/badge.svg)](https://github.com/qizwiz/plumbline/actions/workflows/ci.yml) &nbsp;·&nbsp; **[▶ Live demo](https://qizwiz--plumbline-verification-web.modal.run)** &nbsp;·&nbsp; [the math](https://qizwiz--plumbline-verification-web.modal.run/science)
 
-**plumbline is an autonomous multi-agent system that audits Solidity** — a team of specialist
-agents (solvency, precision, access-control) propose vulnerabilities in parallel, a router agent
-dispatches each finding to the formal verifier that can settle it, and a sound gate grades the
+**plumbline is a demonstration that an LLM-driven Solidity auditor can be made *sound*** — a team of
+specialist agents (solvency, precision, access-control) propose vulnerabilities in parallel, a router
+agent dispatches each finding to the formal verifier that can settle it, and a sound gate grades the
 result — one the agents *cannot fool*: they have no verdict field, and a finding is confirmed only
 when a real verifier subprocess emits a concrete counterexample whose witness appears verbatim in
 its output. The agents' creativity is unbounded;
@@ -14,6 +14,13 @@ its authority to declare truth is zero.
 > ships confident-but-wrong findings. plumbline replaces the model-as-judge with a *sound oracle*:
 > a finding survives only if a formal verifier produces a concrete counterexample or a
 > machine-checked proof.
+
+This is a demonstration of verification **rigor**, not a shipped bug-finder. Having an LLM propose an
+invariant and a sound verifier check it is an established line (PropertyGPT, SmartInv, Lemur, Aether) —
+what this repo shows is the *discipline* that makes the output trustworthy. The sharpest example is the
+**[conservation engine](research/conservation-svm/)**: it induces a conservation law from one bug, proves
+it on a real held-out contract with one-line-mutant discrimination, declines on off-family contracts, and
+— on its first real run — caught and **rejected its own vacuous PASS** rather than ship a false green.
 
 ---
 
