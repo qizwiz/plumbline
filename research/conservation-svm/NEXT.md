@@ -22,8 +22,12 @@ Ethos: **never false** — precision pinned at 1.0 by soundness; recall is the d
   ASTERISKS: (a) raw auto-emit was VACUOUS (mocked staking token but `_stake`/`withdraw` call `safeTransferFrom`
   unconditionally → all paths reverted) — soundness gate fired, fake PASS not counted, repaired harness-only
   with a MockERC20 (induced RULE + asserts preserved verbatim); the INDUCTION is sound, the EMIT path is the
-  weak link. (b) decline is SOFT — only reads correctly if the scorer enforces non-vacuity. (c) n=1 seed/target,
-  single LLM sample, mutation-not-wild-bug.
+  weak link. (b) decline is SOFT — only reads correctly if the scorer enforces non-vacuity. (c) DETERMINISM
+  shown: **4/4** inductions (3 re-samples + different seed AdminVaultBurn) produced the SAME law + correct
+  role-mapping, zero fabrications (discovery/resample/) → n=1-on-SAMPLE killed; n=1-on-TARGET (one real
+  held-out contract) remains; still mutation-not-wild-bug. (d) discover.py HARDCODES the bug-class hint
+  ("aggregate desync", line 29-30) — the model maps roles, a human named the class; fully-autonomous version
+  = derive the class from the seed's own halmos counterexample.
 
 ## The MAP (from the DeFiHackLabs density measurement, n=39)
 - The **proposer generalizes** (69% of real exploits have an extractable single-contract law, all families).
