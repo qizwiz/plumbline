@@ -13,6 +13,17 @@ Ethos: **never false** — precision pinned at 1.0 by soundness; recall is the d
   cleared its sound conservation + caught a 1-line mutation. (discharge-idle/, REPRO.md)
 - **L2 idiom DISCOVERY** (discover.py) — an LLM INDUCES the invariant class from one seed bug and
   TRANSFERS it to a different-surface held-out contract; halmos validates. No human writes the idiom.
+- **L2 HARDENED to real-external + decline control** (2026-06-27, adversarially re-verified). discover.py
+  induced a name-agnostic conservation law from MiniTokenBug and transferred it to held-out **StakingRewards**
+  (Synthetix/Idle): clean **[PASS] non-vacuous** (skeptic proved it with a false-assert probe: 2 real paths) +
+  **1-line-mutant Counterexample** (witness a=b=0x8000…), artifact `discharge-idle/test/Discovered.t.sol`.
+  Decline control on access-control **AdminVault** → **principled soft-decline** (engine recognized "no
+  conservation pair" in prose + emitted only an inert 0==0 test; halmos `paths:1/bounds:[]` confirms vacuity).
+  ASTERISKS: (a) raw auto-emit was VACUOUS (mocked staking token but `_stake`/`withdraw` call `safeTransferFrom`
+  unconditionally → all paths reverted) — soundness gate fired, fake PASS not counted, repaired harness-only
+  with a MockERC20 (induced RULE + asserts preserved verbatim); the INDUCTION is sound, the EMIT path is the
+  weak link. (b) decline is SOFT — only reads correctly if the scorer enforces non-vacuity. (c) n=1 seed/target,
+  single LLM sample, mutation-not-wild-bug.
 
 ## The MAP (from the DeFiHackLabs density measurement, n=39)
 - The **proposer generalizes** (69% of real exploits have an extractable single-contract law, all families).
@@ -23,13 +34,17 @@ Ethos: **never false** — precision pinned at 1.0 by soundness; recall is the d
   (~5% dischargeable, ~20% with Etherscan source-harvest).
 
 ## NEXT MOVES (ranked)
-1. **FIRST: real-external idiom transfer.** Point discover.py at idle StakingRewards (real, already
-   building in discharge-idle/) — induce from MiniToken, transfer to real bytecode, halmos-validate.
-   Hardens L2 from contrived held-out → real external.
-2. **Diverse-family decline test.** Transfer a CONSERVATION idiom to an ACCESS-CONTROL contract; the
-   engine should correctly DECLINE. Proves the seed is load-bearing + idioms are family-specific (kills
-   the "the model would induce it anyway" objection).
-3. **Swap regex → Slither** in conserve.py/conserve_agg.py (`all_state_variables_written()`) — collapses
+✅ DONE 2026-06-27: (1) real-external idiom transfer to StakingRewards + (2) diverse-family decline on
+AdminVault — both adversarially verified (see "What's PROVEN"). New top moves, surfaced by that pass:
+1. **FIRST: harden discover.py's EMIT PATH** so raw emissions are non-vacuous *by construction*. The
+   induction is sound but the auto-emitted harness reverted-all-paths (didn't mock the unconditional
+   `safeTransferFrom`/`safeTransfer` the staked contract calls). Auto-detect external token calls and emit a
+   MockERC20 (mint+approve) by default — kill the manual-repair step that this pass needed.
+2. **Enforce the non-vacuity scoring rule** end-to-end: a halmos `[PASS]` counts ONLY if `paths>1` and the
+   symbolic inputs actually constrain state. Without this the soft-decline (move #2) mis-reads as a success.
+3. **Second seed+target pair** to kill n=1: show the transfer AND the decline aren't one lucky LLM sample
+   (re-sample; different seed family; different real held-out contract).
+4. **Swap regex → Slither** in conserve.py/conserve_agg.py (`all_state_variables_written()`) — collapses
    the 75% parse-stage declines; Slither proven working via foundry build.
 4. **Harvest source-blocked single-contract DHL bugs from Etherscan** (Shadowfi/NovaExchange/Compound) →
    the first REAL un-mutated external catch (the genuinely-special milestone).
