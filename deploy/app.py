@@ -68,6 +68,15 @@ def vstyle(v):
     if v.startswith("ESCALATED"): return "var(--yel)", "⊘ ESCALATED — human review"
     return "var(--fg-dim)", html.escape(v)
 
+def sevcolor(sev):
+    """Pill color tracks SEVERITY (a fixed scale), not the verdict — the verdict is carried by
+    the card's left border + the ✗/⊘ line. Keeps CRIT visually loud and LOW quiet, regardless
+    of whether the gate confirmed or escalated it."""
+    s = str(sev).upper()
+    if s in ("CRIT", "CRITICAL", "HIGH"): return "var(--red)"
+    if s in ("MED", "MEDIUM"): return "var(--yel)"
+    return "var(--fg-dim)"
+
 SPLASH_SVG = '''<svg width="100%" viewBox="0 0 680 392" role="img" xmlns="http://www.w3.org/2000/svg" style="display:block">
 <title>plumbline</title><desc>An Egyptian wall scene: workers haul a stone block toward a pyramid while a plumb-line level swings and settles to true vertical; cartouches morph between glyphs and Ethereum hex. Title: plumbline, true by construction.</desc>
 <rect x="0" y="0" width="680" height="392" fill="#E4D3AC"/>
@@ -126,11 +135,12 @@ def live_banner(target, inv):
     "font-family:inherit;font-size:0.82rem'>&#9654; run halmos live in the cloud</button>"
     "<div style='font-size:0.74rem;color:var(--fg-dim);margin-top:0.4rem'>streams a REAL Modal "
     "container compiling the contract and running symbolic execution, line by line as it happens. "
-    "<b>First run cold-starts a container (~15\\u201330s); re-runs take ~4s.</b> "
-    "Run it twice \\u2014 the witness variable is freshly minted each time.</div>"
+    "<b>First run cold-starts a container (~15&#8211;30s); re-runs take ~4s.</b> "
+    "Run it twice &#8212; the witness variable is freshly minted each time.</div>"
     "<div id='liveOut' style='display:none;background:#0b0e14;border:1px solid var(--bdr);"
     "border-radius:6px;padding:0.6rem 0.8rem;margin-top:0.6rem;font-family:ui-monospace,monospace;"
-    "font-size:0.76rem;white-space:pre-wrap;max-height:320px;overflow:auto;color:#C9B98F'></div></div>"
+    "font-size:0.76rem;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;"
+    "max-height:320px;overflow:auto;color:#C9B98F'></div></div>"
     "<script>"
     "async function runLive(){"
     "var b=document.getElementById('liveBtn'),o=document.getElementById('liveOut');"
@@ -319,9 +329,17 @@ def verification():
                    f"<div class='stat'><div class='label'>target · recorded agent run</div>"
                    f"<div class='value' style='font-size:1.15rem'>{tgt}</div><div class='sub'>{model}</div></div>"
                    f"<div class='stat'><div class='label'>confirmed (target-bound)</div>"
-                   f"<div class='value' style='color:var(--red)'>{nconf3}</div><div class='sub'>replayable witness</div></div>"
+                   f"<div class='value' style='color:{'var(--fg-dim)' if nconf3==0 else 'var(--red)'}'>{nconf3}</div>"
+                   f"<div class='sub'>{'none machine-bound here' if nconf3==0 else 'replayable witness'}</div></div>"
                    f"<div class='stat'><div class='label'>escalated</div>"
                    f"<div class='value' style='color:var(--yel)'>{nesc3}</div><div class='sub'>to human review</div></div></div>"
+                   + (f"<p class='muted-er' style='font-size:.79rem;margin:.1rem 0 1rem;line-height:1.55;"
+                      f"border-left:2px solid var(--yel);padding-left:.7rem'>"
+                      f"<b>0 confirmed here is the honest verdict, not a miss.</b> Every finding on "
+                      f"<code>{tgt}</code> was correctly <b>escalated</b> to human review — no machine-checkable "
+                      f"proof bound it to this contract's bytecode, so the gate refused to mint a CONFIRMED it "
+                      f"can't replay. A confirmed (red) only appears when a tool produces a witness that "
+                      f"reproduces bit-for-bit.</p>" if nconf3 == 0 else "")
                    + agent_panel +
                    f"<p class='muted' style='font-size:.82rem;margin:.2rem 0 .5rem'>"
                    f"tools the agent actually invoked this run: {chips}</p>"
@@ -347,21 +365,30 @@ def verification():
             route = f.get("route", {})
             tool = html.escape(str(route.get("chosen_tool", "none")))
             bug = html.escape(str(f.get("bug_class", "")))
+            bound = v.get("bound")
             term = ""
             for s in v.get("steps", []):
                 ex = html.escape(str(s.get("stdout_excerpt", "")).strip())
+                # A non-target-bound z3 step discharges a stock obligation for the bug CLASS (its
+                # witness variables aren't this contract's). Say so in the terminal, not just below it,
+                # so an FV reader never mistakes a class-level fact for a contract-derived counterexample.
+                cap = ("<div style='color:#C98A3B;font-size:.72rem;margin:0 0 .35rem;font-style:italic'>"
+                       "▸ representative obligation for the bug <i>class</i> (integer truncation) — "
+                       "not extracted from this contract&#39;s bytecode; that is why it is escalated, "
+                       "not confirmed.</div>" if (not bound and "z3" in tool) else "")
                 term += ("<div style='background:#14100A;border:1px solid #3A2E18;border-radius:6px;"
                          "padding:.6rem .8rem;margin:.55rem 0;font-family:ui-monospace,monospace;"
                          "font-size:.78rem;overflow-x:auto'>"
+                         + cap +
                          f"<div style='color:#E0A93B'>$ {html.escape(fmt_argv(s.get('argv', [])))}</div>"
-                         f"<pre style='margin:.4rem 0 0;white-space:pre-wrap;color:#C9B98F'>{ex}</pre>"
+                         f"<pre style='margin:.4rem 0 0;white-space:pre-wrap;overflow-wrap:anywhere;"
+                         f"word-break:break-word;color:#C9B98F'>{ex}</pre>"
                          f"<div style='font-size:.7rem;margin-top:.4rem;color:#9A864E'>"
                          f"exit {s.get('exit_code')} · {s.get('wall_s')}s · sha256:{html.escape(str(s.get('stdout_sha256','')))}</div></div>")
             if not v.get("steps"):
                 term = ("<div class='muted' style='font-size:.8rem;margin:.55rem 0;font-style:italic'>"
                         "no formal tool dispatched — the agent found no verifier that could soundly "
                         "settle this claim</div>")
-            bound = v.get("bound")
             boundtxt = ("bound to this target's bytecode" if bound
                         else "representative obligation — not target-bound" if v.get("steps") else "—")
             note = (f"<div class='muted' style='font-size:.78rem;margin-top:.4rem'>{html.escape(str(v.get('note')))}</div>"
@@ -370,7 +397,7 @@ def verification():
             pbtxt = ("found by " + ", ".join(f"<b style='color:var(--accent)'>{html.escape(str(a))}</b>" for a in pb)
                      if pb else "claim by proposer")
             cards += (f"<div class='stat' style='border-left:3px solid {color};margin-bottom:1.3rem;padding:1rem 1.1rem'>"
-                      f"<div><span class='pill' style='background:{color}'>{html.escape(str(f.get('severity','?')))}</span> "
+                      f"<div><span class='pill' style='background:{sevcolor(f.get('severity','?'))}'>{html.escape(str(f.get('severity','?')))}</span> "
                       f"<code style='font-size:.95rem'>{html.escape(str(f.get('function','?')))}</code> "
                       f"<span class='muted-er' style='font-size:.7rem'>· {pbtxt}</span></div>"
                       f"<div style='margin:.55rem 0 .85rem;line-height:1.55'>{html.escape(str(f.get('claim','')))}</div>"
@@ -410,7 +437,7 @@ def verification():
         wit = (f"<div style='margin-top:.5rem'><span class='muted'>counterexample&nbsp;</span>"
                f"<code style='color:{color}'>{html.escape(str(cex))}</code></div>") if cex else ""
         cards += (f"<div class='stat' style='border-left:3px solid {color};margin-bottom:.8rem'>"
-                  f"<div><span class='pill' style='background:{color}'>{html.escape(str(f.get('severity','?')))}</span> "
+                  f"<div><span class='pill' style='background:{sevcolor(f.get('severity','?'))}'>{html.escape(str(f.get('severity','?')))}</span> "
                   f"<code style='font-size:.95rem'>{html.escape(str(f.get('function','?')))}</code></div>"
                   f"<div style='margin:.55rem 0'>{html.escape(str(f.get('desc','')))}</div>"
                   f"<div class='muted' style='font-size:.8rem'>gate&nbsp;→&nbsp;<b style='color:{color}'>{tag}</b>{inv}</div>{wit}</div>")
